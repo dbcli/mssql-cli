@@ -1,0 +1,2 @@
+# baseline files need to retain crlf for cross plat tests that simulate sql tools service response
+*.txt text eol=crlf
