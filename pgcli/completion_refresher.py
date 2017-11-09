@@ -1,9 +1,10 @@
+import logging
 import threading
-import os
-from collections import OrderedDict
 
+from collections import OrderedDict
 from .pgcompleter import PGCompleter
-from .pgexecute import PGExecute
+
+logger = logging.getLogger(u'mssqlcli.completion_refresher')
 
 
 class CompletionRefresher(object):
@@ -14,8 +15,8 @@ class CompletionRefresher(object):
         self._completer_thread = None
         self._restart_refresh = threading.Event()
 
-    def refresh(self, executor, special, callbacks, history=None,
-      settings=None):
+    def refresh(self, mssqcliclient, special, callbacks, history=None,
+                settings=None):
         """
         Creates a PGCompleter object and populates it with the relevant
         completion suggestions in a background thread.
@@ -34,7 +35,7 @@ class CompletionRefresher(object):
         else:
             self._completer_thread = threading.Thread(
                 target=self._bg_refresh,
-                args=(executor, special, callbacks, history, settings),
+                args=(mssqcliclient, special, callbacks, history, settings),
                 name='completion_refresh')
             self._completer_thread.setDaemon(True)
             self._completer_thread.start()
@@ -44,21 +45,14 @@ class CompletionRefresher(object):
     def is_refreshing(self):
         return self._completer_thread and self._completer_thread.is_alive()
 
-    def _bg_refresh(self, pgexecute, special, callbacks, history=None,
-      settings=None):
+    def _bg_refresh(self, mssqlcliclient, special, callbacks, history=None,
+                    settings=None):
         settings = settings or {}
         completer = PGCompleter(smart_completion=True, pgspecial=special,
             settings=settings)
 
-        if settings.get('single_connection'):
-            executor = pgexecute
-        else:
-            # Create a new pgexecute method to popoulate the completions.
-            e = pgexecute
-            executor = PGExecute(
-                e.dbname, e.user, e.password, e.host, e.port, e.dsn,
-                **e.extra_args)
-
+        executor = mssqlcliclient
+        executor.connect()
         # If callbacks is a single function then push it into a list.
         if callable(callbacks):
             callbacks = [callbacks]
@@ -99,48 +93,33 @@ def refresher(name, refreshers=CompletionRefresher.refreshers):
 
 
 @refresher('schemata')
-def refresh_schemata(completer, executor):
-    completer.set_search_path(executor.search_path())
-    completer.extend_schemata(executor.schemata())
+def refresh_schemata(completer, mssqlcliclient):
+    completer.extend_schemata(mssqlcliclient.schemas())
 
 
 @refresher('tables')
-def refresh_tables(completer, executor):
-    completer.extend_relations(executor.tables(), kind='tables')
-    completer.extend_columns(executor.table_columns(), kind='tables')
-    completer.extend_foreignkeys(executor.foreignkeys())
+def refresh_tables(completer, mssqlcliclient):
+    completer.extend_relations(mssqlcliclient.tables(), kind='tables')
+    completer.extend_columns(mssqlcliclient.table_columns(), kind='tables')
+    completer.extend_foreignkeys(mssqlcliclient.foreignkeys())
 
 
 @refresher('views')
-def refresh_views(completer, executor):
-    completer.extend_relations(executor.views(), kind='views')
-    completer.extend_columns(executor.view_columns(), kind='views')
-
-@refresher('types')
-def refresh_types(completer, executor):
-    completer.extend_datatypes(executor.datatypes())
+def refresh_views(completer, mssqlcliclient):
+    completer.extend_relations(mssqlcliclient.views(), kind='views')
+    completer.extend_columns(mssqlcliclient.view_columns(), kind='views')
 
 
 @refresher('databases')
-def refresh_databases(completer, executor):
-    completer.extend_database_names(executor.databases())
+def refresh_databases(completer, mssqlcliclient):
+    completer.extend_database_names(mssqlcliclient.databases())
 
 
-@refresher('casing')
-def refresh_casing(completer, executor):
-    casing_file = completer.casing_file
-    if not casing_file:
-        return
-    generate_casing_file = completer.generate_casing_file
-    if generate_casing_file and not os.path.isfile(casing_file):
-        casing_prefs = '\n'.join(executor.casing())
-        with open(casing_file, 'w') as f:
-            f.write(casing_prefs)
-    if os.path.isfile(casing_file):
-        with open(casing_file, 'r') as f:
-            completer.extend_casing([line.strip() for line in f])
+@refresher('types')
+def refresh_types(completer, mssqlcliclient):
+    completer.extend_datatypes(mssqlcliclient.user_defined_types())
 
 
-@refresher('functions')
-def refresh_functions(completer, executor):
-    completer.extend_functions(executor.functions())
+#@refresher('functions')
+#def refresh_functions(completer, executor):
+#    completer.extend_functions(executor.functions())

@@ -52,6 +52,7 @@ arg_default_type_strip_regex = re.compile(r'::[\w\.]+(\[\])?$')
 
 normalize_ref = lambda ref: ref if ref[0] == '"' else '"' + ref.lower() +  '"'
 
+
 def generate_alias(tbl):
     """ Generate a table alias, consisting of all upper-case letters in
     the table name, or, if there are no upper-case letters, the first letter +
@@ -202,13 +203,13 @@ class PGCompleter(Completer):
 
         """
         metadata = self.dbmetadata[kind]
-        for schema, relname, colname, datatype, has_default, default in column_data:
+        for schema, relname, colname, datatype, default in column_data:
             (schema, relname, colname) = self.escaped_names(
                 [schema, relname, colname])
             column = ColumnMetadata(
                 name=colname,
                 datatype=datatype,
-                has_default=has_default,
+                has_default=default,
                 default=default
             )
             metadata[schema][relname][colname] = column

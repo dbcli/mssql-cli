@@ -1,7 +1,24 @@
-pytest>=2.7.0
-mock>=1.0.1
-tox>=1.9.2
-behave>=1.2.4
-pexpect==3.3
-coverage==4.3.4
-pep8radius
+enum34 >= 1.1.6
+future >= 0.16.0
+setuptools >= 36.0.1
+requests >= 2.13.0
+wheel >= 0.29.0
+coverage >= 4.3.4
+twine >= 1.8.1
+bumpversion >= 0.5.3 
+tox >= 2.7.0
+flake8 >= 3.3.0
+pytest >= 3.0.7
+pytest-cov >= 2.5.1
+readme_renderer >= 17.2
+docutils >= 0.13.1
+azure-storage >= 0.33.0
+pgspecial>=1.8.0
+click >= 4.1
+Pygments >= 2.0
+prompt_toolkit>=1.0.10,<1.1.0
+psycopg2 >= 2.5.4
+sqlparse >=0.2.2,<0.3.0
+configobj >= 5.0.6
+humanize >= 0.5.1
+cli_helpers >= 0.2.3, < 1.0.0
