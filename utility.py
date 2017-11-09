@@ -25,7 +25,7 @@ def exec_command(command, directory, continue_on_error=True):
             pass
 
 
-def cleaun_up_egg_info_sub_directories(directory):
+def clean_up_egg_info_sub_directories(directory):
     for f in os.listdir(directory):
         if f.endswith(".egg-info"):
             clean_up(os.path.join(directory, f))
