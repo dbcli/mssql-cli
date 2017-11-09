@@ -1,6 +1,19 @@
 Upcoming
 ========
 
+TODO
+
+1.8.1
+=====
+
+Internal changes:
+-----------------
+* Remove shebang and git execute permission from pgcli/main.py. (Thanks: `Dick Marinus`_)
+* Require cli_helpers 0.2.3 (fix #791). (Thanks: `Dick Marinus`_)
+
+1.8.0
+=====
+
 Features:
 ---------
 
@@ -15,6 +28,8 @@ Internal changes:
 * Preliminary work for a future change in outputting results that uses less memory. (Thanks: `Dick Marinus`_)
 * Remove import workaround for OrderedDict, required for python < 2.7. (Thanks: `Andrew Speed`_)
 * Use less memory when formatting results for display (Thanks: `Dick Marinus`_).
+* Port auto_vertical feature test from mycli to pgcli. (Thanks: `Dick Marinus`_)
+* Drop wcwidth dependency (Thanks: `Dick Marinus`_)
 
 Bug Fixes:
 ----------
