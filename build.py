@@ -21,7 +21,7 @@ def build():
 
     # clean
     utility.clean_up(utility.MSSQLCLI_DIST_DIRECTORY)
-    utility.cleaun_up_egg_info_sub_directories(utility.ROOT_DIR)
+    utility.clean_up_egg_info_sub_directories(utility.ROOT_DIR)
 
     print_heading('Running setup')
 
