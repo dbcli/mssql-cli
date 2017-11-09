@@ -191,7 +191,7 @@ def test_multiple_queries_with_special_command_same_line(executor, pgspecial):
     result = run(executor, "select 'foo'; \d", pgspecial=pgspecial)
     assert len(result) == 11  # 2 * (output+status) * 3 lines
     assert "foo" in result[3]
-    # This is a lame check. :(
+    # This is an inadequate check. :(
     assert "Schema" in result[7]
 
 
