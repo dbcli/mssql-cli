@@ -247,6 +247,7 @@
     "GOTO": [],
     "GRANT": [],
     "GROUP": [],
+    "GROUP BY": [],
     "HAVING": [],
     "HOLDLOCK": [],
     "IDENTITY": [],
