@@ -110,7 +110,7 @@ def test_format_array_output_expanded():
             '-[ RECORD 3 ]-------------------------',
             'Name | Night',
             '(3 rows affected)'
-        ]
+            ]
         assert list(results) == expected
     finally:
         shutdown(client)
