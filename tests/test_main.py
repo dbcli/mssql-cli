@@ -2,9 +2,6 @@
 from __future__ import unicode_literals
 import os
 import platform
-import mock
-from decimal import Decimal
-from time import sleep
 from mssqlutils import create_mssql_cli_client, shutdown, run_and_return_string_from_formatter
 
 import pytest
@@ -17,7 +14,6 @@ except ImportError:
 from pgcli.main import (
     obfuscate_process_password, format_output, PGCli, OutputSettings
 )
-from utils import dbtest, run
 
 
 @pytest.mark.skipif(platform.system() == 'Windows',
@@ -96,31 +92,30 @@ def test_format_array_output():
         shutdown(client)
 
 
-#
-# def test_format_array_output_expanded(executor):
-#     statement = u"""
-#     SELECT
-#         array[1, 2, 3]::bigint[] as bigint_array,
-#         '{{1,2},{3,4}}'::numeric[] as nested_numeric_array,
-#         '{å,魚,текст}'::text[] as 配列
-#     UNION ALL
-#     SELECT '{}', NULL, array[NULL]
-#     """
-#     results = run(executor, statement, expanded=True)
-#     expected = [
-#         '-[ RECORD 1 ]-------------------------',
-#         'bigint_array         | {1,2,3}',
-#         'nested_numeric_array | {{1,2},{3,4}}',
-#         '配列                   | {å,魚,текст}',
-#         '-[ RECORD 2 ]-------------------------',
-#         'bigint_array         | {}',
-#         'nested_numeric_array | <null>',
-#         '配列                   | {<null>}',
-#         'SELECT 2'
-#     ]
-#     assert list(results) == expected
-#
-#
+# Runs against AdventureWorks2014 database in SQL Server
+def test_format_array_output_expanded():
+    statement = u"""
+    SELECT Name from HumanResources.Shift
+    """
+
+    try:
+        client = create_mssql_cli_client()
+        results = run_and_return_string_from_formatter(client, statement, expanded=True)
+
+        expected = [
+            '-[ RECORD 1 ]-------------------------',
+            'Name | Day',
+            '-[ RECORD 2 ]-------------------------',
+            'Name | Evening',
+            '-[ RECORD 3 ]-------------------------',
+            'Name | Night',
+            '(3 rows affected)'
+        ]
+        assert list(results) == expected
+    finally:
+        shutdown(client)
+
+
 def test_format_output_auto_expand():
     settings = OutputSettings(
         table_format='psql', dcmlfmt='d', floatfmt='g', max_width=100)
@@ -152,61 +147,26 @@ def test_format_output_auto_expand():
     ]
     assert list(expanded_results) == expanded
 
-#
-# @dbtest
-# def test_i_works(tmpdir, executor):
-#     sqlfile = tmpdir.join("test.sql")
-#     sqlfile.write("SELECT NOW()")
-#     rcfile = str(tmpdir.join("rcfile"))
-#     cli = PGCli(
-#         pgexecute=executor,
-#         pgclirc_file=rcfile,
-#     )
-#     statement = r"\i {0}".format(sqlfile)
-#     run(executor, statement, pgspecial=cli.pgspecial)
-#
-#
-# def test_missing_rc_dir(tmpdir):
-#     rcfile = str(tmpdir.join("subdir").join("rcfile"))
-#
-#     PGCli(pgclirc_file=rcfile)
-#     assert os.path.exists(rcfile)
-#
-#
-# def test_quoted_db_uri(tmpdir):
-#     with mock.patch.object(PGCli, 'connect') as mock_connect:
-#         cli = PGCli(pgclirc_file=str(tmpdir.join("rcfile")))
-#         cli.connect_uri('postgres://bar%5E:%5Dfoo@baz.com/testdb%5B')
-#     mock_connect.assert_called_with(database='testdb[',
-#                                     port=None,
-#                                     host='baz.com',
-#                                     user='bar^',
-#                                     passwd=']foo')
-#
-#
-# def test_ssl_db_uri(tmpdir):
-#     with mock.patch.object(PGCli, 'connect') as mock_connect:
-#         cli = PGCli(pgclirc_file=str(tmpdir.join("rcfile")))
-#         cli.connect_uri(
-#             'postgres://bar%5E:%5Dfoo@baz.com/testdb%5B?'
-#             'sslmode=verify-full&sslcert=m%79.pem&sslkey=my-key.pem&sslrootcert=c%61.pem')
-#     mock_connect.assert_called_with(database='testdb[',
-#                                     host='baz.com',
-#                                     port=None,
-#                                     user='bar^',
-#                                     passwd=']foo',
-#                                     sslmode='verify-full',
-#                                     sslcert='my.pem',
-#                                     sslkey='my-key.pem',
-#                                     sslrootcert='ca.pem')
-#
-#
-# def test_port_db_uri(tmpdir):
-#     with mock.patch.object(PGCli, 'connect') as mock_connect:
-#         cli = PGCli(pgclirc_file=str(tmpdir.join("rcfile")))
-#         cli.connect_uri('postgres://bar:foo@baz.com:2543/testdb')
-#     mock_connect.assert_called_with(database='testdb',
-#                                     host='baz.com',
-#                                     user='bar',
-#                                     passwd='foo',
-#                                     port='2543')
+
+# Special commands not supported in Mssql-cli as of Public Preview.
+# Tracked via github issue.
+"""
+@dbtest
+def test_i_works(tmpdir, executor):
+    sqlfile = tmpdir.join("test.sql")
+    sqlfile.write("SELECT NOW()")
+    rcfile = str(tmpdir.join("rcfile"))
+    cli = PGCli(
+        pgexecute=executor,
+        pgclirc_file=rcfile,
+    )
+    statement = r"\i {0}".format(sqlfile)
+    run(executor, statement, pgspecial=cli.pgspecial)
+"""
+
+
+def test_missing_rc_dir(tmpdir):
+    rcfile = str(tmpdir.join("subdir").join("rcfile"))
+
+    PGCli(pgclirc_file=rcfile)
+    assert os.path.exists(rcfile)
