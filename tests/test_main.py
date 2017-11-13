@@ -5,7 +5,6 @@ import platform
 from mssqlutils import create_mssql_cli_client, shutdown, run_and_return_string_from_formatter
 
 import pytest
-
 try:
     import setproctitle
 except ImportError:
@@ -76,7 +75,7 @@ def test_format_array_output():
     """
     try:
         client = create_mssql_cli_client()
-        results = run_and_return_string_from_formatter(client, statement)
+        result = run_and_return_string_from_formatter(client, statement)
         expected = [
             '+-----------+---------+',
             '| ShiftID   | Name    |',
@@ -87,7 +86,7 @@ def test_format_array_output():
             '+-----------+---------+',
             '(3 rows affected)'
         ]
-        assert list(results) == expected
+        assert list(result) == expected
     finally:
         shutdown(client)
 
@@ -100,7 +99,7 @@ def test_format_array_output_expanded():
 
     try:
         client = create_mssql_cli_client()
-        results = run_and_return_string_from_formatter(client, statement, expanded=True)
+        result = run_and_return_string_from_formatter(client, statement, expanded=True)
 
         expected = [
             '-[ RECORD 1 ]-------------------------',
@@ -111,7 +110,7 @@ def test_format_array_output_expanded():
             'Name | Night',
             '(3 rows affected)'
             ]
-        assert list(results) == expected
+        assert list(result) == expected
     finally:
         shutdown(client)
 
@@ -166,7 +165,9 @@ def test_i_works(tmpdir, executor):
 
 
 def test_missing_rc_dir(tmpdir):
-    rcfile = str(tmpdir.join("subdir").join("rcfile"))
-
-    PGCli(pgclirc_file=rcfile)
-    assert os.path.exists(rcfile)
+    try:
+        rcfile = str(tmpdir.join("subdir").join("rcfile"))
+        pgcli = PGCli(pgclirc_file=rcfile)
+        assert os.path.exists(rcfile)
+    finally:
+        pgcli.sqltoolsclient.shutdown()
