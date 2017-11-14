@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import os
 import platform
 from mssqlutils import create_mssql_cli_client, shutdown, run_and_return_string_from_formatter
+from time import sleep
 
 import pytest
 try:
@@ -65,36 +66,36 @@ def test_format_output():
     assert list(results) == expected
 
 
-# Runs against an AdventureWorks2014 database in SQL Server
-def test_format_array_output():
+def test_format_output_live_connection():
+    sleep(7)
     statement = u"""
-    SELECT
-        ShiftID, Name
-    from
-    HumanResources.Shift
+        select 1 as [ShiftID], 'Day' as [Name] UNION ALL
+        select 2, N'魚' UNION ALL
+        select 3, 'Night'
     """
     try:
         client = create_mssql_cli_client()
         result = run_and_return_string_from_formatter(client, statement)
         expected = [
-            '+-----------+---------+',
-            '| ShiftID   | Name    |',
-            '|-----------+---------|',
-            '| 1         | Day     |',
-            '| 2         | Evening |',
-            '| 3         | Night   |',
-            '+-----------+---------+',
-            '(3 rows affected)'
+            u'+-----------+--------+',
+            u'| ShiftID   | Name   |',
+            u'|-----------+--------|',
+            u'| 1         | Day    |',
+            u'| 2         | 魚     |',
+            u'| 3         | Night  |',
+            u'+-----------+--------+',
+            u'(3 rows affected)'
         ]
         assert list(result) == expected
     finally:
         shutdown(client)
 
 
-# Runs against AdventureWorks2014 database in SQL Server
-def test_format_array_output_expanded():
+def test_format_output_expanded_live_connection():
     statement = u"""
-    SELECT Name from HumanResources.Shift
+        select N'配列' as [Name] UNION ALL
+        select 'Evening' UNION ALL
+        select 'Night'
     """
 
     try:
@@ -103,7 +104,7 @@ def test_format_array_output_expanded():
 
         expected = [
             '-[ RECORD 1 ]-------------------------',
-            'Name | Day',
+            'Name | 配列',
             '-[ RECORD 2 ]-------------------------',
             'Name | Evening',
             '-[ RECORD 3 ]-------------------------',
