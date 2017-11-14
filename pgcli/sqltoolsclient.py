@@ -9,7 +9,7 @@ import io
 import time
 import sys
 
-import mssqltoolsservice
+import pgcli.mssqltoolsservice as mssqltoolsservice
 import pgcli.jsonrpc.jsonrpcclient as json_rpc_client
 import pgcli.jsonrpc.contracts.connectionservice as connection
 import pgcli.jsonrpc.contracts.queryexecutestringservice as query

@@ -3,9 +3,9 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------
-import subprocess
-import mssqltoolsservice
 import io
+import subprocess
+import pgcli.mssqltoolsservice as mssqltoolsservice
 import pgcli.jsonrpc.jsonrpcclient as json_rpc_client
 import time
 
