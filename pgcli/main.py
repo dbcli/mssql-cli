@@ -43,7 +43,6 @@ import pgspecial as special
 from .pgcompleter import PGCompleter
 from .pgtoolbar import create_toolbar_tokens_func
 from .pgstyle import style_factory
-from .pgexecute import PGExecute
 from .pgbuffer import PGBuffer
 from .completion_refresher import CompletionRefresher
 from .config import (get_casing_file,
@@ -124,12 +123,11 @@ class PGCli(object):
 
     # mssql-cli
     def __init__(self, force_passwd_prompt=False,
-                 pgexecute=None, pgclirc_file=None, row_limit=None,
+                 pgclirc_file=None, row_limit=None,
                  single_connection=False, less_chatty=None, prompt=None,
                  auto_vertical_output=False, sql_tools_client=None, integrated_auth=False):
 
         self.force_passwd_prompt = force_passwd_prompt
-        self.pgexecute = pgexecute
 
         # Load config.
         c = self.config = get_config(pgclirc_file)
@@ -209,7 +207,10 @@ class PGCli(object):
             self.sqltoolsclient.shutdown()
 
     def register_special_commands(self):
-
+        # Special commands not supported in mssql-cli right now.
+        # Tracked by Github issue
+        pass
+        """
         self.pgspecial.register(
             self.change_db, '\\c', '\\c[onnect] database_name',
             'Change to a new database.', aliases=('use', '\\connect', 'USE'))
@@ -275,6 +276,7 @@ class PGCli(object):
         return self.pgexecute.run(
             query, self.pgspecial, on_error_resume=on_error_resume
         )
+    """
 
     def write_to_file(self, pattern, **_):
         if not pattern:
@@ -503,6 +505,9 @@ class PGCli(object):
                 self.refresh_completions(persist_priorities='keywords')
             elif query.meta_changed:
                 self.refresh_completions(persist_priorities='all')
+            # Mssql-cli need to investigate if this is required. Currently not implemented.
+            # Tracked by Github issue
+            """
             elif query.path_changed:
                 logger.debug('Refreshing search path')
                 with self._completer_lock:
@@ -510,6 +515,7 @@ class PGCli(object):
                         self.pgexecute.search_path())
                 logger.debug('Search path: %r',
                              self.completer.search_path)
+            """
         return query
 
     def run_cli(self):
@@ -534,9 +540,9 @@ class PGCli(object):
             while True:
                 document = self.cli.run()
 
-                # The reason we check here instead of inside the pgexecute is
+                # The reason we check here instead of inside the mssqlcliclient is
                 # because we want to raise the Exit exception which will be
-                # caught by the try/except block that wraps the pgexecute.run()
+                # caught by the try/except block that wraps the mssqlcliclient execute
                 # statement.
                 if quit_command(document.text):
                     raise EOFError
@@ -920,7 +926,9 @@ def cli(database, username_opt, host, prompt_passwd,
     else:
         pgcli.connect(database, host, user, port='')
 
-    #mssql-cli list_databases not yet supported
+    # mssql-cli list_databases not yet supported
+    # Tracked by Github issue
+    """
     list_databases = None
     if list_databases:
         cur, headers, status = pgcli.pgexecute.full_databases()
@@ -934,6 +942,7 @@ def cli(database, username_opt, host, prompt_passwd,
         click.echo_via_pager('\n'.join(formatted))
 
         sys.exit(0)
+    """
 
     pgcli.logger.debug('Launch Params: \n'
             '\tdatabase: %r'
