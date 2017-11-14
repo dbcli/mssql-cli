@@ -129,7 +129,8 @@ def unit_test():
     Run all unit tests.
     """
     utility.exec_command(
-        'pytest --cov pgcli tests/test_mssqlcliclient.py pgcli/jsonrpc/contracts/tests',
+        'pytest --cov pgcli tests/test_mssqlcliclient.py tests/test_main.py tests/test_fuzzy_completion.py '
+        'tests/test_rowlimit.py tests/test_sqlcompletion.py tests/test_prioritization.py pgcli/jsonrpc/contracts/tests',
         utility.ROOT_DIR,
         continue_on_error=False)
 

@@ -203,6 +203,11 @@ class PGCli(object):
         self.mssqlcliclient_query_execution = None
         self.integrated_auth = integrated_auth
 
+    def __del__(self):
+        # Shut-down sqltoolsservice
+        if self.sqltoolsclient:
+            self.sqltoolsclient.shutdown()
+
     def register_special_commands(self):
 
         self.pgspecial.register(

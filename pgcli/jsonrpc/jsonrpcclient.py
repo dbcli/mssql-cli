@@ -149,7 +149,7 @@ class JsonRpcClient(object):
                 break
             except Exception as error:
                 # Catch generic exceptions.
-                self.record_exception(error, self.RESPONSE_THREAD_NAME)
+                self._record_exception(error, self.RESPONSE_THREAD_NAME)
                 break
 
     def _record_exception(self, ex, thread_name):

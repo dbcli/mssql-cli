@@ -1,6 +1,7 @@
 import os
 import pgcli.sqltoolsclient as sqltoolsclient
 import pgcli.mssqlcliclient as mssqlcliclient
+from pgcli.main import format_output, OutputSettings
 
 
 def create_mssql_cli_client(owner_uri=None, connect=True):
@@ -37,6 +38,28 @@ def create_mssql_cli_client(owner_uri=None, connect=True):
     except Exception as e:
         print('Connection failed')
         raise e
+
+
+def run_and_return_string_from_formatter(client, sql, join=False, expanded=False):
+    """
+    Return string output for the sql to be run
+    :param client: MssqlCliClient
+    :param sql: string
+    :param join: boolean
+    :param expanded: boolean
+    :param exception_formatter: boolean
+    :return:
+    """
+
+    rows, col, message, query, is_error = client.execute_single_batch_query(sql)
+    settings = OutputSettings(table_format='psql', dcmlfmt='d', floatfmt='g',
+                              expanded=expanded)
+    formatted = format_output(None, rows, col, message, settings)
+    if join:
+        formatted = '\n'.join(formatted)
+
+    return formatted
+
 
 def shutdown(connection):
     connection.shutdown()
