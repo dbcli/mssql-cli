@@ -75,11 +75,9 @@ def get_timestamped_version(version):
     return version+'.dev'+datetime.datetime.now().strftime("%y%m%d%I%M")
 
 install_requirements = [
-    'pgspecial>=1.8.0',
     'click >= 4.1',
     'Pygments >= 2.0',  # Pygments has to be Capitalcased.
     'prompt_toolkit>=1.0.10,<1.1.0',
-    'psycopg2 >= 2.5.4',
     'sqlparse >=0.2.2,<0.3.0',
     'configobj >= 5.0.6',
     'humanize >= 0.5.1',

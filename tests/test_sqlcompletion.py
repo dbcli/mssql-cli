@@ -1,5 +1,5 @@
 from pgcli.packages.sqlcompletion import (
-    suggest_type, Special, Database, Schema, Table, Column, View, Keyword,
+    suggest_type, Database, Schema, Table, Column, View, Keyword,
     FromClauseItem, Function, Datatype, Alias, JoinCondition, Join)
 from pgcli.packages.parseutils.tables import TableReference
 import pytest
@@ -739,13 +739,13 @@ SELECT 1 FROM foo;
 @pytest.mark.parametrize('text', functions)
 def test_statements_with_cursor_after_function_body(text):
     suggestions = suggest_type(text, text[:text.find('; ') + 1])
-    assert set(suggestions) == set([Keyword(), Special()])
+    assert set(suggestions) == set([Keyword(),])
 
 
 @pytest.mark.parametrize('text', functions)
 def test_statements_with_cursor_before_function_body(text):
     suggestions = suggest_type(text, '')
-    assert set(suggestions) == set([Keyword(), Special()])
+    assert set(suggestions) == set([Keyword(),])
 
 
 def test_create_db_with_template():
@@ -760,7 +760,7 @@ def test_specials_included_for_initial_completion(initial_text):
     suggestions = suggest_type(initial_text, initial_text)
 
     assert set(suggestions) == \
-        set([Keyword(), Special()])
+        set([Keyword(),])
 
 
 def test_drop_schema_qualified_table_suggests_only_tables():
