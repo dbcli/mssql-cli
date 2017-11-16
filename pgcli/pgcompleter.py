@@ -4,24 +4,19 @@ import re
 from itertools import count, repeat, chain
 import operator
 from collections import namedtuple, defaultdict, OrderedDict
-from pgspecial.namedqueries import NamedQueries
 from prompt_toolkit.completion import Completer, Completion
 from prompt_toolkit.contrib.completers import PathCompleter
 from prompt_toolkit.document import Document
 from .packages.sqlcompletion import (FromClauseItem,
-    suggest_type, Special, Database, Schema, Table, Function, Column, View,
-    Keyword, NamedQuery, Datatype, Alias, Path, JoinCondition, Join)
+    suggest_type, Database, Schema, Table, Function, Column, View,
+    Keyword, Datatype, Alias, Path, JoinCondition, Join)
 from .packages.parseutils.meta import ColumnMetadata, ForeignKey
 from .packages.parseutils.utils import last_word
 from .packages.parseutils.tables import TableReference
 from .packages.pgliterals.main import get_literals
 from .packages.prioritization import PrevalenceCounter
-from .config import load_config, config_location
 
 _logger = logging.getLogger(__name__)
-
-NamedQueries.instance = NamedQueries.from_config(
-    load_config(config_location() + 'config'))
 
 Match = namedtuple('Match', ['completion', 'priority'])
 
@@ -72,10 +67,9 @@ class PGCompleter(Completer):
     datatypes = get_literals('datatypes')
     reserved_words = set(get_literals('reserved'))
 
-    def __init__(self, smart_completion=True, pgspecial=None, settings=None):
+    def __init__(self, smart_completion=True, settings=None):
         super(PGCompleter, self).__init__()
         self.smart_completion = smart_completion
-        self.pgspecial = pgspecial
         self.prioritizer = PrevalenceCounter()
         settings = settings or {}
         self.signature_arg_style = settings.get(
@@ -829,15 +823,6 @@ class PGCompleter(Completer):
         for c in completer.get_completions(document, None):
             yield Match(completion=c, priority=(0,))
 
-    def get_special_matches(self, _, word_before_cursor):
-        if not self.pgspecial:
-            return []
-
-        commands = self.pgspecial.commands
-        cmds = commands.keys()
-        cmds = [Candidate(cmd, 0, commands[cmd].description) for cmd in cmds]
-        return self.find_matches(word_before_cursor, cmds, mode='strict')
-
     def get_datatype_matches(self, suggestion, word_before_cursor):
         # suggest custom datatypes
         types = self.populate_schema_objects(suggestion.schema, 'datatypes')
@@ -851,10 +836,6 @@ class PGCompleter(Completer):
 
         return matches
 
-    def get_namedquery_matches(self, _, word_before_cursor):
-        return self.find_matches(
-            word_before_cursor, NamedQueries.instance.list(), meta='named query')
-
     suggestion_matchers = {
         FromClauseItem: get_from_clause_item_matches,
         JoinCondition: get_join_condition_matches,
@@ -867,9 +848,7 @@ class PGCompleter(Completer):
         Alias: get_alias_matches,
         Database: get_database_matches,
         Keyword: get_keyword_matches,
-        Special: get_special_matches,
         Datatype: get_datatype_matches,
-        NamedQuery: get_namedquery_matches,
         Path: get_path_matches,
     }
 

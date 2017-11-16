@@ -15,15 +15,14 @@ class CompletionRefresher(object):
         self._completer_thread = None
         self._restart_refresh = threading.Event()
 
-    def refresh(self, mssqcliclient, special, callbacks, history=None,
+    def refresh(self, mssqcliclient, callbacks, history=None,
                 settings=None):
         """
         Creates a PGCompleter object and populates it with the relevant
         completion suggestions in a background thread.
 
-        executor - PGExecute object, used to extract the credentials to connect
+        mssqlcliclient - used to extract the credentials to connect
                    to the database.
-        special - PGSpecial object used for creating a new completion object.
         settings - dict of settings for completer object
         callbacks - A function or a list of functions to call after the thread
                     has completed the refresh. The newly created completion
@@ -35,7 +34,7 @@ class CompletionRefresher(object):
         else:
             self._completer_thread = threading.Thread(
                 target=self._bg_refresh,
-                args=(mssqcliclient, special, callbacks, history, settings),
+                args=(mssqcliclient, callbacks, history, settings),
                 name='completion_refresh')
             self._completer_thread.setDaemon(True)
             self._completer_thread.start()
@@ -45,11 +44,10 @@ class CompletionRefresher(object):
     def is_refreshing(self):
         return self._completer_thread and self._completer_thread.is_alive()
 
-    def _bg_refresh(self, mssqlcliclient, special, callbacks, history=None,
+    def _bg_refresh(self, mssqlcliclient, callbacks, history=None,
                     settings=None):
         settings = settings or {}
-        completer = PGCompleter(smart_completion=True, pgspecial=special,
-            settings=settings)
+        completer = PGCompleter(smart_completion=True, settings=settings)
 
         executor = mssqlcliclient
         executor.connect()
