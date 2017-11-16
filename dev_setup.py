@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import utility
+import platform
 import pgcli.mssqltoolsservice.externals as mssqltoolsservice
 
 print('Running dev setup...')
@@ -15,6 +16,6 @@ run_time_id = utility.get_current_platform()
 if run_time_id:
     mssqltoolsservice.copy_sqltoolsservice(run_time_id)
 else:
-    print("This platform does not support mssqltoolsservice.")
+    print("This platform: {} does not support mssqltoolsservice.".format(platform.system()))
 
 print('Finished dev setup.')

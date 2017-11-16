@@ -27,7 +27,7 @@ def get_executable_path():
     mssqltoolsservice_full_path = os.path.abspath(os.path.join(mssqltoolsservice_base_path, mssqltoolsservice_name))
 
     if not os.path.exists(mssqltoolsservice_full_path):
-        error_message = '{} does not exist. Please re-install the mssql-scripter package'.format(mssqltoolsservice_full_path)
+        error_message = '{} does not exist. Please re-install the mssql-cli package'.format(mssqltoolsservice_full_path)
         raise EnvironmentError(error_message)
 
     return mssqltoolsservice_full_path

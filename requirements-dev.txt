@@ -1,4 +1,5 @@
 enum34 >= 1.1.6
+mock >= 2.0.0
 future >= 0.16.0
 setuptools >= 36.0.1
 requests >= 2.13.0
@@ -8,7 +9,7 @@ twine >= 1.8.1
 bumpversion >= 0.5.3 
 tox >= 2.7.0
 flake8 >= 3.3.0
-pytest >= 3.0.7
+pytest >= 3.0.7cls
 pytest-cov >= 2.5.1
 readme_renderer >= 17.2
 docutils >= 0.13.1
