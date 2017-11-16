@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# this must be executed as "python dev_setup.py clean" to prevent invoking the other options from setup.
 from __future__ import print_function
 import utility
 import pgcli.mssqltoolsservice.externals as mssqltoolsservice
