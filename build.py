@@ -3,10 +3,19 @@ from azure.storage.blob import BlockBlobService, ContentSettings
 import os
 import sys
 import utility
+import pgcli.mssqltoolsservice.externals as mssqltoolsservice
 
 AZURE_STORAGE_CONNECTION_STRING = os.environ.get('AZURE_STORAGE_CONNECTION_STRING')
 BLOB_CONTAINER_NAME = 'daily'
 UPLOADED_PACKAGE_LINKS = []
+
+supported_platforms = [
+    'win32',
+    'win_amd64',
+    'win64',
+    'macosx_10_11_intel',
+    'manylinux1_x86_64',
+    'manylinux1_i686']
 
 
 def print_heading(heading, f=None):
@@ -31,9 +40,17 @@ def build():
     # convert windows line endings to unix for mssql-cli bash script
     utility.exec_command('python dos2unix.py mssql-cli mssql-cli', utility.ROOT_DIR)
 
-    print_heading('Building mssql-cli pip package')
-    utility.exec_command('python --version', utility.ROOT_DIR)
-    utility.exec_command('python setup.py check -r -s sdist', utility.ROOT_DIR, continue_on_error=False)
+    for platform in supported_platforms:
+        mssqltoolsservice.copy_sqltoolsservice(platform)
+        utility.clean_up(utility.MSSQLCLI_BUILD_DIRECTORY)
+
+        print_heading('Building mssql-cli pip package')
+        utility.exec_command('python --version', utility.ROOT_DIR)
+        utility.exec_command('python setup.py check -r -s bdist_wheel --plat-name {}'.format(platform),
+                             utility.ROOT_DIR,
+                             continue_on_error=False)
+
+        mssqltoolsservice.clean_up_sqltoolsservice()
 
 
 def _upload_index_file(service, blob_name, title, links):
@@ -76,7 +93,6 @@ def _upload_package(service, file_path, pkg_name):
         blob_name=blob_name,
         file_path=file_path
     )
-    _gen_pkg_index_html(service, pkg_name)
 
 
 def validate_package():
@@ -85,10 +101,13 @@ def validate_package():
     """
     root_dir = os.path.abspath(os.path.join(os.path.abspath(__file__), '..'))
     # Local install of mssql-scripter.
-    mssqlcli_sdist_name = os.listdir(utility.MSSQLCLI_DIST_DIRECTORY)[0]
+    mssqlcli_wheel_dir = os.listdir(utility.MSSQLCLI_DIST_DIRECTORY)
     # To ensure we have a clean install, we disable the cache as to prevent cache overshadowing actual changes made.
+    current_platform = utility.get_current_platform()
+
+    mssqlcli_wheel_name = [pkge for pkge in mssqlcli_wheel_dir if current_platform in pkge]
     utility.exec_command(
-        'pip install --no-cache-dir --no-index ./dist/{}'.format(mssqlcli_sdist_name),
+        'pip install --no-cache-dir --no-index ./dist/{}'.format(mssqlcli_wheel_name),
         root_dir, continue_on_error=False
     )
 
@@ -107,7 +126,8 @@ def publish_daily():
         pkg_path = os.path.join(utility.MSSQLCLI_DIST_DIRECTORY, pkg)
         print('Uploading package {}'.format(pkg_path))
         _upload_package(blob_service, pkg_path, 'mssql-cli')
-    # Upload the final index file
+
+    _gen_pkg_index_html(blob_service, 'mssql-cli')
     _upload_index_file(blob_service, 'index.html', 'Simple Index', UPLOADED_PACKAGE_LINKS)
 
 
@@ -115,13 +135,14 @@ def publish_official():
     """
     Publish mssql-cli package to PyPi.
     """
-    mssqlcli_sdist_name = os.listdir(utility.MSSQLCLI_DIST_DIRECTORY)[0]
+    mssqlcli_wheel_dir = os.listdir(utility.MSSQLCLI_DIST_DIRECTORY)
     # Run twine action for mssqlscripter.
     # Only authorized users with credentials will be able to upload this package.
     # Credentials will be stored in a .pypirc file.
-    utility.exec_command(
-        'twine upload {} pypi'.format(mssqlcli_sdist_name),
-        utility.MSSQLCLI_DIST_DIRECTORY)
+    for wheel in mssqlcli_wheel_dir:
+        utility.exec_command(
+            'twine upload {} pypi'.format(wheel),
+            utility.MSSQLCLI_DIST_DIRECTORY)
 
 
 def unit_test():

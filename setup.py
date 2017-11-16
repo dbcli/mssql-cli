@@ -21,49 +21,6 @@ with open('pgcli/__init__.py', 'rb') as f:
 description = 'CLI for SQL Server Database. With auto-completion and syntax highlighting.'
 
 MSSQLTOOLSSERVICE_VERSION = '1.0.0a21'
-MSSQLTOOLSSERVICE_PACKAGE_NAME = 'mssqltoolsservice-{}=={}'
-MSSQLTOOLSSERVICE_PACKAGE_SUFFIX = [
-    'OSX_10_11_64',
-    'Windows_7_64',
-    'Windows_7_86',
-    'Linux_64'
-]
-
-
-def _get_runtime_id(
-        system=platform.system(),
-        architecture=platform.architecture()[0]):
-    """
-        Find supported run time id for current platform.
-    """
-    run_time_id = None
-
-    if system == 'Windows':
-        if architecture == '32bit':
-            run_time_id = 'Windows_7_86'
-        elif architecture == '64bit':
-            run_time_id = 'Windows_7_64'
-    elif system == 'Darwin':
-        if architecture == '64bit':
-            run_time_id = 'OSX_10_11_64'
-    elif system == 'Linux':
-        if architecture == '64bit':
-            run_time_id = 'Linux_64'
-
-    return run_time_id
-
-
-def get_mssqltoolsservice_package_name(run_time_id=_get_runtime_id()):
-    """
-        Retrieve sql tools service package name for this platform if supported.
-    """
-    if run_time_id and run_time_id in MSSQLTOOLSSERVICE_PACKAGE_SUFFIX:
-        # set package suffix name for other uses like building wheels outside of setup.py.
-        os.environ['MSSQLTOOLSSERVICE_PACKAGE_SUFFIX'] = run_time_id
-        return MSSQLTOOLSSERVICE_PACKAGE_NAME.format(
-            run_time_id, MSSQLTOOLSSERVICE_VERSION).replace('_', '-').lower()
-
-    raise EnvironmentError('mssqltoolsservice is not supported on this platform.')
 
 
 def get_timestamped_version(version):
@@ -73,6 +30,7 @@ def get_timestamped_version(version):
     :return: <version>.dev<YearMonthDayHourMinute>. Example 0.0.1.dev1711030310
     """
     return version+'.dev'+datetime.datetime.now().strftime("%y%m%d%I%M")
+
 
 install_requirements = [
     'click >= 4.1',
@@ -89,11 +47,6 @@ install_requirements = [
 if sys.version_info < (3, 4):
     install_requirements.append('enum34>=1.1.6')
 
-install_requirements.append(get_mssqltoolsservice_package_name())
-
-# Using a environment variable to communicate mssqltoolsservice package name for
-# other modules that need that info like dev_setup.py.
-os.environ['MSSQLTOOLSSERVICE_PACKAGE_NAME'] = install_requirements[-1]
 
 # setproctitle is used to mask the password when running `ps` in command line.
 # But this is not necessary in Windows since the password is never shown in the
@@ -116,6 +69,7 @@ setup(
     description=description,
     long_description=open('README.rst').read(),
     install_requires=install_requirements,
+    include_package_data=True,
     scripts=[
         'mssql-cli.bat',
         'mssql-cli'

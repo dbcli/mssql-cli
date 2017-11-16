@@ -1,4 +1,5 @@
 enum34 >= 1.1.6
+mock >= 2.0.0
 future >= 0.16.0
 setuptools >= 36.0.1
 requests >= 2.13.0

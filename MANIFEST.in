@@ -1,1 +1,3 @@
 include LICENSE.txt
+include pgcli/mssqltoolsservice/bin/*
+include pgcli/mssqltoolsservice/bin/*/*
