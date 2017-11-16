@@ -30,15 +30,14 @@ def test_refresh_called_once(refresher):
     """
     callbacks = Mock()
     pgexecute = Mock()
-    special = Mock()
 
     with patch.object(refresher, '_bg_refresh') as bg_refresh:
-        actual = refresher.refresh(pgexecute, special, callbacks)
+        actual = refresher.refresh(pgexecute, callbacks)
         time.sleep(1)  # Wait for the thread to work.
         assert len(actual) == 1
         assert len(actual[0]) == 4
         assert actual[0][3] == 'Auto-completion refresh started in the background.'
-        bg_refresh.assert_called_with(pgexecute, special, callbacks, None,
+        bg_refresh.assert_called_with(pgexecute, callbacks, None,
             None)
 
 
@@ -51,20 +50,19 @@ def test_refresh_called_twice(refresher):
     callbacks = Mock()
 
     pgexecute = Mock()
-    special = Mock()
 
     def dummy_bg_refresh(*args):
         time.sleep(3)  # seconds
 
     refresher._bg_refresh = dummy_bg_refresh
 
-    actual1 = refresher.refresh(pgexecute, special, callbacks)
+    actual1 = refresher.refresh(pgexecute, callbacks)
     time.sleep(1)  # Wait for the thread to work.
     assert len(actual1) == 1
     assert len(actual1[0]) == 4
     assert actual1[0][3] == 'Auto-completion refresh started in the background.'
 
-    actual2 = refresher.refresh(pgexecute, special, callbacks)
+    actual2 = refresher.refresh(pgexecute, callbacks)
     time.sleep(1)  # Wait for the thread to work.
     assert len(actual2) == 1
     assert len(actual2[0]) == 4
@@ -80,11 +78,10 @@ def test_refresh_with_callbacks(refresher):
     pgexecute_class = Mock()
     pgexecute = Mock()
     pgexecute.extra_args = {}
-    special = Mock()
 
     with patch('pgcli.completion_refresher.PGExecute', pgexecute_class):
         # Set refreshers to 0: we're not testing refresh logic here
         refresher.refreshers = {}
-        refresher.refresh(pgexecute, special, callbacks)
+        refresher.refresh(pgexecute, callbacks)
         time.sleep(1)  # Wait for the thread to work.
         assert (callbacks[0].call_count == 1)

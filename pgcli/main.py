@@ -38,8 +38,6 @@ from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from pygments.lexers.sql import PostgresLexer
 from pygments.token import Token
 
-from pgspecial.main import (PGSpecial, NO_QUERY)
-import pgspecial as special
 from .pgcompleter import PGCompleter
 from .pgtoolbar import create_toolbar_tokens_func
 from .pgstyle import style_factory
@@ -60,9 +58,6 @@ except ImportError:
     from urllib.parse import urlparse, unquote, parse_qs
 
 from getpass import getuser
-from psycopg2 import OperationalError, InterfaceError
-import psycopg2
-
 from collections import namedtuple
 
 #mssql-cli imports
@@ -137,7 +132,6 @@ class PGCli(object):
 
         self.set_default_pager(c)
         self.output_file = None
-        self.pgspecial = PGSpecial()
 
         self.multi_line = c['main'].as_bool('multi_line')
         self.multiline_mode = c['main'].get('multi_line_mode', 'psql')
@@ -145,7 +139,6 @@ class PGCli(object):
         self.auto_expand = auto_vertical_output or c['main'].as_bool(
             'auto_expand')
         self.expanded_output = c['main'].as_bool('expand')
-        self.pgspecial.timing_enabled = c['main'].as_bool('timing')
         if row_limit is not None:
             self.row_limit = row_limit
         else:
@@ -186,8 +179,7 @@ class PGCli(object):
             'keyword_casing': keyword_casing,
         }
 
-        completer = PGCompleter(smart_completion, pgspecial=self.pgspecial,
-            settings=self.settings)
+        completer = PGCompleter(smart_completion, settings=self.settings)
 
         self.completer = completer
         self._completer_lock = threading.Lock()
@@ -210,73 +202,6 @@ class PGCli(object):
         # Special commands not supported in mssql-cli right now.
         # Tracked by Github issue
         pass
-        """
-        self.pgspecial.register(
-            self.change_db, '\\c', '\\c[onnect] database_name',
-            'Change to a new database.', aliases=('use', '\\connect', 'USE'))
-
-        refresh_callback = lambda: self.refresh_completions(
-            persist_priorities='all')
-
-        self.pgspecial.register(refresh_callback, '\\#', '\\#',
-                                'Refresh auto-completions.', arg_type=NO_QUERY)
-        self.pgspecial.register(refresh_callback, '\\refresh', '\\refresh',
-                                'Refresh auto-completions.', arg_type=NO_QUERY)
-        self.pgspecial.register(self.execute_from_file, '\\i', '\\i filename',
-                                'Execute commands from file.')
-        self.pgspecial.register(self.write_to_file, '\\o', '\\o [filename]',
-                                'Send all query results to file.')
-        self.pgspecial.register(self.info_connection, '\\conninfo',
-                                '\\conninfo', 'Get connection details')
-
-    def info_connection(self, **_):
-        if self.pgexecute.host.startswith('/'):
-            host = 'socket "%s"' % self.pgexecute.host
-        else:
-            host = 'host "%s"' % self.pgexecute.host
-
-        yield (None, None, None, 'You are connected to database "%s" as user '
-               '"%s" on %s at port "%s".' % (self.pgexecute.dbname,
-                                             self.pgexecute.user,
-                                             host,
-                                             self.pgexecute.port))
-
-    def change_db(self, pattern, **_):
-        if pattern:
-            # Get all the parameters in pattern, handling double quotes if any.
-            infos = re.findall(r'"[^"]*"|[^"\'\s]+', pattern)
-            # Now removing quotes.
-            list(map(lambda s: s.strip('"'), infos))
-
-            infos.extend([None] * (4 - len(infos)))
-            db, user, host, port = infos
-            try:
-                self.pgexecute.connect(database=db, user=user, host=host,
-                                       port=port)
-            except OperationalError as e:
-                click.secho(str(e), err=True, fg='red')
-                click.echo("Previous connection kept")
-        else:
-            self.pgexecute.connect()
-
-        yield (None, None, None, 'You are now connected to database "%s" as '
-               'user "%s"' % (self.pgexecute.dbname, self.pgexecute.user))
-
-    def execute_from_file(self, pattern, **_):
-        if not pattern:
-            message = '\\i: missing required argument'
-            return [(None, None, None, message, '', False)]
-        try:
-            with open(os.path.expanduser(pattern), encoding='utf-8') as f:
-                query = f.read()
-        except IOError as e:
-            return [(None, None, None, str(e), '', False)]
-
-        on_error_resume = (self.on_error == 'RESUME')
-        return self.pgexecute.run(
-            query, self.pgspecial, on_error_resume=on_error_resume
-        )
-    """
 
     def write_to_file(self, pattern, **_):
         if not pattern:
@@ -333,34 +258,6 @@ class PGCli(object):
         root_logger.debug('Initializing pgcli logging.')
         root_logger.debug('Log file %r.', log_file)
 
-        pgspecial_logger = logging.getLogger('pgspecial')
-        pgspecial_logger.addHandler(handler)
-        pgspecial_logger.setLevel(log_level)
-
-    def connect_dsn(self, dsn):
-        self.connect(dsn=dsn)
-
-    def connect_uri(self, uri):
-        uri = urlparse(uri)
-        database = uri.path[1:]  # ignore the leading fwd slash
-
-        def fixup_possible_percent_encoding(s):
-            return unquote(str(s)) if s else s
-
-        arguments = dict(database=fixup_possible_percent_encoding(database),
-                         host=fixup_possible_percent_encoding(uri.hostname),
-                         user=fixup_possible_percent_encoding(uri.username),
-                         port=fixup_possible_percent_encoding(uri.port),
-                         passwd=fixup_possible_percent_encoding(uri.password))
-        # Deal with extra params e.g. ?sslmode=verify-ca&ssl-cert=/mycert
-        if uri.query:
-            arguments = dict(
-                {k: v for k, (v,) in parse_qs(uri.query).items()},
-                **arguments)
-
-        # unquote str(each URI part (they may be percent encoded)
-        self.connect(**arguments)
-
     def connect(self, database='', host='', user='', port='', passwd='',
                 dsn='', **kwargs):
         # Connect to the database.
@@ -412,38 +309,6 @@ class PGCli(object):
             click.secho(str(e), err=True, fg='red')
             exit(1)
 
-    def handle_editor_command(self, cli, document):
-        r"""
-        Editor command is any query that is prefixed or suffixed
-        by a '\e'. The reason for a while loop is because a user
-        might edit a query multiple times.
-        For eg:
-        "select * from \e"<enter> to edit it in vim, then come
-        back to the prompt with the edited query "select * from
-        blah where q = 'abc'\e" to edit it again.
-        :param cli: CommandLineInterface
-        :param document: Document
-        :return: Document
-        """
-        # FIXME: using application.pre_run_callables like this here is not the best solution.
-        # It's internal api of prompt_toolkit that may change. This was added to fix #668.
-        # We may find a better way to do it in the future.
-        saved_callables = cli.application.pre_run_callables
-        while special.editor_command(document.text):
-            filename = special.get_filename(document.text)
-            query = (special.get_editor_query(document.text) or
-                     self.get_last_query())
-            sql, message = special.open_external_editor(filename, sql=query)
-            if message:
-                # Something went wrong. Raise an exception and bail.
-                raise RuntimeError(message)
-            cli.current_buffer.document = Document(sql, cursor_position=len(sql))
-            cli.application.pre_run_callables = []
-            document = cli.run()
-            continue
-        cli.application.pre_run_callables = saved_callables
-        return document
-
     def execute_command(self, text, query):
         logger = self.logger
 
@@ -462,10 +327,6 @@ class PGCli(object):
 
         except NotImplementedError:
             click.secho('Not Yet Implemented.', fg="yellow")
-        except OperationalError as e:
-            logger.error("sql: %r, error: %r", text, e)
-            logger.error("traceback: %r", traceback.format_exc())
-            self._handle_server_closed_connection()
         except Exception as e:
             logger.error("sql: %r, error: %r", text, e)
             logger.error("traceback: %r", traceback.format_exc())
@@ -485,13 +346,11 @@ class PGCli(object):
             except KeyboardInterrupt:
                 pass
 
-            if self.pgspecial.timing_enabled:
-                # Only add humanized time display if > 1 second
-                if query.total_time > 1:
-                    print('Time: %0.03fs (%s)' % (query.total_time,
-                          humanize.time.naturaldelta(query.total_time)))
-                else:
-                    print('Time: %0.03fs' % query.total_time)
+            if query.total_time > 1:
+                print('Time: %0.03fs (%s)' % (query.total_time,
+                      humanize.time.naturaldelta(query.total_time)))
+            else:
+                print('Time: %0.03fs' % query.total_time)
 
             with self._completer_lock:
                self.completer.reset_completions()
@@ -547,30 +406,9 @@ class PGCli(object):
                 if quit_command(document.text):
                     raise EOFError
 
-                try:
-                    # mssql-cli Issue 25
-                    document = self.handle_editor_command(self.cli, document)
-                except RuntimeError as e:
-                    logger.error("sql: %r, error: %r", document.text, e)
-                    logger.error("traceback: %r", traceback.format_exc())
-                    click.secho(str(e), err=True, fg='red')
-                    continue
-
                 # Initialize default metaquery in case execution fails
                 query = MetaQuery(query=document.text, successful=False)
-
-                watch_command, timing = special.get_watch_command(document.text)
-                if watch_command:
-                    while watch_command:
-                        try:
-                            query = self.execute_command(watch_command, query)
-                            click.echo('Waiting for {0} seconds before repeating'.format(timing))
-                            sleep(timing)
-                        except KeyboardInterrupt:
-                            watch_command = None
-                else:
-                    query = self.execute_command(document.text, query)
-
+                query = self.execute_command(document.text, query)
                 self.now = dt.datetime.today()
 
                 # Allow PGCompleter to learn user's preferred keywords, etc.
@@ -767,7 +605,7 @@ class PGCli(object):
         callback = functools.partial(self._on_completions_refreshed,
                                      persist_priorities=persist_priorities)
 
-        self.completion_refresher.refresh(self.mssqlcliclient_query_execution, self.pgspecial,
+        self.completion_refresher.refresh(self.mssqlcliclient_query_execution,
             callback, history=history, settings=self.settings)
         return [(None, None, None,
                 'Auto-completion refresh started in the background.')]
@@ -905,44 +743,7 @@ def cli(database, username_opt, host, prompt_passwd,
     database = database or dbname
     user = username_opt or username
 
-    #mssql-cli: Dsn not yet supported
-    """if dsn is not '':
-        try:
-            cfg = load_config(mssqlclirc, config_full_path)
-            dsn_config = cfg['alias_dsn'][dsn]
-        except:
-            click.secho('Invalid DSNs found in the config file. '\
-                'Please check the "[alias_dsn]" section in pgclirc.',
-                 err=True, fg='red')
-            exit(1)
-        pgcli.connect_uri(dsn_config)
-    """
-    if '://' in database:
-        pgcli.connect_uri(database)
-    elif "=" in database:
-        pgcli.connect_dsn(database)
-    elif os.environ.get('PGSERVICE', None):
-        pgcli.connect_dsn('service={0}'.format(os.environ['PGSERVICE']))
-    else:
-        pgcli.connect(database, host, user, port='')
-
-    # mssql-cli list_databases not yet supported
-    # Tracked by Github issue
-    """
-    list_databases = None
-    if list_databases:
-        cur, headers, status = pgcli.pgexecute.full_databases()
-
-        title = 'List of databases'
-        settings = OutputSettings(
-            table_format='ascii',
-            missingval='<null>'
-        )
-        formatted = format_output(title, cur, headers, status, settings)
-        click.echo_via_pager('\n'.join(formatted))
-
-        sys.exit(0)
-    """
+    pgcli.connect(database, host, user, port='')
 
     pgcli.logger.debug('Launch Params: \n'
             '\tdatabase: %r'
