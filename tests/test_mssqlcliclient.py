@@ -1,3 +1,4 @@
+# coding=utf-8
 # --------------------------------------------------------------------------------------------
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License. See License.txt in the project root for license information.
@@ -80,10 +81,15 @@ class MssqlCliClientTests(unittest.TestCase):
         """
         try:
             client = create_mssql_cli_client()
-            test_query = u'select * from HumanResources.Department'
+            test_query = u"""
+                select 1 as [ShiftID], 'Day' as [Name] UNION ALL
+                select 2, N'魚' UNION ALL
+                select 3, 'Night'
+            """
+
             rows, col, message, query, is_error = client.execute_single_batch_query(test_query)
 
-            self.assertTrue(len(rows), 16)
+            self.assertTrue(len(rows), 3)
             self.assertTrue(query, test_query)
         finally:
             shutdown(client)
@@ -106,6 +112,8 @@ class MssqlCliClientTests(unittest.TestCase):
     def test_schema_table_views_and_columns_query(self):
         """
             Verify mssqlcliclient's tables, views, columns, and schema are populated.
+            Note: This test should run against a database that the credentials
+                  MSSQLCLIUSER and MSSQLCLIPASSWORD have write access to.
         """
         try:
             client = create_mssql_cli_client()
@@ -145,11 +153,11 @@ class MssqlCliClientTests(unittest.TestCase):
         """
         try:
             client = create_mssql_cli_client()
-            multi_statement_query = u'select * from HumanResources.Department;select 1;'
+            multi_statement_query = u"select 'Morning' as [Name] UNION ALL select 'Evening'; select 1;"
             for rows, col, message, query, is_error in \
                 client.execute_multi_statement_single_batch(multi_statement_query):
-                if query == u'select * from HumanResources.Department':
-                    self.assertTrue(len(rows), 16)
+                if query == u"select 'Morning' as [Name] UNION ALL select 'Evening'":
+                    self.assertTrue(len(rows), 2)
                 else:
                     self.assertTrue(len(rows), 1)
         finally:
