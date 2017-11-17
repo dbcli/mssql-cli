@@ -107,7 +107,7 @@ def validate_package():
 
     mssqlcli_wheel_name = [pkge for pkge in mssqlcli_wheel_dir if current_platform in pkge]
     utility.exec_command(
-        'pip install --no-cache-dir --no-index ./dist/{}'.format(mssqlcli_wheel_name),
+        'pip install --no-cache-dir --no-index ./dist/{}'.format(mssqlcli_wheel_name[0]),
         root_dir, continue_on_error=False
     )
 
