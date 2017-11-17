@@ -70,7 +70,6 @@ def get_current_platform():
 def copy_current_platform_mssqltoolsservice():
     """
     Copy the necessary mssqltoolsservice binaries for the current platform if supported.
-    :return:
     """
     import pgcli.mssqltoolsservice.externals as mssqltoolsservice
 
