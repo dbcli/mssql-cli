@@ -65,3 +65,16 @@ def get_current_platform():
         run_time_id = 'manylinux1_x86_64'
 
     return run_time_id
+
+
+def copy_current_platform_mssqltoolsservice():
+    """
+    Copy the necessary mssqltoolsservice binaries for the current platform if supported.
+    """
+    import pgcli.mssqltoolsservice.externals as mssqltoolsservice
+
+    current_platform = get_current_platform()
+    if current_platform:
+        mssqltoolsservice.copy_sqltoolsservice(current_platform)
+    else:
+        print("This platform: {} does not support mssqltoolsservice.".format(platform.system()))
