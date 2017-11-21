@@ -13,8 +13,7 @@ supported_platforms = [
     'win32',
     'win_amd64',
     'macosx_10_11_intel',
-    'manylinux1_x86_64',
-    'manylinux1_i686']
+    'manylinux1_x86_64']
 
 
 def print_heading(heading, f=None):
