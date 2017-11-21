@@ -15,10 +15,8 @@ SQLTOOLSSERVICE_BASE = os.path.join(utility.ROOT_DIR, 'sqltoolsservice/')
 # Supported platform key's must match those in mssqlscript's setup.py.
 SUPPORTED_PLATFORMS = {
     'manylinux1_x86_64': SQLTOOLSSERVICE_BASE + 'manylinux1/' + 'Microsoft.SqlTools.ServiceLayer-linux-x64-netcoreapp2.0.tar.gz',
-    'manylinux1_i686': SQLTOOLSSERVICE_BASE + 'manylinux1/' + 'Microsoft.SqlTools.ServiceLayer-linux-x64-netcoreapp2.0.tar.gz',
     'macosx_10_11_intel': SQLTOOLSSERVICE_BASE + 'macosx_10_11_intel/' + 'Microsoft.SqlTools.ServiceLayer-osx-x64-netcoreapp2.0.tar.gz',
-    'win_amd64': SQLTOOLSSERVICE_BASE + 'win64/' + 'Microsoft.SqlTools.ServiceLayer-win-x64-netcoreapp2.0.zip',
-    'win64': SQLTOOLSSERVICE_BASE + 'win64/' + 'Microsoft.SqlTools.ServiceLayer-win-x64-netcoreapp2.0.zip',
+    'win_amd64': SQLTOOLSSERVICE_BASE + 'win_amd64/' + 'Microsoft.SqlTools.ServiceLayer-win-x64-netcoreapp2.0.zip',
     'win32': SQLTOOLSSERVICE_BASE + 'win32/' + 'Microsoft.SqlTools.ServiceLayer-win-x86-netcoreapp2.0.zip'
 }
 
@@ -35,7 +33,7 @@ def copy_sqltoolsservice(platform):
     if not platform or platform not in SUPPORTED_PLATFORMS:
         print('{} is not supported.'.format(platform))
         print('Please provide a valid platform flag.' +
-              '[win32, win_amd64, win64, manylinux1_x86_64, manylinux1_i686, macosx_10_11_intel]')
+              '[win32, win_amd64, manylinux1_x86_64, macosx_10_11_intel]')
         sys.exit(1)
 
     copy_file_path = SUPPORTED_PLATFORMS[platform]
