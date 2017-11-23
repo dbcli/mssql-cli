@@ -119,6 +119,11 @@ class ConnectionCompleteEvent(object):
         self.error_message = inner_params[u'errorMessage']
         self.error_number = inner_params[u'errorNumber']
 
+        # server information.
+        self.is_cloud = inner_params['serverInfo']['isCloud']
+        self.server_version = inner_params['serverInfo']['serverVersion']
+        self.server_edition = inner_params['serverInfo']['serverEdition']
+
 
 class ConnectionResponse(object):
     def __init__(self, params):

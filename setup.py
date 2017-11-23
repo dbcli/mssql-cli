@@ -41,7 +41,9 @@ install_requirements = [
     'humanize >= 0.5.1',
     'cli_helpers >= 0.2.3, < 1.0.0',
     'future>=0.16.0',
-    'wheel>=0.29.0'
+    'wheel>=0.29.0',
+    'applicationinsights==0.10.0',
+    'six>=1.11.0'
 ]
 
 if sys.version_info < (3, 4):

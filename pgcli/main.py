@@ -65,6 +65,8 @@ from pgcli import mssqlclilogging
 from pgcli.sqltoolsclient import SqlToolsClient
 from pgcli.mssqlcliclient import MssqlCliClient, reset_connection_and_clients
 
+import pgcli.telemetry as telemetry_session
+
 # Query tuples are used for maintaining history
 MetaQuery = namedtuple(
     'Query',
@@ -302,6 +304,8 @@ class PGCli(object):
             if not self.mssqlcliclient_query_execution.connect():
                 click.secho('\nUnable to connect. Please try again', err=True, fg='red')
                 exit(1)
+
+            telemetry_session.set_server_information(self.mssqlcliclient_query_execution)
 
         except Exception as e:  # Connecting to a database could fail.
             self.logger.debug('Database connection failed: %r.', e)
@@ -907,4 +911,8 @@ def format_output(title, cur, headers, status, settings):
 
 
 if __name__ == "__main__":
-    cli()
+    try:
+        telemetry_session.start()
+        cli()
+    finally:
+        telemetry_session.conclude()
