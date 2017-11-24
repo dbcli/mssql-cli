@@ -40,15 +40,35 @@ class TelemetrySession(object):
     server_edition = None
     connection_type = None
 
+    def add_exception(self, exception, fault_type, description=None, message=''):
+        details = {
+            'Reserved.DataModel.EntityType': 'Fault',
+            'Reserved.DataModel.Fault.Description': description or fault_type,
+            'Reserved.DataModel.Correlation.1': '{},UserTask,'.format(self.correlation_id),
+            'Reserved.DataModel.Fault.TypeString': exception.__class__.__name__,
+            'Reserved.DataModel.Fault.Exception.Message': _remove_cmd_chars(
+                message or str(exception)),
+            'Reserved.DataModel.Fault.Exception.StackTrace': _remove_cmd_chars(_get_stack_trace())
+        }
+        fault_type = _remove_symbols(fault_type).replace('"', '').replace("'", '').replace(' ', '-')
+        fault_name = '{}/{}'.format(PRODUCT_NAME, fault_type.lower())
+
+        self.exceptions.append((fault_name, details))
+
     @decorators.suppress_all_exceptions(raise_in_diagnostics=True, fallback_return=None)
     def generate_payload(self):
         events = []
         base = self._get_base_properties()
         cli = self._get_mssql_cli_properties()
-
         cli.update(base)
 
         events.append({'name': PRODUCT_NAME, 'properties': cli})
+        for name, props in self.exceptions:
+            props.update(base)
+            props.update(cli)
+            props.update({'Reserved.DataModel.CorrelationId': str(uuid.uuid4()),
+                          'Reserved.EventId': str(uuid.uuid4())})
+            events.append({'name': name, 'properties': props})
 
         payload = json.dumps(events)
         return _remove_symbols(payload)
@@ -142,6 +162,11 @@ def output_payload_to_file(payload):
 
 
 @decorators.suppress_all_exceptions(raise_in_diagnostics=True)
+def set_exception(exception, fault_type, summary=None):
+    _session.add_exception(exception, fault_type=fault_type, description=summary)
+
+
+@decorators.suppress_all_exceptions(raise_in_diagnostics=True)
 def set_server_information(connection):
 
     _session.server_edition = connection.server_edition
@@ -206,7 +231,7 @@ def _get_stack_trace():
     def _get_root_path():
         dir_path = os.path.dirname(os.path.realpath(__file__))
         head, tail = os.path.split(dir_path)
-        while tail and tail != 'azure-cli':
+        while tail and tail != 'mssql-cli':
             head, tail = os.path.split(head)
         return head
 

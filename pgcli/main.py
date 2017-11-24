@@ -313,19 +313,21 @@ class PGCli(object):
             if self.integrated_auth:
                 authentication_type = u'Integrated'
 
-            self.mssqlcliclient_query_execution = MssqlCliClient(self.sqltoolsclient, host, user, passwd,
-                                                    database=database, authentication_type=authentication_type, **kwargs)
-
-            if not self.mssqlcliclient_query_execution.connect():
-                click.secho('\nUnable to connect. Please try again', err=True, fg='red')
-                exit(1)
-
+            self.mssqlcliclient_query_execution = MssqlCliClient(self.sqltoolsclient,
+                                                                 host,
+                                                                 user,
+                                                                 passwd,
+                                                                 database=database,
+                                                                 authentication_type=authentication_type,
+                                                                 **kwargs)
+            self.mssqlcliclient_query_execution.connect()
             telemetry_session.set_server_information(self.mssqlcliclient_query_execution)
 
         except Exception as e:  # Connecting to a database could fail.
             self.logger.debug('Database connection failed: %r.', e)
-            self.logger.error("traceback: %r", traceback.format_exc())
+            self.logger.debug("traceback: %r", traceback.format_exc())
             click.secho(str(e), err=True, fg='red')
+            telemetry_session.set_exception(e, fault_type='database-connection-failed')
             exit(1)
 
     def execute_command(self, text, query):
@@ -333,7 +335,7 @@ class PGCli(object):
 
         try:
             output, query = self._evaluate_command(text)
-        except KeyboardInterrupt:
+        except KeyboardInterrupt as e:
             # Issue where Ctrl+C propagates to sql tools service process and kills it,
             # so that query/cancel request can't be sent.
             # Right now the sql_tools_service process is killed and we restart it with a new connection.
@@ -343,13 +345,14 @@ class PGCli(object):
                                          self.mssqlcliclient_query_execution)
             logger.debug("cancelled query, sql: %r", text)
             click.secho("Query cancelled.", err=True, fg='red')
-
+            telemetry_session.set_exception(e, fault_type='query-execution-cancelled')
         except NotImplementedError:
             click.secho('Not Yet Implemented.', fg="yellow")
         except Exception as e:
             logger.error("sql: %r, error: %r", text, e)
             logger.error("traceback: %r", traceback.format_exc())
             click.secho(str(e), err=True, fg='red')
+            telemetry_session.set_exception(e, fault_type='sql-query-error')
         else:
             try:
                 if self.output_file and not text.startswith(('\\o ', '\\? ')):
@@ -610,6 +613,7 @@ class PGCli(object):
 
                 click.secho('Reconnected!\nTry the command again.', fg='green')
             except Exception as e:
+                telemetry_session.set_exception(e, fault_type='reconnection-reset-failed')
                 click.secho(str(e), err=True, fg='red')
 
     def refresh_completions(self, history=None, persist_priorities='all'):

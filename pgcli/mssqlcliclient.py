@@ -80,9 +80,6 @@ class MssqlCliClient(object):
 
             logger.info(u'Connection Successful. Connection Id {0}'.format(response.connection_id))
             return self.owner_uri
-        else:
-            logger.info(u'Connection did not succeed')
-            return None
 
     def execute_multi_statement_single_batch(self, query):
         # Remove spaces, EOL and semi-colons from end
