@@ -58,9 +58,9 @@ For those interested, anonymous usage data of the previous session will always b
 **Note**: The data in this file is sent to Microsoft, **IF** the collect_telemetry  option is set to **True**.
 ##### MacOSX & Linux
 ```
-~/.config/mssqlcli/telemetry.log
+~/.config/mssqlcli/mssqlcli_telemetry.log
 ```
 ##### Windows
 ```
-C:\Users\<Username>\AppData\Local\dbcli\mssqlcli\telemetry.log
+C:\Users\<Username>\AppData\Local\dbcli\mssqlcli\mssqlcli_telemetry.log
 ```
