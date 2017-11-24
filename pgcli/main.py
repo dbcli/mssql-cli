@@ -93,11 +93,19 @@ OutputSettings.__new__.__defaults__ = (
 logger = logging.getLogger(u'mssqlcli.main')
 
 MSSQLCLI_TELEMETRY_DISCLOSURE_LINK = 'https://github.com/dbcli/mssql-cli/tree/master/doc/Telemetry_Disclosure.md'
-MSSQLCLI_TELEMETRY_PROMPT = '\nBy default, Microsoft collects anonymous usage data to improve the user ' \
-                            'experience. Participation is optional and may be disabled by setting the ' \
-                            '[collect_telemetry] option to False in the configuration file located here: {0}.'\
-                            '\nMore information can be found here: {1}'\
-                            .format(get_config(), MSSQLCLI_TELEMETRY_DISCLOSURE_LINK)
+MSSQLCLI_TELEMETRY_PROMPT = """
+Telemetry
+---------
+By default, Mssql CLI collects usage data in order to improve your experience.
+The data is anonymous and does not include commandline argument values.
+The data is collected by Microsoft.
+
+Disable telemetry collection by setting collect_telemetry = False in config file located here:
+{0}
+
+For more information: {1}
+""".format(config_location(), MSSQLCLI_TELEMETRY_DISCLOSURE_LINK)
+
 
 class PGCli(object):
 
@@ -724,6 +732,7 @@ def mssqlcli(database, username_opt, host, prompt_passwd,
         sys.exit(0)
 
     config_dir = os.path.dirname(config_location())
+
     if not os.path.exists(config_dir):
         os.makedirs(config_dir)
         # First usage, display telemetry message.
