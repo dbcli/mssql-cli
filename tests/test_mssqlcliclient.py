@@ -163,5 +163,6 @@ class MssqlCliClientTests(unittest.TestCase):
         finally:
             shutdown(client)
 
+
 if __name__ == u'__main__':
     unittest.main()
