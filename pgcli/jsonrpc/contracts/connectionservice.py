@@ -138,9 +138,7 @@ def handle_connection_response(response):
     # Handles complete notification and return ConnectionCompleteEvent object if connection successful.
     def handle_connection_complete_notification(response):
         if not response.connection_id:
-            sys.stderr.write(u'\nConnection did not succeed.')
-            sys.stderr.write(u'\nError message: ' + response.error_message)
-            sys.stderr.write(u'\nOther messages: '+ response.messages)
+            raise Exception(response.error_message, response.messages)
 
         return response
 
