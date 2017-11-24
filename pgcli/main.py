@@ -67,6 +67,7 @@ from pgcli.mssqlcliclient import MssqlCliClient, reset_connection_and_clients
 
 import pgcli.telemetry as telemetry_session
 
+
 # Query tuples are used for maintaining history
 MetaQuery = namedtuple(
     'Query',
@@ -91,6 +92,12 @@ OutputSettings.__new__.__defaults__ = (
 
 logger = logging.getLogger(u'mssqlcli.main')
 
+MSSQLCLI_TELEMETRY_DISCLOSURE_LINK = 'https://github.com/dbcli/mssql-cli/tree/master/doc/Telemetry_Disclosure.md'
+MSSQLCLI_TELEMETRY_PROMPT = '\nBy default, Microsoft collects anonymous usage data to improve the user ' \
+                            'experience. Participation is optional and may be disabled by setting the ' \
+                            '[collect_telemetry] option to False in the configuration file located here: {0}.'\
+                            '\nMore information can be found here: {1}'\
+                            .format(get_config(), MSSQLCLI_TELEMETRY_DISCLOSURE_LINK)
 
 class PGCli(object):
 
@@ -707,9 +714,7 @@ class PGCli(object):
               help='Automatically switch to vertical output mode if the result is wider than the terminal width.')
 @click.argument('database', default=lambda: None, envvar='MSSQLCLIDATABASE', nargs=1)
 @click.argument('username', default=lambda: None, envvar='MSSQLCLIUSER', nargs=1)
-#mssql-cli
-
-def cli(database, username_opt, host, prompt_passwd,
+def mssqlcli(database, username_opt, host, prompt_passwd,
         dbname, username, version, row_limit,
         less_chatty, prompt, auto_vertical_output, integrated_auth):
     mssqlclilogging.initialize_logger()
@@ -721,6 +726,8 @@ def cli(database, username_opt, host, prompt_passwd,
     config_dir = os.path.dirname(config_location())
     if not os.path.exists(config_dir):
         os.makedirs(config_dir)
+        # First usage, display telemetry message.
+        display_telemetry_message()
 
     # Migrate the config file from old location.
     config_full_path = config_location() + 'config'
@@ -759,6 +766,10 @@ def cli(database, username_opt, host, prompt_passwd,
         obfuscate_process_password()
 
     pgcli.run_cli()
+
+
+def display_telemetry_message():
+    print(MSSQLCLI_TELEMETRY_PROMPT)
 
 
 def obfuscate_process_password():
@@ -913,6 +924,6 @@ def format_output(title, cur, headers, status, settings):
 if __name__ == "__main__":
     try:
         telemetry_session.start()
-        cli()
+        mssqlcli()
     finally:
         telemetry_session.conclude()

@@ -16,7 +16,7 @@ import pgcli.config as config
 PRODUCT_NAME = 'mssqlcli'
 TELEMETRY_VERSION = '0.0.1'
 MSSQL_CLI_PREFIX = 'Context.Default.MSSQLCLI.'
-
+MSSQL_CLI_TELEMETRY_FILE = 'mssqlcli_telemetry.log'
 decorators.is_diagnostics_mode = telemetry_core.in_diagnostic_mode
 
 
@@ -115,14 +115,30 @@ def start():
     _session.start_time = datetime.datetime.now()
 
 
-@_user_agrees_to_telemetry
 @decorators.suppress_all_exceptions(raise_in_diagnostics=True)
 def conclude():
     _session.end_time = datetime.datetime.now()
 
     payload = _session.generate_payload()
+    output_payload_to_file(payload)
+    upload_payload(payload)
+
+
+@_user_agrees_to_telemetry
+@decorators.suppress_all_exceptions(raise_in_diagnostics=True)
+def upload_payload(payload):
     if payload:
         telemetry_core.upload(payload)
+
+
+@decorators.suppress_all_exceptions(raise_in_diagnostics=True)
+def output_payload_to_file(payload):
+    if payload:
+        config_dir = os.path.dirname(config.config_location())
+        telemetry_file_path = os.path.join(config_dir, MSSQL_CLI_TELEMETRY_FILE)
+
+        with open(telemetry_file_path, "w+") as telemetry_file:
+            json.dump(json.loads(payload), telemetry_file, indent=2)
 
 
 @decorators.suppress_all_exceptions(raise_in_diagnostics=True)
