@@ -21,3 +21,4 @@ configobj >= 5.0.6
 humanize >= 0.5.1
 cli_helpers >= 0.2.3, < 1.0.0
 mock>=1.0.1
+setproctitle>=1.1.9; sys.platform != 'win32' and sys.platform != 'win64'
