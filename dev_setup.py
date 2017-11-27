@@ -14,7 +14,7 @@ utility.exec_command('pip install -r requirements-dev.txt', utility.ROOT_DIR)
 # task manager. Also setproctitle is a hard dependency to install in Windows,
 # so we'll only install it if we're not in Windows.
 if platform.system() != 'Windows' and not platform.system().startswith("CYGWIN"):
-    utility.exec_command('pip install setproctitle >= 1.1.9', utility.ROOT_DIR)
+    utility.exec_command('pip install setproctitle>=1.1.9', utility.ROOT_DIR)
 
 # install mssqltoolsservice if this platform supports it.
 utility.copy_current_platform_mssqltoolsservice()
