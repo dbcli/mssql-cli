@@ -8,11 +8,11 @@ from configobj import ConfigObj
 
 def config_location():
     if platform.system() == 'Windows':
-        return os.getenv('USERPROFILE') + '\\AppData\\Local\\dbcli\\mssql-cli\\'
+        return os.getenv('LOCALAPPDATA') + '\\dbcli\\mssqlcli\\'
     elif 'XDG_CONFIG_HOME' in os.environ:
-        return '%s/mssql-cli/' % expanduser(os.environ['XDG_CONFIG_HOME'])
+        return '%s/mssqlcli/' % expanduser(os.environ['XDG_CONFIG_HOME'])
     else:
-        return expanduser('~/.config/mssql-cli/')
+        return expanduser('~/.config/mssqlcli/')
 
 
 def load_config(usr_cfg, def_cfg=None):
