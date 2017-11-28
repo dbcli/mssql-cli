@@ -168,7 +168,7 @@ def test_i_works(tmpdir, executor):
 def test_missing_rc_dir(tmpdir):
     try:
         rcfile = str(tmpdir.join("subdir").join("rcfile"))
-        pgcli = PGCli(pgclirc_file=rcfile)
+        pgcli = PGCli(mssqlclirc_file=rcfile)
         assert os.path.exists(rcfile)
     finally:
         pgcli.sqltoolsclient.shutdown()

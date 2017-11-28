@@ -8,11 +8,11 @@ from configobj import ConfigObj
 
 def config_location():
     if platform.system() == 'Windows':
-        return os.getenv('USERPROFILE') + '\\AppData\\Local\\dbcli\\pgcli\\'
+        return os.getenv('LOCALAPPDATA') + '\\dbcli\\mssqlcli\\'
     elif 'XDG_CONFIG_HOME' in os.environ:
-        return '%s/pgcli/' % expanduser(os.environ['XDG_CONFIG_HOME'])
+        return '%s/mssqlcli/' % expanduser(os.environ['XDG_CONFIG_HOME'])
     else:
-        return expanduser('~/.config/pgcli/')
+        return expanduser('~/.config/mssqlcli/')
 
 
 def load_config(usr_cfg, def_cfg=None):
@@ -49,16 +49,16 @@ def upgrade_config(config, def_config):
     cfg.write()
 
 
-def get_config(pgclirc_file=None):
+def get_config(config_file=None):
     from pgcli import __file__ as package_root
     package_root = os.path.dirname(package_root)
 
-    pgclirc_file = pgclirc_file or '%sconfig' % config_location()
+    config_file = config_file or '%sconfig' % config_location()
 
-    default_config = os.path.join(package_root, 'pgclirc')
-    write_default_config(default_config, pgclirc_file)
+    default_config = os.path.join(package_root, 'mssqlclirc')
+    write_default_config(default_config, config_file)
 
-    return load_config(pgclirc_file, default_config)
+    return load_config(config_file, default_config)
 
 
 def get_casing_file(config):

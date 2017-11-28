@@ -118,14 +118,14 @@ class PGCli(object):
 
     # mssql-cli
     def __init__(self, force_passwd_prompt=False,
-                 pgclirc_file=None, row_limit=None,
-                 single_connection=False, less_chatty=None, prompt=None,
+                 mssqlclirc_file=None, row_limit=None,
+                 single_connection=False, less_chatty=None,
                  auto_vertical_output=False, sql_tools_client=None, integrated_auth=False):
 
         self.force_passwd_prompt = force_passwd_prompt
 
         # Load config.
-        c = self.config = get_config(pgclirc_file)
+        c = self.config = get_config(mssqlclirc_file)
 
         self.logger = logging.getLogger(__name__)
         self.initialize_logging()
@@ -134,7 +134,7 @@ class PGCli(object):
         self.output_file = None
 
         self.multi_line = c['main'].as_bool('multi_line')
-        self.multiline_mode = c['main'].get('multi_line_mode', 'psql')
+        self.multiline_mode = c['main'].get('multi_line_mode', 'tsql')
         self.vi_mode = c['main'].as_bool('vi')
         self.auto_expand = auto_vertical_output or c['main'].as_bool(
             'auto_expand')
@@ -152,7 +152,6 @@ class PGCli(object):
         self.wider_completion_menu = c['main'].as_bool('wider_completion_menu')
         self.less_chatty = bool(less_chatty) or c['main'].as_bool('less_chatty')
         self.null_string = c['main'].get('null_string', '<null>')
-        self.prompt_format = prompt if prompt is not None else c['main'].get('prompt', self.default_prompt)
         self.on_error = c['main']['on_error'].upper()
         self.decimal_format = c['data_formats']['decimal']
         self.float_format = c['data_formats']['float']
@@ -164,7 +163,8 @@ class PGCli(object):
         self.query_history = []
 
         # Initialize completer
-        smart_completion = c['main'].as_bool('smart_completion')
+        # Smart completion is not-supported in Public Preview. Tracked by GitHub issue number 47.
+        smart_completion = False
         keyword_casing = c['main']['keyword_casing']
         self.settings = {
             'casing_file': get_casing_file(c),
@@ -433,10 +433,7 @@ class PGCli(object):
             set_vi_mode_enabled=set_vi_mode)
 
         def prompt_tokens(_):
-            prompt = self.get_prompt(self.prompt_format)
-            if (self.prompt_format == self.default_prompt and
-               len(prompt) > self.max_len_prompt):
-                prompt = self.get_prompt('\\d> ')
+            prompt = self.get_prompt()
             return [(Token.Prompt, prompt)]
 
         def get_continuation_tokens(cli, width):
@@ -659,7 +656,7 @@ class PGCli(object):
             return self.completer.get_completions(
                 Document(text=text, cursor_position=cursor_positition), None)
 
-    def get_prompt(self, string):
+    def get_prompt(self):
         # mssql-cli
         string = self.mssqlcliclient_query_execution.database + u'>'
         return string
@@ -687,8 +684,8 @@ class PGCli(object):
 @click.option('-v', '--version', is_flag=True, help='Version of pgcli.')
 @click.option('-d', '--dbname', default='', envvar='MSSQLCLIDATABASE',
         help='database name to connect to.')
-#@click.option('--pgclirc', default=config_location() + 'config',
-#        envvar='PGCLIRC', help='Location of pgclirc file.')
+@click.option('--mssqlclirc', default=config_location() + 'config',
+        envvar='MSSQLCLIRC', help='Location of mssqlclirc config file.')
 #@click.option('-D', '--dsn', default='', envvar='DSN',
 #        help='Use DSN configured into the [alias_dsn] section of pgclirc file.')
 @click.option('--row-limit', default=None, envvar='MSSQLCLIROWLIMIT', type=click.INT,
@@ -696,18 +693,16 @@ class PGCli(object):
 @click.option('--less-chatty', 'less_chatty', is_flag=True,
         default=False,
         help='Skip intro on startup and goodbye on exit.')
-@click.option('--prompt', help='Prompt format (Default: "\\u@\\h:\\d> ").')
+#@click.option('--prompt', help='Prompt format (Default: "\\u@\\h:\\d> ").')
 #@click.option('-l', '--list', 'list_databases', is_flag=True, help='list '
 #              'available databases, then exit.')
 @click.option('--auto-vertical-output', is_flag=True,
               help='Automatically switch to vertical output mode if the result is wider than the terminal width.')
 @click.argument('database', default=lambda: None, envvar='MSSQLCLIDATABASE', nargs=1)
 @click.argument('username', default=lambda: None, envvar='MSSQLCLIUSER', nargs=1)
-#mssql-cli
-
 def cli(database, username_opt, host, prompt_passwd,
-        dbname, username, version, row_limit,
-        less_chatty, prompt, auto_vertical_output, integrated_auth):
+        dbname, username, version, mssqlclirc, row_limit,
+        less_chatty, auto_vertical_output, integrated_auth):
     mssqlclilogging.initialize_logger()
 
     if version:
@@ -718,26 +713,13 @@ def cli(database, username_opt, host, prompt_passwd,
     if not os.path.exists(config_dir):
         os.makedirs(config_dir)
 
-    # Migrate the config file from old location.
-    config_full_path = config_location() + 'config'
-    if os.path.exists(os.path.expanduser('~/.pgclirc')):
-        if not os.path.exists(config_full_path):
-            shutil.move(os.path.expanduser('~/.pgclirc'), config_full_path)
-            print ('Config file (~/.pgclirc) moved to new location',
-                   config_full_path)
-        else:
-            print ('Config file is now located at', config_full_path)
-            print ('Please move the existing config file ~/.pgclirc to',
-                   config_full_path)
-
     if platform.system().lower() != 'windows' and integrated_auth:
         integrated_auth = False
         print (u'Integrated authentication not supported on this platform')
 
-    pgcli = PGCli(prompt_passwd, pgclirc_file=None,
-                  row_limit=row_limit, single_connection=False,
-                  less_chatty=less_chatty, prompt=prompt,
-                  auto_vertical_output=auto_vertical_output, integrated_auth=integrated_auth)
+    pgcli = PGCli(prompt_passwd, row_limit=row_limit, single_connection=False,
+                  mssqlclirc_file=mssqlclirc, less_chatty=less_chatty, auto_vertical_output=auto_vertical_output,
+                  integrated_auth=integrated_auth)
 
     # Choose which ever one has a valid value.
     database = database or dbname
