@@ -28,8 +28,8 @@ auto_expand = False
 generate_aliases = False
 
 # log_file location.
-# In Unix/Linux: ~/.config/pgcli/log
-# In Windows: %USERPROFILE%\AppData\Local\dbcli\pgcli\log
+# In Unix/Linux: ~/.config/mssql-cli/log
+# In Windows: %USERPROFILE%\AppData\Local\dbcli\mssql-cli\log
 # %USERPROFILE% is typically C:\Users\{username}
 log_file = default
 
@@ -37,8 +37,8 @@ log_file = default
 keyword_casing = upper
 
 # casing_file location.
-# In Unix/Linux: ~/.config/pgcli/casing
-# In Windows: %USERPROFILE%\AppData\Local\dbcli\pgcli\casing
+# In Unix/Linux: ~/.config/mssql-cli/casing
+# In Windows: %USERPROFILE%\AppData\Local\dbcli\mssql-cli\casing
 # %USERPROFILE% is typically C:\Users\{username}
 casing_file = default
 
@@ -50,8 +50,8 @@ generate_casing_file = False
 case_column_headers = True
 
 # history_file location.
-# In Unix/Linux: ~/.config/pgcli/history
-# In Windows: %USERPROFILE%\AppData\Local\dbcli\pgcli\history
+# In Unix/Linux: ~/.config/mssql-cli/history
+# In Windows: %USERPROFILE%\AppData\Local\dbcli\mssql-cli\history
 # %USERPROFILE% is typically C:\Users\{username}
 history_file = default
 
