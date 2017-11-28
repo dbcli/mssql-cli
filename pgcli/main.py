@@ -119,7 +119,7 @@ class PGCli(object):
     # mssql-cli
     def __init__(self, force_passwd_prompt=False,
                  pgclirc_file=None, row_limit=None,
-                 single_connection=False, less_chatty=None, prompt=None,
+                 single_connection=False, less_chatty=None,
                  auto_vertical_output=False, sql_tools_client=None, integrated_auth=False):
 
         self.force_passwd_prompt = force_passwd_prompt
@@ -134,7 +134,7 @@ class PGCli(object):
         self.output_file = None
 
         self.multi_line = c['main'].as_bool('multi_line')
-        self.multiline_mode = c['main'].get('multi_line_mode', 'psql')
+        self.multiline_mode = c['main'].get('multi_line_mode', 'tsql')
         self.vi_mode = c['main'].as_bool('vi')
         self.auto_expand = auto_vertical_output or c['main'].as_bool(
             'auto_expand')
@@ -152,7 +152,6 @@ class PGCli(object):
         self.wider_completion_menu = c['main'].as_bool('wider_completion_menu')
         self.less_chatty = bool(less_chatty) or c['main'].as_bool('less_chatty')
         self.null_string = c['main'].get('null_string', '<null>')
-        self.prompt_format = prompt if prompt is not None else c['main'].get('prompt', self.default_prompt)
         self.on_error = c['main']['on_error'].upper()
         self.decimal_format = c['data_formats']['decimal']
         self.float_format = c['data_formats']['float']
@@ -164,7 +163,8 @@ class PGCli(object):
         self.query_history = []
 
         # Initialize completer
-        smart_completion = c['main'].as_bool('smart_completion')
+        # Smart completion is not-supported in Public Preview. Tracked by GitHub issue
+        smart_completion = False
         keyword_casing = c['main']['keyword_casing']
         self.settings = {
             'casing_file': get_casing_file(c),
@@ -433,10 +433,7 @@ class PGCli(object):
             set_vi_mode_enabled=set_vi_mode)
 
         def prompt_tokens(_):
-            prompt = self.get_prompt(self.prompt_format)
-            if (self.prompt_format == self.default_prompt and
-               len(prompt) > self.max_len_prompt):
-                prompt = self.get_prompt('\\d> ')
+            prompt = self.get_prompt()
             return [(Token.Prompt, prompt)]
 
         def get_continuation_tokens(cli, width):
@@ -659,7 +656,7 @@ class PGCli(object):
             return self.completer.get_completions(
                 Document(text=text, cursor_position=cursor_positition), None)
 
-    def get_prompt(self, string):
+    def get_prompt(self):
         # mssql-cli
         string = self.mssqlcliclient_query_execution.database + u'>'
         return string
@@ -696,7 +693,7 @@ class PGCli(object):
 @click.option('--less-chatty', 'less_chatty', is_flag=True,
         default=False,
         help='Skip intro on startup and goodbye on exit.')
-@click.option('--prompt', help='Prompt format (Default: "\\u@\\h:\\d> ").')
+#@click.option('--prompt', help='Prompt format (Default: "\\u@\\h:\\d> ").')
 #@click.option('-l', '--list', 'list_databases', is_flag=True, help='list '
 #              'available databases, then exit.')
 @click.option('--auto-vertical-output', is_flag=True,
@@ -707,7 +704,7 @@ class PGCli(object):
 
 def cli(database, username_opt, host, prompt_passwd,
         dbname, username, version, row_limit,
-        less_chatty, prompt, auto_vertical_output, integrated_auth):
+        less_chatty, auto_vertical_output, integrated_auth):
     mssqlclilogging.initialize_logger()
 
     if version:
@@ -736,8 +733,7 @@ def cli(database, username_opt, host, prompt_passwd,
 
     pgcli = PGCli(prompt_passwd, pgclirc_file=None,
                   row_limit=row_limit, single_connection=False,
-                  less_chatty=less_chatty, prompt=prompt,
-                  auto_vertical_output=auto_vertical_output, integrated_auth=integrated_auth)
+                  less_chatty=less_chatty, auto_vertical_output=auto_vertical_output, integrated_auth=integrated_auth)
 
     # Choose which ever one has a valid value.
     database = database or dbname
