@@ -5,8 +5,8 @@
 # --------------------------------------------------------------------------------------------
 import io
 import subprocess
-import pgcli.mssqltoolsservice as mssqltoolsservice
-import pgcli.jsonrpc.jsonrpcclient as json_rpc_client
+import mssqlcli.mssqltoolsservice as mssqltoolsservice
+import mssqlcli.jsonrpc.jsonrpcclient as json_rpc_client
 import time
 
 

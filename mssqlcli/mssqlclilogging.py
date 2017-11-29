@@ -1,21 +1,14 @@
 import logging
 import logging.handlers
 import os
-from pgcli.config import config_location
-
-
-def get_config_log_dir():
-    """
-        Retrieve logging directory, create it if it doesn't exist.
-    """
-    return config_location()
+from mssqlcli.config import config_location
 
 
 def get_config_log_file():
     """
         Retrieve log file path.
     """
-    return os.path.join(get_config_log_dir(), u'mssqlcli.log')
+    return os.path.join(config_location(), u'mssqlcli.log')
 
 
 def initialize_logger():

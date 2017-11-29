@@ -1,4 +1,4 @@
-from .main import PGCli
+from .main import MssqlCli
 import sql.parse
 import sql.connection
 import logging
@@ -30,7 +30,7 @@ def pgcli_line_magic(line):
         # I can't figure out how to get the underylying psycopg2 connection
         # from the sqlalchemy connection, so just grab the url and make a
         # new connection
-        pgcli = PGCli()
+        pgcli = MssqlCli()
         u = conn.session.engine.url
         _logger.debug('New pgcli: %r', str(u))
 

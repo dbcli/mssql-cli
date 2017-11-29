@@ -11,8 +11,8 @@ try:
 except ImportError:
     setproctitle = None
 
-from pgcli.main import (
-    obfuscate_process_password, format_output, PGCli, OutputSettings
+from mssqlcli.main import (
+    obfuscate_process_password, format_output, MssqlCli, OutputSettings
 )
 
 
@@ -148,27 +148,10 @@ def test_format_output_auto_expand():
     assert list(expanded_results) == expanded
 
 
-# Special commands not supported in Mssql-cli as of Public Preview.
-# Tracked via github issue.
-"""
-@dbtest
-def test_i_works(tmpdir, executor):
-    sqlfile = tmpdir.join("test.sql")
-    sqlfile.write("SELECT NOW()")
-    rcfile = str(tmpdir.join("rcfile"))
-    cli = PGCli(
-        pgexecute=executor,
-        pgclirc_file=rcfile,
-    )
-    statement = r"\i {0}".format(sqlfile)
-    run(executor, statement, pgspecial=cli.pgspecial)
-"""
-
-
 def test_missing_rc_dir(tmpdir):
     try:
         rcfile = str(tmpdir.join("subdir").join("rcfile"))
-        pgcli = PGCli(mssqlclirc_file=rcfile)
+        pgcli = MssqlCli(mssqlclirc_file=rcfile)
         assert os.path.exists(rcfile)
     finally:
         pgcli.sqltoolsclient.shutdown()

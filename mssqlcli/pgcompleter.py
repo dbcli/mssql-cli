@@ -13,7 +13,7 @@ from .packages.sqlcompletion import (FromClauseItem,
 from .packages.parseutils.meta import ColumnMetadata, ForeignKey
 from .packages.parseutils.utils import last_word
 from .packages.parseutils.tables import TableReference
-from .packages.pgliterals.main import get_literals
+from .packages.mssqlliterals.main import get_literals
 from .packages.prioritization import PrevalenceCounter
 
 _logger = logging.getLogger(__name__)

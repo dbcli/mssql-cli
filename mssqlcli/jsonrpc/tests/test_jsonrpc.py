@@ -5,7 +5,7 @@
 
 import io
 import unittest
-import pgcli.jsonrpc.jsonrpcclient as jsonrpc
+import mssqlcli.jsonrpc.jsonrpcclient as jsonrpc
 
 
 class JsonRpcTest(unittest.TestCase):

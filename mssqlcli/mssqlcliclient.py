@@ -9,10 +9,10 @@ import uuid
 import click
 import sqlparse
 
-from pgcli import mssqlqueries
-from pgcli.jsonrpc.contracts import connectionservice, queryexecutestringservice as queryservice
-from pgcli.sqltoolsclient import SqlToolsClient
-from pgcli.packages.parseutils.meta import ForeignKey
+from mssqlcli import mssqlqueries
+from mssqlcli.jsonrpc.contracts import connectionservice, queryexecutestringservice as queryservice
+from mssqlcli.sqltoolsclient import SqlToolsClient
+from mssqlcli.packages.parseutils.meta import ForeignKey
 
 logger = logging.getLogger(u'mssqlcli.mssqlcliclient')
 time_wait_if_no_response = 0.05

@@ -5,8 +5,8 @@
 # --------------------------------------------------------------------------------------------
 import os
 import io
-import pgcli.jsonrpc.contracts.connectionservice as connectionservice
-import pgcli.jsonrpc.jsonrpcclient as json_rpc_client
+import mssqlcli.jsonrpc.contracts.connectionservice as connectionservice
+import mssqlcli.jsonrpc.jsonrpcclient as json_rpc_client
 import time
 import unittest
 

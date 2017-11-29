@@ -6,7 +6,7 @@ from prompt_toolkit.document import Document
 
 @pytest.fixture
 def completer():
-    import pgcli.pgcompleter as pgcompleter
+    import mssqlcli.pgcompleter as pgcompleter
     return pgcompleter.PGCompleter(smart_completion=False)
 
 

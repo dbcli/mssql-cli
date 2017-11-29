@@ -4,7 +4,7 @@ import pytest
 
 @pytest.fixture
 def completer():
-    import pgcli.pgcompleter as pgcompleter
+    import mssqlcli.pgcompleter as pgcompleter
     return pgcompleter.PGCompleter()
 
 

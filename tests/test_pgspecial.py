@@ -1,5 +1,5 @@
 import pytest
-from pgcli.packages.sqlcompletion import (
+from mssqlcli.packages.sqlcompletion import (
     suggest_type, Special, Database, Schema, Table, View, Function, Datatype)
 
 

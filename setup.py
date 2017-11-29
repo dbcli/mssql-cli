@@ -14,7 +14,7 @@ from setuptools import setup, find_packages
 
 _version_re = re.compile(r'__version__\s+=\s+(.*)')
 
-with open('pgcli/__init__.py', 'rb') as f:
+with open('mssqlcli/__init__.py', 'rb') as f:
     version = str(ast.literal_eval(_version_re.search(
         f.read().decode('utf-8')).group(1)))
 
@@ -64,8 +64,8 @@ setup(
     license='MIT',
     url='https://github.com/Microsoft/mssql-cli',
     packages=find_packages(),
-    package_data={'pgcli': ['pgclirc',
-                            'packages/pgliterals/sqlliterals.json']},
+    package_data={'mssqlcli': ['mssqlclirc',
+                            'packages/mssqlliterals/sqlliterals.json']},
     description=description,
     long_description=open('README.rst').read(),
     install_requires=install_requirements,

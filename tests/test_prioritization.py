@@ -1,4 +1,4 @@
-from pgcli.packages.prioritization import PrevalenceCounter
+from mssqlcli.packages.prioritization import PrevalenceCounter
 
 
 def test_prevalence_counter():

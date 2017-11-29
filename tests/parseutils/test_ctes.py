@@ -1,6 +1,6 @@
 import pytest
 from sqlparse import parse
-from pgcli.packages.parseutils.ctes import (
+from mssqlcli.packages.parseutils.ctes import (
     token_start_pos, extract_ctes,
     extract_column_names as _extract_column_names)
 
