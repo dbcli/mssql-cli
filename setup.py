@@ -37,7 +37,7 @@ install_requirements = [
     'cli_helpers >= 0.2.3, < 1.0.0',
     'future>=0.16.0',
     'wheel>=0.29.0',
-    'applicationinsights==0.10.0',
+    'applicationinsights>=0.11.1',
     'six>=1.11.0'
 ]
 
