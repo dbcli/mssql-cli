@@ -197,8 +197,8 @@ class MetaData(object):
 
     def get_completer(self, settings=None, casing=None):
         metadata = self.metadata
-        from mssqlcli.pgcompleter import PGCompleter
-        comp = PGCompleter(smart_completion=True, settings=settings)
+        from mssqlcli.mssqlcompleter import MssqlCompleter
+        comp = MssqlCompleter(smart_completion=True, settings=settings)
 
         schemata, tables, tbl_cols, views, view_cols = [], [], [], [], []
 

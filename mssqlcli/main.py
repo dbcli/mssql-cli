@@ -37,7 +37,7 @@ from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from pygments.lexers.sql import PostgresLexer
 from pygments.token import Token
 
-from .pgcompleter import PGCompleter
+from .mssqlcompleter import MssqlCompleter
 from .pgtoolbar import create_toolbar_tokens_func
 from .pgstyle import style_factory
 from .pgbuffer import PGBuffer
@@ -174,7 +174,7 @@ class MssqlCli(object):
             'keyword_casing': keyword_casing,
         }
 
-        completer = PGCompleter(smart_completion, settings=self.settings)
+        completer = MssqlCompleter(smart_completion, settings=self.settings)
 
         self.completer = completer
         self._completer_lock = threading.Lock()
@@ -389,7 +389,7 @@ class MssqlCli(object):
                 query = self.execute_command(document.text, query)
                 self.now = dt.datetime.today()
 
-                # Allow PGCompleter to learn user's preferred keywords, etc.
+                # Allow MssqlCompleter to learn user's preferred keywords, etc.
 
                 with self._completer_lock:
                     self.completer.extend_query_history(document.text)

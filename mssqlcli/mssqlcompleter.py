@@ -58,7 +58,7 @@ def generate_alias(tbl):
         [l for l, prev in zip(tbl,  '_' + tbl) if prev == '_' and l != '_'])
 
 
-class PGCompleter(Completer):
+class MssqlCompleter(Completer):
     # keywords_tree: A dict mapping keywords to well known following keywords.
     # e.g. 'CREATE': ['TABLE', 'USER', ...],
     keywords_tree = get_literals('keywords', type_=dict)
@@ -68,7 +68,7 @@ class PGCompleter(Completer):
     reserved_words = set(get_literals('reserved'))
 
     def __init__(self, smart_completion=True, settings=None):
-        super(PGCompleter, self).__init__()
+        super(MssqlCompleter, self).__init__()
         self.smart_completion = smart_completion
         self.prioritizer = PrevalenceCounter()
         settings = settings or {}
