@@ -23,28 +23,28 @@ from mssqlcli.main import (
 def test_obfuscate_process_password():
     original_title = setproctitle.getproctitle()
 
-    setproctitle.setproctitle("pgcli user=root password=secret host=localhost")
+    setproctitle.setproctitle("mssql-cli user=root password=secret host=localhost")
     obfuscate_process_password()
     title = setproctitle.getproctitle()
-    expected = "pgcli user=root password=xxxx host=localhost"
+    expected = "mssql-cli user=root password=xxxx host=localhost"
     assert title == expected
 
-    setproctitle.setproctitle("pgcli user=root password=top secret host=localhost")
+    setproctitle.setproctitle("mssql-cli user=root password=top secret host=localhost")
     obfuscate_process_password()
     title = setproctitle.getproctitle()
-    expected = "pgcli user=root password=xxxx host=localhost"
+    expected = "mssql-cli user=root password=xxxx host=localhost"
     assert title == expected
 
-    setproctitle.setproctitle("pgcli user=root password=top secret")
+    setproctitle.setproctitle("mssql-cli user=root password=top secret")
     obfuscate_process_password()
     title = setproctitle.getproctitle()
-    expected = "pgcli user=root password=xxxx"
+    expected = "mssql-cli user=root password=xxxx"
     assert title == expected
 
-    setproctitle.setproctitle("pgcli postgres://root:secret@localhost/db")
+    setproctitle.setproctitle("mssql-cli postgres://root:secret@localhost/db")
     obfuscate_process_password()
     title = setproctitle.getproctitle()
-    expected = "pgcli postgres://root:xxxx@localhost/db"
+    expected = "mssql-cli postgres://root:xxxx@localhost/db"
     assert title == expected
 
     setproctitle.setproctitle(original_title)
@@ -151,7 +151,7 @@ def test_format_output_auto_expand():
 def test_missing_rc_dir(tmpdir):
     try:
         rcfile = str(tmpdir.join("subdir").join("rcfile"))
-        pgcli = MssqlCli(mssqlclirc_file=rcfile)
+        mssqlcli = MssqlCli(mssqlclirc_file=rcfile)
         assert os.path.exists(rcfile)
     finally:
-        pgcli.sqltoolsclient.shutdown()
+        mssqlcli.sqltoolsclient.shutdown()

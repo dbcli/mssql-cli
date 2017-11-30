@@ -20,8 +20,9 @@ TableMetadata = namedtuple('TableMetadata', 'name columns')
 
 
 def parse_defaults(defaults_string):
-    """Yields default values for a function, given the string provided by
-    pg_get_expr(pg_catalog.pg_proc.proargdefaults, 0)"""
+    """
+    Yields default values for a function, given the string provided.
+    """
     if not defaults_string:
         return
     current = ''

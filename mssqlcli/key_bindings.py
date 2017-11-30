@@ -10,7 +10,7 @@ _logger = logging.getLogger(__name__)
 
 def mssqlcli_bindings(get_vi_mode_enabled, set_vi_mode_enabled):
     """
-    Custom key bindings for pgcli.
+    Custom key bindings for mssqlcli.
     """
     assert callable(get_vi_mode_enabled)
     assert callable(set_vi_mode_enabled)

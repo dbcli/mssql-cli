@@ -7,7 +7,7 @@ from mssqlcli.jsonrpc.contracts import Request
 import sys
 import logging
 
-logger = logging.getLogger(u'pgcli.jsonrpc.contracts.connectionservice')
+logger = logging.getLogger(u'mssqlcli.connectionservice')
 
 
 class ConnectionRequest(Request):
