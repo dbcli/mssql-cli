@@ -8,8 +8,10 @@ diagnostics mode.
 """
 
 import hashlib
+import uuid
+import os
 from functools import wraps
-
+import pgcli.config as config
 
 # module global variable
 is_diagnostics_mode = False
@@ -58,14 +60,30 @@ def hash256_result(func):
     function doesn't return string or return None, raise ValueError."""
     @wraps(func)
     def _decorator(*args, **kwargs):
+        salt = generate_salt()
+        print(salt)
         val = func(*args, **kwargs)
         if not val:
             raise ValueError('Return value is None')
         elif not isinstance(val, str):
             raise ValueError('Return value is not string')
-        hash_object = hashlib.sha256(val.encode('utf-8'))
+        hash_object = hashlib.sha256(salt.encode() + val.encode('utf-8') + os.path.expanduser('~').encode())
         return str(hash_object.hexdigest())
     return _decorator
+
+
+def generate_salt():
+    MSSQLCLI_TELEMETRY_FILE = '.telemetry'
+    tel_file = os.path.join(config.config_location(), MSSQLCLI_TELEMETRY_FILE)
+    if not os.path.exists(tel_file):
+        salt = uuid.uuid4().hex
+        with open(tel_file, 'w+') as file2:
+            file2.write(salt)
+        return salt
+    else:
+        with open(tel_file, 'r+') as file2:
+            salt = file2.read()
+            return salt
 
 
 def suppress_all_exceptions(raise_in_diagnostics=False, fallback_return=None):
