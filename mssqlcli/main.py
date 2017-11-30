@@ -7,12 +7,11 @@ import sys
 import traceback
 import logging
 import threading
-import shutil
 import functools
 import humanize
 import datetime as dt
 import itertools
-from time import time, sleep
+from time import time
 from codecs import open
 import platform
 
@@ -44,8 +43,8 @@ from .pgstyle import style_factory
 from .pgbuffer import PGBuffer
 from .completion_refresher import CompletionRefresher
 from .config import (get_casing_file,
-    load_config, config_location, ensure_dir_exists, get_config)
-from .key_bindings import pgcli_bindings
+    config_location, ensure_dir_exists, get_config)
+from .key_bindings import mssqlcli_bindings
 from .encodingutils import utf8tounicode
 from .encodingutils import text_type
 from .__init__ import __version__
@@ -61,7 +60,6 @@ from getpass import getuser
 from collections import namedtuple
 
 #mssql-cli imports
-from mssqlcli import mssqlclilogging
 from mssqlcli.sqltoolsclient import SqlToolsClient
 from mssqlcli.mssqlcliclient import MssqlCliClient, reset_connection_and_clients
 
@@ -86,8 +84,6 @@ OutputSettings = namedtuple(
 OutputSettings.__new__.__defaults__ = (
     None, None, None, '<null>', False, None, lambda x: x
 )
-
-logger = logging.getLogger(u'mssqlcli.main')
 
 
 class MssqlCli(object):
@@ -126,7 +122,7 @@ class MssqlCli(object):
         # Load config.
         c = self.config = get_config(mssqlclirc_file)
 
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger(u'mssqlcli.main')
         self.initialize_logging()
 
         self.set_default_pager(c)
@@ -244,11 +240,11 @@ class MssqlCli(object):
 
         handler.setFormatter(formatter)
 
-        root_logger = logging.getLogger('pgcli')
+        root_logger = logging.getLogger('mssqlcli')
         root_logger.addHandler(handler)
         root_logger.setLevel(log_level)
 
-        root_logger.debug('Initializing pgcli logging.')
+        root_logger.info('Initializing mssqlcli logging.')
         root_logger.debug('Log file %r.', log_file)
 
     def connect(self, database='', host='', user='', port='', passwd='',
@@ -311,7 +307,6 @@ class MssqlCli(object):
             # Issue where Ctrl+C propagates to sql tools service process and kills it,
             # so that query/cancel request can't be sent.
             # Right now the sql_tools_service process is killed and we restart it with a new connection.
-            # Address in Github Issue 46.
             click.secho(u'Cancelling query...', err=True, fg='red')
             reset_connection_and_clients(self.sqltoolsclient,
                                          self.mssqlcliclient_query_execution)
@@ -376,7 +371,7 @@ class MssqlCli(object):
         if not self.less_chatty:
             print('Version:', __version__)
             print('Mail: sqlcli@microsoft.com')
-            print('Home: http://github.com/Microsoft/mssql-cli')
+            print('Home: http://github.com/dbcli/mssql-cli')
 
         try:
             while True:
@@ -411,7 +406,7 @@ class MssqlCli(object):
         def set_vi_mode(value):
             self.vi_mode = value
 
-        key_binding_manager = pgcli_bindings(
+        key_binding_manager = mssqlcli_bindings(
             get_vi_mode_enabled=lambda: self.vi_mode,
             set_vi_mode_enabled=set_vi_mode)
 
@@ -603,7 +598,7 @@ class MssqlCli(object):
                 # Leave the new prioritizer as is
                 pass
 
-            # When pgcli is first launched we call refresh_completions before
+            # When mssql-cli is first launched we call refresh_completions before
             # instantiating the cli object. So it is necessary to check if cli
             # exists before trying the replace the completer object in cli.
             if self.cli:
@@ -625,35 +620,24 @@ class MssqlCli(object):
 
 
 @click.command()
-# Default host is '' so psycopg2 can default to either localhost or unix socket
 @click.option('-h', '--host', default='', envvar='MSSQLCLIHOST',
         help='Host address of the SQL Server database.')
-#@click.option('-p', '--port', default=5432, help='Port number at which the '
-#        'postgres instance is listening.', envvar='PGPORT')
 @click.option('-U', '--username', 'username_opt', envvar='MSSQLCLIUSER',
         help='Username to connect to the postgres database.')
 @click.option('-W', '--password', 'prompt_passwd', is_flag=True, default=False,
         help='Force password prompt.')
 @click.option('-I', '--integrated', 'integrated_auth', is_flag=True, default=False,
               help='Use integrated authentication on windows.')
-#@click.option('--single-connection', 'single_connection', is_flag=True,
-#        default=False,
-#        help='Do not use a separate connection for completions.')
 @click.option('-v', '--version', is_flag=True, help='Version of mssql-cli.')
 @click.option('-d', '--dbname', default='', envvar='MSSQLCLIDATABASE',
         help='database name to connect to.')
 @click.option('--mssqlclirc', default=config_location() + 'config',
         envvar='MSSQLCLIRC', help='Location of mssqlclirc config file.')
-#@click.option('-D', '--dsn', default='', envvar='DSN',
-#        help='Use DSN configured into the [alias_dsn] section of pgclirc file.')
 @click.option('--row-limit', default=None, envvar='MSSQLCLIROWLIMIT', type=click.INT,
         help='Set threshold for row limit prompt. Use 0 to disable prompt.')
 @click.option('--less-chatty', 'less_chatty', is_flag=True,
         default=False,
         help='Skip intro on startup and goodbye on exit.')
-#@click.option('--prompt', help='Prompt format (Default: "\\u@\\h:\\d> ").')
-#@click.option('-l', '--list', 'list_databases', is_flag=True, help='list '
-#              'available databases, then exit.')
 @click.option('--auto-vertical-output', is_flag=True,
               help='Automatically switch to vertical output mode if the result is wider than the terminal width.')
 @click.argument('database', default=lambda: None, envvar='MSSQLCLIDATABASE', nargs=1)
@@ -661,7 +645,6 @@ class MssqlCli(object):
 def cli(database, username_opt, host, prompt_passwd,
         dbname, username, version, mssqlclirc, row_limit,
         less_chatty, auto_vertical_output, integrated_auth):
-    mssqlclilogging.initialize_logger()
 
     if version:
         print('Version:', __version__)
@@ -676,8 +659,8 @@ def cli(database, username_opt, host, prompt_passwd,
         print (u'Integrated authentication not supported on this platform')
 
     mssqlcli = MssqlCli(prompt_passwd, row_limit=row_limit, single_connection=False,
-                     mssqlclirc_file=mssqlclirc, less_chatty=less_chatty, auto_vertical_output=auto_vertical_output,
-                     integrated_auth=integrated_auth)
+                        mssqlclirc_file=mssqlclirc, less_chatty=less_chatty, auto_vertical_output=auto_vertical_output,
+                        integrated_auth=integrated_auth)
 
     # Choose which ever one has a valid value.
     database = database or dbname
