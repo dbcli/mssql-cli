@@ -3,7 +3,7 @@ from prompt_toolkit.filters import Condition
 from .packages.parseutils.utils import is_open_quote
 
 
-class PGBuffer(Buffer):
+class MssqlBuffer(Buffer):
     def __init__(self, always_multiline, multiline_mode, *args, **kwargs):
         self.always_multiline = always_multiline
         self.multiline_mode = multiline_mode

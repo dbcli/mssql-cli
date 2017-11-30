@@ -38,9 +38,9 @@ from pygments.lexers.sql import PostgresLexer
 from pygments.token import Token
 
 from .mssqlcompleter import MssqlCompleter
-from .pgtoolbar import create_toolbar_tokens_func
-from .pgstyle import style_factory
-from .pgbuffer import PGBuffer
+from .mssqltoolbar import create_toolbar_tokens_func
+from .mssqlstyle import style_factory
+from .mssqlbuffer import MssqlBuffer
 from .completion_refresher import CompletionRefresher
 from .config import (get_casing_file,
     config_location, ensure_dir_exists, get_config)
@@ -261,7 +261,7 @@ class MssqlCli(object):
         # If password prompt is not forced but no password is provided, try
         # getting it from environment variable.
         if not self.force_passwd_prompt and not passwd:
-            passwd = os.environ.get('PGPASSWORD', '')
+            passwd = os.environ.get('MSSQLCLIPASSWORD', '')
 
         if not self.integrated_auth:
             # Prompt for a password immediately if requested via the -W flag. This
@@ -439,7 +439,7 @@ class MssqlCli(object):
             ])
 
         with self._completer_lock:
-            buf = PGBuffer(
+            buf = MssqlBuffer(
                 auto_suggest=AutoSuggestFromHistory(),
                 always_multiline=self.multi_line,
                 multiline_mode=self.multiline_mode,
@@ -505,13 +505,18 @@ class MssqlCli(object):
                 all_success = False
                 continue
 
+            if self.auto_expand:
+                max_width = self.cli.output.get_size().columns
+            else:
+                max_width = None
+
             settings = OutputSettings(
                 table_format=self.table_format,
                 dcmlfmt=self.decimal_format,
                 floatfmt=self.float_format,
                 missingval=self.null_string,
                 expanded=self.expanded_output,
-                max_width=None,
+                max_width=max_width,
                 case_function=(
                     # mssql-cli Github Issue 16 : Commenting out completer
                     # self.completer.case if self.settings['case_column_headers']
