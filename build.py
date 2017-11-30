@@ -138,7 +138,7 @@ def publish_official():
     Publish mssql-cli package to PyPi.
     """
     mssqlcli_wheel_dir = os.listdir(utility.MSSQLCLI_DIST_DIRECTORY)
-    # Run twine action for mssqlscripter.
+    # Run twine action for mssql-cli.
     # Only authorized users with credentials will be able to upload this package.
     # Credentials will be stored in a .pypirc file.
     for wheel in mssqlcli_wheel_dir:
