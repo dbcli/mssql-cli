@@ -148,7 +148,8 @@ def conclude():
 @decorators.suppress_all_exceptions(raise_in_diagnostics=True)
 def upload_payload(payload):
     if payload:
-        telemetry_core.upload(payload)
+        import subprocess
+        subprocess.Popen([sys.executable, os.path.realpath(telemetry_core.__file__), payload])
 
 
 @decorators.suppress_all_exceptions(raise_in_diagnostics=True)

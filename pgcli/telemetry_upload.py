@@ -4,8 +4,21 @@ import json
 import six
 import pgcli.decorators as decorators
 
+from applicationinsights import TelemetryClient
+from applicationinsights.channel import TelemetryChannel, SynchronousQueue, SynchronousSender
+from applicationinsights.exceptions import enable
+
 DIAGNOSTICS_TELEMETRY_ENV_NAME = 'MSSQL_CLI_DIAGNOSTICS_TELEMETRY'
-INSTRUMENTATION_KEY = 'cbc4f7ec-b85f-4b54-9c46-e4db79836a8f'
+INSTRUMENTATION_KEY = 'AIF-5574968e-856d-40d2-af67-c89a14e76412'
+
+try:
+    # Python 2.x
+    import urllib2 as HTTPClient
+    from urllib2 import HTTPError
+except ImportError:
+    # Python 3.x
+    import urllib.request as HTTPClient
+    from urllib.error import HTTPError
 
 
 def in_diagnostic_mode():
@@ -16,13 +29,59 @@ def in_diagnostic_mode():
     return bool(os.environ.get(DIAGNOSTICS_TELEMETRY_ENV_NAME, False))
 
 
+class VortexSynchronousSender(SynchronousSender):
+    """
+        A Synchronous sender specific to the Vortex service with limited retry logic.
+    """
+    def __init__(self, service_endpoint_uri='https://vortex.data.microsoft.com/collect/v1'):
+        SynchronousSender.__init__(self, service_endpoint_uri)
+        self.retry = 0
+
+    def send(self, data_to_send):
+        """
+            Override the send method to strip the request_payload's brackets since Vortex does not
+        """
+        request_payload = json.dumps([a.write() for a in data_to_send]).strip('[').strip(']')
+
+        request = HTTPClient.Request(self._service_endpoint_uri, bytearray(request_payload, 'utf-8'),
+                                     {'Accept': 'application/json',
+                                      'Content-Type': 'application/json; charset=utf-8'})
+        try:
+            response = HTTPClient.urlopen(request, timeout=self._timeout)
+            status_code = response.getcode()
+            if 200 <= status_code < 300:
+                return
+        except HTTPError as e:
+            if e.getcode() == 400:
+                return
+        except Exception:
+            if self.retry < 3:
+                self.retry += 1
+            else:
+                return
+
+        # Add our unsent data back on to the queue
+        for data in data_to_send:
+            self._queue.put(data)
+
+
+def build_vortex_telemetry_client():
+    """
+        Build vortex telemetry client.
+    """
+    vortex_sender = VortexSynchronousSender()
+    sync_queue = SynchronousQueue(vortex_sender)
+    channel = TelemetryChannel(None, queue=sync_queue)
+
+    client = TelemetryClient(INSTRUMENTATION_KEY, channel)
+    enable(INSTRUMENTATION_KEY)
+    return client
+
+
 @decorators.suppress_all_exceptions(raise_in_diagnostics=True)
 def upload(data_to_save):
-    from applicationinsights import TelemetryClient
-    from applicationinsights.exceptions import enable
 
-    client = TelemetryClient(INSTRUMENTATION_KEY)
-    enable(INSTRUMENTATION_KEY)
+    client = build_vortex_telemetry_client()
 
     if in_diagnostic_mode():
         sys.stdout.write('Telemetry upload begins\n')
@@ -38,7 +97,7 @@ def upload(data_to_save):
     for record in data_to_save:
         name = record['name']
         raw_properties = record['properties']
-        properties = {}
+        properties = {}#
         measurements = {}
         for k in raw_properties:
             v = raw_properties[k]
