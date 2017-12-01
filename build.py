@@ -3,7 +3,7 @@ from azure.storage.blob import BlockBlobService, ContentSettings
 import os
 import sys
 import utility
-import pgcli.mssqltoolsservice.externals as mssqltoolsservice
+import mssqlcli.mssqltoolsservice.externals as mssqltoolsservice
 
 AZURE_STORAGE_CONNECTION_STRING = os.environ.get('AZURE_STORAGE_CONNECTION_STRING')
 BLOB_CONTAINER_NAME = 'daily'
@@ -138,7 +138,7 @@ def publish_official():
     Publish mssql-cli package to PyPi.
     """
     mssqlcli_wheel_dir = os.listdir(utility.MSSQLCLI_DIST_DIRECTORY)
-    # Run twine action for mssqlscripter.
+    # Run twine action for mssql-cli.
     # Only authorized users with credentials will be able to upload this package.
     # Credentials will be stored in a .pypirc file.
     for wheel in mssqlcli_wheel_dir:
@@ -152,8 +152,8 @@ def unit_test():
     Run all unit tests.
     """
     utility.exec_command(
-        'pytest --cov pgcli tests/test_mssqlcliclient.py tests/test_main.py tests/test_fuzzy_completion.py '
-        'tests/test_rowlimit.py tests/test_sqlcompletion.py tests/test_prioritization.py pgcli/jsonrpc/contracts/tests',
+        'pytest --cov mssqlcli tests/test_mssqlcliclient.py tests/test_main.py tests/test_fuzzy_completion.py '
+        'tests/test_rowlimit.py tests/test_sqlcompletion.py tests/test_prioritization.py mssqlcli/jsonrpc/contracts/tests',
         utility.ROOT_DIR,
         continue_on_error=False)
 

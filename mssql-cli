@@ -13,4 +13,4 @@ if [ -z ${PYTHONIOENCODING+x} ]; then export PYTHONIOENCODING=utf8; fi
 
 export PYTHONPATH="${DIR}:${PYTHONPATH}"
 
-python -m pgcli.main "$@"
+python -m mssqlcli.main "$@"

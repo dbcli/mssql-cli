@@ -50,7 +50,7 @@ def upgrade_config(config, def_config):
 
 
 def get_config(config_file=None):
-    from pgcli import __file__ as package_root
+    from mssqlcli import __file__ as package_root
     package_root = os.path.dirname(package_root)
 
     config_file = config_file or '%sconfig' % config_location()

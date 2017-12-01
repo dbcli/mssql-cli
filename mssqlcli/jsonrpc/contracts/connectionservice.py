@@ -2,12 +2,12 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------
-from pgcli.jsonrpc.contracts import Request
+from mssqlcli.jsonrpc.contracts import Request
 
 import sys
 import logging
 
-logger = logging.getLogger(u'pgcli.jsonrpc.contracts.connectionservice')
+logger = logging.getLogger(u'mssqlcli.connectionservice')
 
 
 class ConnectionRequest(Request):

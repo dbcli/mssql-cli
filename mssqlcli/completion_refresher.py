@@ -2,7 +2,7 @@ import logging
 import threading
 
 from collections import OrderedDict
-from .pgcompleter import PGCompleter
+from .mssqlcompleter import MssqlCompleter
 
 logger = logging.getLogger(u'mssqlcli.completion_refresher')
 
@@ -18,7 +18,7 @@ class CompletionRefresher(object):
     def refresh(self, mssqcliclient, callbacks, history=None,
                 settings=None):
         """
-        Creates a PGCompleter object and populates it with the relevant
+        Creates a MssqlCompleter object and populates it with the relevant
         completion suggestions in a background thread.
 
         mssqlcliclient - used to extract the credentials to connect
@@ -47,7 +47,7 @@ class CompletionRefresher(object):
     def _bg_refresh(self, mssqlcliclient, callbacks, history=None,
                     settings=None):
         settings = settings or {}
-        completer = PGCompleter(smart_completion=True, settings=settings)
+        completer = MssqlCompleter(smart_completion=True, settings=settings)
 
         executor = mssqlcliclient
         executor.connect()
@@ -70,7 +70,7 @@ class CompletionRefresher(object):
             # break statement.
             continue
 
-        # Load history into pgcompleter so it can learn user preferences
+        # Load history into mssqlcompleter so it can learn user preferences
         n_recent = 100
         if history:
             for recent in history[-n_recent:]:

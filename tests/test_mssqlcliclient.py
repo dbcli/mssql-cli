@@ -8,10 +8,11 @@ import io
 import unittest
 from time import sleep
 
-import pgcli.sqltoolsclient as sqltoolsclient
-import pgcli.mssqlcliclient as mssqlcliclient
-from pgcli.jsonrpc.jsonrpcclient import JsonRpcWriter
+import mssqlcli.sqltoolsclient as sqltoolsclient
+import mssqlcli.mssqlcliclient as mssqlcliclient
+from mssqlcli.jsonrpc.jsonrpcclient import JsonRpcWriter
 from mssqlutils import create_mssql_cli_client, shutdown
+
 
 # All tests apart from test_mssqlcliclient_request_response require a live connection to an
 # AdventureWorks2014 database with a hardcoded test server.
@@ -35,7 +36,7 @@ class MssqlCliClientTests(unittest.TestCase):
                     os.path.abspath(__file__),
                     u'..',
                     u'..',
-                    u'pgcli',
+                    u'mssqlcli',
                     u'jsonrpc',
                     u'contracts',
                     u'tests',

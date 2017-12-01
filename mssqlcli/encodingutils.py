@@ -8,7 +8,7 @@ text_type = unicode if PY2 else str
 
 def unicode2utf8(arg):
     """
-    Only in Python 2. Psycopg2 expects the args as bytes not unicode.
+    Only in Python 2.
     In Python 3 the args are expected as unicode.
     """
 
@@ -19,7 +19,7 @@ def unicode2utf8(arg):
 
 def utf8tounicode(arg):
     """
-    Only in Python 2. Psycopg2 returns the error message as utf-8.
+    Only in Python 2.
     In Python 3 the errors are returned as unicode.
     """
 

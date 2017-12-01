@@ -9,10 +9,10 @@ import io
 import time
 import sys
 
-import pgcli.mssqltoolsservice as mssqltoolsservice
-import pgcli.jsonrpc.jsonrpcclient as json_rpc_client
-import pgcli.jsonrpc.contracts.connectionservice as connection
-import pgcli.jsonrpc.contracts.queryexecutestringservice as query
+import mssqlcli.mssqltoolsservice as mssqltoolsservice
+import mssqlcli.jsonrpc.jsonrpcclient as json_rpc_client
+import mssqlcli.jsonrpc.contracts.connectionservice as connection
+import mssqlcli.jsonrpc.contracts.queryexecutestringservice as query
 
 logger = logging.getLogger(u'mssqlcli.sqltoolsclient')
 sqltoolsservice_args = [mssqltoolsservice.get_executable_path()]

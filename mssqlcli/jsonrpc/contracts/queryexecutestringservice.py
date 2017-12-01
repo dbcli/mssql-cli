@@ -3,7 +3,7 @@
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------
 
-from pgcli.jsonrpc.contracts import Request
+from mssqlcli.jsonrpc.contracts import Request
 
 
 class QueryExecuteStringRequest(Request):

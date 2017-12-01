@@ -1,7 +1,7 @@
-from pgcli.packages.sqlcompletion import (
+from mssqlcli.packages.sqlcompletion import (
     suggest_type, Database, Schema, Table, Column, View, Keyword,
     FromClauseItem, Function, Datatype, Alias, JoinCondition, Join)
-from pgcli.packages.parseutils.tables import TableReference
+from mssqlcli.packages.parseutils.tables import TableReference
 import pytest
 
 

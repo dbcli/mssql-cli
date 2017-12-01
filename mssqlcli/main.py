@@ -7,12 +7,11 @@ import sys
 import traceback
 import logging
 import threading
-import shutil
 import functools
 import humanize
 import datetime as dt
 import itertools
-from time import time, sleep
+from time import time
 from codecs import open
 import platform
 
@@ -38,14 +37,14 @@ from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from pygments.lexers.sql import PostgresLexer
 from pygments.token import Token
 
-from .pgcompleter import PGCompleter
-from .pgtoolbar import create_toolbar_tokens_func
-from .pgstyle import style_factory
-from .pgbuffer import PGBuffer
+from .mssqlcompleter import MssqlCompleter
+from .mssqltoolbar import create_toolbar_tokens_func
+from .mssqlstyle import style_factory
+from .mssqlbuffer import MssqlBuffer
 from .completion_refresher import CompletionRefresher
 from .config import (get_casing_file,
-    load_config, config_location, ensure_dir_exists, get_config)
-from .key_bindings import pgcli_bindings
+    config_location, ensure_dir_exists, get_config)
+from .key_bindings import mssqlcli_bindings
 from .encodingutils import utf8tounicode
 from .encodingutils import text_type
 from .__init__ import __version__
@@ -61,9 +60,8 @@ from getpass import getuser
 from collections import namedtuple
 
 #mssql-cli imports
-from pgcli import mssqlclilogging
-from pgcli.sqltoolsclient import SqlToolsClient
-from pgcli.mssqlcliclient import MssqlCliClient, reset_connection_and_clients
+from mssqlcli.sqltoolsclient import SqlToolsClient
+from mssqlcli.mssqlcliclient import MssqlCliClient, reset_connection_and_clients
 
 # Query tuples are used for maintaining history
 MetaQuery = namedtuple(
@@ -87,12 +85,9 @@ OutputSettings.__new__.__defaults__ = (
     None, None, None, '<null>', False, None, lambda x: x
 )
 
-logger = logging.getLogger(u'mssqlcli.main')
 
+class MssqlCli(object):
 
-class PGCli(object):
-
-    default_prompt = '\\u@\\h:\\d> '
     max_len_prompt = 30
 
     def set_default_pager(self, config):
@@ -127,7 +122,7 @@ class PGCli(object):
         # Load config.
         c = self.config = get_config(mssqlclirc_file)
 
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger(u'mssqlcli.main')
         self.initialize_logging()
 
         self.set_default_pager(c)
@@ -179,11 +174,10 @@ class PGCli(object):
             'keyword_casing': keyword_casing,
         }
 
-        completer = PGCompleter(smart_completion, settings=self.settings)
+        completer = MssqlCompleter(smart_completion, settings=self.settings)
 
         self.completer = completer
         self._completer_lock = threading.Lock()
-        self.register_special_commands()
 
         self.eventloop = create_eventloop()
         self.cli = None
@@ -197,11 +191,6 @@ class PGCli(object):
         # Shut-down sqltoolsservice
         if self.sqltoolsclient:
             self.sqltoolsclient.shutdown()
-
-    def register_special_commands(self):
-        # Special commands not supported in mssql-cli right now.
-        # Tracked by Github issue
-        pass
 
     def write_to_file(self, pattern, **_):
         if not pattern:
@@ -251,11 +240,11 @@ class PGCli(object):
 
         handler.setFormatter(formatter)
 
-        root_logger = logging.getLogger('pgcli')
+        root_logger = logging.getLogger('mssqlcli')
         root_logger.addHandler(handler)
         root_logger.setLevel(log_level)
 
-        root_logger.debug('Initializing pgcli logging.')
+        root_logger.info('Initializing mssqlcli logging.')
         root_logger.debug('Log file %r.', log_file)
 
     def connect(self, database='', host='', user='', port='', passwd='',
@@ -272,7 +261,7 @@ class PGCli(object):
         # If password prompt is not forced but no password is provided, try
         # getting it from environment variable.
         if not self.force_passwd_prompt and not passwd:
-            passwd = os.environ.get('PGPASSWORD', '')
+            passwd = os.environ.get('MSSQLCLIPASSWORD', '')
 
         if not self.integrated_auth:
             # Prompt for a password immediately if requested via the -W flag. This
@@ -318,7 +307,6 @@ class PGCli(object):
             # Issue where Ctrl+C propagates to sql tools service process and kills it,
             # so that query/cancel request can't be sent.
             # Right now the sql_tools_service process is killed and we restart it with a new connection.
-            # Address in Github Issue 46.
             click.secho(u'Cancelling query...', err=True, fg='red')
             reset_connection_and_clients(self.sqltoolsclient,
                                          self.mssqlcliclient_query_execution)
@@ -364,17 +352,7 @@ class PGCli(object):
                 self.refresh_completions(persist_priorities='keywords')
             elif query.meta_changed:
                 self.refresh_completions(persist_priorities='all')
-            # Mssql-cli need to investigate if this is required. Currently not implemented.
-            # Tracked by Github issue
-            """
-            elif query.path_changed:
-                logger.debug('Refreshing search path')
-                with self._completer_lock:
-                    self.completer.set_search_path(
-                        self.pgexecute.search_path())
-                logger.debug('Search path: %r',
-                             self.completer.search_path)
-            """
+
         return query
 
     def run_cli(self):
@@ -393,7 +371,7 @@ class PGCli(object):
         if not self.less_chatty:
             print('Version:', __version__)
             print('Mail: sqlcli@microsoft.com')
-            print('Home: http://github.com/Microsoft/mssql-cli')
+            print('Home: http://github.com/dbcli/mssql-cli')
 
         try:
             while True:
@@ -411,7 +389,7 @@ class PGCli(object):
                 query = self.execute_command(document.text, query)
                 self.now = dt.datetime.today()
 
-                # Allow PGCompleter to learn user's preferred keywords, etc.
+                # Allow MssqlCompleter to learn user's preferred keywords, etc.
 
                 with self._completer_lock:
                     self.completer.extend_query_history(document.text)
@@ -428,7 +406,7 @@ class PGCli(object):
         def set_vi_mode(value):
             self.vi_mode = value
 
-        key_binding_manager = pgcli_bindings(
+        key_binding_manager = mssqlcli_bindings(
             get_vi_mode_enabled=lambda: self.vi_mode,
             set_vi_mode_enabled=set_vi_mode)
 
@@ -440,12 +418,6 @@ class PGCli(object):
             continuation=self.multiline_continuation_char * (width - 1) + ' '
             return [(Token.Continuation, continuation)]
 
-        # mssql-cli Issue 16
-        """get_toolbar_tokens = create_toolbar_tokens_func(
-            lambda: self.vi_mode, self.completion_refresher.is_refreshing,
-            self.pgexecute.failed_transaction,
-            self.pgexecute.valid_transaction)
-        """
         get_toolbar_tokens = create_toolbar_tokens_func(
             lambda: self.vi_mode, None,
             None,
@@ -467,7 +439,7 @@ class PGCli(object):
             ])
 
         with self._completer_lock:
-            buf = PGBuffer(
+            buf = MssqlBuffer(
                 auto_suggest=AutoSuggestFromHistory(),
                 always_multiline=self.multi_line,
                 multiline_mode=self.multiline_mode,
@@ -533,13 +505,18 @@ class PGCli(object):
                 all_success = False
                 continue
 
+            if self.auto_expand:
+                max_width = self.cli.output.get_size().columns
+            else:
+                max_width = None
+
             settings = OutputSettings(
                 table_format=self.table_format,
                 dcmlfmt=self.decimal_format,
                 floatfmt=self.float_format,
                 missingval=self.null_string,
                 expanded=self.expanded_output,
-                max_width=None,
+                max_width=max_width,
                 case_function=(
                     # mssql-cli Github Issue 16 : Commenting out completer
                     # self.completer.case if self.settings['case_column_headers']
@@ -556,25 +533,6 @@ class PGCli(object):
                 self.mssqlcliclient_query_execution.database = new_db_name
 
         return output, MetaQuery(sql, all_success, total, meta_changed, db_changed, path_changed, mutated)
-
-        # mssql-cli Issue 16 and Issue 27
-        # The below code path needs to be addressed later as queries that change the state of the database
-        # Keep track of whether any of the queries are mutating or changing
-        # the database
-        """
-        if success:
-            mutated = mutated or is_mutating(status)
-            db_changed = db_changed or has_change_db_cmd(sql)
-            meta_changed = meta_changed or has_meta_cmd(sql)
-            path_changed = path_changed or has_change_path_cmd(sql)
-        else:
-            all_success = False
-
-        meta_query = MetaQuery(text, all_success, total, meta_changed,
-                               db_changed, path_changed, mutated)
-
-        return output, meta_query
-        """
 
     def _handle_server_closed_connection(self):
         """Used during CLI execution"""
@@ -645,7 +603,7 @@ class PGCli(object):
                 # Leave the new prioritizer as is
                 pass
 
-            # When pgcli is first launched we call refresh_completions before
+            # When mssql-cli is first launched we call refresh_completions before
             # instantiating the cli object. So it is necessary to check if cli
             # exists before trying the replace the completer object in cli.
             if self.cli:
@@ -667,35 +625,24 @@ class PGCli(object):
 
 
 @click.command()
-# Default host is '' so psycopg2 can default to either localhost or unix socket
 @click.option('-h', '--host', default='', envvar='MSSQLCLIHOST',
         help='Host address of the SQL Server database.')
-#@click.option('-p', '--port', default=5432, help='Port number at which the '
-#        'postgres instance is listening.', envvar='PGPORT')
 @click.option('-U', '--username', 'username_opt', envvar='MSSQLCLIUSER',
         help='Username to connect to the postgres database.')
 @click.option('-W', '--password', 'prompt_passwd', is_flag=True, default=False,
         help='Force password prompt.')
 @click.option('-I', '--integrated', 'integrated_auth', is_flag=True, default=False,
               help='Use integrated authentication on windows.')
-#@click.option('--single-connection', 'single_connection', is_flag=True,
-#        default=False,
-#        help='Do not use a separate connection for completions.')
-@click.option('-v', '--version', is_flag=True, help='Version of pgcli.')
+@click.option('-v', '--version', is_flag=True, help='Version of mssql-cli.')
 @click.option('-d', '--dbname', default='', envvar='MSSQLCLIDATABASE',
         help='database name to connect to.')
 @click.option('--mssqlclirc', default=config_location() + 'config',
         envvar='MSSQLCLIRC', help='Location of mssqlclirc config file.')
-#@click.option('-D', '--dsn', default='', envvar='DSN',
-#        help='Use DSN configured into the [alias_dsn] section of pgclirc file.')
 @click.option('--row-limit', default=None, envvar='MSSQLCLIROWLIMIT', type=click.INT,
         help='Set threshold for row limit prompt. Use 0 to disable prompt.')
 @click.option('--less-chatty', 'less_chatty', is_flag=True,
         default=False,
         help='Skip intro on startup and goodbye on exit.')
-#@click.option('--prompt', help='Prompt format (Default: "\\u@\\h:\\d> ").')
-#@click.option('-l', '--list', 'list_databases', is_flag=True, help='list '
-#              'available databases, then exit.')
 @click.option('--auto-vertical-output', is_flag=True,
               help='Automatically switch to vertical output mode if the result is wider than the terminal width.')
 @click.argument('database', default=lambda: None, envvar='MSSQLCLIDATABASE', nargs=1)
@@ -703,7 +650,6 @@ class PGCli(object):
 def cli(database, username_opt, host, prompt_passwd,
         dbname, username, version, mssqlclirc, row_limit,
         less_chatty, auto_vertical_output, integrated_auth):
-    mssqlclilogging.initialize_logger()
 
     if version:
         print('Version:', __version__)
@@ -717,17 +663,17 @@ def cli(database, username_opt, host, prompt_passwd,
         integrated_auth = False
         print (u'Integrated authentication not supported on this platform')
 
-    pgcli = PGCli(prompt_passwd, row_limit=row_limit, single_connection=False,
-                  mssqlclirc_file=mssqlclirc, less_chatty=less_chatty, auto_vertical_output=auto_vertical_output,
-                  integrated_auth=integrated_auth)
+    mssqlcli = MssqlCli(prompt_passwd, row_limit=row_limit, single_connection=False,
+                        mssqlclirc_file=mssqlclirc, less_chatty=less_chatty, auto_vertical_output=auto_vertical_output,
+                        integrated_auth=integrated_auth)
 
     # Choose which ever one has a valid value.
     database = database or dbname
     user = username_opt or username
 
-    pgcli.connect(database, host, user, port='')
+    mssqlcli.connect(database, host, user, port='')
 
-    pgcli.logger.debug('Launch Params: \n'
+    mssqlcli.logger.debug('Launch Params: \n'
             '\tdatabase: %r'
             '\tuser: %r'
             '\thost: %r'
@@ -736,7 +682,7 @@ def cli(database, username_opt, host, prompt_passwd,
     if setproctitle:
         obfuscate_process_password()
 
-    pgcli.run_cli()
+    mssqlcli.run_cli()
 
 
 def obfuscate_process_password():
@@ -857,17 +803,6 @@ def format_output(title, cur, headers, status, settings):
         if max_width is not None:
             cur = list(cur)
         column_types = None
-        if hasattr(cur, 'description'):
-            column_types = []
-            for d in cur.description:
-                if d[1] in psycopg2.extensions.DECIMAL.values or \
-                        d[1] in psycopg2.extensions.FLOAT.values:
-                    column_types.append(float)
-                if d[1] == psycopg2.extensions.INTEGER.values or \
-                        d[1] in psycopg2.extensions.LONGINTEGER.values:
-                    column_types.append(int)
-                else:
-                    column_types.append(text_type)
         formatted = formatter.format_output(cur, headers, **output_kwargs)
         if isinstance(formatted, (text_type)):
             formatted = iter(formatted.splitlines())
