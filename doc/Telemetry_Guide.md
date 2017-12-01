@@ -8,7 +8,7 @@ By default, Microsoft collects anonymous usage data in order to improve the user
 3. [Additional Information](#information)
 
 
-#### <a name="collect"></a>What do we collect?
+### <a name="collect"></a>What do we collect?
 A unique user ID is sent with each telemetry event for the purpose of counting distinct users and correlating errors or exceptions. It does not contain any personally identifiable information nor can it be used to find any personal information.
 
   - SHA256 Hashed Mac address
