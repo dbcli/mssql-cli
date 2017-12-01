@@ -91,7 +91,6 @@ class TelemetrySession(object):
             'Context.Default.SQL.Core.ExeName': PRODUCT_NAME,
             'Context.Default.SQL.Core.ExeVersion': _get_mssql_cli_version(),
             'Context.Default.SQL.Core.MacAddressHash': _get_hash_mac_address(),
-            'Context.Default.SQL.Core.Machine.Id': _get_hash_machine_id(),
             'Context.Default.SQL.Core.OS.Type': platform.system().lower(),
             'Context.Default.SQL.Core.OS.Version': platform.version().lower(),
             'Context.Default.SQL.Core.User.IsMicrosoftInternal': 'False',
@@ -196,12 +195,6 @@ def _get_hash_mac_address():
     s = s.strip('-')
 
     return s
-
-
-@decorators.suppress_all_exceptions(fallback_return='')
-def _get_hash_machine_id():
-    # Definition: Take first 128bit of the SHA256 hashed MAC address and convert them into a GUID
-    return str(uuid.UUID(_get_hash_mac_address()[0:32]))
 
 
 def _get_env_string():
