@@ -18,13 +18,15 @@ TELEMETRY_VERSION = '0.0.1'
 MSSQL_CLI_PREFIX = 'Context.Default.MSSQLCLI.'
 MSSQL_CLI_TELEMETRY_FILE = 'mssqlcli_telemetry.log'
 decorators.is_diagnostics_mode = telemetry_core.in_diagnostic_mode
+MSSQL_CLI_TELEMETRY_OPT_OUT = 'MSSQL_CLI_TELEMETRY_OPTOUT'
 
 
 def _user_agrees_to_telemetry(func):
     @wraps(func)
     def _wrapper(*args, **kwargs):
-        c = config.get_config()
-        if not c['main'].as_bool('collect_telemetry'):
+        user_opted_out = bool(os.environ.get(MSSQL_CLI_TELEMETRY_OPT_OUT, False))
+        print(user_opted_out)
+        if user_opted_out:
             return
         return func(*args, **kwargs)
 

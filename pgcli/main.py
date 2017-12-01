@@ -100,8 +100,7 @@ By default, Mssql CLI collects usage data in order to improve your experience.
 The data is anonymous and does not include commandline argument values.
 The data is collected by Microsoft.
 
-Disable telemetry collection by setting collect_telemetry = False in config file located here:
-{0}
+Disable telemetry collection by setting MSSQL_CLI_TELEMETRY_OPTOUT to true or 1.
 
 For more information: {1}
 """.format(config_location(), MSSQLCLI_TELEMETRY_DISCLOSURE_LINK)

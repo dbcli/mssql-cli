@@ -1,11 +1,6 @@
     # vi: ft=dosini
 [main]
 
-# Allows Microsoft to collect telemetry.
-# Setting this option to False opts out usage data collection.
-# More information can be found at: https://github.com/dbcli/mssql-cli/tree/master/doc/Telemetry_Disclosure.md
-collect_telemetry = True
-
 # Enables context sensitive auto-completion. If this is disabled the all
 # possible completions will be listed.
 smart_completion = True
