@@ -45,10 +45,7 @@ class TelemetrySession(object):
             'Reserved.DataModel.EntityType': 'Fault',
             'Reserved.DataModel.Fault.Description': description or fault_type,
             'Reserved.DataModel.Correlation.1': '{},UserTask,'.format(self.correlation_id),
-            'Reserved.DataModel.Fault.TypeString': exception.__class__.__name__,
-            'Reserved.DataModel.Fault.Exception.Message': _remove_cmd_chars(
-                message or str(exception)),
-            'Reserved.DataModel.Fault.Exception.StackTrace': _remove_cmd_chars(_get_stack_trace())
+            'Reserved.DataModel.Fault.TypeString': exception.__class__.__name__
         }
         fault_type = _remove_symbols(fault_type).replace('"', '').replace("'", '').replace(' ', '-')
         fault_name = '{}/{}'.format(PRODUCT_NAME, fault_type.lower())

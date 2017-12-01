@@ -61,13 +61,12 @@ def hash256_result(func):
     @wraps(func)
     def _decorator(*args, **kwargs):
         salt = generate_salt()
-        print(salt)
         val = func(*args, **kwargs)
         if not val:
             raise ValueError('Return value is None')
         elif not isinstance(val, str):
             raise ValueError('Return value is not string')
-        hash_object = hashlib.sha256(salt.encode() + val.encode('utf-8') + os.path.expanduser('~').encode())
+        hash_object = hashlib.sha256(salt.encode() + val.encode('utf-8'))
         return str(hash_object.hexdigest())
     return _decorator
 
