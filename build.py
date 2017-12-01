@@ -38,8 +38,7 @@ def build():
     # convert windows line endings to unix for mssql-cli bash script
     utility.exec_command('python dos2unix.py mssql-cli mssql-cli', utility.ROOT_DIR)
 
-    # For each platform, populate the appropriate binaries, generate the wheel, clear mssqltoolsservice binaries.
-
+    # For the current platform, populate the appropriate binaries and generate the wheel.
     mssqltoolsservice.copy_sqltoolsservice(utility.get_current_platform())
     utility.clean_up(utility.MSSQLCLI_BUILD_DIRECTORY)
 
