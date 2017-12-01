@@ -3,12 +3,12 @@
 By default, Microsoft collects anonymous usage data in order to improve the user experience. The usage data collected allows the team to prioritize features and bug fixes.
 
 ## Table of Contents
-1. [What do we collect?] (#What_do_we_collect?)
-2. [How do I opt out?] (#How_do_I_opt_out?)
-3. [Additional Information] (#Additional_Information)
+1. [What do we collect](#collect)
+2. [How do I opt out?](#opt_out)
+3. [Additional Information](#information)
 
 
-#### <a name="What_do_we_collect?"></a>What do we collect?
+#### <a name="collect"></a>What do we collect?
 A unique user ID is sent with each telemetry event for the purpose of counting distinct users and correlating errors or exceptions. It does not contain any personally identifiable information nor can it be used to find any personal information.
 
   - SHA256 Hashed Mac address
@@ -34,7 +34,7 @@ Measurement data points allow the team to be proactive in improving performance.
 Error data points allow the team to be proactive in troubleshooting and fixing common issues/exceptions.
 - Exceptions
 
-### <a name="How_do_I_opt_out?"></a>How do I opt out?
+### <a name="opt_out"></a>How do I opt out?
 Users can opt out of anonymous data collection by setting the following option in the configuration file:
 ##### Example configuration file
 ```
@@ -54,7 +54,7 @@ The configuration file can be found at the following location:
 C:\Users\<Username>\AppData\Local\dbcli\mssqlcli\
 ```
 
-### <a name="Additional_Information"></a>Additional Information
+### <a name="information"></a>Additional Information
 
 ##### What does the anonymous usage data actually look like?
 For those interested, anonymous usage data of the previous session will always be outputted to a telemetry file in the user's configuration directory. It can be found right next to the location of the configuration file.
