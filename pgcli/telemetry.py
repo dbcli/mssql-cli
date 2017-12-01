@@ -25,7 +25,6 @@ def _user_agrees_to_telemetry(func):
     @wraps(func)
     def _wrapper(*args, **kwargs):
         user_opted_out = bool(os.environ.get(MSSQL_CLI_TELEMETRY_OPT_OUT, False))
-        print(user_opted_out)
         if user_opted_out:
             return
         return func(*args, **kwargs)
