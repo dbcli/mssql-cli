@@ -38,21 +38,15 @@ def build():
     # convert windows line endings to unix for mssql-cli bash script
     utility.exec_command('python dos2unix.py mssql-cli mssql-cli', utility.ROOT_DIR)
 
-    # For each platform, populate the appropriate binaries, generate the wheel, clear mssqltoolsservice binaries.
-    for platform in supported_platforms:
-        mssqltoolsservice.copy_sqltoolsservice(platform)
-        utility.clean_up(utility.MSSQLCLI_BUILD_DIRECTORY)
+    # For the current platform, populate the appropriate binaries and generate the wheel.
+    mssqltoolsservice.copy_sqltoolsservice(utility.get_current_platform())
+    utility.clean_up(utility.MSSQLCLI_BUILD_DIRECTORY)
 
-        print_heading('Building mssql-cli pip package')
-        utility.exec_command('python --version', utility.ROOT_DIR)
-        utility.exec_command('python setup.py check -r -s bdist_wheel --plat-name {}'.format(platform),
-                             utility.ROOT_DIR,
-                             continue_on_error=False)
-
-        mssqltoolsservice.clean_up_sqltoolsservice()
-
-    # Since the build previosuly clears out mssqltoolsservice, re copy it so test execution may proceed.
-    utility.copy_current_platform_mssqltoolsservice()
+    print_heading('Building mssql-cli pip package')
+    utility.exec_command('python --version', utility.ROOT_DIR)
+    utility.exec_command('python setup.py check -r -s bdist_wheel --plat-name {}'.format(utility.get_current_platform()),
+                         utility.ROOT_DIR,
+                         continue_on_error=False)
 
 
 def _upload_index_file(service, blob_name, title, links):
