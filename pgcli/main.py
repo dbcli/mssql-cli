@@ -92,7 +92,7 @@ OutputSettings.__new__.__defaults__ = (
 
 logger = logging.getLogger(u'mssqlcli.main')
 
-MSSQLCLI_TELEMETRY_DISCLOSURE_LINK = 'https://github.com/dbcli/mssql-cli/tree/master/doc/Telemetry_Disclosure.md'
+MSSQLCLI_TELEMETRY_DISCLOSURE_LINK = 'https://github.com/dbcli/mssql-cli/tree/master/doc/Telemetry_Guide.md'
 MSSQLCLI_TELEMETRY_PROMPT = """
 Telemetry
 ---------
