@@ -50,6 +50,8 @@ class VortexSynchronousSender(SynchronousSender):
             response = HTTPClient.urlopen(request, timeout=self._timeout)
             status_code = response.getcode()
             if 200 <= status_code < 300:
+                if in_diagnostic_mode():
+                    print('Telemetry uploaded succesfully.')
                 return
         except HTTPError as e:
             if e.getcode() == 400:

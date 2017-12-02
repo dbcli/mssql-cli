@@ -17,8 +17,8 @@ PRODUCT_NAME = 'mssqlcli'
 TELEMETRY_VERSION = '0.0.1'
 MSSQL_CLI_PREFIX = 'Context.Default.MSSQLCLI.'
 MSSQL_CLI_TELEMETRY_FILE = 'mssqlcli_telemetry.log'
-decorators.is_diagnostics_mode = telemetry_core.in_diagnostic_mode
 MSSQL_CLI_TELEMETRY_OPT_OUT = 'MSSQL_CLI_TELEMETRY_OPTOUT'
+decorators.is_diagnostics_mode = telemetry_core.in_diagnostic_mode
 
 
 def _user_agrees_to_telemetry(func):
@@ -57,13 +57,10 @@ class TelemetrySession(object):
     def generate_payload(self):
         events = []
         base = self._get_base_properties()
-        cli = self._get_mssql_cli_properties()
-        cli.update(base)
 
-        events.append({'name': PRODUCT_NAME, 'properties': cli})
+        events.append({'name': PRODUCT_NAME, 'properties': base})
         for name, props in self.exceptions:
             props.update(base)
-            props.update(cli)
             props.update({'Reserved.DataModel.CorrelationId': str(uuid.uuid4()),
                           'Reserved.EventId': str(uuid.uuid4())})
             events.append({'name': name, 'properties': props})
@@ -86,40 +83,26 @@ class TelemetrySession(object):
             'Reserved.DataModel.Severity': 0,
             'Reserved.DataModel.CorrelationId': self.correlation_id,
 
-            'Context.Default.SQL.Core.ExeName': PRODUCT_NAME,
-            'Context.Default.SQL.Core.ExeVersion': _get_mssql_cli_version(),
-            'Context.Default.SQL.Core.MacAddressHash': _get_hash_mac_address(),
-            'Context.Default.SQL.Core.OS.Type': platform.system().lower(),
-            'Context.Default.SQL.Core.OS.Version': platform.version().lower(),
-            'Context.Default.SQL.Core.User.IsMicrosoftInternal': 'False',
-            'Context.Default.SQL.Core.User.IsOptedIn': 'True',
+            'Context.Default.SQLTools.ExeName': PRODUCT_NAME,
+            'Context.Default.SQLTools.ExeVersion': _get_mssql_cli_version(),
+            'Context.Default.SQLTools.MacAddressHash': _get_hash_mac_address(),
+            'Context.Default.SQLTools.OS.Type': platform.system().lower(),
+            'Context.Default.SQLTools.OS.Version': platform.version().lower(),
+            'Context.Default.SQLTools.User.Id': _get_user_id(),
+            'Context.Default.SQLTools.User.IsMicrosoftInternal': 'False',
+            'Context.Default.SQLTools.User.IsOptedIn': 'True',
+            'Context.Default.SQLTools.ShellType': _get_shell_type(),
+            'Context.Default.SQLTools.EnvironmentVariables': _get_env_string(),
+            'Context.Default.SQLTools.Locale': '{},{}'.format(locale.getdefaultlocale()[0],
+                                                              locale.getdefaultlocale()[1]),
+            'Context.Default.SQLTools.StartTime': str(self.start_time),
+            'Context.Default.SQLTools.EndTime': str(self.end_time),
+            'Context.Default.SQLTools.SessionDuration': str((self.end_time - self.start_time).total_seconds()),
+            'Context.Default.SQLTools.PythonVersion': platform.python_version(),
+            'Context.Default.SQLTools.ServerVersion': self.server_version,
+            'Context.Default.SQLTools.ServerEdition': self.server_edition,
+            'Context.Default.SQLTools.ConnectionType': self.connection_type,
         }
-
-    def _get_mssql_cli_properties(self):
-
-        # Custom data points used by Mssql-cli.
-        result = {}
-        self.set_custom_properties(result, 'ShellType', _get_shell_type)
-        self.set_custom_properties(result, 'EnvironmentVariables', _get_env_string)
-        self.set_custom_properties(result, 'Locale',
-                                   lambda: '{},{}'.format(locale.getdefaultlocale()[0],
-                                                          locale.getdefaultlocale()[1]))
-        self.set_custom_properties(result, 'StartTime', str(self.start_time))
-        self.set_custom_properties(result, 'EndTime', str(self.end_time))
-        self.set_custom_properties(result, 'SessionDuration', str((self.end_time - self.start_time).total_seconds()))
-        self.set_custom_properties(result, 'PythonVersion', platform.python_version())
-        self.set_custom_properties(result, 'ServerVersion', _session.server_version)
-        self.set_custom_properties(result, 'ServerEdition', _session.server_edition)
-        self.set_custom_properties(result, 'ConnectionType', _session.connection_type)
-
-        return result
-
-    @classmethod
-    @decorators.suppress_all_exceptions(raise_in_diagnostics=True)
-    def set_custom_properties(cls, prop, name, value):
-        actual_value = value() if hasattr(value, '__call__') else value
-        if actual_value:
-            prop[MSSQL_CLI_PREFIX + name] = actual_value
 
 
 _session = TelemetrySession()
@@ -186,6 +169,20 @@ def _get_mssql_cli_version():
 def _get_hash_mac_address():
     s = ''
     for index, c in enumerate(hex(uuid.getnode())[2:].upper()):
+        s += c
+        if index % 2:
+            s += '-'
+
+    s = s.strip('-')
+
+    return s
+
+
+@decorators.suppress_all_exceptions(fallback_return='')
+@decorators.hash256_result
+def _get_user_id():
+    s = ''
+    for index, c in enumerate(hex(uuid.getnode())[2:].upper() + os.path.expanduser('~')):
         s += c
         if index % 2:
             s += '-'
