@@ -18,6 +18,7 @@ TELEMETRY_VERSION = '0.0.1'
 MSSQL_CLI_PREFIX = 'Context.Default.MSSQLCLI.'
 MSSQL_CLI_TELEMETRY_FILE = 'mssqlcli_telemetry.log'
 MSSQL_CLI_TELEMETRY_OPT_OUT = 'MSSQL_CLI_TELEMETRY_OPTOUT'
+MSSQL_CLI_IN_DOCKER = 'MSSQL_CLI_IN_DOCKER'
 decorators.is_diagnostics_mode = telemetry_core.in_diagnostic_mode
 
 
@@ -86,6 +87,7 @@ class TelemetrySession(object):
             'Context.Default.SQLTools.MacAddressHash': _get_hash_mac_address(),
             'Context.Default.SQLTools.OS.Type': platform.system().lower(),
             'Context.Default.SQLTools.OS.Version': platform.version().lower(),
+            'Context.Default.SQLTools.IsDocker': bool(os.environ.get(MSSQL_CLI_IN_DOCKER, False)),
             'Context.Default.SQLTools.User.Id': _get_user_id(),
             'Context.Default.SQLTools.User.IsMicrosoftInternal': 'False',
             'Context.Default.SQLTools.User.IsOptedIn': 'True',
@@ -138,11 +140,6 @@ def output_payload_to_file(payload):
 
         with open(telemetry_file_path, "w+") as telemetry_file:
             json.dump(json.loads(payload), telemetry_file, indent=2)
-
-
-@decorators.suppress_all_exceptions(raise_in_diagnostics=True)
-def set_exception(exception, fault_type, summary=None):
-    _session.add_exception(exception, fault_type=fault_type, description=summary)
 
 
 @decorators.suppress_all_exceptions(raise_in_diagnostics=True)
