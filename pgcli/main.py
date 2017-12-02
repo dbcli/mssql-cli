@@ -100,7 +100,7 @@ By default, Mssql CLI collects usage data in order to improve your experience.
 The data is anonymous and does not include commandline argument values.
 The data is collected by Microsoft.
 
-Disable telemetry collection by setting MSSQL_CLI_TELEMETRY_OPTOUT to true or 1.
+Disable telemetry collection by setting MSSQL_CLI_TELEMETRY_OPTOUT to 'True' or '1'.
 
 For more information: {1}
 """.format(config_location(), MSSQLCLI_TELEMETRY_DISCLOSURE_LINK)
@@ -326,7 +326,6 @@ class PGCli(object):
             self.logger.debug('Database connection failed: %r.', e)
             self.logger.debug("traceback: %r", traceback.format_exc())
             click.secho(str(e), err=True, fg='red')
-            telemetry_session.set_exception(e, fault_type='database-connection-failed')
             exit(1)
 
     def execute_command(self, text, query):
@@ -344,14 +343,12 @@ class PGCli(object):
                                          self.mssqlcliclient_query_execution)
             logger.debug("cancelled query, sql: %r", text)
             click.secho("Query cancelled.", err=True, fg='red')
-            telemetry_session.set_exception(e, fault_type='query-execution-cancelled')
         except NotImplementedError:
             click.secho('Not Yet Implemented.', fg="yellow")
         except Exception as e:
             logger.error("sql: %r, error: %r", text, e)
             logger.error("traceback: %r", traceback.format_exc())
             click.secho(str(e), err=True, fg='red')
-            telemetry_session.set_exception(e, fault_type='sql-query-error')
         else:
             try:
                 if self.output_file and not text.startswith(('\\o ', '\\? ')):
@@ -612,7 +609,6 @@ class PGCli(object):
 
                 click.secho('Reconnected!\nTry the command again.', fg='green')
             except Exception as e:
-                telemetry_session.set_exception(e, fault_type='reconnection-reset-failed')
                 click.secho(str(e), err=True, fg='red')
 
     def refresh_completions(self, history=None, persist_priorities='all'):

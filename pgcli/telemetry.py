@@ -41,14 +41,12 @@ class TelemetrySession(object):
     server_edition = None
     connection_type = None
 
-    def add_exception(self, exception, fault_type, description=None, message=''):
+    def add_exception(self, fault_type, description=None, message=''):
         details = {
             'Reserved.DataModel.EntityType': 'Fault',
             'Reserved.DataModel.Fault.Description': description or fault_type,
             'Reserved.DataModel.Correlation.1': '{},UserTask,'.format(self.correlation_id),
-            'Reserved.DataModel.Fault.TypeString': exception.__class__.__name__
         }
-        fault_type = _remove_symbols(fault_type).replace('"', '').replace("'", '').replace(' ', '-')
         fault_name = '{}/{}'.format(PRODUCT_NAME, fault_type.lower())
 
         self.exceptions.append((fault_name, details))
