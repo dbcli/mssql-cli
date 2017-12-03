@@ -116,20 +116,24 @@ def start():
 
 
 @decorators.suppress_all_exceptions(raise_in_diagnostics=True)
-def conclude():
+def conclude(service_endpoint_uri='https://vortex.data.microsoft.com/collect/v1', separate_process=True):
     _session.end_time = datetime.datetime.now()
 
     payload = _session.generate_payload()
     output_payload_to_file(payload)
-    upload_payload(payload)
+    return upload_payload(payload, service_endpoint_uri, separate_process)
 
 
 @_user_agrees_to_telemetry
 @decorators.suppress_all_exceptions(raise_in_diagnostics=True)
-def upload_payload(payload):
+def upload_payload(payload, service_endpoint_uri, separate_process):
     if payload:
-        import subprocess
-        subprocess.Popen([sys.executable, os.path.realpath(telemetry_core.__file__), payload])
+        if not separate_process:
+            telemetry_core.upload(payload, service_endpoint_uri)
+        else:
+            import subprocess
+            subprocess.Popen([sys.executable, os.path.realpath(telemetry_core.__file__), payload, service_endpoint_uri])
+        return payload
 
 
 @decorators.suppress_all_exceptions(raise_in_diagnostics=True)

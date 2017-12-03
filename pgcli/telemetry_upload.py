@@ -26,7 +26,7 @@ def in_diagnostic_mode():
     When the telemetry runs in the diagnostic mode, exception are not suppressed and telemetry
     traces are dumped to the stdout.
     """
-    return bool(os.environ.get(DIAGNOSTICS_TELEMETRY_ENV_NAME, False))
+    return os.environ.get(DIAGNOSTICS_TELEMETRY_ENV_NAME, False) == 'True'
 
 
 class VortexSynchronousSender(SynchronousSender):
@@ -55,7 +55,7 @@ class VortexSynchronousSender(SynchronousSender):
                 return
         except HTTPError as e:
             if e.getcode() == 400:
-                return
+                raise e
         except Exception:
             if self.retry < 3:
                 self.retry += 1
@@ -67,11 +67,11 @@ class VortexSynchronousSender(SynchronousSender):
             self._queue.put(data)
 
 
-def build_vortex_telemetry_client():
+def build_vortex_telemetry_client(service_endpoint_uri):
     """
         Build vortex telemetry client.
     """
-    vortex_sender = VortexSynchronousSender()
+    vortex_sender = VortexSynchronousSender(service_endpoint_uri)
     sync_queue = SynchronousQueue(vortex_sender)
     channel = TelemetryChannel(None, queue=sync_queue)
 
@@ -81,9 +81,9 @@ def build_vortex_telemetry_client():
 
 
 @decorators.suppress_all_exceptions(raise_in_diagnostics=True)
-def upload(data_to_save):
+def upload(data_to_save, service_endpoint_uri):
 
-    client = build_vortex_telemetry_client()
+    client = build_vortex_telemetry_client(service_endpoint_uri)
 
     if in_diagnostic_mode():
         sys.stdout.write('Telemetry upload begins\n')
@@ -99,7 +99,7 @@ def upload(data_to_save):
     for record in data_to_save:
         name = record['name']
         raw_properties = record['properties']
-        properties = {}#
+        properties = {}
         measurements = {}
         for k in raw_properties:
             v = raw_properties[k]
@@ -109,13 +109,17 @@ def upload(data_to_save):
                 measurements[k] = v
         client.track_event(name, properties, measurements)
 
-    client.flush()
+    try:
+        client.flush()
+        if in_diagnostic_mode():
+            sys.stdout.write('\nTelemetry upload completes\n')
 
-    if in_diagnostic_mode():
-        sys.stdout.write('\nTelemetry upload completes\n')
+    except HTTPError as e:
+        if in_diagnostic_mode():
+            raise e
 
 
 if __name__ == '__main__':
     # If user doesn't agree to upload telemetry, this scripts won't be executed. The caller should control.
     decorators.is_diagnostics_mode = in_diagnostic_mode
-    upload(sys.argv[1])
+    upload(sys.argv[1], sys.argv[2])
