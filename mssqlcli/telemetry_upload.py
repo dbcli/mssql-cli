@@ -1,12 +1,13 @@
+import json
 import os
 import sys
-import json
-import six
-import pgcli.decorators as decorators
 
+import six
 from applicationinsights import TelemetryClient
 from applicationinsights.channel import TelemetryChannel, SynchronousQueue, SynchronousSender
 from applicationinsights.exceptions import enable
+
+import mssqlcli.decorators as decorators
 
 DIAGNOSTICS_TELEMETRY_ENV_NAME = 'MSSQL_CLI_DIAGNOSTICS_TELEMETRY'
 INSTRUMENTATION_KEY = 'AIF-5574968e-856d-40d2-af67-c89a14e76412'

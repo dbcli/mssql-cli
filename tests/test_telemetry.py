@@ -1,8 +1,9 @@
 # coding=utf-8
-import unittest
-import os
 import json
-import pgcli.telemetry_upload as telemetry_upload
+import os
+import unittest
+
+import mssqlcli.telemetry_upload as telemetry_upload
 
 try:
     # Python 2.x
@@ -20,7 +21,7 @@ class TelemetryTests(unittest.TestCase):
     """
     @staticmethod
     def build_telemetry_client():
-        import pgcli.telemetry as telemetry
+        import mssqlcli.telemetry as telemetry
         return telemetry
 
     def test_telemetry_data_points(self):

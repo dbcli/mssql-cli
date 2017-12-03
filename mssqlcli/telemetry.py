@@ -9,9 +9,10 @@ import traceback
 import uuid
 from functools import wraps
 
-import pgcli.decorators as decorators
-import pgcli.telemetry_upload as telemetry_core
 import pgcli.config as config
+import pgcli.telemetry_upload as telemetry_core
+
+import mssqlcli.decorators as decorators
 
 PRODUCT_NAME = 'mssqlcli'
 TELEMETRY_VERSION = '0.0.1'
