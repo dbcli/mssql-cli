@@ -7,7 +7,7 @@ import unittest
 import time
 import io
 
-import pgcli.jsonrpc.jsonrpcclient as json_rpc_client
+import mssqlcli.jsonrpc.jsonrpcclient as json_rpc_client
 
 
 class JsonRpcClientTests(unittest.TestCase):

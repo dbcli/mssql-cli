@@ -1,7 +1,7 @@
-from pgcli.main import PGCli
+from mssqlcli.main import MssqlCli
 from mock import Mock
 
-DEFAULT = PGCli().row_limit
+DEFAULT = MssqlCli().row_limit
 LIMIT = DEFAULT + 1000
 
 
@@ -16,7 +16,7 @@ low_count.configure_mock(rowcount=1)
 
 
 def test_default_row_limit():
-    cli = PGCli()
+    cli = MssqlCli()
     stmt = "SELECT * FROM students"
     result = cli._should_show_limit_prompt(stmt, low_count)
     assert result is False
@@ -26,7 +26,7 @@ def test_default_row_limit():
 
 
 def test_set_row_limit():
-    cli = PGCli(row_limit=LIMIT)
+    cli = MssqlCli(row_limit=LIMIT)
     stmt = "SELECT * FROM students"
     result = cli._should_show_limit_prompt(stmt, over_default)
     assert result is False
@@ -36,7 +36,7 @@ def test_set_row_limit():
 
 
 def test_no_limit():
-    cli = PGCli(row_limit=0)
+    cli = MssqlCli(row_limit=0)
     stmt = "SELECT * FROM students"
 
     result = cli._should_show_limit_prompt(stmt, over_limit)
@@ -44,11 +44,11 @@ def test_no_limit():
 
 
 def test_row_limit_on_non_select():
-    cli = PGCli()
+    cli = MssqlCli()
     stmt = "UPDATE students set name='Boby'"
     result = cli._should_show_limit_prompt(stmt, None)
     assert result is False
 
-    cli = PGCli(row_limit=0)
+    cli = MssqlCli(row_limit=0)
     result = cli._should_show_limit_prompt(stmt, over_default)
     assert result is False

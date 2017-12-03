@@ -8,9 +8,9 @@ from .filters import HasSelectedCompletion
 _logger = logging.getLogger(__name__)
 
 
-def pgcli_bindings(get_vi_mode_enabled, set_vi_mode_enabled):
+def mssqlcli_bindings(get_vi_mode_enabled, set_vi_mode_enabled):
     """
-    Custom key bindings for pgcli.
+    Custom key bindings for mssqlcli.
     """
     assert callable(get_vi_mode_enabled)
     assert callable(set_vi_mode_enabled)
@@ -21,15 +21,6 @@ def pgcli_bindings(get_vi_mode_enabled, set_vi_mode_enabled):
         enable_auto_suggest_bindings=True,
         enable_search=True,
         enable_abort_and_exit_bindings=True)
-
-    @key_binding_manager.registry.add_binding(Keys.F2)
-    def _(event):
-        """
-        Enable/Disable SmartCompletion Mode.
-        """
-        _logger.debug('Detected F2 key.')
-        buf = event.cli.current_buffer
-        buf.completer.smart_completion = not buf.completer.smart_completion
 
     @key_binding_manager.registry.add_binding(Keys.F3)
     def _(event):

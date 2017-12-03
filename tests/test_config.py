@@ -3,7 +3,7 @@ import stat
 
 import pytest
 
-from pgcli.config import ensure_dir_exists
+from mssqlcli.config import ensure_dir_exists
 
 
 def test_ensure_file_parent(tmpdir):

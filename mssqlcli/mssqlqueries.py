@@ -25,7 +25,7 @@ def get_table_columns():
     Query string to retrieve all table columns.
     :return: string
     """
-    return '''			
+    return '''
         SELECT  isc.table_schema, 
                 isc.table_name, 
                 isc.column_name, 
@@ -56,7 +56,7 @@ def get_view_columns():
     Query string to retrieve all view columns.
     :return: string
     """
-    return '''			
+    return '''
         SELECT  isc.table_schema, 
                 isc.table_name, 
                 isc.column_name, 

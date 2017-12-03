@@ -5,7 +5,7 @@ from mock import Mock, patch
 
 @pytest.fixture
 def refresher():
-    from pgcli.completion_refresher import CompletionRefresher
+    from mssqlcli.completion_refresher import CompletionRefresher
     return CompletionRefresher()
 
 

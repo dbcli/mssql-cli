@@ -13,7 +13,7 @@ from .packages.sqlcompletion import (FromClauseItem,
 from .packages.parseutils.meta import ColumnMetadata, ForeignKey
 from .packages.parseutils.utils import last_word
 from .packages.parseutils.tables import TableReference
-from .packages.pgliterals.main import get_literals
+from .packages.mssqlliterals.main import get_literals
 from .packages.prioritization import PrevalenceCounter
 
 _logger = logging.getLogger(__name__)
@@ -58,7 +58,7 @@ def generate_alias(tbl):
         [l for l, prev in zip(tbl,  '_' + tbl) if prev == '_' and l != '_'])
 
 
-class PGCompleter(Completer):
+class MssqlCompleter(Completer):
     # keywords_tree: A dict mapping keywords to well known following keywords.
     # e.g. 'CREATE': ['TABLE', 'USER', ...],
     keywords_tree = get_literals('keywords', type_=dict)
@@ -68,7 +68,7 @@ class PGCompleter(Completer):
     reserved_words = set(get_literals('reserved'))
 
     def __init__(self, smart_completion=True, settings=None):
-        super(PGCompleter, self).__init__()
+        super(MssqlCompleter, self).__init__()
         self.smart_completion = smart_completion
         self.prioritizer = PrevalenceCounter()
         settings = settings or {}
@@ -664,14 +664,6 @@ class PGCompleter(Completer):
 
     def get_schema_matches(self, suggestion, word_before_cursor):
         schema_names = self.dbmetadata['tables'].keys()
-
-        # Unless we're sure the user really wants them, hide schema names
-        # starting with pg_, which are mostly temporary schemas
-        if not word_before_cursor.startswith('pg_'):
-            schema_names = [s
-                            for s in schema_names
-                            if not s.startswith('pg_')]
-
         if suggestion.quoted:
             schema_names = [self.escape_schema(s) for s in schema_names]
 
@@ -765,22 +757,12 @@ class PGCompleter(Completer):
     def get_table_matches(self, suggestion, word_before_cursor, alias=False):
         tables = self.populate_schema_objects(suggestion.schema, 'tables')
         tables.extend(SchemaObject(tbl.name) for tbl in suggestion.local_tables)
-
-        # Unless we're sure the user really wants them, don't suggest the
-        # pg_catalog tables that are implicitly on the search path
-        if not suggestion.schema and (
-                not word_before_cursor.startswith('pg_')):
-            tables = [t for t in tables if not t.name.startswith('pg_')]
         tables = [self._make_cand(t, alias, suggestion) for t in tables]
         return self.find_matches(word_before_cursor, tables, meta='table')
 
 
     def get_view_matches(self, suggestion, word_before_cursor, alias=False):
         views = self.populate_schema_objects(suggestion.schema, 'views')
-
-        if not suggestion.schema and (
-                not word_before_cursor.startswith('pg_')):
-            views = [v for v in views if not v.name.startswith('pg_')]
         views = [self._make_cand(v, alias, suggestion) for v in views]
         return self.find_matches(word_before_cursor, views, meta='view')
 

@@ -1,7 +1,7 @@
 import os
-import pgcli.sqltoolsclient as sqltoolsclient
-import pgcli.mssqlcliclient as mssqlcliclient
-from pgcli.main import format_output, OutputSettings
+import mssqlcli.sqltoolsclient as sqltoolsclient
+import mssqlcli.mssqlcliclient as mssqlcliclient
+from mssqlcli.main import format_output, OutputSettings
 
 
 def create_mssql_cli_client(owner_uri=None, connect=True):

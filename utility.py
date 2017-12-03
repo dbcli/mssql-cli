@@ -71,7 +71,7 @@ def copy_current_platform_mssqltoolsservice():
     """
     Copy the necessary mssqltoolsservice binaries for the current platform if supported.
     """
-    import pgcli.mssqltoolsservice.externals as mssqltoolsservice
+    import mssqlcli.mssqltoolsservice.externals as mssqltoolsservice
 
     current_platform = get_current_platform()
     if current_platform:

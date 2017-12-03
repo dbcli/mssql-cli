@@ -1,3 +1,8 @@
+# --------------------------------------------------------------------------------------------
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License. See License.txt in the project root for license information.
+# --------------------------------------------------------------------------------------------
+
 import ast
 import os
 import platform
@@ -9,7 +14,7 @@ from setuptools import setup, find_packages
 
 _version_re = re.compile(r'__version__\s+=\s+(.*)')
 
-with open('pgcli/__init__.py', 'rb') as f:
+with open('mssqlcli/__init__.py', 'rb') as f:
     version = str(ast.literal_eval(_version_re.search(
         f.read().decode('utf-8')).group(1)))
 
@@ -35,10 +40,9 @@ install_requirements = [
     'configobj >= 5.0.6',
     'humanize >= 0.5.1',
     'cli_helpers >= 0.2.3, < 1.0.0',
+	'applicationinsights>=0.11.1',
     'future>=0.16.0',
-    'wheel>=0.29.0',
-    'applicationinsights>=0.11.1',
-    'six>=1.11.0'
+    'wheel>=0.29.0'
 ]
 
 if sys.version_info < (3, 4):
@@ -61,8 +65,8 @@ setup(
     license='MIT',
     url='https://github.com/Microsoft/mssql-cli',
     packages=find_packages(),
-    package_data={'pgcli': ['pgclirc',
-                            'packages/pgliterals/sqlliterals.json']},
+    package_data={'mssqlcli': ['mssqlclirc',
+                            'packages/mssqlliterals/sqlliterals.json']},
     description=description,
     long_description=open('README.rst').read(),
     install_requires=install_requirements,
@@ -88,3 +92,4 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
 )
+
