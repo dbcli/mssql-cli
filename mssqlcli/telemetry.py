@@ -9,8 +9,8 @@ import traceback
 import uuid
 from functools import wraps
 
-import pgcli.config as config
-import pgcli.telemetry_upload as telemetry_core
+import mssqlcli.config as config
+import mssqlcli.telemetry_upload as telemetry_core
 
 import mssqlcli.decorators as decorators
 
@@ -160,7 +160,7 @@ def set_server_information(connection):
 
 @decorators.suppress_all_exceptions(fallback_return=None)
 def _get_mssql_cli_version():
-    from pgcli import __version__ as mssql_cli_version
+    from mssqlcli import __version__ as mssql_cli_version
     return mssql_cli_version
 
 
