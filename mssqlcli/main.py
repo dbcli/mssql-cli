@@ -257,7 +257,9 @@ class MssqlCli(object):
                 user = click.prompt('Username (press enter for sa)', default=u'sa', show_default=False)
 
         if not host:
-            host = u'localhost'
+            host = os.environ.get('MSSQLCLIHOST', '')
+            if not host:
+                host = u'localhost'
 
         if not database:
             database = u'master'

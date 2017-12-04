@@ -137,8 +137,9 @@ def handle_connection_response(response):
             sys.stderr.write(u'\nConnection did not succeed.')
             if response.error_message:
                 sys.stderr.write(u'\nError message: ' + response.error_message)
+                logger.error(response.error_message)
             if response.messages:
-                sys.stderr.write(u'\nOther messages: '+ response.messages)
+                logger.error(response.messages)
 
         return response
 
