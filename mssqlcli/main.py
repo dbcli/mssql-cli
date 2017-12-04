@@ -86,18 +86,18 @@ OutputSettings.__new__.__defaults__ = (
     None, None, None, '<null>', False, None, lambda x: x
 )
 
-MSSQLCLI_TELEMETRY_DISCLOSURE_LINK = 'https://github.com/dbcli/mssql-cli/tree/master/doc/Telemetry_Guide.md'
 MSSQLCLI_TELEMETRY_PROMPT = """
 Telemetry
 ---------
-By default, Mssql CLI collects usage data in order to improve your experience.
+By default, mssql-cli collects usage data in order to improve your experience.
 The data is anonymous and does not include commandline argument values.
-The data is collected by Microsoft.
+The data is collected by Microsoft. 
 
 Disable telemetry collection by setting MSSQL_CLI_TELEMETRY_OPTOUT to 'True' or '1'.
 
-For more information: {1}
-""".format(config_location(), MSSQLCLI_TELEMETRY_DISCLOSURE_LINK)
+Microsoft Privacy statement: https://privacy.microsoft.com/en-us/privacystatement
+"""
+
 
 class MssqlCli(object):
 
