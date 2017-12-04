@@ -17,7 +17,7 @@ except ImportError:
 
 class TelemetryTests(unittest.TestCase):
     """
-        Tests for mssqlcliclient.py and sqltoolsclient.py.
+        Tests for telemetry client.
     """
     @staticmethod
     def build_telemetry_client():
