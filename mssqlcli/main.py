@@ -252,14 +252,10 @@ class MssqlCli(object):
         # Connect to the database.
 
         if not user:
-            user = os.environ.get('MSSQLCLIUSER', '')
-            if not user:
-                user = click.prompt('Username (press enter for sa)', default=u'sa', show_default=False)
+            user = click.prompt('Username (press enter for sa)', default=u'sa', show_default=False)
 
         if not host:
-            host = os.environ.get('MSSQLCLIHOST', '')
-            if not host:
-                host = u'localhost'
+            host = u'localhost'
 
         if not database:
             database = u'master'
