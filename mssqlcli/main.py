@@ -62,6 +62,7 @@ from collections import namedtuple
 #mssql-cli imports
 from mssqlcli.sqltoolsclient import SqlToolsClient
 from mssqlcli.mssqlcliclient import MssqlCliClient, reset_connection_and_clients
+import mssqlcli.telemetry as telemetry_session
 
 # Query tuples are used for maintaining history
 MetaQuery = namedtuple(
@@ -84,6 +85,18 @@ OutputSettings = namedtuple(
 OutputSettings.__new__.__defaults__ = (
     None, None, None, '<null>', False, None, lambda x: x
 )
+
+MSSQLCLI_TELEMETRY_PROMPT = """
+Telemetry
+---------
+By default, mssql-cli collects usage data in order to improve your experience.
+The data is anonymous and does not include commandline argument values.
+The data is collected by Microsoft. 
+
+Disable telemetry collection by setting environment variable MSSQL_CLI_TELEMETRY_OPTOUT to 'True' or '1'.
+
+Microsoft Privacy statement: https://privacy.microsoft.com/en-us/privacystatement
+"""
 
 
 class MssqlCli(object):
@@ -293,6 +306,8 @@ class MssqlCli(object):
             if not self.mssqlcliclient_query_execution.connect():
                 click.secho('\nUnable to connect. Please try again', err=True, fg='red')
                 exit(1)
+
+            telemetry_session.set_server_information(self.mssqlcliclient_query_execution)
 
         except Exception as e:  # Connecting to a database could fail.
             self.logger.debug('Database connection failed: %r.', e)
@@ -660,6 +675,7 @@ def cli(database, username_opt, host, prompt_passwd,
     config_dir = os.path.dirname(config_location())
     if not os.path.exists(config_dir):
         os.makedirs(config_dir)
+        display_telemetry_message()
 
     if platform.system().lower() != 'windows' and integrated_auth:
         integrated_auth = False
@@ -686,6 +702,8 @@ def cli(database, username_opt, host, prompt_passwd,
 
     mssqlcli.run_cli()
 
+def display_telemetry_message():
+    print(MSSQLCLI_TELEMETRY_PROMPT)
 
 def obfuscate_process_password():
     process_title = setproctitle.getproctitle()
@@ -826,4 +844,9 @@ def format_output(title, cur, headers, status, settings):
 
 
 if __name__ == "__main__":
-    cli()
+    try:
+        telemetry_session.start()
+        cli()
+    finally:
+        # Upload telemetry async in a separate process.
+        telemetry_session.conclude()

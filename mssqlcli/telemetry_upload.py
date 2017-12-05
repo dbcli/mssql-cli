@@ -1,0 +1,126 @@
+import json
+import os
+import sys
+
+import six
+from applicationinsights import TelemetryClient
+from applicationinsights.channel import TelemetryChannel, SynchronousQueue, SynchronousSender
+from applicationinsights.exceptions import enable
+
+import mssqlcli.decorators as decorators
+
+DIAGNOSTICS_TELEMETRY_ENV_NAME = 'MSSQL_CLI_DIAGNOSTICS_TELEMETRY'
+INSTRUMENTATION_KEY = 'AIF-5574968e-856d-40d2-af67-c89a14e76412'
+
+try:
+    # Python 2.x
+    import urllib2 as HTTPClient
+    from urllib2 import HTTPError
+except ImportError:
+    # Python 3.x
+    import urllib.request as HTTPClient
+    from urllib.error import HTTPError
+
+
+def in_diagnostic_mode():
+    """
+    When the telemetry runs in the diagnostic mode, exception are not suppressed and telemetry
+    traces are dumped to the stdout.
+    """
+    return os.environ.get(DIAGNOSTICS_TELEMETRY_ENV_NAME, False) == 'True'
+
+
+class VortexSynchronousSender(SynchronousSender):
+    """
+        A Synchronous sender specific to the Vortex service with limited retry logic.
+    """
+    def __init__(self, service_endpoint_uri='https://vortex.data.microsoft.com/collect/v1'):
+        SynchronousSender.__init__(self, service_endpoint_uri)
+        self.retry = 0
+
+    def send(self, data_to_send):
+        """
+            Override the send method to strip the request_payload's brackets since Vortex does not
+        """
+        request_payload = json.dumps([a.write() for a in data_to_send]).strip('[').strip(']')
+
+        request = HTTPClient.Request(self._service_endpoint_uri, bytearray(request_payload, 'utf-8'),
+                                     {'Accept': 'application/json',
+                                      'Content-Type': 'application/json; charset=utf-8'})
+        try:
+            response = HTTPClient.urlopen(request, timeout=self._timeout)
+            status_code = response.getcode()
+            if 200 <= status_code < 300:
+                if in_diagnostic_mode():
+                    print('Telemetry uploaded succesfully.')
+                return
+        except HTTPError as e:
+            if e.getcode() == 400:
+                raise e
+        except Exception:
+            if self.retry < 3:
+                self.retry += 1
+            else:
+                return
+
+        # Add our unsent data back on to the queue
+        for data in data_to_send:
+            self._queue.put(data)
+
+
+def build_vortex_telemetry_client(service_endpoint_uri):
+    """
+        Build vortex telemetry client.
+    """
+    vortex_sender = VortexSynchronousSender(service_endpoint_uri)
+    sync_queue = SynchronousQueue(vortex_sender)
+    channel = TelemetryChannel(None, queue=sync_queue)
+
+    client = TelemetryClient(INSTRUMENTATION_KEY, channel)
+    enable(INSTRUMENTATION_KEY)
+    return client
+
+
+@decorators.suppress_all_exceptions(raise_in_diagnostics=True)
+def upload(data_to_save, service_endpoint_uri):
+
+    client = build_vortex_telemetry_client(service_endpoint_uri)
+
+    if in_diagnostic_mode():
+        sys.stdout.write('Telemetry upload begins\n')
+        sys.stdout.write('Got data {}\n'.format(json.dumps(json.loads(data_to_save), indent=2)))
+
+    try:
+        data_to_save = json.loads(data_to_save.replace("'", '"'))
+    except Exception as err:  # pylint: disable=broad-except
+        if in_diagnostic_mode():
+            sys.stdout.write('{}/n'.format(str(err)))
+            sys.stdout.write('Raw [{}]/n'.format(data_to_save))
+
+    for record in data_to_save:
+        name = record['name']
+        raw_properties = record['properties']
+        properties = {}
+        measurements = {}
+        for k in raw_properties:
+            v = raw_properties[k]
+            if isinstance(v, six.string_types):
+                properties[k] = v
+            else:
+                measurements[k] = v
+        client.track_event(name, properties, measurements)
+
+    try:
+        client.flush()
+        if in_diagnostic_mode():
+            sys.stdout.write('\nTelemetry upload completes\n')
+
+    except HTTPError as e:
+        if in_diagnostic_mode():
+            raise e
+
+
+if __name__ == '__main__':
+    # If user doesn't agree to upload telemetry, this scripts won't be executed. The caller should control.
+    decorators.is_diagnostics_mode = in_diagnostic_mode
+    upload(sys.argv[1], sys.argv[2])

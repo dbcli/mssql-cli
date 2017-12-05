@@ -1,7 +1,3 @@
-# --------------------------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for license information.
-# --------------------------------------------------------------------------------------------
 import logging
 from time import sleep
 import time
@@ -37,7 +33,9 @@ class MssqlCliClient(object):
         self.multiple_active_result_sets = multiple_active_result_sets
         self.extra_params = {k: v for k, v in kwargs.items()}
         self.sql_tools_client = sql_tools_client
-
+        self.server_version = None
+        self.server_edition = None
+        self.is_cloud = False
         # If no owner_uri which depicts a connection is passed, generate one and use that.
         if not owner_uri:
             self.owner_uri = generate_owner_uri()
@@ -53,12 +51,12 @@ class MssqlCliClient(object):
             return self.owner_uri
 
         connection_params = {u'ServerName': self.server_name,
-                              u'DatabaseName': self.database,
-                              u'UserName': self.user_name,
-                              u'Password': self.password,
-                              u'AuthenticationType': self.authentication_type,
-                              u'OwnerUri': self.owner_uri,
-                              u'MultipleActiveResultSets': self.multiple_active_result_sets}
+                             u'DatabaseName': self.database,
+                             u'UserName': self.user_name,
+                             u'Password': self.password,
+                             u'AuthenticationType': self.authentication_type,
+                             u'OwnerUri': self.owner_uri,
+                             u'MultipleActiveResultSets': self.multiple_active_result_sets}
 
         connection_params.update(self.extra_params)
 
@@ -76,11 +74,12 @@ class MssqlCliClient(object):
             # response owner_uri should be the same as owner_uri used, else something is weird :)
             assert response.owner_uri == self.owner_uri
             self.is_connected = True
+            self.server_version = response.server_version
+            self.server_edition = response.server_edition
+            self.is_cloud = response.is_cloud
+
             logger.info(u'Connection Successful. Connection Id {0}'.format(response.connection_id))
             return self.owner_uri
-        else:
-            logger.info(u'Connection did not succeed')
-            return None
 
     def execute_multi_statement_single_batch(self, query):
         # Remove spaces, EOL and semi-colons from end

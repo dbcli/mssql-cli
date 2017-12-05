@@ -118,6 +118,10 @@ class ConnectionCompleteEvent(object):
         self.messages = inner_params[u'messages']
         self.error_message = inner_params[u'errorMessage']
         self.error_number = inner_params[u'errorNumber']
+        # server information.
+        self.is_cloud = inner_params['serverInfo']['isCloud'] if inner_params['serverInfo'] else False
+        self.server_version = inner_params['serverInfo']['serverVersion'] if inner_params['serverInfo'] else None
+        self.server_edition = inner_params['serverInfo']['serverEdition'] if inner_params['serverInfo'] else None
 
 
 class ConnectionResponse(object):
