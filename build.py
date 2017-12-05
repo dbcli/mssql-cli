@@ -39,15 +39,15 @@ def build():
     utility.exec_command('python dos2unix.py mssql-cli mssql-cli', utility.ROOT_DIR)
 
     # For the current platform, populate the appropriate binaries and generate the wheel.
-    mssqltoolsservice.copy_sqltoolsservice(utility.get_current_platform())
     utility.clean_up(utility.MSSQLCLI_BUILD_DIRECTORY)
+    mssqltoolsservice.copy_sqltoolsservice(utility.get_current_platform())
 
     print_heading('Building mssql-cli pip package')
     utility.exec_command('python --version', utility.ROOT_DIR)
     utility.exec_command('python setup.py check -r -s bdist_wheel --plat-name {}'.format(utility.get_current_platform()),
                          utility.ROOT_DIR,
                          continue_on_error=False)
-
+    
 
 def _upload_index_file(service, blob_name, title, links):
     print('Uploading index file {}'.format(blob_name))
