@@ -29,7 +29,7 @@ def get_timestamped_version(version):
     :param version: The version number
     :return: <version>.dev<YearMonthDayHourMinute>. Example 0.0.1.dev1711030310
     """
-    return version+'.dev'+datetime.datetime.now().strftime("%y%m%d%I%M")
+    return version+'.dev'+datetime.datetime.now().strftime("%y%m%d%H%M")
 
 
 install_requirements = [
