@@ -135,8 +135,11 @@ def handle_connection_response(response):
     def handle_connection_complete_notification(response):
         if not response.connection_id:
             sys.stderr.write(u'\nConnection did not succeed.')
-            sys.stderr.write(u'\nError message: ' + response.error_message)
-            sys.stderr.write(u'\nOther messages: '+ response.messages)
+            if response.error_message:
+                sys.stderr.write(u'\nError message: ' + response.error_message)
+                logger.error(response.error_message)
+            if response.messages:
+                logger.error(response.messages)
 
         return response
 

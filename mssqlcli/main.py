@@ -252,10 +252,12 @@ class MssqlCli(object):
         # Connect to the database.
 
         if not user:
-            user = getuser()
+            user = click.prompt('Username (press enter for sa)', default=u'sa', show_default=False)
+
+        if not host:
+            host = u'localhost'
 
         if not database:
-            # mssql-cli Issue 41
             database = u'master'
 
         # If password prompt is not forced but no password is provided, try
