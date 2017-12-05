@@ -846,5 +846,5 @@ if __name__ == "__main__":
         telemetry_session.start()
         cli()
     finally:
-        # Upload telemetry in a separate process if the user did not opt out.
+        # Upload telemetry async in a separate process.
         telemetry_session.conclude()
