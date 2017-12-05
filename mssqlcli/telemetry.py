@@ -137,12 +137,14 @@ def upload_payload(payload, service_endpoint_uri, separate_process):
         return payload
 
 
+@_user_agrees_to_telemetry
 @decorators.suppress_all_exceptions(raise_in_diagnostics=True)
 def output_payload_to_file(payload):
     if payload:
         config_dir = os.path.dirname(config.config_location())
         telemetry_file_path = os.path.join(config_dir, MSSQL_CLI_TELEMETRY_FILE)
 
+        # Telemetry log file will only contain data points from the most recent session.
         with open(telemetry_file_path, "w+") as telemetry_file:
             json.dump(json.loads(payload), telemetry_file, indent=2)
 

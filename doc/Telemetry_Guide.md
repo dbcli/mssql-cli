@@ -2,6 +2,8 @@
 
 By default, Microsoft collects anonymous usage data in order to improve the user experience. The usage data collected allows the team to prioritize features and bug fixes.
 
+Microsoft Privacy statement: https://privacy.microsoft.com/en-us/privacystatement
+
 ## Table of Contents
 1. [How do we anonymize the data?](#anonymize)
 1. [What do we collect](#collect)
@@ -10,7 +12,7 @@ By default, Microsoft collects anonymous usage data in order to improve the user
 
 
 ### <a name="anonymize"></a>How do we anonymize data?
-Hashed MAC address: a cryptographically (SHA256) anonymous and unique ID for a machine. This metric is not published.
+Hashed MAC address: a cryptographically (SHA256) anonymous and unique ID for a machine.
   
 ### <a name="collect"></a>What do we collect?
 ##### Environment
@@ -35,7 +37,7 @@ Abnormal process termination.
 - Error flag to indicate type of shutdown.
 
 ### <a name="opt_out"></a>How do I opt out?
-The Mssql CLi Tools telemetry feature is enabled by default. Opt-out of the telemetry feature by setting the ```MSSQLCLI_CLI_TELEMETRY_OPTOUT``` environment variable to ```true``` or ```1```.
+The mssql-cli Tools telemetry feature is enabled by default. Opt-out of the telemetry feature by setting the ```MSSQLCLI_CLI_TELEMETRY_OPTOUT``` environment variable to ```true``` or ```1```.
 
 ##### Windows
 ```
@@ -57,4 +59,17 @@ For those interested, anonymous usage data of the previous session will always b
 ##### Windows
 ```
 C:\Users\<Username>\AppData\Local\dbcli\mssqlcli\mssqlcli_telemetry.log
+```
+
+##### Partial sample of log content
+```
+  {
+    "name": "mssqlcli",
+    "properties": {
+      "Reserved.ChannelUsed": "aivortex",
+      "Reserved.SequenceNumber": 1,
+      "Reserved.EventId": "e6f0bdab-65b0-4e79-87a4-b05fa514c92d",
+      "Reserved.SessionId": "3fa7361c-50ff-4bff-8a55-f22bdc26452d",
+      }
+  }
 ```

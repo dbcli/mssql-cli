@@ -1,4 +1,4 @@
-    # vi: ft=dosini
+# vi: ft=dosini
 [main]
 
 # Display the completions in several columns. (More completions will be

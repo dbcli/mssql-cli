@@ -93,7 +93,7 @@ By default, mssql-cli collects usage data in order to improve your experience.
 The data is anonymous and does not include commandline argument values.
 The data is collected by Microsoft. 
 
-Disable telemetry collection by setting MSSQL_CLI_TELEMETRY_OPTOUT to 'True' or '1'.
+Disable telemetry collection by setting environment variable MSSQL_CLI_TELEMETRY_OPTOUT to 'True' or '1'.
 
 Microsoft Privacy statement: https://privacy.microsoft.com/en-us/privacystatement
 """
@@ -846,4 +846,5 @@ if __name__ == "__main__":
         telemetry_session.start()
         cli()
     finally:
+        # Upload telemetry in a separate process if the user did not opt out.
         telemetry_session.conclude()

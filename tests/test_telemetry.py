@@ -97,5 +97,6 @@ class TelemetryTests(unittest.TestCase):
 
 
 if __name__ == u'__main__':
+    # Enabling this env var would output what telemetry payload is sent.
     os.environ[telemetry_upload.DIAGNOSTICS_TELEMETRY_ENV_NAME] = 'False'
     unittest.main()
