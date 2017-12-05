@@ -13,7 +13,8 @@ Microsoft Privacy statement: https://privacy.microsoft.com/en-us/privacystatemen
 
 ### <a name="anonymize"></a>How do we anonymize data?
 Hashed MAC address: a cryptographically (SHA256) anonymous and unique ID for a machine.
-  
+Hashed MAC address and home directory path: a cryptographically (SHA256) anonymous and unique ID for a user.
+
 ### <a name="collect"></a>What do we collect?
 ##### Environment
 Environment data points give the team insight into commonly used platforms and allow the team to prioritize features, bug fixes, and packaging.
@@ -66,7 +67,6 @@ C:\Users\<Username>\AppData\Local\dbcli\mssqlcli\mssqlcli_telemetry.log
   {
     "name": "mssqlcli",
     "properties": {
-      "Reserved.ChannelUsed": "aivortex",
       "Reserved.SequenceNumber": 1,
       "Reserved.EventId": "e6f0bdab-65b0-4e79-87a4-b05fa514c92d",
       "Reserved.SessionId": "3fa7361c-50ff-4bff-8a55-f22bdc26452d",
