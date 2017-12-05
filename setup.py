@@ -41,12 +41,9 @@ install_requirements = [
     'humanize >= 0.5.1',
     'cli_helpers >= 0.2.3, < 1.0.0',
     'future>=0.16.0',
-    'wheel>=0.29.0'
+    'wheel>=0.29.0',
+    'enum34>=1.1.6'
 ]
-
-if sys.version_info < (3, 4):
-    install_requirements.append('enum34>=1.1.6')
-
 
 # setproctitle is used to mask the password when running `ps` in command line.
 # But this is not necessary in Windows since the password is never shown in the
