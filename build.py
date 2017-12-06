@@ -22,7 +22,7 @@ def print_heading(heading, f=None):
 
 def clean_and_copy_sqltoolsservice(platform):
     """
-        Cleans the SqlToolsService directory and copies over the SqlToolsService binaries for the given platform
+        Cleans the SqlToolsService directory and copies over the SqlToolsService binaries for the given platform.
         :param platform: string
     """
     mssqltoolsservice.clean_up_sqltoolsservice()
