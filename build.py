@@ -20,6 +20,15 @@ def print_heading(heading, f=None):
     print('{0}\n{1}\n{0}'.format('=' * len(heading), heading), file=f)
 
 
+def clean_and_copy_sqltoolsservice(platform):
+    """
+        Cleans the SqlToolsService directory and copies over the SqlToolsService binaries for the given platform.
+        :param platform: string
+    """
+    mssqltoolsservice.clean_up_sqltoolsservice()
+    mssqltoolsservice.copy_sqltoolsservice(platform)
+
+
 def build():
     """
         Builds mssql-cli package.
@@ -38,16 +47,25 @@ def build():
     # convert windows line endings to unix for mssql-cli bash script
     utility.exec_command('python dos2unix.py mssql-cli mssql-cli', utility.ROOT_DIR)
 
-    # For the current platform, populate the appropriate binaries and generate the wheel.
-    utility.clean_up(utility.MSSQLCLI_BUILD_DIRECTORY)
-    mssqltoolsservice.copy_sqltoolsservice(utility.get_current_platform())
+    if utility.get_current_platform().startswith('win'):
+        platforms_to_build = ['win32', 'win_amd64']
+    else:
+        platforms_to_build = [utility.get_current_platform()]
 
-    print_heading('Building mssql-cli pip package')
-    utility.exec_command('python --version', utility.ROOT_DIR)
-    utility.exec_command('python setup.py check -r -s bdist_wheel --plat-name {}'.format(utility.get_current_platform()),
-                         utility.ROOT_DIR,
-                         continue_on_error=False)
-    
+    for platform in platforms_to_build:
+        # For the current platform, populate the appropriate binaries and generate the wheel.
+        clean_and_copy_sqltoolsservice(platform)
+        utility.clean_up(utility.MSSQLCLI_BUILD_DIRECTORY)
+
+        print_heading('Building mssql-cli pip package')
+        utility.exec_command('python --version', utility.ROOT_DIR)
+        utility.exec_command('python setup.py check -r -s bdist_wheel --plat-name {}'.format(platform),
+                             utility.ROOT_DIR,
+                             continue_on_error=False)
+
+    # Copy back the SqlToolsService binaries for this platform.
+    clean_and_copy_sqltoolsservice(utility.get_current_platform())
+
 
 def _upload_index_file(service, blob_name, title, links):
     print('Uploading index file {}'.format(blob_name))
