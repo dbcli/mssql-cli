@@ -1,53 +1,12 @@
 # coding=utf-8
 from __future__ import unicode_literals
 import os
-import platform
 from mssqlutils import create_mssql_cli_client, shutdown, run_and_return_string_from_formatter
 from time import sleep
-
 import pytest
-try:
-    import setproctitle
-except ImportError:
-    setproctitle = None
-
 from mssqlcli.main import (
-    obfuscate_process_password, format_output, MssqlCli, OutputSettings
+    format_output, MssqlCli, OutputSettings
 )
-
-
-@pytest.mark.skipif(platform.system() == 'Windows',
-                    reason='Not applicable in windows')
-@pytest.mark.skipif(not setproctitle,
-                    reason='setproctitle not available')
-def test_obfuscate_process_password():
-    original_title = setproctitle.getproctitle()
-
-    setproctitle.setproctitle("mssql-cli user=root password=secret host=localhost")
-    obfuscate_process_password()
-    title = setproctitle.getproctitle()
-    expected = "mssql-cli user=root password=xxxx host=localhost"
-    assert title == expected
-
-    setproctitle.setproctitle("mssql-cli user=root password=top secret host=localhost")
-    obfuscate_process_password()
-    title = setproctitle.getproctitle()
-    expected = "mssql-cli user=root password=xxxx host=localhost"
-    assert title == expected
-
-    setproctitle.setproctitle("mssql-cli user=root password=top secret")
-    obfuscate_process_password()
-    title = setproctitle.getproctitle()
-    expected = "mssql-cli user=root password=xxxx"
-    assert title == expected
-
-    setproctitle.setproctitle("mssql-cli postgres://root:secret@localhost/db")
-    obfuscate_process_password()
-    title = setproctitle.getproctitle()
-    expected = "mssql-cli postgres://root:xxxx@localhost/db"
-    assert title == expected
-
-    setproctitle.setproctitle(original_title)
 
 
 def test_format_output():

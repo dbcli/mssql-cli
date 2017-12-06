@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 from __future__ import print_function
 
 import os
-import re
 import sys
 import traceback
 import logging
@@ -19,10 +18,6 @@ from cli_helpers.tabular_output import TabularOutputFormatter
 from cli_helpers.tabular_output.preprocessors import (align_decimals,
                                                       format_numbers)
 import click
-try:
-    import setproctitle
-except ImportError:
-    setproctitle = None
 from prompt_toolkit import CommandLineInterface, Application, AbortAction
 from prompt_toolkit.enums import DEFAULT_BUFFER, EditingMode
 from prompt_toolkit.shortcuts import create_prompt_layout, create_eventloop
@@ -644,14 +639,14 @@ class MssqlCli(object):
 @click.command()
 @click.option('-h', '--host', default='', envvar='MSSQLCLIHOST',
         help='Host address of the SQL Server database.')
-@click.option('-U', '--username', 'username_opt', envvar='MSSQLCLIUSER',
+@click.option('-U', '--username', 'username', envvar='MSSQLCLIUSER',
         help='Username to connect to the postgres database.')
 @click.option('-W', '--password', 'prompt_passwd', is_flag=True, default=False,
         help='Force password prompt.')
 @click.option('-I', '--integrated', 'integrated_auth', is_flag=True, default=False,
               help='Use integrated authentication on windows.')
 @click.option('-v', '--version', is_flag=True, help='Version of mssql-cli.')
-@click.option('-d', '--dbname', default='', envvar='MSSQLCLIDATABASE',
+@click.option('-d', '--database', default='', envvar='MSSQLCLIDATABASE',
         help='database name to connect to.')
 @click.option('--mssqlclirc', default=config_location() + 'config',
         envvar='MSSQLCLIRC', help='Location of mssqlclirc config file.')
@@ -662,10 +657,8 @@ class MssqlCli(object):
         help='Skip intro on startup and goodbye on exit.')
 @click.option('--auto-vertical-output', is_flag=True,
               help='Automatically switch to vertical output mode if the result is wider than the terminal width.')
-@click.argument('database', default=lambda: None, envvar='MSSQLCLIDATABASE', nargs=1)
-@click.argument('username', default=lambda: None, envvar='MSSQLCLIUSER', nargs=1)
-def cli(database, username_opt, host, prompt_passwd,
-        dbname, username, version, mssqlclirc, row_limit,
+def cli(username, host, prompt_passwd,
+        database, version, mssqlclirc, row_limit,
         less_chatty, auto_vertical_output, integrated_auth):
 
     if version:
@@ -685,34 +678,19 @@ def cli(database, username_opt, host, prompt_passwd,
                         mssqlclirc_file=mssqlclirc, less_chatty=less_chatty, auto_vertical_output=auto_vertical_output,
                         integrated_auth=integrated_auth)
 
-    # Choose which ever one has a valid value.
-    database = database or dbname
-    user = username_opt or username
-
-    mssqlcli.connect(database, host, user, port='')
+    mssqlcli.connect(database, host, username, port='')
 
     mssqlcli.logger.debug('Launch Params: \n'
             '\tdatabase: %r'
             '\tuser: %r'
             '\thost: %r'
-            '\tport: %r', database, user, host, '')
-
-    if setproctitle:
-        obfuscate_process_password()
+            '\tport: %r', database, username, host, '')
 
     mssqlcli.run_cli()
 
+
 def display_telemetry_message():
     print(MSSQLCLI_TELEMETRY_PROMPT)
-
-def obfuscate_process_password():
-    process_title = setproctitle.getproctitle()
-    if '://' in process_title:
-        process_title = re.sub(r":(.*):(.*)@", r":\1:xxxx@", process_title)
-    elif "=" in process_title:
-        process_title = re.sub(r"password=(.+?)((\s[a-zA-Z]+=)|$)", r"password=xxxx\2", process_title)
-
-    setproctitle.setproctitle(process_title)
 
 
 def has_meta_cmd(query):
