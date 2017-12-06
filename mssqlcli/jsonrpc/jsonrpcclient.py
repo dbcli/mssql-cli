@@ -10,7 +10,7 @@ import json
 import logging
 import threading
 
-logger = logging.getLogger(u'mssqlscripter.jsonrpc.jsonrpcclient')
+logger = logging.getLogger(u'mssqlcli.jsonrpc.jsonrpcclient')
 
 
 class JsonRpcClient(object):
