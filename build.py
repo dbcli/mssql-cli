@@ -147,7 +147,8 @@ def unit_test():
     """
     utility.exec_command(
         'pytest --cov mssqlcli tests/test_mssqlcliclient.py tests/test_main.py tests/test_fuzzy_completion.py '
-        'tests/test_rowlimit.py tests/test_sqlcompletion.py tests/test_prioritization.py mssqlcli/jsonrpc/contracts/tests',
+        'tests/test_rowlimit.py tests/test_sqlcompletion.py tests/test_prioritization.py mssqlcli/jsonrpc/contracts/tests '
+        'tests/test_telemetry.py',
         utility.ROOT_DIR,
         continue_on_error=False)
 
