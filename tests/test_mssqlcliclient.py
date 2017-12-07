@@ -114,7 +114,7 @@ class MssqlCliClientTests(unittest.TestCase):
         """
             Verify mssqlcliclient's tables, views, columns, and schema are populated.
             Note: This test should run against a database that the credentials
-                  MSSQLCLIUSER and MSSQLCLIPASSWORD have write access to.
+                  MSSQL_CLI_USER and MSSQL_CLI_PASSWORD have write access to.
         """
         try:
             client = create_mssql_cli_client()

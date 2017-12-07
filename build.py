@@ -29,6 +29,10 @@ def clean_and_copy_sqltoolsservice(platform):
     mssqltoolsservice.copy_sqltoolsservice(platform)
 
 
+def code_analysis():
+    utility.exec_command('flake8 mssqlcli setup.py dev_setup.py build.py utility.py dos2unix.py', utility.ROOT_DIR)
+
+
 def build():
     """
         Builds mssql-cli package.
@@ -46,6 +50,9 @@ def build():
 
     # convert windows line endings to unix for mssql-cli bash script
     utility.exec_command('python dos2unix.py mssql-cli mssql-cli', utility.ROOT_DIR)
+
+    # run flake8
+    code_analysis()
 
     if utility.get_current_platform().startswith('win'):
         platforms_to_build = ['win32', 'win_amd64']

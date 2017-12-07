@@ -116,8 +116,3 @@ def refresh_databases(completer, mssqlcliclient):
 @refresher('types')
 def refresh_types(completer, mssqlcliclient):
     completer.extend_datatypes(mssqlcliclient.user_defined_types())
-
-
-#@refresher('functions')
-#def refresh_functions(completer, executor):
-#    completer.extend_functions(executor.functions())
