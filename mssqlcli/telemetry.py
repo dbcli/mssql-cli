@@ -16,7 +16,6 @@ import mssqlcli.decorators as decorators
 
 PRODUCT_NAME = 'mssqlcli'
 TELEMETRY_VERSION = '0.0.1'
-MSSQL_CLI_PREFIX = 'Context.Default.MSSQLCLI.'
 MSSQL_CLI_TELEMETRY_FILE = 'mssqlcli_telemetry.log'
 MSSQL_CLI_TELEMETRY_OPT_OUT = 'MSSQL_CLI_TELEMETRY_OPTOUT'
 MSSQL_CLI_IN_DOCKER = 'MSSQL_CLI_IN_DOCKER'

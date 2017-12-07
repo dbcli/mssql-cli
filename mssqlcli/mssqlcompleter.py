@@ -45,7 +45,7 @@ def Candidate(
 # Used to strip trailing '::some_type' from default-value expressions
 arg_default_type_strip_regex = re.compile(r'::[\w\.]+(\[\])?$')
 
-normalize_ref = lambda ref: ref if ref[0] == '"' else '"' + ref.lower() +  '"'
+normalize_ref = lambda ref: ref if ref[0] == '"' else '"' + ref.lower() + '"'
 
 
 def generate_alias(tbl):

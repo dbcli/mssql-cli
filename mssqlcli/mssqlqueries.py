@@ -4,7 +4,7 @@ def get_schemas():
     :return: string
     """
     return '''
-        SELECT name 
+        SELECT name
         FROM sys.schemas
         ORDER BY 1'''
 
@@ -15,7 +15,7 @@ def get_databases():
     :return: string
     """
     return '''
-        Select name 
+        Select name
         FROM sys.databases
         ORDER BY 1'''
 
@@ -26,27 +26,27 @@ def get_table_columns():
     :return: string
     """
     return '''
-        SELECT  isc.table_schema, 
-                isc.table_name, 
-                isc.column_name, 
+        SELECT  isc.table_schema,
+                isc.table_name,
+                isc.column_name,
                 isc.data_type,
-                isc.column_default 
+                isc.column_default
         FROM
             (
-                SELECT  table_schema, 
-                        table_name, 
-                        column_name, 
+                SELECT  table_schema,
+                        table_name,
+                        column_name,
                         data_type,
-                        column_default 
+                        column_default
                 FROM information_schema.columns
             )   AS isc
             INNER JOIN
             (
                 SELECT  table_schema,
                         table_name
-                FROM information_schema.tables 
-                WHERE TABLE_TYPE = 'BASE TABLE' 
-            )   AS ist 
+                FROM information_schema.tables
+                WHERE TABLE_TYPE = 'BASE TABLE'
+            )   AS ist
             ON ist.table_name = isc.table_name AND ist.TABLE_SCHEMA = isc.TABLE_SCHEMA
             ORDER BY 1, 2'''
 
@@ -57,27 +57,27 @@ def get_view_columns():
     :return: string
     """
     return '''
-        SELECT  isc.table_schema, 
-                isc.table_name, 
-                isc.column_name, 
+        SELECT  isc.table_schema,
+                isc.table_name,
+                isc.column_name,
                 isc.data_type,
-                isc.column_default 
+                isc.column_default
         FROM
             (
-                SELECT  table_schema, 
-                        table_name, 
-                        column_name, 
+                SELECT  table_schema,
+                        table_name,
+                        column_name,
                         data_type,
-                        column_default 
+                        column_default
                 FROM information_schema.columns
             )   AS isc
             INNER JOIN
             (
                 SELECT  table_schema,
                         table_name
-                FROM information_schema.tables 
-                WHERE TABLE_TYPE = 'VIEW' 
-            )   AS ist 
+                FROM information_schema.tables
+                WHERE TABLE_TYPE = 'VIEW'
+            )   AS ist
             ON ist.table_name = isc.table_name AND ist.TABLE_SCHEMA = isc.TABLE_SCHEMA
             ORDER BY 1, 2'''
 
@@ -89,9 +89,9 @@ def get_views():
     """
     return '''
         SELECT  table_schema,
-                table_name   
-        FROM information_schema.tables 
-        WHERE table_type = 'View' 
+                table_name
+        FROM information_schema.tables
+        WHERE table_type = 'View'
         ORDER BY 1, 2'''
 
 
@@ -102,8 +102,8 @@ def get_tables():
     """
     return '''
         SELECT  table_schema,
-                table_name   
-        FROM information_schema.tables 
+                table_name
+        FROM information_schema.tables
         WHERE table_type = 'BASE TABLE'
         ORDER BY 1, 2'''
 
@@ -120,7 +120,7 @@ def get_user_defined_types():
         (
             SELECT name,
                    schema_id
-            FROM sys.types 
+            FROM sys.types
             WHERE is_user_defined = 1) AS types
         INNER JOIN
         (
@@ -147,22 +147,22 @@ def get_foreignkeys():
     :return: string
     """
     return '''
-        SELECT  
+        SELECT
             kcu1.table_schema AS fk_table_schema,
             kcu1.table_name AS fk_table_name,
             kcu1.column_name AS fk_column_name,
             kcu2.table_schema AS referenced_table_schema,
-            kcu2.table_name AS referenced_table_name, 
+            kcu2.table_name AS referenced_table_name,
             kcu2.column_name AS referenced_column_name
-        FROM information_schema.referential_constraints AS rc 
-        INNER JOIN information_schema.key_column_usage AS kcu1 
-            ON kcu1.constraint_catalog = rc.constraint_catalog  
-            AND kcu1.constraint_schema = rc.constraint_schema 
-            AND kcu1.constraint_name = rc.constraint_name 
-        INNER JOIN information_schema.key_column_usage AS kcu2 
-            ON kcu2.constraint_catalog = rc.unique_constraint_catalog  
-            AND kcu2.constraint_schema = rc.unique_constraint_schema 
-            AND kcu2.constraint_name = rc.unique_constraint_name 
-            AND kcu2.ordinal_position = kcu1.ordinal_position 
+        FROM information_schema.referential_constraints AS rc
+        INNER JOIN information_schema.key_column_usage AS kcu1
+            ON kcu1.constraint_catalog = rc.constraint_catalog
+            AND kcu1.constraint_schema = rc.constraint_schema
+            AND kcu1.constraint_name = rc.constraint_name
+        INNER JOIN information_schema.key_column_usage AS kcu2
+            ON kcu2.constraint_catalog = rc.unique_constraint_catalog
+            AND kcu2.constraint_schema = rc.unique_constraint_schema
+            AND kcu2.constraint_name = rc.unique_constraint_name
+            AND kcu2.ordinal_position = kcu1.ordinal_position
             ORDER BY 3, 4'''
 

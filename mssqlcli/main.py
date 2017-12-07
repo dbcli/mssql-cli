@@ -25,8 +25,7 @@ from prompt_toolkit.buffer import AcceptAction
 from prompt_toolkit.document import Document
 from prompt_toolkit.filters import Always, HasFocus, IsDone
 from prompt_toolkit.layout.lexers import PygmentsLexer
-from prompt_toolkit.layout.processors import (ConditionalProcessor,
-                                        HighlightMatchingBracketProcessor)
+from prompt_toolkit.layout.processors import (ConditionalProcessor, HighlightMatchingBracketProcessor)
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from pygments.lexers.sql import PostgresLexer
@@ -37,8 +36,7 @@ from .mssqltoolbar import create_toolbar_tokens_func
 from .mssqlstyle import style_factory
 from .mssqlbuffer import MssqlBuffer
 from .completion_refresher import CompletionRefresher
-from .config import (get_casing_file,
-    config_location, ensure_dir_exists, get_config)
+from .config import (get_casing_file, config_location, ensure_dir_exists, get_config)
 from .key_bindings import mssqlcli_bindings
 from .encodingutils import utf8tounicode
 from .encodingutils import text_type
@@ -50,11 +48,9 @@ try:
     from urlparse import urlparse, unquote, parse_qs
 except ImportError:
     from urllib.parse import urlparse, unquote, parse_qs
-
-from getpass import getuser
 from collections import namedtuple
 
-#mssql-cli imports
+# mssql-cli imports
 from mssqlcli.sqltoolsclient import SqlToolsClient
 from mssqlcli.mssqlcliclient import MssqlCliClient, reset_connection_and_clients
 import mssqlcli.telemetry as telemetry_session
@@ -86,7 +82,7 @@ Telemetry
 ---------
 By default, mssql-cli collects usage data in order to improve your experience.
 The data is anonymous and does not include commandline argument values.
-The data is collected by Microsoft. 
+The data is collected by Microsoft.
 
 Disable telemetry collection by setting environment variable MSSQL_CLI_TELEMETRY_OPTOUT to 'True' or '1'.
 
@@ -271,7 +267,7 @@ class MssqlCli(object):
         # If password prompt is not forced but no password is provided, try
         # getting it from environment variable.
         if not self.force_passwd_prompt and not passwd:
-            passwd = os.environ.get('MSSQLCLIPASSWORD', '')
+            passwd = os.environ.get('MSSQL_CLI_PASSWORD', '')
 
         if not self.integrated_auth:
             # Prompt for a password immediately if requested via the -W flag. This
@@ -296,7 +292,8 @@ class MssqlCli(object):
                 authentication_type = u'Integrated'
 
             self.mssqlcliclient_query_execution = MssqlCliClient(self.sqltoolsclient, host, user, passwd,
-                                                    database=database, authentication_type=authentication_type, **kwargs)
+                                                                 database=database,
+                                                                 authentication_type=authentication_type, **kwargs)
 
             if not self.mssqlcliclient_query_execution.connect():
                 click.secho('\nUnable to connect. Please try again', err=True, fg='red')
@@ -353,14 +350,14 @@ class MssqlCli(object):
                 print('Time: %0.03fs' % query.total_time)
 
             with self._completer_lock:
-               self.completer.reset_completions()
+                self.completer.reset_completions()
             self.refresh_completions(persist_priorities='keywords')
 
             # Check if we need to update completions, in order of most
             # to least drastic changes
             if query.db_changed:
                 with self._completer_lock:
-                   self.completer.reset_completions()
+                    self.completer.reset_completions()
                 self.refresh_completions(persist_priorities='keywords')
             elif query.meta_changed:
                 self.refresh_completions(persist_priorities='all')
@@ -368,8 +365,6 @@ class MssqlCli(object):
         return query
 
     def run_cli(self):
-        logger = self.logger
-
         history_file = self.config['main']['history_file']
         if history_file == 'default':
             history_file = config_location() + 'history'
@@ -427,7 +422,7 @@ class MssqlCli(object):
             return [(Token.Prompt, prompt)]
 
         def get_continuation_tokens(cli, width):
-            continuation=self.multiline_continuation_char * (width - 1) + ' '
+            continuation = self.multiline_continuation_char * (width - 1) + ' '
             return [(Token.Continuation, continuation)]
 
         get_toolbar_tokens = create_toolbar_tokens_func(
@@ -502,7 +497,6 @@ class MssqlCli(object):
 
         # Run the query.
         start = time()
-        on_error_resume = self.on_error == 'RESUME'
 
         # mssql-cli
         if not self.mssqlcliclient_query_execution.connect():
@@ -530,9 +524,8 @@ class MssqlCli(object):
                 expanded=self.expanded_output,
                 max_width=max_width,
                 case_function=(
-                    # mssql-cli Github Issue 16 : Commenting out completer
-                    # self.completer.case if self.settings['case_column_headers']
-                    # else
+                    self.completer.case if self.settings['case_column_headers']
+                    else
                     lambda x: x
                 )
             )
@@ -637,20 +630,20 @@ class MssqlCli(object):
 
 
 @click.command()
-@click.option('-h', '--host', default='', envvar='MSSQLCLIHOST',
+@click.option('-h', '--host', default='', envvar='MSSQL_CLI_HOST',
         help='Host address of the SQL Server database.')
-@click.option('-U', '--username', 'username', envvar='MSSQLCLIUSER',
+@click.option('-U', '--username', 'username', envvar='MSSQL_CLI_USER',
         help='Username to connect to the postgres database.')
 @click.option('-W', '--password', 'prompt_passwd', is_flag=True, default=False,
         help='Force password prompt.')
 @click.option('-I', '--integrated', 'integrated_auth', is_flag=True, default=False,
               help='Use integrated authentication on windows.')
 @click.option('-v', '--version', is_flag=True, help='Version of mssql-cli.')
-@click.option('-d', '--database', default='', envvar='MSSQLCLIDATABASE',
+@click.option('-d', '--database', default='', envvar='MSSQL_CLI_DATABASE',
         help='database name to connect to.')
 @click.option('--mssqlclirc', default=config_location() + 'config',
-        envvar='MSSQLCLIRC', help='Location of mssqlclirc config file.')
-@click.option('--row-limit', default=None, envvar='MSSQLCLIROWLIMIT', type=click.INT,
+        envvar='MSSQL_CLI_RC', help='Location of mssqlclirc config file.')
+@click.option('--row-limit', default=None, envvar='MSSQL_CLI_ROW_LIMIT', type=click.INT,
         help='Set threshold for row limit prompt. Use 0 to disable prompt.')
 @click.option('--less-chatty', 'less_chatty', is_flag=True,
         default=False,
@@ -743,10 +736,10 @@ def is_select(status):
 
 
 def quit_command(sql):
-    return (sql.strip().lower() == 'exit'
-            or sql.strip().lower() == 'quit'
-            or sql.strip() == r'\q'
-            or sql.strip() == ':q')
+    return (sql.strip().lower() == 'exit' or
+            sql.strip().lower() == 'quit' or
+            sql.strip() == r'\q' or
+            sql.strip() == ':q')
 
 
 def exception_formatter(e):
@@ -800,7 +793,6 @@ def format_output(title, cur, headers, status, settings):
         headers = [case_function(utf8tounicode(x)) for x in headers]
         if max_width is not None:
             cur = list(cur)
-        column_types = None
         formatted = formatter.format_output(cur, headers, **output_kwargs)
         if isinstance(formatted, (text_type)):
             formatted = iter(formatted.splitlines())

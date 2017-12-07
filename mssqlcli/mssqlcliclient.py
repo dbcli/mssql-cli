@@ -103,7 +103,7 @@ class MssqlCliClient(object):
         query_request = self.sql_tools_client.create_request(u'query_execute_string_request',
                                                              {u'OwnerUri': self.owner_uri, u'Query': query})
         query_request.execute()
-        query_message=None
+        query_message = None
         while not query_request.completed():
             query_response = query_request.get_response()
             if query_response:
@@ -122,7 +122,7 @@ class MssqlCliClient(object):
                 is_error=True)
 
         if (not query_response.batch_summaries[0].result_set_summaries) or \
-            (query_response.batch_summaries[0].result_set_summaries[0].row_count == 0):
+           (query_response.batch_summaries[0].result_set_summaries[0].row_count == 0):
             return self.tabular_results_generator(
                 column_info=None,
                 result_rows=None,

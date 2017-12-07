@@ -14,10 +14,10 @@ def create_mssql_cli_client(owner_uri=None, connect=True):
     :return: MssqlCliClient
     """
     try:
-        server_name = os.environ['MSSQLCLIHOST']
-        database_name = os.environ['MSSQLCLIDATABASE']
-        user_name = os.environ['MSSQLCLIUSER']
-        password = os.environ['MSSQLCLIPASSWORD']
+        server_name = os.environ['MSSQL_CLI_HOST']
+        database_name = os.environ['MSSQL_CLI_DATABASE']
+        user_name = os.environ['MSSQL_CLI_USER']
+        password = os.environ['MSSQL_CLI_PASSWORD']
 
         if not server_name or not database_name or not user_name or not password:
             raise Exception('Environment variables for running tests not found.')

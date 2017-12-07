@@ -25,12 +25,6 @@ def create_toolbar_tokens_func(get_vi_mode_enabled, get_is_refreshing,
         result = []
         result.append((token, ' '))
 
-        # mssql-cli Issue 16
-        #if cli.buffers[DEFAULT_BUFFER].completer.smart_completion:
-        #    result.append((token.On, '[F2] Smart Completion: ON  '))
-        #else:
-        #result.append((token.Off, '[F2] Smart Completion: OFF  '))
-
         if cli.buffers[DEFAULT_BUFFER].always_multiline:
             result.append((token.On, '[F3] Multiline: ON  '))
         else:
@@ -47,16 +41,5 @@ def create_toolbar_tokens_func(get_vi_mode_enabled, get_is_refreshing,
         else:
             result.append((token.On, '[F4] Emacs-mode'))
 
-        # mssql-cli Issue 16, Issue 38
-        """
-        if failed_transaction():
-            result.append((token.Transaction.Failed, '     Failed transaction'))
-
-        if valid_transaction():
-            result.append((token.Transaction.Valid, '     Transaction'))
-
-        if get_is_refreshing():
-            result.append((token, '     Refreshing completions...'))
-        """
         return result
     return get_toolbar_tokens
