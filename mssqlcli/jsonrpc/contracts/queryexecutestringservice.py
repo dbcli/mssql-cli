@@ -77,8 +77,8 @@ class QueryExecuteStringParams(object):
 class QueryExecuteErrorResponseEvent(object):
     def __init__(self, parameters):
         inner_params = parameters[u'error']
-        self.error_message = inner_params[u'message']
-        self.error_code = inner_params[u'code']
+        self.error_message = inner_params[u'message'] if u'message' in inner_params else ''
+        self.error_code = inner_params[u'code'] if u'code' in inner_params else ''
 
 
 class QueryMessageEvent(object):
