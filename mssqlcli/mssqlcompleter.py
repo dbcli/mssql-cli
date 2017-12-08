@@ -112,9 +112,7 @@ class MssqlCompleter(Completer):
         self.all_completions = set(self.keywords + self.functions)
 
     def escape_name(self, name):
-        if name and ((not self.name_pattern.match(name))
-                or (name.upper() in self.reserved_words)
-                or (name.upper() in self.functions)):
+        if name:
             name = '"%s"' % name
 
         return name
