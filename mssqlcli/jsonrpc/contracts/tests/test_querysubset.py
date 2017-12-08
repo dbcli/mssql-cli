@@ -33,7 +33,8 @@ class QuerySubsetTests(unittest.TestCase):
                           u'RowsStartIndex': 0,
                           u'RowCount': 16}
 
-            request = queryservice.QuerySubsetRequest(3, rpc_client, parameters)
+            request = queryservice.QuerySubsetRequest(
+                3, rpc_client, parameters)
             self.verify_subset_response(request=request)
             rpc_client.shutdown()
 
@@ -60,10 +61,11 @@ class QuerySubsetTests(unittest.TestCase):
         """
         return os.path.abspath(
             os.path.join(
-            os.path.abspath(__file__),
-            u'..',
-            u'baselines',
-            file_name))
+                os.path.abspath(__file__),
+                u'..',
+                u'baselines',
+                file_name))
+
 
 if __name__ == u'__main__':
     unittest.main()

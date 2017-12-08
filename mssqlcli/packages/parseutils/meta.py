@@ -15,7 +15,7 @@ def ColumnMetadata(
 
 
 ForeignKey = namedtuple('ForeignKey', ['parentschema', 'parenttable',
-    'parentcolumn', 'childschema', 'childtable', 'childcolumn'])
+                                       'parentcolumn', 'childschema', 'childtable', 'childcolumn'])
 TableMetadata = namedtuple('TableMetadata', 'name columns')
 
 
@@ -81,8 +81,7 @@ class FunctionMetadata(object):
         self.is_set_returning = is_set_returning
 
     def __eq__(self, other):
-        return (isinstance(other, self.__class__)
-                and self.__dict__ == other.__dict__)
+        return (isinstance(other, self.__class__) and self.__dict__ == other.__dict__)
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -107,7 +106,8 @@ class FunctionMetadata(object):
         )
 
     def has_variadic(self):
-        return self.arg_modes and any(arg_mode == 'v' for arg_mode in self.arg_modes)
+        return self.arg_modes and any(
+            arg_mode == 'v' for arg_mode in self.arg_modes)
 
     def args(self):
         """Returns a list of input-parameter ColumnMetadata namedtuples."""
@@ -132,7 +132,6 @@ class FunctionMetadata(object):
 
         return [arg(name, typ, num) for num, (name, typ) in enumerate(args)]
 
-
     def fields(self):
         """Returns a list of output-field ColumnMetadata namedtuples"""
 
@@ -145,6 +144,6 @@ class FunctionMetadata(object):
             return [ColumnMetadata(self.func_name, self.return_type, [])]
 
         return [ColumnMetadata(name, typ, [])
-            for name, typ, mode in zip(
+                for name, typ, mode in zip(
                 self.arg_names, self.arg_types, self.arg_modes)
-            if mode in ('o', 'b', 't')] # OUT, INOUT, TABLE
+                if mode in ('o', 'b', 't')]  # OUT, INOUT, TABLE

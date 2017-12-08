@@ -25,7 +25,8 @@ from prompt_toolkit.buffer import AcceptAction
 from prompt_toolkit.document import Document
 from prompt_toolkit.filters import Always, HasFocus, IsDone
 from prompt_toolkit.layout.lexers import PygmentsLexer
-from prompt_toolkit.layout.processors import (ConditionalProcessor, HighlightMatchingBracketProcessor)
+from prompt_toolkit.layout.processors import (
+    ConditionalProcessor, HighlightMatchingBracketProcessor)
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from pygments.lexers.sql import PostgresLexer
@@ -36,7 +37,11 @@ from .mssqltoolbar import create_toolbar_tokens_func
 from .mssqlstyle import style_factory
 from .mssqlbuffer import MssqlBuffer
 from .completion_refresher import CompletionRefresher
-from .config import (get_casing_file, config_location, ensure_dir_exists, get_config)
+from .config import (
+    get_casing_file,
+    config_location,
+    ensure_dir_exists,
+    get_config)
 from .key_bindings import mssqlcli_bindings
 from .encodingutils import utf8tounicode
 from .encodingutils import text_type
@@ -149,7 +154,8 @@ class MssqlCli(object):
         self.syntax_style = c['main']['syntax_style']
         self.cli_style = c['colors']
         self.wider_completion_menu = c['main'].as_bool('wider_completion_menu')
-        self.less_chatty = bool(less_chatty) or c['main'].as_bool('less_chatty')
+        self.less_chatty = bool(
+            less_chatty) or c['main'].as_bool('less_chatty')
         self.null_string = c['main'].get('null_string', '<null>')
         self.on_error = c['main']['on_error'].upper()
         self.decimal_format = c['data_formats']['decimal']
@@ -162,7 +168,8 @@ class MssqlCli(object):
         self.query_history = []
 
         # Initialize completer
-        # Smart completion is not-supported in Public Preview. Tracked by GitHub issue number 47.
+        # Smart completion is not-supported in Public Preview. Tracked by
+        # GitHub issue number 47.
         smart_completion = False
         keyword_casing = c['main']['keyword_casing']
         self.settings = {
@@ -222,7 +229,8 @@ class MssqlCli(object):
         log_level = self.config['main']['log_level']
 
         # Disable logging if value is NONE by switching to a no-op handler.
-        # Set log level to a high value so it doesn't even waste cycles getting called.
+        # Set log level to a high value so it doesn't even waste cycles getting
+        # called.
         if log_level.upper() == 'NONE':
             handler = logging.NullHandler()
         else:
@@ -256,7 +264,10 @@ class MssqlCli(object):
         # Connect to the database.
 
         if not user:
-            user = click.prompt('Username (press enter for sa)', default=u'sa', show_default=False)
+            user = click.prompt(
+                'Username (press enter for sa)',
+                default=u'sa',
+                show_default=False)
 
         if not host:
             host = u'localhost'
@@ -284,7 +295,8 @@ class MssqlCli(object):
                                       show_default=False, type=str)
 
         # Attempt to connect to the database.
-        # Note that passwd may be empty on the first attempt. In this case try integrated auth.
+        # Note that passwd may be empty on the first attempt. In this case try
+        # integrated auth.
         try:
             # mssql-cli
             authentication_type = u'SqlLogin'
@@ -296,10 +308,14 @@ class MssqlCli(object):
                                                                  authentication_type=authentication_type, **kwargs)
 
             if not self.mssqlcliclient_query_execution.connect():
-                click.secho('\nUnable to connect. Please try again', err=True, fg='red')
+                click.secho(
+                    '\nUnable to connect. Please try again',
+                    err=True,
+                    fg='red')
                 exit(1)
 
-            telemetry_session.set_server_information(self.mssqlcliclient_query_execution)
+            telemetry_session.set_server_information(
+                self.mssqlcliclient_query_execution)
 
         except Exception as e:  # Connecting to a database could fail.
             self.logger.debug('Database connection failed: %r.', e)
@@ -315,7 +331,8 @@ class MssqlCli(object):
         except KeyboardInterrupt:
             # Issue where Ctrl+C propagates to sql tools service process and kills it,
             # so that query/cancel request can't be sent.
-            # Right now the sql_tools_service process is killed and we restart it with a new connection.
+            # Right now the sql_tools_service process is killed and we restart
+            # it with a new connection.
             click.secho(u'Cancelling query...', err=True, fg='red')
             reset_connection_and_clients(self.sqltoolsclient,
                                          self.mssqlcliclient_query_execution)
@@ -345,7 +362,7 @@ class MssqlCli(object):
 
             if query.total_time > 1:
                 print('Time: %0.03fs (%s)' % (query.total_time,
-                      humanize.time.naturaldelta(query.total_time)))
+                                              humanize.time.naturaldelta(query.total_time)))
             else:
                 print('Time: %0.03fs' % query.total_time)
 
@@ -439,10 +456,11 @@ class MssqlCli(object):
             display_completions_in_columns=self.wider_completion_menu,
             multiline=True,
             extra_input_processors=[
-               # Highlight matching brackets while editing.
-               ConditionalProcessor(
-                   processor=HighlightMatchingBracketProcessor(chars='[](){}'),
-                   filter=HasFocus(DEFAULT_BUFFER) & ~IsDone()),
+                # Highlight matching brackets while editing.
+                ConditionalProcessor(
+                    processor=HighlightMatchingBracketProcessor(
+                        chars='[](){}'),
+                    filter=HasFocus(DEFAULT_BUFFER) & ~IsDone()),
             ])
 
         with self._completer_lock:
@@ -503,7 +521,8 @@ class MssqlCli(object):
             click.secho(u'No connection to server. Exiting.')
             exit(1)
 
-        for rows, columns, status, sql, is_error in self.mssqlcliclient_query_execution.execute_multi_statement_single_batch(text):
+        for rows, columns, status, sql, is_error in self.mssqlcliclient_query_execution.execute_multi_statement_single_batch(
+                text):
             total = time() - start
 
             if is_error:
@@ -537,7 +556,8 @@ class MssqlCli(object):
             if new_db_name:
                 self.mssqlcliclient_query_execution.database = new_db_name
 
-        return output, MetaQuery(sql, all_success, total, meta_changed, db_changed, path_changed, mutated)
+        return output, MetaQuery(
+            sql, all_success, total, meta_changed, db_changed, path_changed, mutated)
 
     def _handle_server_closed_connection(self):
         """Used during CLI execution"""
@@ -566,9 +586,9 @@ class MssqlCli(object):
                                      persist_priorities=persist_priorities)
 
         self.completion_refresher.refresh(self.mssqlcliclient_query_execution,
-            callback, history=history, settings=self.settings)
+                                          callback, history=history, settings=self.settings)
         return [(None, None, None,
-                'Auto-completion refresh started in the background.')]
+                 'Auto-completion refresh started in the background.')]
 
     def _on_completions_refreshed(self, new_completer, persist_priorities):
         self._swap_completer_objects(new_completer, persist_priorities)
@@ -631,23 +651,23 @@ class MssqlCli(object):
 
 @click.command()
 @click.option('-h', '--host', default='', envvar='MSSQL_CLI_HOST',
-        help='Host address of the SQL Server database.')
+              help='Host address of the SQL Server database.')
 @click.option('-U', '--username', 'username', envvar='MSSQL_CLI_USER',
-        help='Username to connect to the postgres database.')
+              help='Username to connect to the postgres database.')
 @click.option('-W', '--password', 'prompt_passwd', is_flag=True, default=False,
-        help='Force password prompt.')
+              help='Force password prompt.')
 @click.option('-I', '--integrated', 'integrated_auth', is_flag=True, default=False,
               help='Use integrated authentication on windows.')
 @click.option('-v', '--version', is_flag=True, help='Version of mssql-cli.')
 @click.option('-d', '--database', default='', envvar='MSSQL_CLI_DATABASE',
-        help='database name to connect to.')
+              help='database name to connect to.')
 @click.option('--mssqlclirc', default=config_location() + 'config',
-        envvar='MSSQL_CLI_RC', help='Location of mssqlclirc config file.')
+              envvar='MSSQL_CLI_RC', help='Location of mssqlclirc config file.')
 @click.option('--row-limit', default=None, envvar='MSSQL_CLI_ROW_LIMIT', type=click.INT,
-        help='Set threshold for row limit prompt. Use 0 to disable prompt.')
+              help='Set threshold for row limit prompt. Use 0 to disable prompt.')
 @click.option('--less-chatty', 'less_chatty', is_flag=True,
-        default=False,
-        help='Skip intro on startup and goodbye on exit.')
+              default=False,
+              help='Skip intro on startup and goodbye on exit.')
 @click.option('--auto-vertical-output', is_flag=True,
               help='Automatically switch to vertical output mode if the result is wider than the terminal width.')
 def cli(username, host, prompt_passwd,
@@ -674,10 +694,10 @@ def cli(username, host, prompt_passwd,
     mssqlcli.connect(database, host, username, port='')
 
     mssqlcli.logger.debug('Launch Params: \n'
-            '\tdatabase: %r'
-            '\tuser: %r'
-            '\thost: %r'
-            '\tport: %r', database, username, host, '')
+                          '\tdatabase: %r'
+                          '\tuser: %r'
+                          '\thost: %r'
+                          '\tport: %r', database, username, host, '')
 
     mssqlcli.run_cli()
 
@@ -799,7 +819,8 @@ def format_output(title, cur, headers, status, settings):
         first_line = next(formatted)
         formatted = itertools.chain([first_line], formatted)
 
-        if (not expanded and max_width and len(first_line) > max_width and headers):
+        if (not expanded and max_width and len(
+                first_line) > max_width and headers):
             formatted = formatter.format_output(
                 cur, headers, format_name='vertical', column_types=None, **output_kwargs)
             if isinstance(formatted, (text_type)):

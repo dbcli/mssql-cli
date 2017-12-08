@@ -36,7 +36,8 @@ class MssqlCliClient(object):
         self.server_version = None
         self.server_edition = None
         self.is_cloud = False
-        # If no owner_uri which depicts a connection is passed, generate one and use that.
+        # If no owner_uri which depicts a connection is passed, generate one
+        # and use that.
         if not owner_uri:
             self.owner_uri = generate_owner_uri()
 
@@ -60,25 +61,30 @@ class MssqlCliClient(object):
 
         connection_params.update(self.extra_params)
 
-        connection_request = self.sql_tools_client.create_request(u'connection_request', connection_params)
+        connection_request = self.sql_tools_client.create_request(
+            u'connection_request', connection_params)
         connection_request.execute()
 
         while not connection_request.completed():
             response = connection_request.get_response()
             if response:
-                response = connectionservice.handle_connection_response(response)
+                response = connectionservice.handle_connection_response(
+                    response)
             else:
                 time.sleep(time_wait_if_no_response)
 
         if response and response.connection_id:
-            # response owner_uri should be the same as owner_uri used, else something is weird :)
+            # response owner_uri should be the same as owner_uri used, else
+            # something is weird :)
             assert response.owner_uri == self.owner_uri
             self.is_connected = True
             self.server_version = response.server_version
             self.server_edition = response.server_edition
             self.is_cloud = response.is_cloud
 
-            logger.info(u'Connection Successful. Connection Id {0}'.format(response.connection_id))
+            logger.info(
+                u'Connection Successful. Connection Id {0}'.format(
+                    response.connection_id))
             return self.owner_uri
 
     def execute_multi_statement_single_batch(self, query):
@@ -97,7 +103,10 @@ class MssqlCliClient(object):
 
     def execute_single_batch_query(self, query):
         if not self.is_connected:
-            click.secho(u'No connection established with the server.', err=True, fg='red')
+            click.secho(
+                u'No connection established with the server.',
+                err=True,
+                fg='red')
             exit(1)
 
         query_request = self.sql_tools_client.create_request(u'query_execute_string_request',
@@ -132,11 +141,11 @@ class MssqlCliClient(object):
 
         else:
             query_subset_request = self.sql_tools_client.create_request(u'query_subset_request',
-                        {u'OwnerUri': query_response.owner_uri,
-                          u'BatchIndex': query_response.batch_summaries[0].result_set_summaries[0].batch_id,
-                          u'ResultSetIndex': query_response.batch_summaries[0].result_set_summaries[0].id,
-                          u'RowsStartIndex': 0,
-                          u'RowCount': query_response.batch_summaries[0].result_set_summaries[0].row_count})
+                                                                        {u'OwnerUri': query_response.owner_uri,
+                                                                         u'BatchIndex': query_response.batch_summaries[0].result_set_summaries[0].batch_id,
+                                                                            u'ResultSetIndex': query_response.batch_summaries[0].result_set_summaries[0].id,
+                                                                            u'RowsStartIndex': 0,
+                                                                            u'RowCount': query_response.batch_summaries[0].result_set_summaries[0].row_count})
 
             query_subset_request.execute()
             while not query_subset_request.completed():
@@ -160,13 +169,17 @@ class MssqlCliClient(object):
                 query=query,
                 message=query_message.message if query_message else u'')
 
-    def tabular_results_generator(self, column_info, result_rows, query, message, is_error=False):
-        # Returns a generator of rows, columns, status(rows affected) or message, sql (the query), is_error
+    def tabular_results_generator(
+            self, column_info, result_rows, query, message, is_error=False):
+        # Returns a generator of rows, columns, status(rows affected) or
+        # message, sql (the query), is_error
         if is_error:
             return None, None, message, query, is_error
 
-        columns = [col.column_name for col in column_info] if column_info else None
-        rows = ([[cell.display_value for cell in result_row.result_cells] for result_row in result_rows]) if result_rows else ()
+        columns = [
+            col.column_name for col in column_info] if column_info else None
+        rows = ([[cell.display_value for cell in result_row.result_cells]
+                 for result_row in result_rows]) if result_rows else ()
 
         return rows, columns, message, query, is_error
 
@@ -244,7 +257,10 @@ def reset_connection_and_clients(sql_tools_client, *mssqlcliclients):
             if not mssqlcliclient.connect():
                 click.secho('Unable reconnect to server {0}; database {1}.'.format(mssqlcliclient.server_name, mssqlcliclient.database),
                             err=True, fg='red')
-                logger.info(u'Unable to reset connection to server {0}; database {1}'.format(mssqlcliclient.server_name, mssqlcliclient.database))
+                logger.info(
+                    u'Unable to reset connection to server {0}; database {1}'.format(
+                        mssqlcliclient.server_name,
+                        mssqlcliclient.database))
                 exit(1)
 
     except Exception as e:
