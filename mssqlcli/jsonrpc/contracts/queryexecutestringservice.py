@@ -58,6 +58,8 @@ class QueryExecuteStringRequest(Request):
             return QueryCompleteEvent(response)
         elif u'method' in response and response[u'method'] == u'query/message':
             return QueryMessageEvent(response)
+        elif u'error' in response:
+            return QueryExecuteErrorResponseEvent(response)
 
         return response
 
@@ -70,6 +72,13 @@ class QueryExecuteStringParams(object):
     def format(self):
         return {u'OwnerUri': self.owner_uri,
                 u'Query': self.query}
+
+
+class QueryExecuteErrorResponseEvent(object):
+    def __init__(self, parameters):
+        inner_params = parameters[u'error']
+        self.error_message = inner_params[u'message'] if u'message' in inner_params else ''
+        self.error_code = inner_params[u'code'] if u'code' in inner_params else ''
 
 
 class QueryMessageEvent(object):
