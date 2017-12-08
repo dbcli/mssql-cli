@@ -52,7 +52,7 @@ setup(
     author_email='sqlcli@microsoft.com',
     version=get_timestamped_version(version),
     license='MIT',
-    url='https://github.com/Microsoft/mssql-cli',
+    url='https://github.com/dbcli/mssql-cli',
     packages=find_packages(),
     package_data={'mssqlcli': ['mssqlclirc',
                                'packages/mssqlliterals/sqlliterals.json']},
