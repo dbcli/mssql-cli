@@ -195,7 +195,7 @@ def _get_user_id():
 
 def _get_env_string():
     return _remove_cmd_chars(_remove_symbols(str([v for v in os.environ
-                                                  if v.startswith('MSSQLCLI')])))
+                                                  if v.startswith('MSSQL_CLI_')])))
 
 
 def _get_shell_type():
