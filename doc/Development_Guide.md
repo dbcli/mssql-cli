@@ -87,7 +87,7 @@ Provided your PYTHONPATH was set correctly, you can run the tests from your `<cl
 
 1. Run unit tests:
     
-    **Note**:You must first set the target server and database information connection info via environment variables:
+    **Note**: You must first set the target server and database information connection info via environment variables:
     ##### Windows
     ```
         set MSSQL_CLI_HOST=<Target server name>
