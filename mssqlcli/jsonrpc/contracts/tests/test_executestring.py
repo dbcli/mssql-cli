@@ -27,9 +27,11 @@ class QueryExecuteTests(unittest.TestCase):
                 request_stream, response_file)
             rpc_client.start()
             # Submit a dummy request.
-            parameters = {u'OwnerUri': u'connectionservicetest', u'Query': "select * from HumanResources.Department"}
+            parameters = {u'OwnerUri': u'connectionservicetest',
+                          u'Query': "select * from HumanResources.Department"}
 
-            request = queryservice.QueryExecuteStringRequest(2, rpc_client, parameters)
+            request = queryservice.QueryExecuteStringRequest(
+                2, rpc_client, parameters)
             self.verify_query_response(request=request)
             rpc_client.shutdown()
 
@@ -51,7 +53,8 @@ class QueryExecuteTests(unittest.TestCase):
                 elif isinstance(response, queryservice.QueryCompleteEvent):
                     complete_event += 1
                     batch_summaries = len(response.batch_summaries)
-                    result_set_summaries = len(response.batch_summaries[0].result_set_summaries)
+                    result_set_summaries = len(
+                        response.batch_summaries[0].result_set_summaries)
                     row_count = response.batch_summaries[0].result_set_summaries[0].row_count
 
         self.assertEqual(message_event, 1)
@@ -66,10 +69,11 @@ class QueryExecuteTests(unittest.TestCase):
         """
         return os.path.abspath(
             os.path.join(
-            os.path.abspath(__file__),
-            u'..',
-            u'baselines',
-            file_name))
+                os.path.abspath(__file__),
+                u'..',
+                u'baselines',
+                file_name))
+
 
 if __name__ == u'__main__':
     unittest.main()

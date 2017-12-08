@@ -28,18 +28,17 @@ class ConnectionServiceTests(unittest.TestCase):
             rpc_client.start()
             # Submit a dummy request.
             parameters = {u'OwnerUri': u'connectionservicetest',
-                            u'ServerName': u'bro-hb',
-                            u'DatabaseName': u'AdventureWorks2014',
-                            u'UserName': u'*',
-                            u'Password': u'*',
-                            u'AuthenticationType': u'Integrated',
-                            u'MultipleActiveResultSets': True}
+                          u'ServerName': u'bro-hb',
+                          u'DatabaseName': u'AdventureWorks2014',
+                          u'UserName': u'*',
+                          u'Password': u'*',
+                          u'AuthenticationType': u'Integrated',
+                          u'MultipleActiveResultSets': True}
 
-            request = connectionservice.ConnectionRequest(1, rpc_client, parameters)
+            request = connectionservice.ConnectionRequest(
+                1, rpc_client, parameters)
             self.verify_success_response(request=request)
             rpc_client.shutdown()
-
-
 
     def verify_success_response(self, request):
         response_event = 0
@@ -67,10 +66,11 @@ class ConnectionServiceTests(unittest.TestCase):
         """
         return os.path.abspath(
             os.path.join(
-            os.path.abspath(__file__),
-            u'..',
-            u'baselines',
-            file_name))
+                os.path.abspath(__file__),
+                u'..',
+                u'baselines',
+                file_name))
+
 
 if __name__ == u'__main__':
     unittest.main()

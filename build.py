@@ -5,7 +5,8 @@ import sys
 import utility
 import mssqlcli.mssqltoolsservice.externals as mssqltoolsservice
 
-AZURE_STORAGE_CONNECTION_STRING = os.environ.get('AZURE_STORAGE_CONNECTION_STRING')
+AZURE_STORAGE_CONNECTION_STRING = os.environ.get(
+    'AZURE_STORAGE_CONNECTION_STRING')
 BLOB_CONTAINER_NAME = 'daily'
 UPLOADED_PACKAGE_LINKS = []
 
@@ -30,7 +31,9 @@ def clean_and_copy_sqltoolsservice(platform):
 
 
 def code_analysis():
-    utility.exec_command('flake8 mssqlcli setup.py dev_setup.py build.py utility.py dos2unix.py', utility.ROOT_DIR)
+    utility.exec_command(
+        'flake8 mssqlcli setup.py dev_setup.py build.py utility.py dos2unix.py',
+        utility.ROOT_DIR)
 
 
 def build():
@@ -46,10 +49,14 @@ def build():
     print_heading('Running setup')
 
     # install general requirements.
-    utility.exec_command('pip install -r requirements-dev.txt', utility.ROOT_DIR)
+    utility.exec_command(
+        'pip install -r requirements-dev.txt',
+        utility.ROOT_DIR)
 
     # convert windows line endings to unix for mssql-cli bash script
-    utility.exec_command('python dos2unix.py mssql-cli mssql-cli', utility.ROOT_DIR)
+    utility.exec_command(
+        'python dos2unix.py mssql-cli mssql-cli',
+        utility.ROOT_DIR)
 
     # run flake8
     code_analysis()
@@ -60,7 +67,8 @@ def build():
         platforms_to_build = [utility.get_current_platform()]
 
     for platform in platforms_to_build:
-        # For the current platform, populate the appropriate binaries and generate the wheel.
+        # For the current platform, populate the appropriate binaries and
+        # generate the wheel.
         clean_and_copy_sqltoolsservice(platform)
         utility.clean_up(utility.MSSQLCLI_BUILD_DIRECTORY)
 
@@ -80,7 +88,7 @@ def _upload_index_file(service, blob_name, title, links):
         container_name=BLOB_CONTAINER_NAME,
         blob_name=blob_name,
         text="<html><head><title>{0}</title></head><body><h1>{0}</h1>{1}</body></html>"
-            .format(title, '\n'.join(
+        .format(title, '\n'.join(
                 ['<a href="{0}">{0}</a><br/>'.format(link) for link in links])),
         content_settings=ContentSettings(
             content_type='text/html',
@@ -89,19 +97,24 @@ def _upload_index_file(service, blob_name, title, links):
             content_language=None,
             content_md5=None,
             cache_control=None
-            )
+        )
     )
 
 
 def _gen_pkg_index_html(service, pkg_name):
     links = []
-    index_file_name = pkg_name+'/'
-    for blob in list(service.list_blobs(BLOB_CONTAINER_NAME, prefix=index_file_name)):
+    index_file_name = pkg_name + '/'
+    for blob in list(service.list_blobs(
+            BLOB_CONTAINER_NAME, prefix=index_file_name)):
         if blob.name == index_file_name:
             # Exclude the index file from being added to the list
             continue
         links.append(blob.name.replace(index_file_name, ''))
-    _upload_index_file(service, index_file_name, 'Links for {}'.format(pkg_name), links)
+    _upload_index_file(
+        service,
+        index_file_name,
+        'Links for {}'.format(pkg_name),
+        links)
     UPLOADED_PACKAGE_LINKS.append(index_file_name)
 
 
@@ -123,12 +136,15 @@ def validate_package():
     root_dir = os.path.abspath(os.path.join(os.path.abspath(__file__), '..'))
     # Local install of mssql-scripter.
     mssqlcli_wheel_dir = os.listdir(utility.MSSQLCLI_DIST_DIRECTORY)
-    # To ensure we have a clean install, we disable the cache as to prevent cache overshadowing actual changes made.
+    # To ensure we have a clean install, we disable the cache as to prevent
+    # cache overshadowing actual changes made.
     current_platform = utility.get_current_platform()
 
-    mssqlcli_wheel_name = [pkge for pkge in mssqlcli_wheel_dir if current_platform in pkge]
+    mssqlcli_wheel_name = [
+        pkge for pkge in mssqlcli_wheel_dir if current_platform in pkge]
     utility.exec_command(
-        'pip install --no-cache-dir --no-index ./dist/{}'.format(mssqlcli_wheel_name[0]),
+        'pip install --no-cache-dir --no-index ./dist/{}'.format(
+            mssqlcli_wheel_name[0]),
         root_dir, continue_on_error=False
     )
 
@@ -140,7 +156,8 @@ def publish_daily():
     print('Publishing to daily container within storage account.')
     assert AZURE_STORAGE_CONNECTION_STRING, 'Set AZURE_STORAGE_CONNECTION_STRING environment variable'
 
-    blob_service = BlockBlobService(connection_string=AZURE_STORAGE_CONNECTION_STRING)
+    blob_service = BlockBlobService(
+        connection_string=AZURE_STORAGE_CONNECTION_STRING)
 
     print_heading('Uploading packages to blob storage ')
     for pkg in os.listdir(utility.MSSQLCLI_DIST_DIRECTORY):
@@ -149,7 +166,11 @@ def publish_daily():
         _upload_package(blob_service, pkg_path, 'mssql-cli')
 
     _gen_pkg_index_html(blob_service, 'mssql-cli')
-    _upload_index_file(blob_service, 'index.html', 'Simple Index', UPLOADED_PACKAGE_LINKS)
+    _upload_index_file(
+        blob_service,
+        'index.html',
+        'Simple Index',
+        UPLOADED_PACKAGE_LINKS)
 
 
 def publish_official():

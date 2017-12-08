@@ -29,7 +29,7 @@ def get_timestamped_version(version):
     :param version: The version number
     :return: <version>.dev<YearMonthDayHourMinute>. Example 0.0.1.dev1711030310
     """
-    return version+'.dev'+datetime.datetime.now().strftime("%y%m%d%H%M")
+    return version + '.dev' + datetime.datetime.now().strftime("%y%m%d%H%M")
 
 
 install_requirements = [
@@ -55,7 +55,7 @@ setup(
     url='https://github.com/Microsoft/mssql-cli',
     packages=find_packages(),
     package_data={'mssqlcli': ['mssqlclirc',
-                            'packages/mssqlliterals/sqlliterals.json']},
+                               'packages/mssqlliterals/sqlliterals.json']},
     description=description,
     long_description=open('README.rst').read(),
     install_requires=install_requirements,
@@ -81,4 +81,3 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
 )
-

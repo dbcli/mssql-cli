@@ -75,7 +75,7 @@ def find_prev_keyword(sql, n_skip=0):
 
     parsed = sqlparse.parse(sql)[0]
     flattened = list(parsed.flatten())
-    flattened = flattened[:len(flattened)-n_skip]
+    flattened = flattened[:len(flattened) - n_skip]
 
     logical_operators = ('AND', 'OR', 'NOT', 'BETWEEN')
 
@@ -94,7 +94,7 @@ def find_prev_keyword(sql, n_skip=0):
             # Combine the string values of all tokens in the original list
             # up to and including the target keyword token t, to produce a
             # query string with everything after the keyword token removed
-            text = ''.join(tok.value for tok in flattened[:idx+1])
+            text = ''.join(tok.value for tok in flattened[:idx + 1])
             return t, text
 
     return None, ''
