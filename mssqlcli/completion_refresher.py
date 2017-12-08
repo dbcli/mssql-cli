@@ -1,5 +1,6 @@
 import logging
 import threading
+import mssqlcli.decorators as decorators
 
 from collections import OrderedDict
 from .mssqlcompleter import MssqlCompleter
@@ -91,11 +92,13 @@ def refresher(name, refreshers=CompletionRefresher.refreshers):
 
 
 @refresher('schemata')
+@decorators.suppress_all_exceptions()
 def refresh_schemata(completer, mssqlcliclient):
     completer.extend_schemata(mssqlcliclient.schemas())
 
 
 @refresher('tables')
+@decorators.suppress_all_exceptions()
 def refresh_tables(completer, mssqlcliclient):
     completer.extend_relations(mssqlcliclient.tables(), kind='tables')
     completer.extend_columns(mssqlcliclient.table_columns(), kind='tables')
@@ -103,16 +106,19 @@ def refresh_tables(completer, mssqlcliclient):
 
 
 @refresher('views')
+@decorators.suppress_all_exceptions()
 def refresh_views(completer, mssqlcliclient):
     completer.extend_relations(mssqlcliclient.views(), kind='views')
     completer.extend_columns(mssqlcliclient.view_columns(), kind='views')
 
 
 @refresher('databases')
+@decorators.suppress_all_exceptions()
 def refresh_databases(completer, mssqlcliclient):
     completer.extend_database_names(mssqlcliclient.databases())
 
 
 @refresher('types')
+@decorators.suppress_all_exceptions()
 def refresh_types(completer, mssqlcliclient):
     completer.extend_datatypes(mssqlcliclient.user_defined_types())
