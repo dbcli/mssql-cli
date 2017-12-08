@@ -8,7 +8,6 @@ Development Guide
 3. [Running Tests](#Running_Tests)
 5. [Running mssql-cli](#Run_mssql-cli)
 
-See the [Architecture Guide](architecture_guide.md) for details on how mssql-cli is designed and implemented.
 
 mssql-cli sources are located on GitHub (https://github.com/dbcli/mssql-cli). In order to contribute to the project, you are expected to: 
 -	Have a GitHub account. For Microsoft contributors, follow the guidelines on https://opensourcehub.microsoft.com/ to create, configure and link your account
@@ -86,12 +85,16 @@ The repo has a launch.json file that will launch the version of Python that is f
 ## <a name="Running_Tests"></a>4. Running Tests
 Provided your PYTHONPATH was set correctly, you can run the tests from your `<clone_root>` directory.
 
-1. Run end to end tests (code format, unit tests, packaging, integration,) with tox:
+1. Run unit tests:
     
     ```
     python build.py unit_test
     ```
-    
+2. Run integration tests (code format, unit tests, packaging, integration,) with tox:
+
+    ```
+    python build.by integration_test
+    ```
 
 ## <a name="Run_mssql-cli"></a>5. Running mssql-cli
 #### Command line
