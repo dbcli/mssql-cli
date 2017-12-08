@@ -263,7 +263,7 @@ class MssqlCli(object):
                 dsn='', **kwargs):
         # Connect to the database.
 
-        if not user:
+        if not user and not self.integrated_auth:
             user = click.prompt(
                 'Username (press enter for sa)',
                 default=u'sa',
