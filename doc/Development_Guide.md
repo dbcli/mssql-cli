@@ -6,8 +6,7 @@ Development Guide
 1. [Environment Setup](#Environment_Setup)
 2. [Configuring IDE](#Configure_IDE)
 3. [Running Tests](#Running_Tests)
-4. [Running mssql-cli](#Run_mssql-cli)
-4. [Packaging](pypi_release_steps.md)
+5. [Running mssql-cli](#Run_mssql-cli)
 
 See the [Architecture Guide](architecture_guide.md) for details on how mssql-cli is designed and implemented.
 
