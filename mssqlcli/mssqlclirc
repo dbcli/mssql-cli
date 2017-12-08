@@ -18,11 +18,11 @@ multi_line = False
 # a command.
 multi_line_mode = tsql
 
-# Enables expand mode.
-expand = False
-
-# Enables auto expand mode.
-auto_expand = False
+# Use expand mode to display the results.
+# Possible values: "always", "never" and "auto"
+# "auto" will switch to expanded mode automatically if the table is too wide to
+# fit the screen.
+expand = auto
 
 # If set to True, table suggestions will include a table alias
 generate_aliases = False
