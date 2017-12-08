@@ -63,7 +63,7 @@ License
 mssql-cli is licensed under the `BSD-3 license`_.
 
 Disclaimer for mssql_cli 0.0.3 users
-----------------------------------
+----------------------------------------
 
 For users of the older mssql_cli 0.0.3, please specifically download 0.0.3 as that version is no longer being maintained.
 
