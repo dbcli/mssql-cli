@@ -36,7 +36,7 @@ For general help content, pass in the ``-h`` parameter:
 
 .. code:: bash
 
-    $ mssql-cli -h
+    $ mssql-cli --help
 
 Contributing
 -----------------------------
@@ -62,7 +62,7 @@ License
 mssql-cli is licensed under the `BSD-3 license`_.
 
 Disclaimer for mssql_cli 0.0.3 users
--------
+----------------------------------
 
 For users of the older mssql_cli 0.0.3, please specifically download 0.0.3 as that version is no longer being maintained.
 
@@ -73,4 +73,4 @@ For users of the older mssql_cli 0.0.3, please specifically download 0.0.3 as th
 .. _Issues: https://github.com/dbcli/mssql-cli/issues
 .. _Microsoft Open Source Code of Conduct: https://opensource.microsoft.com/codeofconduct/
 .. _Code of Conduct FAQ: https://opensource.microsoft.com/codeofconduct/faq/
-.. _MIT license: https://github.com/dbcli/mssql-cli/blob/master/LICENSE.txt
+.. _BSD-3 license: https://github.com/dbcli/mssql-cli/blob/master/LICENSE.txt
