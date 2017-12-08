@@ -87,9 +87,28 @@ Provided your PYTHONPATH was set correctly, you can run the tests from your `<cl
 
 1. Run unit tests:
     
+    **Note**:You must first set the target server and database information connection info via environment variables:
+    ##### Windows
+    ```
+        set MSSQL_CLI_HOST=<Target server name>
+        set MSSQL_CLI_DATABASE=<Target database name>
+        set MSSQL_CLI_USER=<User name>
+        set MSSQL_CLI_PASSWORD=<password>
+    ```
+    
+    ##### MacOSX/Linux (bash)
+    ```
+        export MSSQL_CLI_HOST=<Target server name>
+        export MSSQL_CLI_DATABASE=<Target database name>
+        export MSSQL_CLI_USER=<User name>
+        export MSSQL_CLI_PASSWORD=<password>
+    ```
+
+    Execute the unit tests.
     ```
     python build.py unit_test
     ```
+    
 2. Run integration tests (code format, unit tests, packaging, integration,) with tox:
 
     ```
