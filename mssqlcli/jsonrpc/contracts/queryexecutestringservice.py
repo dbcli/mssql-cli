@@ -82,7 +82,7 @@ class QueryMessageEvent(object):
 
 
 class QueryCompleteEvent(object):
-    def __init__(self, parameters, exception_message = None):
+    def __init__(self, parameters, exception_message=None):
         inner_params = parameters[u'params']
         if inner_params:
             self.owner_uri = inner_params[u'ownerUri']
@@ -100,7 +100,8 @@ class BatchSummary(object):
         self.execution_time_elapsed = parameters[u'executionElapsed']
         self.result_set_summaries = []
         for result_set_summary in parameters[u'resultSetSummaries']:
-            self.result_set_summaries.append(ResultSetSummary(result_set_summary))
+            self.result_set_summaries.append(
+                ResultSetSummary(result_set_summary))
 
 
 class ResultSetSummary(object):
@@ -127,7 +128,7 @@ class QuerySubsetRequest(Request):
     METHOD_NAME = u'query/subset'
 
     def __init__(self, id, json_rpc_client, parameters):
-        self.id = id;
+        self.id = id
         self.finished = False
         self.json_rpc_client = json_rpc_client
         self.params = QuerySubsetParams(parameters)
@@ -165,7 +166,8 @@ class QuerySubsetRequest(Request):
         if u'result' in response:
             return ResultSubset(response)
         elif u'error' in response:
-            return ResultSubset(None, error_message=response[u'error']['Message'])
+            return ResultSubset(
+                None, error_message=response[u'error']['Message'])
 
 
 class QuerySubsetParams(object):
@@ -208,4 +210,3 @@ class ResultCell(object):
         self.display_value = parameter[u'displayValue']
         self.row_id = parameter[u'rowId']
         self.is_null = parameter[u'isNull']
-

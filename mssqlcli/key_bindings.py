@@ -72,7 +72,8 @@ def mssqlcli_bindings(get_vi_mode_enabled, set_vi_mode_enabled):
         else:
             event.cli.start_completion(select_first=False)
 
-    @key_binding_manager.registry.add_binding(Keys.ControlJ, filter=HasSelectedCompletion())
+    @key_binding_manager.registry.add_binding(
+        Keys.ControlJ, filter=HasSelectedCompletion())
     def _(event):
         """
         Makes the enter key work as the tab key only when showing the menu.

@@ -165,4 +165,3 @@ def get_foreignkeys():
             AND kcu2.constraint_name = rc.unique_constraint_name
             AND kcu2.ordinal_position = kcu1.ordinal_position
             ORDER BY 3, 4'''
-

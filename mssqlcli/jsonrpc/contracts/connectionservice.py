@@ -135,7 +135,8 @@ class ConnectionResponse(object):
 #
 
 def handle_connection_response(response):
-    # Handles complete notification and return ConnectionCompleteEvent object if connection successful.
+    # Handles complete notification and return ConnectionCompleteEvent object
+    # if connection successful.
     def handle_connection_complete_notification(response):
         if not response.connection_id:
             sys.stderr.write(u'\nConnection did not succeed.')
@@ -148,8 +149,9 @@ def handle_connection_response(response):
         return response
 
     def handle_connection_response_notification(response):
-        if response.result == False:
-            sys.stderr.write(u'\nIncorrect json rpc request. Connection not successful.')
+        if not response.result:
+            sys.stderr.write(
+                u'\nIncorrect json rpc request. Connection not successful.')
         return None
 
     response_handlers = {
