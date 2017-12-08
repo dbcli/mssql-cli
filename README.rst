@@ -8,7 +8,7 @@ mssql-cli
 ===============
 
 
-We’re excited to introduce 'mssql-cli'_, a new and interactive command line query tool for SQL Server. This open source tool works cross-platform and proud to be a part of the 'dbcli.org community'_. 
+We’re excited to introduce `mssql-cli`_, a new and interactive command line query tool for SQL Server. This open source tool works cross-platform and proud to be a part of the `dbcli.org community`_. 
 
 .. image:: screenshots/mssql-cli-autocomplete.gif
    :align: center
