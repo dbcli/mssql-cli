@@ -50,7 +50,7 @@ setup(
     name='mssql-cli',
     author='Microsoft Corporation',
     author_email='sqlcli@microsoft.com',
-    version=get_timestamped_version(version),
+    version=get_timestamped_version(version) if os.environ.get('MSSQL_CLI_DAILY_BUILD', '') else version,
     license='MIT',
     url='https://github.com/Microsoft/mssql-cli',
     packages=find_packages(),
