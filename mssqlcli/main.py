@@ -140,9 +140,8 @@ class MssqlCli(object):
         self.multi_line = c['main'].as_bool('multi_line')
         self.multiline_mode = c['main'].get('multi_line_mode', 'tsql')
         self.vi_mode = c['main'].as_bool('vi')
-        self.auto_expand = auto_vertical_output or c['main'].as_bool(
-            'auto_expand')
-        self.expanded_output = c['main'].as_bool('expand')
+        self.auto_expand = auto_vertical_output or c['main']['expand'] == 'auto'
+        self.expanded_output = c['main']['expand'] == 'always'
         if row_limit is not None:
             self.row_limit = row_limit
         else:
