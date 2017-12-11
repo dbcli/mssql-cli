@@ -183,7 +183,7 @@ def publish_official():
     # Credentials will be stored in a .pypirc file.
     for wheel in mssqlcli_wheel_dir:
         utility.exec_command(
-            'twine upload {} pypi'.format(wheel),
+            'twine upload {}'.format(wheel),
             utility.MSSQLCLI_DIST_DIRECTORY)
 
 

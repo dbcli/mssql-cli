@@ -1,6 +1,16 @@
 Development Guide
 =================
 
+## Contributing
+
+This project welcomes contributions and suggestions.  Most contributions require you to agree to a
+Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
+the rights to use your contribution. For details, visit https://cla.microsoft.com.
+
+When you submit a pull request, a CLA-bot will automatically determine whether you need to provide
+a CLA and decorate the PR appropriately (e.g., label, comment). Simply follow the instructions
+provided by the bot. You will only need to do this once across all repos using our CLA.
+
 ## Table of Contents
 1. [Preparing your machine](#Preparing_machine)
 1. [Environment Setup](#Environment_Setup)
@@ -90,7 +100,7 @@ Provided your PYTHONPATH was set correctly, you can run the tests from your `<cl
     **Note**: You must first set the target server and database information connection info via environment variables:
     ##### Windows
     ```
-        set MSSQL_CLI_HOST=<Target server name>
+        set MSSQL_CLI_SERVER=<Target server name>
         set MSSQL_CLI_DATABASE=<Target database name>
         set MSSQL_CLI_USER=<User name>
         set MSSQL_CLI_PASSWORD=<password>
@@ -98,7 +108,7 @@ Provided your PYTHONPATH was set correctly, you can run the tests from your `<cl
     
     ##### MacOSX/Linux (bash)
     ```
-        export MSSQL_CLI_HOST=<Target server name>
+        export MSSQL_CLI_SERVER=<Target server name>
         export MSSQL_CLI_DATABASE=<Target database name>
         export MSSQL_CLI_USER=<User name>
         export MSSQL_CLI_PASSWORD=<password>
