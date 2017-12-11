@@ -19,6 +19,8 @@ TELEMETRY_VERSION = '0.0.1'
 MSSQL_CLI_TELEMETRY_FILE = 'mssqlcli_telemetry.log'
 MSSQL_CLI_TELEMETRY_OPT_OUT = 'MSSQL_CLI_TELEMETRY_OPTOUT'
 MSSQL_CLI_IN_DOCKER = 'MSSQL_CLI_IN_DOCKER'
+MSSQL_CLI_TELEMETRY_ID_FILE = 'mssqlcli_telemetry_id.txt'
+
 decorators.is_diagnostics_mode = telemetry_core.in_diagnostic_mode
 
 
@@ -84,9 +86,8 @@ class TelemetrySession(object):
 
             'Context.Default.SQLTools.ExeName': PRODUCT_NAME,
             'Context.Default.SQLTools.ExeVersion': _get_mssql_cli_version(),
-            'Context.Default.SQLTools.MacAddressHash': _get_hash_mac_address(),
             'Context.Default.SQLTools.OS.Type': platform.system().lower(),
-            'Context.Default.SQLTools.OS.Version': platform.version().lower(),
+            'Context.Default.SQLTools.OS.Version': platform.release().lower(),
             'Context.Default.SQLTools.IsDocker': bool(os.environ.get(MSSQL_CLI_IN_DOCKER, False)),
             'Context.Default.SQLTools.User.Id': _get_user_id(),
             'Context.Default.SQLTools.User.IsMicrosoftInternal': 'False',
@@ -166,36 +167,33 @@ def _get_mssql_cli_version():
 
 
 @decorators.suppress_all_exceptions(fallback_return='')
-@decorators.hash256_result
-def _get_hash_mac_address():
-    s = ''
-    for index, c in enumerate(hex(uuid.getnode())[2:].upper()):
-        s += c
-        if index % 2:
-            s += '-'
+def _get_user_id():
+    config_dir = config.config_location()
+    full_path = os.path.join(config_dir, MSSQL_CLI_TELEMETRY_ID_FILE)
 
-    s = s.strip('-')
-
-    return s
+    if os.path.exists(full_path):
+        with open(full_path, 'r') as file:
+            user_id = file.read()
+            return user_id
+    else:
+        with open(full_path, 'w') as file:
+            user_id = _generate_user_id()
+            file.write(user_id)
+            return user_id
 
 
 @decorators.suppress_all_exceptions(fallback_return='')
 @decorators.hash256_result
-def _get_user_id():
-    s = ''
-    for index, c in enumerate(hex(uuid.getnode())[2:].upper() + os.path.expanduser('~')):
-        s += c
-        if index % 2:
-            s += '-'
+def _generate_user_id():
+    random_id = uuid.uuid4().hex
+    salt = uuid.uuid4().hex
 
-    s = s.strip('-')
-
-    return s
+    return random_id + salt
 
 
 def _get_env_string():
     return _remove_cmd_chars(_remove_symbols(str([v for v in os.environ
-                                                  if v.startswith('MSSQLCLI')])))
+                                                  if v.startswith('MSSQL_CLI_')])))
 
 
 def _get_shell_type():

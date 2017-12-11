@@ -2,7 +2,6 @@ import json
 import os
 import sys
 
-import six
 from applicationinsights import TelemetryClient
 from applicationinsights.channel import TelemetryChannel, SynchronousQueue, SynchronousSender
 from applicationinsights.exceptions import enable
@@ -104,7 +103,7 @@ def upload(data_to_save, service_endpoint_uri):
         measurements = {}
         for k in raw_properties:
             v = raw_properties[k]
-            if isinstance(v, six.string_types):
+            if isinstance(v, str if sys.version_info[0] >= 3 else basestring):
                 properties[k] = v
             else:
                 measurements[k] = v
