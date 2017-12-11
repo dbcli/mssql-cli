@@ -223,7 +223,7 @@ class MssqlCli(object):
 
         log_file = self.config['main']['log_file']
         if log_file == 'default':
-            log_file = config_location() + 'log'
+            log_file = config_location() + 'mssqlcli.log'
         ensure_dir_exists(log_file)
         log_level = self.config['main']['log_level']
 
@@ -258,7 +258,7 @@ class MssqlCli(object):
         root_logger.info('Initializing mssqlcli logging.')
         root_logger.debug('Log file %r.', log_file)
 
-    def connect(self, database='', host='', user='', port='', passwd='',
+    def connect(self, database='', server='', user='', port='', passwd='',
                 dsn='', **kwargs):
         # Connect to the database.
 
@@ -268,8 +268,8 @@ class MssqlCli(object):
                 default=u'sa',
                 show_default=False)
 
-        if not host:
-            host = u'localhost'
+        if not server:
+            server = u'localhost'
 
         if not database:
             database = u'master'
@@ -302,7 +302,7 @@ class MssqlCli(object):
             if self.integrated_auth:
                 authentication_type = u'Integrated'
 
-            self.mssqlcliclient_query_execution = MssqlCliClient(self.sqltoolsclient, host, user, passwd,
+            self.mssqlcliclient_query_execution = MssqlCliClient(self.sqltoolsclient, server, user, passwd,
                                                                  database=database,
                                                                  authentication_type=authentication_type, **kwargs)
 
@@ -649,13 +649,13 @@ class MssqlCli(object):
 
 
 @click.command()
-@click.option('-h', '--host', default='', envvar='MSSQL_CLI_HOST',
-              help='Host address of the SQL Server database.')
+@click.option('-S', '--server', default='', envvar='MSSQL_CLI_SERVER',
+              help='SQL Server instance name or address.')
 @click.option('-U', '--username', 'username', envvar='MSSQL_CLI_USER',
               help='Username to connect to the postgres database.')
 @click.option('-W', '--password', 'prompt_passwd', is_flag=True, default=False,
               help='Force password prompt.')
-@click.option('-I', '--integrated', 'integrated_auth', is_flag=True, default=False,
+@click.option('-E', '--integrated', 'integrated_auth', is_flag=True, default=False,
               help='Use integrated authentication on windows.')
 @click.option('-v', '--version', is_flag=True, help='Version of mssql-cli.')
 @click.option('-d', '--database', default='', envvar='MSSQL_CLI_DATABASE',
@@ -669,7 +669,7 @@ class MssqlCli(object):
               help='Skip intro on startup and goodbye on exit.')
 @click.option('--auto-vertical-output', is_flag=True,
               help='Automatically switch to vertical output mode if the result is wider than the terminal width.')
-def cli(username, host, prompt_passwd,
+def cli(username, server, prompt_passwd,
         database, version, mssqlclirc, row_limit,
         less_chatty, auto_vertical_output, integrated_auth):
 
@@ -690,13 +690,13 @@ def cli(username, host, prompt_passwd,
                         mssqlclirc_file=mssqlclirc, less_chatty=less_chatty, auto_vertical_output=auto_vertical_output,
                         integrated_auth=integrated_auth)
 
-    mssqlcli.connect(database, host, username, port='')
+    mssqlcli.connect(database, server, username, port='')
 
     mssqlcli.logger.debug('Launch Params: \n'
                           '\tdatabase: %r'
                           '\tuser: %r'
-                          '\thost: %r'
-                          '\tport: %r', database, username, host, '')
+                          '\tserver: %r'
+                          '\tport: %r', database, username, server, '')
 
     mssqlcli.run_cli()
 
