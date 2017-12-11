@@ -2,7 +2,6 @@ import json
 import os
 import sys
 
-import six
 from applicationinsights import TelemetryClient
 from applicationinsights.channel import TelemetryChannel, SynchronousQueue, SynchronousSender
 from applicationinsights.exceptions import enable
