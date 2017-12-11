@@ -16,62 +16,19 @@ If you are having installation issues, see the [troubleshooting](#troubleshootin
 
 ## Detailed Instructions
 
-For operating system specific installs, see one of the following links:
+For operating system specific installations, see one of the following links:
 
+* [Windows](#windows-installation)
 * [macOS](#macos-installation)
 * [Linux](#linux-installation)
-* [Windows](#windows-installation)
-
-# macOS Installation
-
-Check if Python is installed using command:
-```shell
-$ python --version
-```
-If Python is not installed or less than version 2.7, upgrade Python using the following command:
-```shell
-$ sudo brew install python
-```
-
-Check if pip 9.0 or above is installed using command:
-```shell
-$ pip --version
-```
-
-If pip is not installed or less than version 9.0, upgrade pip using the following command:
-
-```shell
-$ sudo pip install --upgrade pip
-```
-
-Install mssql-cli using command:
-
-```shell
-$ sudo pip install mssql-cli
-```
-
-# Linux Installation
-
-Check if pip 9.0 or above is installed using command:
-```shell
-$ pip --version
-```
-
-If pip is not installed or less than version 9.0, upgrade pip using the following command:
-
-```shell
-$ sudo apt-get install python-pip
-$ sudo pip install --upgrade pip
-```
-
-Install mssql-cli using command:
-
-```shell
-$ sudo pip install mssql-cli
-```
-If you are using Ubuntu or Debian, you'll need to install the libunwind8 package.  See the [libunwind8 installation steps below](#installing-the-libunwind8-package).
-
-If you are using RHEL, you'll need to install the icu package.  See the [icu installation steps below](#installing-the-icu-package).
+    * [Red Hat Enterprise Linux 7](#install-red-hat-enterprise-linux-rhel-7)
+    * [CentOS 7](#install-centos-7)
+    * [Fedora 25, Fedora 26](#install-fedora-25-fedora-26)
+    * [Debian 8.7 or later versions](#install-debian-87-or-later)
+    * [Ubuntu 17.04, Ubuntu 16.04, Ubuntu 14.04](#install-ubuntu-1704-ubuntu-1604-ubuntu-1404)
+    * [Linux Mint 18, Linux Mint 17](#install-linux-mint-18-linux-mint-17)
+    * [openSUSE 42.2 or later](#install-opensuse-422-or-later)
+    * [SUSE Enterprise Linux (SLES) 12 SP2 or later](#install-suse-enterprise-linux-sles-12-sp2-or-later)
 
 # Windows Installation
 
@@ -82,9 +39,111 @@ Once Python is installed and in the PATH environment variable, open a command pr
 C:\> pip install mssql-cli
 ```
 
+# macOS Installation
+
+To can install mssql-cli using the Homebrew package manager.
+
+## Homebrew Installation
+
+```shell
+$ sudo brew install python
+$ sudo pip install --upgrade pip
+$ sudo pip install mssql-cli --ignore-installed six
+```
+
+# Linux Installation
+
+There are two prerequisit packages to run mssql-cli on Linux: libunwind and libicu.
+
+## Install Red Hat Enterprise Linux (RHEL) 7
+```shell
+$ wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm 
+$ sudo yum -y install ./epel-release-latest-7.noarch.rpm
+$ sudo yum -y install icu libunwind python-pip 
+$ sudo pip install mssql-cli
+```
+
+## Install CentOS 7
+```shell
+$ wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm 
+$ sudo yum -y install ./epel-release-latest-7.noarch.rpm
+$ sudo yum -y install epel-release libunwind libicu python-pip 
+$ sudo pip install mssql-cli
+```
+
+## Install Fedora 25, Fedora 26
+```shell
+$ sudo  update
+$ sudo install libunwind libicu
+$ sudo pip install --upgrade pip
+$ sudo pip install mssql-cli
+```
+
+## Install Debian 8.7 or later
+```shell
+$ echo deb http://ftp.us.debian.org/debian jessie main | sudo tee -a /etc/apt/sources.list
+$ sudo apt-get update & sudo apt-get install -y libunwind8 python-pip
+$ sudo pip install --upgrade pip
+$ sudo pip install mssql-cli
+```
+
+## Install Ubuntu 17.04, Ubuntu 16.04, Ubuntu 14.04
+
+### Install Ubuntu 17.04
+```shell
+$ sudo apt-get update & sudo apt-get install -y libunwind8 python-pip libicu57
+$ sudo pip install --upgrade pip
+$ sudo pip install mssql-cli
+```
+
+### Install Ubuntu 16.04
+```shell
+$ sudo apt-get update & sudo apt-get install -y libunwind8 python-pip libicu55 
+$ sudo pip install --upgrade pip
+$ sudo pip install mssql-cli
+```
+
+### Install Ubuntu 14.04
+```shell
+$ sudo apt-get update & sudo apt-get install -y libunwind8 python-pip libicu52
+$ sudo pip install --upgrade pip
+$ sudo pip install mssql-cli
+```
+
+## Install Linux Mint 18, Linux Mint 17
+
+### Install Linux Mint 18
+```shell
+$ sudo apt-get update & sudo apt-get install -y libunwind8 python-pip libicu57
+$ sudo pip install --upgrade pip
+$ sudo pip install mssql-cli
+```
+
+### Install Linux Mint 17
+```shell
+$ sudo apt-get update & sudo apt-get install -y libunwind8 python-pip libicu55
+$ sudo pip install --upgrade pip
+$ sudo pip install mssql-cli
+```
+
+### Install OpenSUSE 42.2 or later
+```shell
+$ sudo apt-get update & sudo apt-get install -y libunwind8 python-pip libicu55
+$ sudo pip install --upgrade pip
+$ sudo pip install mssql-cli
+```
+ 
+ 
+### Install SUSE Enterprise Linux (SLES) 12 SP2 or later
+```shell
+$ sudo apt-get update & sudo apt-get install -y libunwind8 python-pip libicu55
+$ sudo pip install --upgrade pip
+$ sudo pip install mssql-cli
+```
+
 # Troubleshooting
 
-If you're having installation issues, please check the below known issues and workarounds.  If you're having a different issue, please check the [issues](https://github.com/Microsoft/mssql-cli/issues) page to see if the issue has already been reported.  If you don't see your issue there, filing a new issue would be appreciated.
+If you're having installation issues, please check the below known issues and workarounds.  If you're having a different issue, please check the [issues](https://github.com/dbcli/mssql-cli/issues) page to see if the issue has already been reported.  If you don't see your issue there, filing a new issue would be appreciated.
 
 ## Error: No module named mssqlcli
 If the installation was successful and this error message is encountered, this may be caused by different versions of python in the environment.
@@ -98,14 +157,10 @@ More information can be found at:
 - [Development guide](development_guide.md#Environment_Setup)
 
 ## Error: Could not find version that satisfies the requirement mssql-cli
-If you see the above error running `pip install mssql-cli`, this means the pip version used is out-of-date.  Upgrade pip using the command:
-```shell
-$ sudo apt-get install python-pip
-$ sudo pip install --upgrade pip
-```
+If you see the above error running `pip install mssql-cli`, this means the pip version used is out-of-date.  Please upgrade your pip installation for your python platform and OS distribution. 
 
 ## Error: System.DllNotFoundException: Unable to load DLL 'System.Security.Cryptography.Native': The specified module could not be found.
-If you encounter this error on MacOS, this means you need the latest version of OpenSSL. To update:
+If you encounter this error on MacOS, this means you need the latest version of OpenSSL. Later version of macOS (Sierra, and High Sierra) should not have this issue.  To install OpenSSL use the following commands:
 ```shell
 $ brew update
 $ brew install openssl
@@ -114,50 +169,15 @@ $ ln -s /usr/local/opt/openssl/lib/libcrypto.1.0.0.dylib /usr/local/lib/
 $ ln -s /usr/local/opt/openssl/lib/libssl.1.0.0.dylib /usr/local/lib/
 ```
 
-## Error: libunwind.so.8: cannot open shared object file
-If you encounter the below error running mssql-cli, this means the libunwind8 package is not installed.  This error has been seen
-on Ubuntu 14 & 17, Debian 8.
+## Error: libunwind.so: cannot open shared object file
+If you encounter the below error running mssql-cli, this means the libunwind package is not installed.  Please install the libunwind package for your Linux distribution.
 ```shell
 Failed to load /usr/local/lib/python2.7/dist-packages/mssqltoolsservice/bin/libcoreclr.so, error
 libunwind.so.8: cannot open shared object file: No such file or directory
 ```
 
-## Error: Failed to initialize CoreCLR, HRESULT: 0x80131500 on RHEL
-If you encounter this error running mssql-cli Red Hat Enterprise Linux, it could be due to the icu package not being installed.  See the [icu installation steps below](#installing-the-icu-package).
-
-## Installing the libunwind8 package
-
-### Ubuntu 14 & 17
-Run commands
+## Error: Failed to initialize CoreCLR, HRESULT: 0x80131500
+If you encounter the below error running mssql-cli, this means the libicu package is not installed.  Please install the libicu package for your Linux distribution.
 ```shell
-$ sudo apt-get update
-$ sudo apt-get install libunwind8
-```
-
-### Debian 8
-The file `/etc/apt/sources.list' needs to be updated with the following line
-```
-deb http://ftp.us.debian.org/debian/ jessie main
-```
-Then run commands:
-```shell
-$ sudo apt-get update
-$ sudo apt-get install libunwind8
-```
-
-### CentOS 7
-Run commands
-```shell
-## libunwind.x86_64 is in the epel-release repository
-## (Not necessary on GNOME, minimal install does not have this installed)
-$ sudo yum -y install epel-release
-$ sudo yum -y install libunwind
-```
-
-## Installing the icu package
-
-### RHEL 7.3
-Run commands
-```shell
-$ sudo yum install icu
+Failed to initialize CoreCLR, HRESULT: 0x80131500
 ```
