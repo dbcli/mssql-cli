@@ -65,9 +65,8 @@ $ sudo pip install mssql-cli
 
 ## Install CentOS 7
 ```shell
-$ wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm 
-$ sudo yum -y install ./epel-release-latest-7.noarch.rpm
-$ sudo yum -y install epel-release libunwind libicu python-pip 
+$ sudo yum -y install epel-release 
+$ sudo yum -y install libunwind libicu python-pip 
 $ sudo pip install mssql-cli
 ```
 
@@ -128,16 +127,16 @@ $ sudo pip install mssql-cli
 
 ### Install OpenSUSE 42.2 or later
 ```shell
-$ sudo apt-get update & sudo apt-get install -y libunwind8 python-pip libicu55
-$ sudo pip install --upgrade pip
+$ sudo zypper update
+$ sudo zypper install libunwind libicu python-pip
 $ sudo pip install mssql-cli
 ```
  
  
 ### Install SUSE Enterprise Linux (SLES) 12 SP2 or later
 ```shell
-$ sudo apt-get update & sudo apt-get install -y libunwind8 python-pip libicu55
-$ sudo pip install --upgrade pip
+$ sudo zypper update
+$ sudo zypper install libunwind libicu python-pip
 $ sudo pip install mssql-cli
 ```
 
