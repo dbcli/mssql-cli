@@ -12,8 +12,7 @@ Microsoft Privacy statement: https://privacy.microsoft.com/en-us/privacystatemen
 
 
 ### <a name="anonymize"></a>How do we anonymize data?
-Hashed MAC address: a cryptographically (SHA256) anonymous and unique ID for a machine.
-Hashed MAC address and home directory path: a cryptographically (SHA256) anonymous and unique ID for a user.
+Hashed random UUID: a cryptographically (SHA256) anonymous and unique ID per user.
 
 ### <a name="collect"></a>What do we collect?
 ##### Environment
