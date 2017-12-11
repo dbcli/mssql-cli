@@ -28,8 +28,8 @@ expand = auto
 generate_aliases = False
 
 # log_file location.
-# In Unix/Linux: ~/.config/mssql-cli/log
-# In Windows: %USERPROFILE%\AppData\Local\dbcli\mssql-cli\log
+# In Unix/Linux: ~/.config/mssqlcli/mssqlcli.log
+# In Windows: %USERPROFILE%\AppData\Local\dbcli\mssqlcli\mssqlcli.log
 # %USERPROFILE% is typically C:\Users\{username}
 log_file = default
 

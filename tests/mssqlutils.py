@@ -14,7 +14,7 @@ def create_mssql_cli_client(owner_uri=None, connect=True):
     :return: MssqlCliClient
     """
     try:
-        server_name = os.environ['MSSQL_CLI_HOST']
+        server_name = os.environ['MSSQL_CLI_SERVER']
         database_name = os.environ['MSSQL_CLI_DATABASE']
         user_name = os.environ['MSSQL_CLI_USER']
         password = os.environ['MSSQL_CLI_PASSWORD']
