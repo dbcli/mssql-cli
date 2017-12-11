@@ -72,7 +72,7 @@ $ sudo pip install mssql-cli
 
 ## Install Fedora 25, Fedora 26
 ```shell
-$ dnf install update
+$ dnf upgrade
 $ dnf install libunwind libicu python-pip
 $ sudo pip install mssql-cli
 ```
