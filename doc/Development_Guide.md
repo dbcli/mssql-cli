@@ -100,7 +100,7 @@ Provided your PYTHONPATH was set correctly, you can run the tests from your `<cl
     **Note**: You must first set the target server and database information connection info via environment variables:
     ##### Windows
     ```
-        set MSSQL_CLI_HOST=<Target server name>
+        set MSSQL_CLI_SERVER=<Target server name>
         set MSSQL_CLI_DATABASE=<Target database name>
         set MSSQL_CLI_USER=<User name>
         set MSSQL_CLI_PASSWORD=<password>
@@ -108,7 +108,7 @@ Provided your PYTHONPATH was set correctly, you can run the tests from your `<cl
     
     ##### MacOSX/Linux (bash)
     ```
-        export MSSQL_CLI_HOST=<Target server name>
+        export MSSQL_CLI_SERVER=<Target server name>
         export MSSQL_CLI_DATABASE=<Target database name>
         export MSSQL_CLI_USER=<User name>
         export MSSQL_CLI_PASSWORD=<password>
