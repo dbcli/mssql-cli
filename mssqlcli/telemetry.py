@@ -188,7 +188,6 @@ def _generate_user_id():
     random_id = uuid.uuid4().hex
     salt = uuid.uuid4().hex
 
-    print(random_id)
     return random_id + salt
 
 
