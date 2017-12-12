@@ -59,7 +59,7 @@ bumpversion patch              ->  1.0.<b>1</b>
         ```
 4. Publish to Azure storage account
     ```
-    python build.py publish_daily
+    python release.py publish_daily
     ```
 
 5. Test install locally
