@@ -652,7 +652,7 @@ class MssqlCli(object):
 @click.option('-S', '--server', default='', envvar='MSSQL_CLI_SERVER',
               help='SQL Server instance name or address.')
 @click.option('-U', '--username', 'username', envvar='MSSQL_CLI_USER',
-              help='Username to connect to the postgres database.')
+              help='Username to connect to the database.')
 @click.option('-W', '--password', 'prompt_passwd', is_flag=True, default=False,
               help='Force password prompt.')
 @click.option('-E', '--integrated', 'integrated_auth', is_flag=True, default=False,
