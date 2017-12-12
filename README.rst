@@ -36,11 +36,17 @@ Usage
 
 Please refer to the `usage guide`_ for details on options and example usage.
 
-For general help content, pass in the ``-h`` parameter:
+Run the following command to see list of options.
 
 .. code:: bash
 
     $ mssql-cli --help
+
+To quickly get started by connecting to a server, run the following:
+
+.. code:: bash
+
+    $ mssql-cli -S <server name> -d <database name> -U <user name>
 
 Contributing
 -----------------------------
