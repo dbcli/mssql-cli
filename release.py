@@ -56,7 +56,7 @@ def publish_official():
 
 
 if __name__ == '__main__':
-    default_actions = ['build', 'unit_test']
+    default_actions = ['download_official_wheels']
 
     targets = {
         'publish_official': publish_official,
