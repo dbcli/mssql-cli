@@ -1,10 +1,8 @@
-PYPI Test mssql-scripter upload
+PYPI Test mssql-cli upload
 ========================================
 
 ### Requirements:
-1. Create and Register a user account on testpypi at [test pypi](https://testpypi.python.org/pypi?%3Aaction=register_form)
-
-2.  Add `<clone_root>` to your PYTHONPATH environment variable:
+1.  Add `<clone_root>` to your PYTHONPATH environment variable:
     ##### Windows
     ```
     set PYTHONPATH=<clone_root>;%PYTHONPATH%
@@ -13,7 +11,7 @@ PYPI Test mssql-scripter upload
     ```
     export PYTHONPATH=<clone_root>:${PYTHONPATH}
     ```
-3.	Install the dependencies:
+2.	Install the dependencies:
     ```
     python <clone_root>/dev_setup.py
     ```
