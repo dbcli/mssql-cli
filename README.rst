@@ -72,10 +72,10 @@ For users of the older mssql_cli 0.0.3, please specifically download 0.0.3 as th
 
 .. _mssql-cli: https://github.com/dbcli/mssql-cli
 .. _dbcli.org community: https://github.com/dbcli
-.. _installation guide: doc/installation_guide.md
-.. _development guide: doc/development_guide.md
-.. _usage guide: doc/usage_guide.md
-.. _telemetry guide: doc/telemetry_guide.md
+.. _installation guide: https://github.com/dbcli/mssql-cli/tree/master/doc/installation_guide.md
+.. _development guide: https://github.com/dbcli/mssql-cli/tree/master/doc/development_guide.md
+.. _usage guide: https://github.com/dbcli/mssql-cli/tree/master/doc/usage_guide.md
+.. _telemetry guide: https://github.com/dbcli/mssql-cli/tree/master/doc/telemetry_guide.md
 .. _Issues: https://github.com/dbcli/mssql-cli/issues
 .. _Microsoft Open Source Code of Conduct: https://opensource.microsoft.com/codeofconduct/
 .. _Code of Conduct FAQ: https://opensource.microsoft.com/codeofconduct/faq/
