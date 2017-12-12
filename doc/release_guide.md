@@ -15,7 +15,22 @@ mssql-cli release guide
     ```
     python <clone_root>/dev_setup.py
     ```
+### Requirements for daily and official builds:
+1. A azure storage account with a container named **daily**.
+
+2. A sub folder named **mssql-cli** under the previous container.
+
+3. Set Azure storage account connection string via environment variable, this will be the storage account we are publishing to.
+    #### Windows
+    ```
+       set AZURE_STORAGE_CONNECTION_STRING=<connection string>
+    ```
     
+    #### MacOS/Linux
+    ```
+        export AZURE_STORAGE_CONNECTION_STRING='<connection_string>'
+    ```
+
 ## Bump Version
 
 	Versioning schema: {major}.{minor}.{patch}
@@ -39,40 +54,29 @@ The steps below outline how to build mssql-cli locally on your dev environment.
     ```
 
 ## 2. Install
-1. Test install locally
+1. Test install locally:
 
 	To install the local mssql-scripter wheel package, from `<clone_root>` execute:
     ```
     sudo pip install --no-index -i ./dist/mssql_scripter-1.0.0a1-py2.py3-none-win32.whl
     ```
-
-### Requirements for daily and official builds
-1. A azure storage account with a container named **daily**.
-
-2. A sub folder named **mssql-cli** under the previous container.
-
-3. Set Azure storage account connection string via environment variable, this will be the storage account we are publishing to.
-    #### Windows
-    ```
-       set AZURE_STORAGE_CONNECTION_STRING=<connection string>
-    ```
-    
-    #### MacOS/Linux
-    ```
-        export AZURE_STORAGE_CONNECTION_STRING='<connection_string>'
-    ```
     
 # Daily builds
 The steps below outline how daily builds of mssql-cli are generated. These steps are ran on each supported platform via Visual Studio Team Services. 
 ## 1. Build
-1. Build mssql-cli 
+1. Build mssql-cli:
     ```
     python build.py build
     ```
 
-2. Publish build to daily storage account
+2. Publish build to daily storage account:
     ```
     python build.py publish_daily
+    ```
+## 2. Install
+3. Test install from daily storage account:
+    ```
+        pip install --pre --no-cache --extra-index-url https://mssqlcli.blob.core.windows.net/daily mssql-cli
     ```
     
 # Official builds
