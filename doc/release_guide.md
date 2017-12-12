@@ -1,4 +1,4 @@
-PYPI Test mssql-cli upload
+mssql-cli release guide
 ========================================
 
 ### Requirements:
@@ -15,8 +15,7 @@ PYPI Test mssql-cli upload
     ```
     python <clone_root>/dev_setup.py
     ```
-
-
+    
 ## Bump Version
 
 	Versioning schema: {major}.{minor}.{patch}
@@ -30,15 +29,56 @@ bumpversion patch              ->  1.0.<b>1</b>
 </pre>
 
 **Note**: bumpversion does not allow version bumping if your workspace has pending changes.This is to protect against any manual updates that may have been made which can lead to inconsistent versions across files. If you know what you are doing you can override this by appending `--allow-dirty` to the bumpversion command.
-	
-## Build
-1. Build mssql-cli wheel:
 
+# Local builds
+The steps below outline how to build mssql-cli locally on your dev environment.
+## 1. Build
+1. Build mssql-cli wheel for the current platform:
     ```
     Python build.by build
     ```
 
-2. Add a .pypirc configuration file:
+## 2. Install
+1. Test install locally
+
+	To install the local mssql-scripter wheel package, from `<clone_root>` execute:
+    ```
+    sudo pip install --no-index -i ./dist/mssql_scripter-1.0.0a1-py2.py3-none-win32.whl
+    ```
+
+### Requirements for daily and official builds
+1. A azure storage account with a container named **daily**.
+
+2. A sub folder named **mssql-cli** under the previous container.
+
+3. Set Azure storage account connection string via environment variable, this will be the storage account we are publishing to.
+    #### Windows
+    ```
+       set AZURE_STORAGE_CONNECTION_STRING=<connection string>
+    ```
+    
+    #### MacOS/Linux
+    ```
+        export AZURE_STORAGE_CONNECTION_STRING='<connection_string>'
+    ```
+    
+# Daily builds
+The steps below outline how daily builds of mssql-cli are generated. These steps are ran on each supported platform via Visual Studio Team Services. 
+## 1. Build
+1. Build mssql-cli 
+    ```
+    python build.py build
+    ```
+
+2. Publish build to daily storage account
+    ```
+    python build.py publish_daily
+    ```
+    
+# Official builds
+The steps below outline how to build official builds and publish to PYPI.
+## 1. Create a .pypirc configuration file
+1. Add a .pypirc configuration file:
 
     - Create a .pypirc file in your user directory:
         #### Windows: 
@@ -57,28 +97,34 @@ bumpversion patch              ->  1.0.<b>1</b>
 		username = your_username
 		password = your_password
         ```
-4. Publish to Azure storage account
+2. Set env var to indicate a official build:
+    #### Windows
     ```
-    python release.py publish_daily
+       set MSSQL_CLI_OFFICIAL_BUILD=True
+    ```
+    
+    #### MacOS/Linux
+    ```
+        export MSSQL_CLI_OFFICIAL_BUILD=True
+    ```
+3. Build for the current platform:
+    ```
+        python build.py build
     ```
 
-5. Test install locally
-
-	To install the local mssql-scripter wheel package, from `<clone_root>` execute:
+4. Publish to daily storage account:
     ```
-    sudo pip install --no-index -i ./dist/mssql_scripter-1.0.0a1-py2.py3-none-win32.whl
+        python build.py publish_daily
+    ```
+    
+5. Download official wheels from storage account:
+    ```
+        python release.py download_official_wheels
+    ```
+    
+6. Publish downloaded wheels to PYPI:
+    ```
+        python release.py publish_official
     ```
 
-6. Test install via pypi server:
 
-	**Note**: Specifying the test pypi server as the index to search for, pip will attempt to search for mssql-scripter's dependencies from the same server. This can result in a requirement not found error, but should not be a problem if dev_setup.py was ran during developer setup. If the error does occur, manually pip install the dependencies that are listed in setup.py and ensure the versions are correct.
-	
-	Install the mssql-scripter package that was just uploaded:
-    ```
-	pip install -i https://testpypi.python.org/pypi mssql-scripter
-	```
-
-	Upgrade to the mssql-scripter that was uploaded:
-	```
-    pip install --upgrade -i https://testpypi.python.org/pypi mssql-scripter
-    ```
