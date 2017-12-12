@@ -29,7 +29,7 @@ Installation
 
     $ pip install mssql-cli
 
-Please refer to the `installation guide`_ for detailed install instructions. 
+Please refer to the `installation guide`_ for detailed install instructions.
 
 Usage
 -----
@@ -41,6 +41,8 @@ For general help content, pass in the ``-h`` parameter:
 .. code:: bash
 
     $ mssql-cli --help
+
+The mssql-cli tool includes a telemetry feature.  Please refer to the `telemetry guide`_ for more information.
 
 Contributing
 -----------------------------
@@ -73,6 +75,7 @@ For users of the older mssql_cli 0.0.3, please specifically download 0.0.3 as th
 .. _installation guide: doc/installation_guide.md
 .. _development guide: doc/development_guide.md
 .. _usage guide: doc/usage_guide.md
+.. _telemetry guide: doc/telemetry_guide.md
 .. _Issues: https://github.com/dbcli/mssql-cli/issues
 .. _Microsoft Open Source Code of Conduct: https://opensource.microsoft.com/codeofconduct/
 .. _Code of Conduct FAQ: https://opensource.microsoft.com/codeofconduct/faq/
