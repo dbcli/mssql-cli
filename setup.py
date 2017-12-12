@@ -5,9 +5,7 @@
 
 import ast
 import os
-import platform
 import re
-import sys
 import datetime
 
 from setuptools import setup, find_packages
