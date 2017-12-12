@@ -41,12 +41,8 @@ C:\> pip install mssql-cli
 
 # macOS Installation
 
-To can install mssql-cli using the Homebrew package manager.
-
-## Homebrew Installation
-
 ```shell
-$ sudo brew install python
+$ sudo easy_install pip
 $ sudo pip install --upgrade pip
 $ sudo pip install mssql-cli --ignore-installed six
 ```
