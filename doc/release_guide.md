@@ -1,7 +1,13 @@
 mssql-cli release guide
 ========================================
-
-### Requirements:
+## Table of Contents
+1. [Requirements](#Requirements)
+2. [Version bump](#BumpVersion)
+2. [Local builds](#Local)
+3. [Daily builds](#Daily)
+4. [Official builds](#Official)
+ 
+### <a name="Requirements"></a> Requirements:
 1.  Add `<clone_root>` to your PYTHONPATH environment variable:
     ##### Windows
     ```
@@ -31,7 +37,7 @@ mssql-cli release guide
         export AZURE_STORAGE_CONNECTION_STRING='<connection_string>'
     ```
 
-## Bump Version
+## <a name="BumpVersion"></a>Bump Version
 
 	Versioning schema: {major}.{minor}.{patch}
     Example: 1.0.0
@@ -45,7 +51,7 @@ bumpversion patch              ->  1.0.<b>1</b>
 
 **Note**: bumpversion does not allow version bumping if your workspace has pending changes.This is to protect against any manual updates that may have been made which can lead to inconsistent versions across files. If you know what you are doing you can override this by appending `--allow-dirty` to the bumpversion command.
 
-# Local builds
+# <a name="Local"></a>Local builds
 The steps below outline how to build mssql-cli locally on your dev environment.
 ## 1. Build
 1. Build mssql-cli wheel for the current platform:
@@ -61,7 +67,7 @@ The steps below outline how to build mssql-cli locally on your dev environment.
     sudo pip install --no-index -i ./dist/mssql_scripter-1.0.0a1-py2.py3-none-win32.whl
     ```
     
-# Daily builds
+# <a name="Daily"></a>Daily builds
 The steps below outline how daily builds of mssql-cli are generated. These steps are ran on each supported platform via Visual Studio Team Services. 
 ## 1. Build
 1. Build mssql-cli:
@@ -79,7 +85,7 @@ The steps below outline how daily builds of mssql-cli are generated. These steps
         pip install --pre --no-cache --extra-index-url https://mssqlcli.blob.core.windows.net/daily mssql-cli
     ```
     
-# Official builds
+# <a name="Official"></a>Official builds
 The steps below outline how to build official builds and publish to PYPI.
 ## 1. Create a .pypirc configuration file
 1. Add a .pypirc configuration file:
@@ -92,14 +98,14 @@ The steps below outline how to build official builds and publish to PYPI.
     
     - Add the following content to the .pypirc file, replace `your_username` and `your_passsword` with your account information created from step 1:
         ```
-		[distutils]
-		index-servers=
-		    pypitest
-		 
-		[pypitest]
-		repository = https://test.pypi.org/legacy/
-		username = your_username
-		password = your_password
+        [distutils]
+        index-servers=
+            pypi
+        
+        [pypi]
+        username = sqlcli
+        password = <Get Password from Azure Key Vault>
+
         ```
 2. Set env var to indicate a official build:
     #### Windows
