@@ -1,20 +1,8 @@
 from __future__ import print_function
-from azure.storage.blob import BlockBlobService, ContentSettings
 import os
 import sys
 import utility
 import mssqlcli.mssqltoolsservice.externals as mssqltoolsservice
-
-AZURE_STORAGE_CONNECTION_STRING = os.environ.get(
-    'AZURE_STORAGE_CONNECTION_STRING')
-BLOB_CONTAINER_NAME = 'daily'
-UPLOADED_PACKAGE_LINKS = []
-
-supported_platforms = [
-    'win32',
-    'win_amd64',
-    'macosx_10_11_intel',
-    'manylinux1_x86_64']
 
 
 def print_heading(heading, f=None):
@@ -82,53 +70,6 @@ def build():
     clean_and_copy_sqltoolsservice(utility.get_current_platform())
 
 
-def _upload_index_file(service, blob_name, title, links):
-    print('Uploading index file {}'.format(blob_name))
-    service.create_blob_from_text(
-        container_name=BLOB_CONTAINER_NAME,
-        blob_name=blob_name,
-        text="<html><head><title>{0}</title></head><body><h1>{0}</h1>{1}</body></html>"
-        .format(title, '\n'.join(
-                ['<a href="{0}">{0}</a><br/>'.format(link) for link in links])),
-        content_settings=ContentSettings(
-            content_type='text/html',
-            content_disposition=None,
-            content_encoding=None,
-            content_language=None,
-            content_md5=None,
-            cache_control=None
-        )
-    )
-
-
-def _gen_pkg_index_html(service, pkg_name):
-    links = []
-    index_file_name = pkg_name + '/'
-    for blob in list(service.list_blobs(
-            BLOB_CONTAINER_NAME, prefix=index_file_name)):
-        if blob.name == index_file_name:
-            # Exclude the index file from being added to the list
-            continue
-        links.append(blob.name.replace(index_file_name, ''))
-    _upload_index_file(
-        service,
-        index_file_name,
-        'Links for {}'.format(pkg_name),
-        links)
-    UPLOADED_PACKAGE_LINKS.append(index_file_name)
-
-
-def _upload_package(service, file_path, pkg_name):
-    print('Uploading {}'.format(file_path))
-    file_name = os.path.basename(file_path)
-    blob_name = '{}/{}'.format(pkg_name, file_name)
-    service.create_blob_from_path(
-        container_name=BLOB_CONTAINER_NAME,
-        blob_name=blob_name,
-        file_path=file_path
-    )
-
-
 def validate_package():
     """
         Install mssql-cli package locally.
@@ -147,44 +88,6 @@ def validate_package():
             mssqlcli_wheel_name[0]),
         root_dir, continue_on_error=False
     )
-
-
-def publish_daily():
-    """
-    Publish mssql-cli package to daily storage account.
-    """
-    print('Publishing to daily container within storage account.')
-    assert AZURE_STORAGE_CONNECTION_STRING, 'Set AZURE_STORAGE_CONNECTION_STRING environment variable'
-
-    blob_service = BlockBlobService(
-        connection_string=AZURE_STORAGE_CONNECTION_STRING)
-
-    print_heading('Uploading packages to blob storage ')
-    for pkg in os.listdir(utility.MSSQLCLI_DIST_DIRECTORY):
-        pkg_path = os.path.join(utility.MSSQLCLI_DIST_DIRECTORY, pkg)
-        print('Uploading package {}'.format(pkg_path))
-        _upload_package(blob_service, pkg_path, 'mssql-cli')
-
-    _gen_pkg_index_html(blob_service, 'mssql-cli')
-    _upload_index_file(
-        blob_service,
-        'index.html',
-        'Simple Index',
-        UPLOADED_PACKAGE_LINKS)
-
-
-def publish_official():
-    """
-    Publish mssql-cli package to PyPi.
-    """
-    mssqlcli_wheel_dir = os.listdir(utility.MSSQLCLI_DIST_DIRECTORY)
-    # Run twine action for mssql-cli.
-    # Only authorized users with credentials will be able to upload this package.
-    # Credentials will be stored in a .pypirc file.
-    for wheel in mssqlcli_wheel_dir:
-        utility.exec_command(
-            'twine upload {}'.format(wheel),
-            utility.MSSQLCLI_DIST_DIRECTORY)
 
 
 def unit_test():
@@ -225,9 +128,7 @@ if __name__ == '__main__':
         'validate_package': validate_package,
         'unit_test': unit_test,
         'integration_test': integration_test,
-        'test': test,
-        'publish_daily': publish_daily,
-        'publish_official': publish_official
+        'test': test
     }
     actions = sys.argv[1:] or default_actions
 
