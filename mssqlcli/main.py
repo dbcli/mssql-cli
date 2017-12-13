@@ -365,10 +365,6 @@ class MssqlCli(object):
             else:
                 print('Time: %0.03fs' % query.total_time)
 
-            with self._completer_lock:
-                self.completer.reset_completions()
-            self.refresh_completions(persist_priorities='keywords')
-
             # Check if we need to update completions, in order of most
             # to least drastic changes
             if query.db_changed:
@@ -555,6 +551,9 @@ class MssqlCli(object):
             if new_db_name:
                 self.mssqlcliclient_query_execution.database = new_db_name
 
+            if all_success:
+                meta_changed = meta_changed or has_meta_cmd(text)
+
         return output, MetaQuery(
             sql, all_success, total, meta_changed, db_changed, path_changed, mutated)
 
@@ -710,7 +709,7 @@ def has_meta_cmd(query):
     statement is an alter, create, drop, commit or rollback."""
     try:
         first_token = query.split()[0]
-        if first_token.lower() in ('alter', 'create', 'drop', 'commit', 'rollback'):
+        if first_token.lower() in ('alter', 'create', 'drop'):
             return True
     except Exception:
         return False
