@@ -1,6 +1,8 @@
 # Installation Guide
 
 ## Quick Start
+mssql-cli needs Python to run, and works with Python 2.7 and 3.6.
+
 mssql-cli is installed via pip.  If you know pip, you can install mssql-cli using command
 ```shell
 $ pip install mssql-cli
