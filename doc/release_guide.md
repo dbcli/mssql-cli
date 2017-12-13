@@ -104,7 +104,7 @@ The steps below outline how to build official builds and publish to PYPI.
         
         [pypi]
         username = sqlcli
-        password = <Get Password from Azure Key Vault>
+        password = <Get Password from Azure Key Vault> (https://sqltoolssecretstore.vault.azure.net/secrets/PYPI-AccountName-sqlcli/)
 
         ```
 2. Set env var to indicate a official build:
