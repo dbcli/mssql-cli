@@ -485,11 +485,9 @@ class MssqlCli(object):
 
             return cli
 
-    def _should_show_limit_prompt(self, status, cur):
+    def _should_show_limit_prompt(self, status, rows):
         """returns True if limit prompt should be shown, False otherwise."""
-        if not is_select(status):
-            return False
-        return self.row_limit > 0 and cur and cur.rowcount > self.row_limit
+        return self.row_limit > 0 and len(rows) > self.row_limit
 
     def _evaluate_command(self, text):
         """Used to run a command entered by the user during CLI operation
@@ -519,6 +517,12 @@ class MssqlCli(object):
         for rows, columns, status, sql, is_error in self.mssqlcliclient_query_execution.execute_multi_statement_single_batch(
                 text):
             total = time() - start
+            if self._should_show_limit_prompt(status, rows):
+                click.secho('The result set has more than %s rows.'
+                            % self.row_limit, fg='red')
+                if not click.confirm('Do you want to continue?'):
+                    click.secho("Aborted!", err=True, fg='red')
+                    break
 
             if is_error:
                 output.append(status)
@@ -744,13 +748,6 @@ def is_mutating(status):
 
     mutating = set(['insert', 'update', 'delete'])
     return status.split(None, 1)[0].lower() in mutating
-
-
-def is_select(status):
-    """Returns true if the first word in status is 'select'."""
-    if not status:
-        return False
-    return status.split(None, 1)[0].lower() == 'select'
 
 
 def quit_command(sql):
