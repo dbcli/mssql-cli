@@ -18,11 +18,11 @@ If you are having installation issues, see the [troubleshooting](#troubleshootin
 
 ## Detailed Instructions
 
-For operating system specific installations, see one of the following links:
+For supported operating system specific installations, see one of the following links:
 
-* [Windows](#windows-installation)
-* [macOS](#macos-installation)
-* [Linux](#linux-installation)
+* [Windows (x86/x64) 7 SP1+, 8.1, 10, Windows Server 2008 R2 SP1+](#windows-installation)
+* [macOS (x64) 10.12+](#macos-installation)
+* [Linux (x64)](#linux-installation)
     * [Red Hat Enterprise Linux 7](#install-red-hat-enterprise-linux-rhel-7)
     * [CentOS 7](#install-centos-7)
     * [Fedora 25, Fedora 26](#install-fedora-25-fedora-26)
