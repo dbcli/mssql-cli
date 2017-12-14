@@ -45,7 +45,7 @@ NOTE: If Python was installed into the "Program Files" directory, you may need t
 
 # macOS Installation
 
-On Linux, Python 2.7 is generally pre-installed. You may have to upgrade pip with the following easy_install commands.
+On macOS, Python 2.7 is generally pre-installed. You may have to upgrade pip with the following easy_install commands.
 
 ```shell
 $ sudo easy_install pip
