@@ -36,12 +36,16 @@ For operating system specific installations, see one of the following links:
 
 Python is not installed by default on Windows.  The latest Python installation package can be downloaded from [here](https://www.python.org/downloads/).  When installing, select the 'Add Python to PATH' option.  Python must be in the PATH environment variable.
 
-Once Python is installed and in the PATH environment variable, open a command prompt, and install mssql-cli using the command:
+Once Python is installed and in the PATH environment variable, open a command prompt, and install mssql-cli using the below command.  
+
 ```shell
 C:\> pip install mssql-cli
 ```
+NOTE: If Python was installed into the "Program Files" directory, you may need to open the command prompt as an administrator for the above command to succeed.
 
 # macOS Installation
+
+On Linux, Python 2.7 is generally pre-installed. You may have to upgrade pip with the following easy_install commands.
 
 ```shell
 $ sudo easy_install pip
@@ -51,7 +55,7 @@ $ sudo pip install mssql-cli --ignore-installed six
 
 # Linux Installation
 
-There are two prerequisit packages to run mssql-cli on Linux: libunwind and libicu.
+On Linux, Python 2.7 is generally pre-installed. There are two prerequisite packages to run mssql-cli on Linux: libunwind and libicu.
 
 ## Install Red Hat Enterprise Linux (RHEL) 7
 ```shell
