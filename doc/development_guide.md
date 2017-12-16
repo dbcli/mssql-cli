@@ -88,7 +88,7 @@ General development steps that apply to both a virtual environment or a global e
 #### Visual Studio Code (Any platform)
 
 1.	Install VS Code
-2.	Install the the VS Code [Python extension](https://marketplace.visualstudio.com/items?itemName=donjayamanne.python)
+2.	Install the the VS Code [Python extension](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
 
 The repo has a launch.json file that will launch the version of Python that is first on your path. 
 
@@ -122,7 +122,7 @@ Provided your PYTHONPATH was set correctly, you can run the tests from your `<cl
 2. Run integration tests (code format, unit tests, packaging, integration,) with tox:
 
     ```
-    python build.by integration_test
+    python build.py integration_test
     ```
 
 ## <a name="Run_mssql-cli"></a>5. Running mssql-cli
