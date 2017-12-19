@@ -20,7 +20,7 @@ If you are having installation issues, see the [troubleshooting](#troubleshootin
 
 For supported operating system specific installations, see one of the following links:
 
-* [Windows (x86/x64) 7 SP1+, 8.1, 10, Windows Server 2008 R2 SP1+](#windows-installation)
+* [Windows (x86/x64) 8.1, 10, Windows Server 2008 R2 SP1+](#windows-installation)
 * [macOS (x64) 10.12+](#macos-installation)
 * [Linux (x64)](#linux-installation)
     * [Red Hat Enterprise Linux 7](#install-red-hat-enterprise-linux-rhel-7)
