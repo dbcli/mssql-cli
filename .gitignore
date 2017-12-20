@@ -8,7 +8,7 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-env/
+env*/
 build/
 develop-eggs/
 dist/
@@ -83,7 +83,7 @@ celerybeat-schedule
 .env
 
 # sqltoolsservice binaries
-/pgcli/mssqltoolsservice/bin/*
+/mssqlcli/mssqltoolsservice/bin/*
 
 # virtualenv
 .venv
