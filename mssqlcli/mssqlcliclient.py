@@ -178,7 +178,7 @@ class MssqlCliClient(object):
         # Returns a generator of rows, columns, status(rows affected) or
         # message, sql (the query), is_error
         if is_error:
-            return None, None, message, query, is_error
+            return (), None, message, query, is_error
 
         columns = [
             col.column_name for col in column_info] if column_info else None
