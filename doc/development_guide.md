@@ -30,7 +30,7 @@ mssql-cli sources are located on GitHub (https://github.com/dbcli/mssql-cli). In
     - The latest Python installation package can be downloaded from [here](https://www.python.org/downloads/).  
     - During installation, select the 'Add Python to PATH' option.  Python must be in the PATH environment variable.
     
-2. Clone the repo from [https://github.com/dbcli/mssql-cli](https://github.com/Microsoft/mssql-cli)
+2. Clone the repo from [https://github.com/dbcli/mssql-cli](https://github.com/dbcli/mssql-cli)
 
 ## <a name="Environment_Setup"></a>2. Environment Setup
 When developing on a Python project, it is recommended to do so in a virtual environment. A virtual environment is a sandbox that maintains a copy of all libraries necessary to run python in a isolated environment without interfering with the system or global python. For more information on virtual environments, go to [Virtual Environment Info](docs/virtual_environment_info.md).
