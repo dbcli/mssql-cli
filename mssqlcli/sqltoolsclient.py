@@ -8,6 +8,7 @@ import subprocess
 import io
 import time
 import sys
+import uuid
 
 import mssqlcli.mssqltoolsservice as mssqltoolsservice
 import mssqlcli.jsonrpc.jsonrpcclient as json_rpc_client
@@ -29,7 +30,7 @@ class SqlToolsClient(object):
             Input and output streams for JsonRpcClient are taken as optional params,
             Else a SqlToolsService process is started and its stdin and stdout is used.
         """
-        self.current_id = 1
+        self.current_id = uuid.uuid4().int
         self.tools_service_process = None
 
         if input_stream and output_stream:
@@ -60,23 +61,21 @@ class SqlToolsClient(object):
             Create request of request type passed in.
         """
         request = None
+        self.current_id = uuid.uuid4().int
 
         if request_type == u'connection_request':
             logger.info(u'SqlToolsClient connection request Id {0}'.format(self.current_id))
             request = connection.ConnectionRequest(self.current_id, self.json_rpc_client, parameters)
-            self.current_id += 1
             return request
 
         if request_type == u'query_execute_string_request':
             logger.info(u'SqlToolsClient execute string request Id {0}'.format(self.current_id))
             request = query.QueryExecuteStringRequest(self.current_id, self.json_rpc_client, parameters)
-            self.current_id += 1
             return request
 
         if request_type == u'query_subset_request':
             logger.info(u'SqlToolsClient subset request Id {0}'.format(self.current_id))
             request = query.QuerySubsetRequest(self.current_id, self.json_rpc_client, parameters)
-            self.current_id += 1
             return request
 
     def shutdown(self):
