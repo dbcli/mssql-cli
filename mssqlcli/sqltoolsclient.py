@@ -30,7 +30,7 @@ class SqlToolsClient(object):
             Input and output streams for JsonRpcClient are taken as optional params,
             Else a SqlToolsService process is started and its stdin and stdout is used.
         """
-        self.current_id = uuid.uuid4()
+        self.current_id = uuid.uuid4().int
         self.tools_service_process = None
 
         if input_stream and output_stream:
