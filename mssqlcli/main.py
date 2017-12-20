@@ -487,6 +487,8 @@ class MssqlCli(object):
 
     def _should_show_limit_prompt(self, status, rows):
         """returns True if limit prompt should be shown, False otherwise."""
+        if not rows:
+            return False
         return self.row_limit > 0 and len(rows) > self.row_limit
 
     def _evaluate_command(self, text):
