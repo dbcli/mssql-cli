@@ -164,7 +164,7 @@ class QuerySubsetRequest(Request):
 
         except Exception as error:
             self.finished = True
-            self.json_rpc_client.request_finised(self.id)
+            self.json_rpc_client.request_finished(self.id)
             return ResultSubset(None, error_message=str(error))
 
     def execute(self):
