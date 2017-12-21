@@ -33,7 +33,7 @@ mssql-cli sources are located on GitHub (https://github.com/dbcli/mssql-cli). In
 2. Clone the repo from [https://github.com/dbcli/mssql-cli](https://github.com/dbcli/mssql-cli)
 
 ## <a name="Environment_Setup"></a>2. Environment Setup
-When developing on a Python project, it is recommended to do so in a virtual environment. A virtual environment is a sandbox that maintains a copy of all libraries necessary to run python in a isolated environment without interfering with the system or global python. For more information on virtual environments, go to [Virtual Environment Info](docs/virtual_environment_info.md).
+When developing on a Python project, it is recommended to do so in a virtual environment. A virtual environment is a sandbox that maintains a copy of all libraries necessary to run python in a isolated environment without interfering with the system or global python. For more information on virtual environments, go to [Virtual Environment Info](virtual_environment_info.md).
 
 If not developing in a virtual environment, please proceed to [Development Setup](#Development) 
 ### Virtual Environment
