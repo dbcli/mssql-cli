@@ -14,9 +14,9 @@ import mssqlcli.mssqltoolsservice as mssqltoolsservice
 import mssqlcli.jsonrpc.jsonrpcclient as json_rpc_client
 import mssqlcli.jsonrpc.contracts.connectionservice as connection
 import mssqlcli.jsonrpc.contracts.queryexecutestringservice as query
+from .config import config_location
 
 logger = logging.getLogger(u'mssqlcli.sqltoolsclient')
-sqltoolsservice_args = [mssqltoolsservice.get_executable_path()]
 
 
 class SqlToolsClient(object):
@@ -24,7 +24,7 @@ class SqlToolsClient(object):
         Create sql tools service requests.
     """
 
-    def __init__(self, input_stream=None, output_stream=None):
+    def __init__(self, input_stream=None, output_stream=None, enable_logging=False):
         """
             Initializes the sql tools client.
             Input and output streams for JsonRpcClient are taken as optional params,
@@ -32,6 +32,13 @@ class SqlToolsClient(object):
         """
         self.current_id = uuid.uuid4().int
         self.tools_service_process = None
+
+        sqltoolsservice_args = [mssqltoolsservice.get_executable_path()]
+
+        if enable_logging:
+            sqltoolsservice_args.append('--enable-logging')
+            sqltoolsservice_args.append('--log-dir')
+            sqltoolsservice_args.append(config_location())
 
         if input_stream and output_stream:
             self.json_rpc_client = json_rpc_client.JsonRpcClient(

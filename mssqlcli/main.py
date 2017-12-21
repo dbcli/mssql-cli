@@ -124,7 +124,8 @@ class MssqlCli(object):
     def __init__(self, force_passwd_prompt=False,
                  mssqlclirc_file=None, row_limit=None,
                  single_connection=False, less_chatty=None,
-                 auto_vertical_output=False, sql_tools_client=None, integrated_auth=False):
+                 auto_vertical_output=False, sql_tools_client=None,
+                 integrated_auth=False, enable_sqltoolsservice_logging=False):
 
         self.force_passwd_prompt = force_passwd_prompt
 
@@ -193,7 +194,8 @@ class MssqlCli(object):
         self.cli = None
 
         # mssql-cli
-        self.sqltoolsclient = sql_tools_client if sql_tools_client else SqlToolsClient()
+        self.sqltoolsclient = sql_tools_client if sql_tools_client else SqlToolsClient(
+            enable_logging=enable_sqltoolsservice_logging)
         self.mssqlcliclient_query_execution = None
         self.integrated_auth = integrated_auth
 
@@ -674,9 +676,13 @@ class MssqlCli(object):
               help='Skip intro on startup and goodbye on exit.')
 @click.option('--auto-vertical-output', is_flag=True,
               help='Automatically switch to vertical output mode if the result is wider than the terminal width.')
+@click.option('--enable-sqltoolsservice-logging', is_flag=True,
+              default=False,
+              help='Enables diagnostic logging for the SqlToolsService.')
 def cli(username, server, prompt_passwd,
         database, version, mssqlclirc, row_limit,
-        less_chatty, auto_vertical_output, integrated_auth):
+        less_chatty, auto_vertical_output,
+        integrated_auth, enable_sqltoolsservice_logging):
 
     if version:
         print('Version:', __version__)
@@ -693,7 +699,7 @@ def cli(username, server, prompt_passwd,
 
     mssqlcli = MssqlCli(prompt_passwd, row_limit=row_limit, single_connection=False,
                         mssqlclirc_file=mssqlclirc, less_chatty=less_chatty, auto_vertical_output=auto_vertical_output,
-                        integrated_auth=integrated_auth)
+                        integrated_auth=integrated_auth, enable_sqltoolsservice_logging=enable_sqltoolsservice_logging)
 
     mssqlcli.connect(database, server, username, port='')
 
