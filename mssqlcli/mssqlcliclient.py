@@ -22,7 +22,8 @@ class MssqlCliClient(object):
 
     def __init__(self, sql_tools_client, server_name, user_name, password,
                  authentication_type=u'SqlLogin', database=u'master', owner_uri=None, multiple_active_result_sets=True,
-                 **kwargs):
+                 encrypt=None, trust_server_certificate=None, connection_timeout=None, application_intent=None,
+                 multi_subnet_failover=None, packet_size=None, **kwargs):
         self.server_name = server_name
         self.user_name = user_name
         self.password = password
@@ -31,6 +32,12 @@ class MssqlCliClient(object):
         self.owner_uri = owner_uri
         self.is_connected = False
         self.multiple_active_result_sets = multiple_active_result_sets
+        self.encrypt = encrypt
+        self.trust_server_certificate = trust_server_certificate
+        self.connection_timeout = connection_timeout
+        self.application_intent = application_intent
+        self.multi_subnet_failover = multi_subnet_failover
+        self.packet_size = packet_size
         self.extra_params = {k: v for k, v in kwargs.items()}
         self.sql_tools_client = sql_tools_client
         self.server_version = None
@@ -51,6 +58,7 @@ class MssqlCliClient(object):
         if self.is_connected:
             return self.owner_uri
 
+        # Required params
         connection_params = {u'ServerName': self.server_name,
                              u'DatabaseName': self.database,
                              u'UserName': self.user_name,
@@ -58,6 +66,20 @@ class MssqlCliClient(object):
                              u'AuthenticationType': self.authentication_type,
                              u'OwnerUri': self.owner_uri,
                              u'MultipleActiveResultSets': self.multiple_active_result_sets}
+
+        # Optional params
+        if self.encrypt:
+            connection_params[u'Encrypt'] = self.encrypt
+        if self.trust_server_certificate:
+            connection_params[u'TrustServerCertificate'] = self.trust_server_certificate
+        if self.connection_timeout:
+            connection_params[u'ConnectTimeout'] = self.connection_timeout
+        if self.application_intent:
+            connection_params[u'ApplicationIntent'] = self.application_intent
+        if self.multi_subnet_failover:
+            connection_params[u'MultiSubnetFailover'] = self.multi_subnet_failover
+        if self.packet_size:
+            connection_params[u'PacketSize'] = self.packet_size
 
         connection_params.update(self.extra_params)
 
