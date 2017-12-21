@@ -133,9 +133,13 @@ class ConnectionCompleteEvent(object):
         self.error_message = inner_params[u'errorMessage']
         self.error_number = inner_params[u'errorNumber']
         # server information.
-        self.is_cloud = inner_params[u'serverInfo'][u'isCloud'] if u'serverInfo' in inner_params else False
-        self.server_version = inner_params[u'serverInfo'][u'serverVersion'] if u'serverInfo' in inner_params else None
-        self.server_edition = inner_params[u'serverInfo'][u'serverEdition'] if u'serverInfo' in inner_params else None
+        if u'serverInfo' in inner_params and inner_params[u'serverInfo']:
+            self.is_cloud = inner_params[u'serverInfo'][u'isCloud'] if \
+                u'isCloud' in inner_params[u'serverInfo'] else False
+            self.server_version = inner_params[u'serverInfo'][u'serverVersion'] if \
+                u'serverVersion' in inner_params[u'serverInfo'] else None
+            self.server_edition = inner_params[u'serverInfo'][u'serverEdition'] if \
+                u'serverEdition' in inner_params[u'serverInfo'] else None
 
 
 class ConnectionResponse(object):
