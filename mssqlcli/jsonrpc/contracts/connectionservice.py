@@ -85,12 +85,26 @@ class ConnectionDetails(object):
     """
 
     def __init__(self, parameters):
+        # Required params
         self.ServerName = parameters[u'ServerName']
         self.DatabaseName = parameters[u'DatabaseName']
         self.UserName = parameters[u'UserName']
         self.Password = parameters[u'Password']
         self.AuthenticationType = parameters[u'AuthenticationType']
         self.MultipleActiveResultSets = parameters[u'MultipleActiveResultSets']
+        # Optional Params
+        if u'Encrypt' in parameters:
+            self.Encrypt = parameters[u'Encrypt']
+        if u'TrustServerCertificate' in parameters:
+            self.TrustServerCertificate = parameters[u'TrustServerCertificate']
+        if u'ConnectTimeout' in parameters:
+            self.ConnectTimeout = parameters[u'ConnectTimeout']
+        if u'ApplicationIntent' in parameters:
+            self.ApplicationIntent = parameters[u'ApplicationIntent']
+        if u'MultiSubnetFailover' in parameters:
+            self.MultiSubnetFailover = parameters[u'MultiSubnetFailover']
+        if u'PacketSize' in parameters:
+            self.PacketSize = parameters[u'PacketSize']
 
     def format(self):
         return vars(self)
@@ -98,7 +112,7 @@ class ConnectionDetails(object):
 
 class ConnectionParams(object):
     def __init__(self, parameters):
-        self.owner_uri = parameters['OwnerUri']
+        self.owner_uri = parameters[u'OwnerUri']
         self.connection_details = ConnectionDetails(parameters)
 
     def format(self):
@@ -119,9 +133,13 @@ class ConnectionCompleteEvent(object):
         self.error_message = inner_params[u'errorMessage']
         self.error_number = inner_params[u'errorNumber']
         # server information.
-        self.is_cloud = inner_params[u'serverInfo'][u'isCloud'] if u'serverInfo' in inner_params else False
-        self.server_version = inner_params[u'serverInfo'][u'serverVersion'] if u'serverInfo' in inner_params else None
-        self.server_edition = inner_params[u'serverInfo'][u'serverEdition'] if u'serverInfo' in inner_params else None
+        if u'serverInfo' in inner_params and inner_params[u'serverInfo']:
+            self.is_cloud = inner_params[u'serverInfo'][u'isCloud'] if \
+                u'isCloud' in inner_params[u'serverInfo'] else False
+            self.server_version = inner_params[u'serverInfo'][u'serverVersion'] if \
+                u'serverVersion' in inner_params[u'serverInfo'] else None
+            self.server_edition = inner_params[u'serverInfo'][u'serverEdition'] if \
+                u'serverEdition' in inner_params[u'serverInfo'] else None
 
 
 class ConnectionResponse(object):

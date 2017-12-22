@@ -259,7 +259,8 @@ class MssqlCli(object):
         root_logger.debug('Log file %r.', log_file)
 
     def connect(self, database='', server='', user='', port='', passwd='',
-                dsn='', **kwargs):
+                dsn='', encrypt=None, trust_server_certificate=None, connection_timeout=None, application_intent=None,
+                multi_subnet_failover=None, packet_size=None, **kwargs):
         # Connect to the database.
 
         if not user and not self.integrated_auth:
@@ -304,7 +305,13 @@ class MssqlCli(object):
 
             self.mssqlcliclient_query_execution = MssqlCliClient(self.sqltoolsclient, server, user, passwd,
                                                                  database=database,
-                                                                 authentication_type=authentication_type, **kwargs)
+                                                                 authentication_type=authentication_type,
+                                                                 encrypt=encrypt,
+                                                                 trust_server_certificate=trust_server_certificate,
+                                                                 connection_timeout=connection_timeout,
+                                                                 application_intent=application_intent,
+                                                                 multi_subnet_failover=multi_subnet_failover,
+                                                                 packet_size=packet_size,**kwargs)
 
             if not self.mssqlcliclient_query_execution.connect():
                 click.secho(
@@ -674,9 +681,23 @@ class MssqlCli(object):
               help='Skip intro on startup and goodbye on exit.')
 @click.option('--auto-vertical-output', is_flag=True,
               help='Automatically switch to vertical output mode if the result is wider than the terminal width.')
-def cli(username, server, prompt_passwd,
-        database, version, mssqlclirc, row_limit,
-        less_chatty, auto_vertical_output, integrated_auth):
+@click.option('-N', '--encrypt', is_flag=True, default=False,
+              help='SQL Server uses SSL encryption for all data if the server has a certificate installed.')
+@click.option('-C', '--trust-server-certificate', is_flag=True, default=False,
+              help='The channel will be encrypted while bypassing walking the certificate chain to validate trust.')
+@click.option('-l', '--connect-timeout', default=0, type=int,
+              help='Time in seconds to wait for a connection to the server before terminating request.')
+@click.option('-K', '--application-intent', default='',
+              help='Declares the application workload type when connecting to a database in a SQL Server Availability '
+                   'Group.')
+@click.option('-M', '--multi-subnet-failover', is_flag=True, default=False,
+              help='If application is connecting to AlwaysOn AG on different subnets, setting this provides faster '
+                   'detection and connection to currently active server.')
+@click.option('-a', '--packet-size', default=0, type=int,
+              help='Size in bytes of the network packets used to communicate with SQL Server.')
+def cli(username, server, prompt_passwd, database, version, mssqlclirc, row_limit, less_chatty, auto_vertical_output,
+        integrated_auth, encrypt, trust_server_certificate, connect_timeout, application_intent, multi_subnet_failover,
+        packet_size):
 
     if version:
         print('Version:', __version__)
@@ -695,7 +716,10 @@ def cli(username, server, prompt_passwd,
                         mssqlclirc_file=mssqlclirc, less_chatty=less_chatty, auto_vertical_output=auto_vertical_output,
                         integrated_auth=integrated_auth)
 
-    mssqlcli.connect(database, server, username, port='')
+    mssqlcli.connect(database, server, username, port='', encrypt=encrypt,
+                     trust_server_certificate=trust_server_certificate, connection_timeout=connect_timeout,
+                     application_intent=application_intent, multi_subnet_failover=multi_subnet_failover,
+                     packet_size=packet_size)
 
     mssqlcli.logger.debug('Launch Params: \n'
                           '\tdatabase: %r'
