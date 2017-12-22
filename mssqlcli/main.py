@@ -667,6 +667,8 @@ class MssqlCli(object):
 @click.option('-v', '--version', is_flag=True, help='Version of mssql-cli.')
 @click.option('-d', '--database', default='', envvar='MSSQL_CLI_DATABASE',
               help='database name to connect to.')
+@click.option('-A', '--dac-connection', is_flag=True, default=False,
+              help='Connect to SQL Server using the dedicated administrator connection.')
 @click.option('--mssqlclirc', default=config_location() + 'config',
               envvar='MSSQL_CLI_RC', help='Location of mssqlclirc config file.')
 @click.option('--row-limit', default=None, envvar='MSSQL_CLI_ROW_LIMIT', type=click.INT,
@@ -682,7 +684,7 @@ class MssqlCli(object):
 def cli(username, server, prompt_passwd,
         database, version, mssqlclirc, row_limit,
         less_chatty, auto_vertical_output,
-        integrated_auth, enable_sqltoolsservice_logging):
+        integrated_auth, enable_sqltoolsservice_logging, dac_connection):
 
     if version:
         print('Version:', __version__)
@@ -696,6 +698,9 @@ def cli(username, server, prompt_passwd,
     if platform.system().lower() != 'windows' and integrated_auth:
         integrated_auth = False
         print (u'Integrated authentication not supported on this platform')
+
+    if dac_connection and server and not server.lower().startswith("admin:"):
+        server = "admin:" + server
 
     mssqlcli = MssqlCli(prompt_passwd, row_limit=row_limit, single_connection=False,
                         mssqlclirc_file=mssqlclirc, less_chatty=less_chatty, auto_vertical_output=auto_vertical_output,
