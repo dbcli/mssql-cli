@@ -124,7 +124,8 @@ class MssqlCli(object):
     def __init__(self, force_passwd_prompt=False,
                  mssqlclirc_file=None, row_limit=None,
                  single_connection=False, less_chatty=None,
-                 auto_vertical_output=False, sql_tools_client=None, integrated_auth=False):
+                 auto_vertical_output=False, sql_tools_client=None,
+                 integrated_auth=False, enable_sqltoolsservice_logging=False):
 
         self.force_passwd_prompt = force_passwd_prompt
 
@@ -193,7 +194,8 @@ class MssqlCli(object):
         self.cli = None
 
         # mssql-cli
-        self.sqltoolsclient = sql_tools_client if sql_tools_client else SqlToolsClient()
+        self.sqltoolsclient = sql_tools_client if sql_tools_client else SqlToolsClient(
+            enable_logging=enable_sqltoolsservice_logging)
         self.mssqlcliclient_query_execution = None
         self.integrated_auth = integrated_auth
 
@@ -695,9 +697,14 @@ class MssqlCli(object):
                    'detection and connection to currently active server.')
 @click.option('-a', '--packet-size', default=0, type=int,
               help='Size in bytes of the network packets used to communicate with SQL Server.')
+@click.option('-A', '--dac-connection', is_flag=True, default=False,
+              help='Connect to SQL Server using the dedicated administrator connection.')
+@click.option('--enable-sqltoolsservice-logging', is_flag=True,
+              default=False,
+              help='Enables diagnostic logging for the SqlToolsService.')
 def cli(username, server, prompt_passwd, database, version, mssqlclirc, row_limit, less_chatty, auto_vertical_output,
         integrated_auth, encrypt, trust_server_certificate, connect_timeout, application_intent, multi_subnet_failover,
-        packet_size):
+        packet_size, enable_sqltoolsservice_logging, dac_connection):
 
     if version:
         print('Version:', __version__)
@@ -712,9 +719,12 @@ def cli(username, server, prompt_passwd, database, version, mssqlclirc, row_limi
         integrated_auth = False
         print (u'Integrated authentication not supported on this platform')
 
+    if dac_connection and server and not server.lower().startswith("admin:"):
+        server = "admin:" + server
+
     mssqlcli = MssqlCli(prompt_passwd, row_limit=row_limit, single_connection=False,
                         mssqlclirc_file=mssqlclirc, less_chatty=less_chatty, auto_vertical_output=auto_vertical_output,
-                        integrated_auth=integrated_auth)
+                        integrated_auth=integrated_auth, enable_sqltoolsservice_logging=enable_sqltoolsservice_logging)
 
     mssqlcli.connect(database, server, username, port='', encrypt=encrypt,
                      trust_server_certificate=trust_server_certificate, connection_timeout=connect_timeout,
