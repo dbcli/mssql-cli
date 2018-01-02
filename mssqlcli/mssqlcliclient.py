@@ -121,7 +121,8 @@ class MssqlCliClient(object):
                 if not sql:
                     yield None, None, None, sql, False
                     continue
-                yield self.execute_single_batch_query(sql)
+                for rows, columns, status, sql, is_error in self.execute_single_batch_query(sql):
+                    yield rows, columns, status, sql, is_error
 
     def execute_single_batch_query(self, query):
         if not self.is_connected:
@@ -134,22 +135,22 @@ class MssqlCliClient(object):
         query_request = self.sql_tools_client.create_request(u'query_execute_string_request',
                                                              {u'OwnerUri': self.owner_uri, u'Query': query})
         query_request.execute()
-        query_message = None
+        query_messages = []
         while not query_request.completed():
             query_response = query_request.get_response()
             if query_response:
                 if isinstance(query_response, queryservice.QueryExecuteErrorResponseEvent):
-                    return self.tabular_results_generator(column_info=None, result_rows=None,
+                    yield self.tabular_results_generator(column_info=None, result_rows=None,
                                                           query=query, message=query_response.error_message,
                                                           is_error=True)
                 elif isinstance(query_response, queryservice.QueryMessageEvent):
-                    query_message = query_response
+                    query_messages.append(query_response)
             else:
                 sleep(time_wait_if_no_response)
 
         if query_response.exception_message:
             logger.error(u'Query response had an exception')
-            return self.tabular_results_generator(
+            yield self.tabular_results_generator(
                 column_info=None,
                 result_rows=None,
                 query=query,
@@ -158,42 +159,43 @@ class MssqlCliClient(object):
 
         if (not query_response.batch_summaries[0].result_set_summaries) or \
            (query_response.batch_summaries[0].result_set_summaries[0].row_count == 0):
-            return self.tabular_results_generator(
+            yield self.tabular_results_generator(
                 column_info=None,
                 result_rows=None,
                 query=query,
-                message=query_message.message if query_message else u'',
-                is_error=query_message.is_error if query_message else query_response.batch_summaries[0].has_error)
+                message=query_messages[0].message if query_messages else u'',
+                is_error=query_messages[0].is_error if query_messages else query_response.batch_summaries[0].has_error)
 
         else:
-            query_subset_request = self.sql_tools_client.create_request(u'query_subset_request',
-                                                                        {u'OwnerUri': query_response.owner_uri,
-                                                                         u'BatchIndex': query_response.batch_summaries[0].result_set_summaries[0].batch_id,
-                                                                            u'ResultSetIndex': query_response.batch_summaries[0].result_set_summaries[0].id,
-                                                                            u'RowsStartIndex': 0,
-                                                                            u'RowCount': query_response.batch_summaries[0].result_set_summaries[0].row_count})
+            for result_set_summary in query_response.batch_summaries[0].result_set_summaries:
+                query_subset_request = self.sql_tools_client.create_request(u'query_subset_request',
+                                                                            {u'OwnerUri': query_response.owner_uri,
+                                                                             u'BatchIndex': result_set_summary.batch_id,
+                                                                                u'ResultSetIndex': result_set_summary.id,
+                                                                                u'RowsStartIndex': 0,
+                                                                                u'RowCount': result_set_summary.row_count})
 
-            query_subset_request.execute()
-            while not query_subset_request.completed():
-                subset_response = query_subset_request.get_response()
-                if not subset_response:
-                    sleep(time_wait_if_no_response)
+                query_subset_request.execute()
+                while not query_subset_request.completed():
+                    subset_response = query_subset_request.get_response()
+                    if not subset_response:
+                        sleep(time_wait_if_no_response)
 
-            if subset_response.error_message:
-                logger.error(u'Error obtaining result sets for query response')
-                return self.tabular_results_generator(
-                    column_info=None,
-                    result_rows=None,
+                if subset_response.error_message:
+                    logger.error(u'Error obtaining result sets for query response')
+                    yield self.tabular_results_generator(
+                        column_info=None,
+                        result_rows=None,
+                        query=query,
+                        message=subset_response.error_message,
+                        is_error=True)
+
+                logger.info(u'Obtained result set for query')
+                yield self.tabular_results_generator(
+                    column_info=result_set_summary.column_info,
+                    result_rows=subset_response.rows,
                     query=query,
-                    message=subset_response.error_message,
-                    is_error=True)
-
-            logger.info(u'Obtained result set for query')
-            return self.tabular_results_generator(
-                column_info=query_response.batch_summaries[0].result_set_summaries[0].column_info,
-                result_rows=subset_response.rows,
-                query=query,
-                message=query_message.message if query_message else u'')
+                    message=query_messages[result_set_summary.id].message if query_messages else u'')
 
     def tabular_results_generator(
             self, column_info, result_rows, query, message, is_error=False):
