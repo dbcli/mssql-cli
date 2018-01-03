@@ -215,55 +215,63 @@ class MssqlCliClient(object):
         """ Returns a list of schema names"""
         query = mssqlqueries.get_schemas()
         logger.info(u'Schemas query: {0}'.format(query))
-        return [x[0] for x in self.execute_single_batch_query(query)[0]]
+        for tabular_result in self.execute_single_batch_query(query):
+            return [x[0] for x in tabular_result[0]]
 
     def databases(self):
         """ Returns a list of database names"""
         query = mssqlqueries.get_databases()
         logger.info(u'Databases query: {0}'.format(query))
-        return [x[0] for x in self.execute_single_batch_query(query)[0]]
+        for tabular_result in self.execute_single_batch_query(query):
+            return [x[0] for x in tabular_result[0]]
 
     def tables(self):
         """ Yields (schema_name, table_name) tuples"""
         query = mssqlqueries.get_tables()
         logger.info(u'Tables query: {0}'.format(query))
-        for row in self.execute_single_batch_query(query)[0]:
-            yield (row[0], row[1])
+        for tabular_result in self.execute_single_batch_query(query):
+            for row in tabular_result[0]:
+                yield (row[0], row[1])
 
     def table_columns(self):
         """ Yields (schema_name, table_name, column_name, data_type, column_default) tuples"""
         query = mssqlqueries.get_table_columns()
         logger.info(u'Table columns query: {0}'.format(query))
-        for row in self.execute_single_batch_query(query)[0]:
-            yield (row[0], row[1], row[2], row[3], row[4])
+        for tabular_result in self.execute_single_batch_query(query):
+            for row in tabular_result[0]:
+                yield (row[0], row[1], row[2], row[3], row[4])
 
     def views(self):
         """ Yields (schema_name, table_name) tuples"""
         query = mssqlqueries.get_views()
         logger.info(u'Views query: {0}'.format(query))
-        for row in self.execute_single_batch_query(query)[0]:
-            yield (row[0], row[1])
+        for tabular_result in self.execute_single_batch_query(query):
+            for row in tabular_result[0]:
+                yield (row[0], row[1])
 
     def view_columns(self):
         """ Yields (schema_name, table_name, column_name, data_type, column_default) tuples"""
         query = mssqlqueries.get_view_columns()
         logger.info(u'View columns query: {0}'.format(query))
-        for row in self.execute_single_batch_query(query)[0]:
-            yield (row[0], row[1], row[2], row[3], row[4])
+        for tabular_result in self.execute_single_batch_query(query):
+            for row in tabular_result[0]:
+                yield (row[0], row[1], row[2], row[3], row[4])
 
     def user_defined_types(self):
         """ Yields (schema_name, type_name) tuples"""
         query = mssqlqueries.get_user_defined_types()
         logger.info(u'UDTs query: {0}'.format(query))
-        for row in self.execute_single_batch_query(query)[0]:
-            yield (row[0], row[1])
+        for tabular_result in self.execute_single_batch_query(query):
+            for row in tabular_result[0]:
+                yield (row[0], row[1])
 
     def foreignkeys(self):
         """ Yields (parent_schema, parent_table, parent_column, child_schema, child_table, child_column) typles"""
         query = mssqlqueries.get_foreignkeys()
         logger.info(u'Foreign keys query: {0}'.format(query))
-        for row in self.execute_single_batch_query(query)[0]:
-            yield ForeignKey(*row)
+        for tabular_result in self.execute_single_batch_query(query):
+            for row in tabular_result[0]:
+                yield ForeignKey(*row)
 
     def shutdown(self):
         self.sql_tools_client.shutdown()

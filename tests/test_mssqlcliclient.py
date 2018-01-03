@@ -88,10 +88,9 @@ class MssqlCliClientTests(unittest.TestCase):
                 select 3, 'Night'
             """
 
-            rows, col, message, query, is_error = client.execute_single_batch_query(test_query)
-
-            self.assertTrue(len(rows), 3)
-            self.assertTrue(query, test_query)
+            for rows, col, message, query, is_error in client.execute_single_batch_query(test_query):
+                self.assertTrue(len(rows), 3)
+                self.assertTrue(query, test_query)
         finally:
             shutdown(client)
 
@@ -118,11 +117,11 @@ class MssqlCliClientTests(unittest.TestCase):
         """
         try:
             client = create_mssql_cli_client()
-            client.execute_single_batch_query('CREATE TABLE tabletest1 (a int, b varchar(25));')
-            client.execute_single_batch_query('CREATE TABLE tabletest2 (x int, y varchar(25), z bit);')
-            client.execute_single_batch_query('CREATE VIEW viewtest as SELECT a from tabletest1;')
-            client.execute_single_batch_query('CREATE SCHEMA schematest;')
-            client.execute_single_batch_query('CREATE TABLE schematest.tabletest1 (a int);')
+            list(client.execute_single_batch_query('CREATE TABLE tabletest1 (a int, b varchar(25));'))
+            list(client.execute_single_batch_query('CREATE TABLE tabletest2 (x int, y varchar(25), z bit);'))
+            list(client.execute_single_batch_query('CREATE VIEW viewtest as SELECT a from tabletest1;'))
+            list(client.execute_single_batch_query('CREATE SCHEMA schematest;'))
+            list(client.execute_single_batch_query('CREATE TABLE schematest.tabletest1 (a int);'))
 
             assert ('schematest', 'tabletest1') in set(client.tables())
             assert ('dbo', 'viewtest') in set(client.views())
@@ -131,11 +130,11 @@ class MssqlCliClientTests(unittest.TestCase):
             assert 'schematest' in client.schemas()
 
         finally:
-            client.execute_single_batch_query('DROP TABLE tabletest1;')
-            client.execute_single_batch_query('DROP TABLE tabletest2;')
-            client.execute_single_batch_query('DROP VIEW viewtest IF EXISTS;')
-            client.execute_single_batch_query('DROP TABLE schematest.tabletest1;')
-            client.execute_single_batch_query('DROP SCHEMA schematest;')
+            list(client.execute_single_batch_query('DROP TABLE tabletest1;'))
+            list(client.execute_single_batch_query('DROP TABLE tabletest2;'))
+            list(client.execute_single_batch_query('DROP VIEW viewtest IF EXISTS;'))
+            list(client.execute_single_batch_query('DROP TABLE schematest.tabletest1;'))
+            list(client.execute_single_batch_query('DROP SCHEMA schematest;'))
             shutdown(client)
 
     def test_mssqlcliclient_reset_connection(self):
