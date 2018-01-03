@@ -13,4 +13,12 @@ if [ -z ${PYTHONIOENCODING+x} ]; then export PYTHONIOENCODING=utf8; fi
 
 export PYTHONPATH="${DIR}:${PYTHONPATH}"
 
-python -m mssqlcli.main "$@"
+# Usually, this script is installed by setuptools right next to a Python interpreter.
+# In case of using virtualenvs, it's essential to use that one instead of the one
+# that's first in $PATH, so we do not accidentally end up using the wrong packages.
+if [[ -x ${DIR}/python ]] ; then
+    ${DIR}/python -m mssqlcli.main "$@"
+else
+    # Use the default interpreter as fallback.
+    python -m mssqlcli.main "$@"
+fi
