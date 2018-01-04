@@ -88,10 +88,9 @@ class MssqlCliClientTests(unittest.TestCase):
                 select 3, 'Night'
             """
 
-            rows, col, message, query, is_error = client.execute_single_batch_query(test_query)
-
-            self.assertTrue(len(rows), 3)
-            self.assertTrue(query, test_query)
+            for rows, col, message, query, is_error in client.execute_single_batch_query(test_query):
+                self.assertTrue(len(rows), 3)
+                self.assertTrue(query, test_query)
         finally:
             shutdown(client)
 
@@ -118,11 +117,11 @@ class MssqlCliClientTests(unittest.TestCase):
         """
         try:
             client = create_mssql_cli_client()
-            client.execute_single_batch_query('CREATE TABLE tabletest1 (a int, b varchar(25));')
-            client.execute_single_batch_query('CREATE TABLE tabletest2 (x int, y varchar(25), z bit);')
-            client.execute_single_batch_query('CREATE VIEW viewtest as SELECT a from tabletest1;')
-            client.execute_single_batch_query('CREATE SCHEMA schematest;')
-            client.execute_single_batch_query('CREATE TABLE schematest.tabletest1 (a int);')
+            list(client.execute_single_batch_query('CREATE TABLE tabletest1 (a int, b varchar(25));'))
+            list(client.execute_single_batch_query('CREATE TABLE tabletest2 (x int, y varchar(25), z bit);'))
+            list(client.execute_single_batch_query('CREATE VIEW viewtest as SELECT a from tabletest1;'))
+            list(client.execute_single_batch_query('CREATE SCHEMA schematest;'))
+            list(client.execute_single_batch_query('CREATE TABLE schematest.tabletest1 (a int);'))
 
             assert ('schematest', 'tabletest1') in set(client.tables())
             assert ('dbo', 'viewtest') in set(client.views())
@@ -131,11 +130,11 @@ class MssqlCliClientTests(unittest.TestCase):
             assert 'schematest' in client.schemas()
 
         finally:
-            client.execute_single_batch_query('DROP TABLE tabletest1;')
-            client.execute_single_batch_query('DROP TABLE tabletest2;')
-            client.execute_single_batch_query('DROP VIEW viewtest IF EXISTS;')
-            client.execute_single_batch_query('DROP TABLE schematest.tabletest1;')
-            client.execute_single_batch_query('DROP SCHEMA schematest;')
+            list(client.execute_single_batch_query('DROP TABLE tabletest1;'))
+            list(client.execute_single_batch_query('DROP TABLE tabletest2;'))
+            list(client.execute_single_batch_query('DROP VIEW viewtest IF EXISTS;'))
+            list(client.execute_single_batch_query('DROP TABLE schematest.tabletest1;'))
+            list(client.execute_single_batch_query('DROP SCHEMA schematest;'))
             shutdown(client)
 
     def test_mssqlcliclient_reset_connection(self):
@@ -155,12 +154,54 @@ class MssqlCliClientTests(unittest.TestCase):
         try:
             client = create_mssql_cli_client()
             multi_statement_query = u"select 'Morning' as [Name] UNION ALL select 'Evening'; select 1;"
+            multi_statement_query2 = u"select 1; select 'foo' from teapot;"
+            multi_statement_query3 = u"select 'foo' from teapot; select 2;"
             for rows, col, message, query, is_error in \
                 client.execute_multi_statement_single_batch(multi_statement_query):
                 if query == u"select 'Morning' as [Name] UNION ALL select 'Evening'":
                     self.assertTrue(len(rows), 2)
                 else:
                     self.assertTrue(len(rows), 1)
+
+            for rows, col, message, query, is_error in \
+                    client.execute_multi_statement_single_batch(multi_statement_query2):
+                if query == u"select 1":
+                    self.assertTrue(len(rows) == 1)
+                else:
+                    self.assertTrue(is_error)
+
+            for rows, col, message, query, is_error in \
+                    client.execute_multi_statement_single_batch(multi_statement_query3):
+                if query == u"select 2":
+                    self.assertTrue(len(rows) == 1)
+                else:
+                    self.assertTrue(is_error)
+
+        finally:
+            shutdown(client)
+
+    def test_stored_proc_multiple_result_sets(self):
+        """
+            Verify the results of running a stored proc with multiple result sets
+        """
+        try:
+            client = create_mssql_cli_client()
+            create_stored_proc = u"CREATE PROC sp_mssqlcli_multiple_results " \
+                          u"AS " \
+                          u"BEGIN " \
+                          u"SELECT 'Morning' as [Name] UNION ALL select 'Evening' " \
+                          u"SELECT 'Dawn' as [Name] UNION ALL select 'Dusk' UNION ALL select 'Midnight' " \
+                          u"END"
+            exec_stored_proc = u"EXEC sp_mssqlcli_multiple_results"
+            del_stored_proc = u"DROP PROCEDURE sp_mssqlcli_multiple_results"
+
+            list(client.execute_single_batch_query(create_stored_proc))
+            row_counts = []
+            for rows, columns, message, query, is_error in client.execute_single_batch_query(exec_stored_proc):
+                row_counts.append(len(rows))
+            self.assertTrue(row_counts[0] == 2)
+            self.assertTrue(row_counts[1] == 3)
+            list(client.execute_single_batch_query(del_stored_proc))
         finally:
             shutdown(client)
 

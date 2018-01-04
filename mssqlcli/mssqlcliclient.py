@@ -121,7 +121,8 @@ class MssqlCliClient(object):
                 if not sql:
                     yield None, None, None, sql, False
                     continue
-                yield self.execute_single_batch_query(sql)
+                for rows, columns, status, sql, is_error in self.execute_single_batch_query(sql):
+                    yield rows, columns, status, sql, is_error
 
     def execute_single_batch_query(self, query):
         if not self.is_connected:
@@ -134,22 +135,22 @@ class MssqlCliClient(object):
         query_request = self.sql_tools_client.create_request(u'query_execute_string_request',
                                                              {u'OwnerUri': self.owner_uri, u'Query': query})
         query_request.execute()
-        query_message = None
+        query_messages = []
         while not query_request.completed():
             query_response = query_request.get_response()
             if query_response:
                 if isinstance(query_response, queryservice.QueryExecuteErrorResponseEvent):
-                    return self.tabular_results_generator(column_info=None, result_rows=None,
+                    yield self.tabular_results_generator(column_info=None, result_rows=None,
                                                           query=query, message=query_response.error_message,
                                                           is_error=True)
                 elif isinstance(query_response, queryservice.QueryMessageEvent):
-                    query_message = query_response
+                    query_messages.append(query_response)
             else:
                 sleep(time_wait_if_no_response)
 
         if query_response.exception_message:
             logger.error(u'Query response had an exception')
-            return self.tabular_results_generator(
+            yield self.tabular_results_generator(
                 column_info=None,
                 result_rows=None,
                 query=query,
@@ -158,42 +159,43 @@ class MssqlCliClient(object):
 
         if (not query_response.batch_summaries[0].result_set_summaries) or \
            (query_response.batch_summaries[0].result_set_summaries[0].row_count == 0):
-            return self.tabular_results_generator(
+            yield self.tabular_results_generator(
                 column_info=None,
                 result_rows=None,
                 query=query,
-                message=query_message.message if query_message else u'',
-                is_error=query_message.is_error if query_message else query_response.batch_summaries[0].has_error)
+                message=query_messages[0].message if query_messages else u'',
+                is_error=query_messages[0].is_error if query_messages else query_response.batch_summaries[0].has_error)
 
         else:
-            query_subset_request = self.sql_tools_client.create_request(u'query_subset_request',
-                                                                        {u'OwnerUri': query_response.owner_uri,
-                                                                         u'BatchIndex': query_response.batch_summaries[0].result_set_summaries[0].batch_id,
-                                                                            u'ResultSetIndex': query_response.batch_summaries[0].result_set_summaries[0].id,
-                                                                            u'RowsStartIndex': 0,
-                                                                            u'RowCount': query_response.batch_summaries[0].result_set_summaries[0].row_count})
+            for result_set_summary in query_response.batch_summaries[0].result_set_summaries:
+                query_subset_request = self.sql_tools_client.create_request(u'query_subset_request',
+                                                                            {u'OwnerUri': query_response.owner_uri,
+                                                                             u'BatchIndex': result_set_summary.batch_id,
+                                                                                u'ResultSetIndex': result_set_summary.id,
+                                                                                u'RowsStartIndex': 0,
+                                                                                u'RowCount': result_set_summary.row_count})
 
-            query_subset_request.execute()
-            while not query_subset_request.completed():
-                subset_response = query_subset_request.get_response()
-                if not subset_response:
-                    sleep(time_wait_if_no_response)
+                query_subset_request.execute()
+                while not query_subset_request.completed():
+                    subset_response = query_subset_request.get_response()
+                    if not subset_response:
+                        sleep(time_wait_if_no_response)
 
-            if subset_response.error_message:
-                logger.error(u'Error obtaining result sets for query response')
-                return self.tabular_results_generator(
-                    column_info=None,
-                    result_rows=None,
+                if subset_response.error_message:
+                    logger.error(u'Error obtaining result sets for query response')
+                    yield self.tabular_results_generator(
+                        column_info=None,
+                        result_rows=None,
+                        query=query,
+                        message=subset_response.error_message,
+                        is_error=True)
+
+                logger.info(u'Obtained result set for query')
+                yield self.tabular_results_generator(
+                    column_info=result_set_summary.column_info,
+                    result_rows=subset_response.rows,
                     query=query,
-                    message=subset_response.error_message,
-                    is_error=True)
-
-            logger.info(u'Obtained result set for query')
-            return self.tabular_results_generator(
-                column_info=query_response.batch_summaries[0].result_set_summaries[0].column_info,
-                result_rows=subset_response.rows,
-                query=query,
-                message=query_message.message if query_message else u'')
+                    message=query_messages[result_set_summary.id].message if query_messages else u'')
 
     def tabular_results_generator(
             self, column_info, result_rows, query, message, is_error=False):
@@ -213,55 +215,63 @@ class MssqlCliClient(object):
         """ Returns a list of schema names"""
         query = mssqlqueries.get_schemas()
         logger.info(u'Schemas query: {0}'.format(query))
-        return [x[0] for x in self.execute_single_batch_query(query)[0]]
+        for tabular_result in self.execute_single_batch_query(query):
+            return [x[0] for x in tabular_result[0]]
 
     def databases(self):
         """ Returns a list of database names"""
         query = mssqlqueries.get_databases()
         logger.info(u'Databases query: {0}'.format(query))
-        return [x[0] for x in self.execute_single_batch_query(query)[0]]
+        for tabular_result in self.execute_single_batch_query(query):
+            return [x[0] for x in tabular_result[0]]
 
     def tables(self):
         """ Yields (schema_name, table_name) tuples"""
         query = mssqlqueries.get_tables()
         logger.info(u'Tables query: {0}'.format(query))
-        for row in self.execute_single_batch_query(query)[0]:
-            yield (row[0], row[1])
+        for tabular_result in self.execute_single_batch_query(query):
+            for row in tabular_result[0]:
+                yield (row[0], row[1])
 
     def table_columns(self):
         """ Yields (schema_name, table_name, column_name, data_type, column_default) tuples"""
         query = mssqlqueries.get_table_columns()
         logger.info(u'Table columns query: {0}'.format(query))
-        for row in self.execute_single_batch_query(query)[0]:
-            yield (row[0], row[1], row[2], row[3], row[4])
+        for tabular_result in self.execute_single_batch_query(query):
+            for row in tabular_result[0]:
+                yield (row[0], row[1], row[2], row[3], row[4])
 
     def views(self):
         """ Yields (schema_name, table_name) tuples"""
         query = mssqlqueries.get_views()
         logger.info(u'Views query: {0}'.format(query))
-        for row in self.execute_single_batch_query(query)[0]:
-            yield (row[0], row[1])
+        for tabular_result in self.execute_single_batch_query(query):
+            for row in tabular_result[0]:
+                yield (row[0], row[1])
 
     def view_columns(self):
         """ Yields (schema_name, table_name, column_name, data_type, column_default) tuples"""
         query = mssqlqueries.get_view_columns()
         logger.info(u'View columns query: {0}'.format(query))
-        for row in self.execute_single_batch_query(query)[0]:
-            yield (row[0], row[1], row[2], row[3], row[4])
+        for tabular_result in self.execute_single_batch_query(query):
+            for row in tabular_result[0]:
+                yield (row[0], row[1], row[2], row[3], row[4])
 
     def user_defined_types(self):
         """ Yields (schema_name, type_name) tuples"""
         query = mssqlqueries.get_user_defined_types()
         logger.info(u'UDTs query: {0}'.format(query))
-        for row in self.execute_single_batch_query(query)[0]:
-            yield (row[0], row[1])
+        for tabular_result in self.execute_single_batch_query(query):
+            for row in tabular_result[0]:
+                yield (row[0], row[1])
 
     def foreignkeys(self):
         """ Yields (parent_schema, parent_table, parent_column, child_schema, child_table, child_column) typles"""
         query = mssqlqueries.get_foreignkeys()
         logger.info(u'Foreign keys query: {0}'.format(query))
-        for row in self.execute_single_batch_query(query)[0]:
-            yield ForeignKey(*row)
+        for tabular_result in self.execute_single_batch_query(query):
+            for row in tabular_result[0]:
+                yield ForeignKey(*row)
 
     def shutdown(self):
         self.sql_tools_client.shutdown()

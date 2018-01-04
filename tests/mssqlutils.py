@@ -51,14 +51,14 @@ def run_and_return_string_from_formatter(client, sql, join=False, expanded=False
     :return:
     """
 
-    rows, col, message, query, is_error = client.execute_single_batch_query(sql)
-    settings = OutputSettings(table_format='psql', dcmlfmt='d', floatfmt='g',
-                              expanded=expanded)
-    formatted = format_output(None, rows, col, message, settings)
-    if join:
-        formatted = '\n'.join(formatted)
+    for rows, col, message, query, is_error in client.execute_single_batch_query(sql):
+        settings = OutputSettings(table_format='psql', dcmlfmt='d', floatfmt='g',
+                                  expanded=expanded)
+        formatted = format_output(None, rows, col, message, settings)
+        if join:
+            formatted = '\n'.join(formatted)
 
-    return formatted
+        return formatted
 
 
 def shutdown(connection):
