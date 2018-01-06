@@ -167,10 +167,6 @@ class MssqlCli(object):
 
         self.query_history = []
 
-        # Initialize completer
-        # Smart completion is not-supported in Public Preview. Tracked by
-        # GitHub issue number 47.
-        smart_completion = False
         keyword_casing = c['main']['keyword_casing']
         self.settings = {
             'casing_file': get_casing_file(c),
@@ -185,7 +181,7 @@ class MssqlCli(object):
             'keyword_casing': keyword_casing,
         }
 
-        completer = MssqlCompleter(smart_completion, settings=self.settings)
+        completer = MssqlCompleter(settings=self.settings)
 
         self.completer = completer
         self._completer_lock = threading.Lock()
