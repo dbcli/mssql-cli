@@ -12,13 +12,14 @@ using the [roadmap label](https://github.com/dbcli/mssql-cli/labels/roadmap).
   * Support special commands
   * Smart completion
 * Engineering Fundamentals
-  * Jenkins
+  * Travis
   * AppVeyor
   * Code coverage > 80%
 
 ## Milestone 2
 * Packaging
   * self-contained python runtimes
+  * docker
 * Package manager support
   * brew
   * apt-get
