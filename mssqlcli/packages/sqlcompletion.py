@@ -424,9 +424,8 @@ def suggest_based_on_last_token(token, stmt):
             else:
                 return (Alias(aliases=aliases),)
 
-    elif token_v in ('c', 'use', 'database', 'template'):
-        # "\c <db", "use <db>", "DROP DATABASE <db>",
-        # "CREATE DATABASE <newdb> WITH TEMPLATE <db>"
+    elif token_v in ('use', 'database'):
+        # "use <db>", "DROP DATABASE <db>",
         return (Database(),)
     elif token_v == 'schema':
         # DROP SCHEMA schema_name, SET SCHEMA schema name
