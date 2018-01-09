@@ -321,7 +321,8 @@ def suggest_based_on_last_token(token, stmt):
                        local_tables=stmt.local_tables, qualifiable=True),)
     elif token_v == 'set':
         return (Column(table_refs=stmt.get_tables(),
-                       local_tables=stmt.local_tables),)
+                       local_tables=stmt.local_tables),
+                Keyword(token_v.upper()))
     elif token_v in ('select', 'where', 'having', 'by', 'distinct'):
         # Check for a table alias or schema qualification
         parent = (stmt.identifier and stmt.identifier.get_parent_name()) or []
