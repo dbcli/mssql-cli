@@ -29,7 +29,7 @@ from prompt_toolkit.layout.processors import (
     ConditionalProcessor, HighlightMatchingBracketProcessor)
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
-from pygments.lexers.sql import PostgresLexer
+from pygments.lexers.sql import TransactSqlLexer
 from pygments.token import Token
 
 from .mssqlcompleter import MssqlCompleter
@@ -448,7 +448,7 @@ class MssqlCli(object):
             None)
 
         layout = create_prompt_layout(
-            lexer=PygmentsLexer(PostgresLexer),
+            lexer=PygmentsLexer(TransactSqlLexer),
             reserve_space_for_menu=self.min_num_menu_lines,
             get_prompt_tokens=prompt_tokens,
             get_continuation_tokens=get_continuation_tokens,
