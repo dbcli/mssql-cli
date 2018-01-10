@@ -24,7 +24,13 @@ class MssqlCliClient(object):
                  authentication_type=u'SqlLogin', database=u'master', owner_uri=None, multiple_active_result_sets=True,
                  encrypt=None, trust_server_certificate=None, connection_timeout=None, application_intent=None,
                  multi_subnet_failover=None, packet_size=None, **kwargs):
+
         self.server_name = server_name
+        if ',' in server_name:
+            self.host, self.port = self.server_name.split(',')
+        else:
+            self.host = server_name
+            self.port = 1433
         self.user_name = user_name
         self.password = password
         self.authentication_type = authentication_type
