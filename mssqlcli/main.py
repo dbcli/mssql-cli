@@ -521,8 +521,8 @@ class MssqlCli(object):
             click.secho(u'No connection to server. Exiting.')
             exit(1)
 
-        for rows, columns, status, sql, is_error in self.mssqlcliclient_query_execution.execute_multi_statement_single_batch(
-                text):
+        for rows, columns, status, sql, is_error in \
+                self.mssqlcliclient_query_execution.execute_multi_statement_single_batch(text):
             total = time() - start
             if self._should_show_limit_prompt(status, rows):
                 click.secho('The result set has more than %s rows.'
