@@ -566,7 +566,7 @@ class MssqlCli(object):
                 meta_changed = meta_changed or has_meta_cmd(text)
 
         return output, MetaQuery(
-            sql, all_success, total, meta_changed, db_changed, path_changed, mutated)
+            text, all_success, total, meta_changed, db_changed, path_changed, mutated)
 
     def _handle_server_closed_connection(self):
         """Used during CLI execution"""

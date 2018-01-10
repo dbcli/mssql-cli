@@ -30,7 +30,8 @@ class QueryExecuteStringRequest(Request):
             if response:
                 decoded_response = self.decode_response(response)
 
-            if isinstance(decoded_response, QueryCompleteEvent):
+            if isinstance(decoded_response, QueryCompleteEvent) or \
+               isinstance(decoded_response, QueryExecuteErrorResponseEvent):
                 self.finished = True
                 self.json_rpc_client.request_finished(self.id)
 
@@ -77,7 +78,7 @@ class QueryExecuteStringParams(object):
 class QueryExecuteErrorResponseEvent(object):
     def __init__(self, parameters):
         inner_params = parameters[u'error']
-        self.error_message = inner_params[u'message'] if u'message' in inner_params else ''
+        self.exception_message = inner_params[u'message'] if u'message' in inner_params else ''
         self.error_code = inner_params[u'code'] if u'code' in inner_params else ''
 
 
