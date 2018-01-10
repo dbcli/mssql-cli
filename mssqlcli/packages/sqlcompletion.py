@@ -144,6 +144,7 @@ def suggest_type(full_text, text_before_cursor):
     # here should be removed once sqlparse has been fixed
     try:
         stmt = SqlStatement(full_text, text_before_cursor)
+
     except (TypeError, AttributeError):
         return []
 
@@ -296,7 +297,7 @@ def suggest_based_on_last_token(token, stmt):
         # Get the token before the parens
         prev_tok = p.token_prev(len(p.tokens) - 1)[1]
 
-        if (prev_tok and prev_tok.value and prev_tok.value.lower().split(' ')[-1] == 'using'):
+        if prev_tok and prev_tok.value and prev_tok.value.lower().split(' ')[-1] == 'using':
             # tbl1 INNER JOIN tbl2 USING (col1, col2)
             tables = stmt.get_tables('before')
 
@@ -341,8 +342,8 @@ def suggest_based_on_last_token(token, stmt):
     elif token_v == 'as':
         # Don't suggest anything for aliases
         return ()
-    elif (token_v.endswith('join') and token.is_keyword) or (token_v in
-                                                             ('copy', 'from', 'update', 'into', 'describe', 'truncate')):
+    elif (token_v.endswith('join') and token.is_keyword) or \
+            (token_v in ('copy', 'from', 'update', 'into', 'describe', 'truncate')):
 
         schema = stmt.get_identifier_schema()
         tables = extract_tables(stmt.text_before_cursor)
@@ -374,12 +375,17 @@ def suggest_based_on_last_token(token, stmt):
     elif token_v == 'function':
         schema = stmt.get_identifier_schema()
         # stmt.get_previous_token will fail for e.g. `SELECT 1 FROM functions
-        # WHERE function:`
+        # WHERE function:` and 'function'
         try:
             prev = stmt.get_previous_token(token).value.lower()
-            if prev in('drop', 'alter', 'create', 'create or replace'):
-                return (Function(schema=schema, usage='signature'),)
+            if prev in('drop', 'alter', 'create', 'create or alter'):
+                if schema:
+                    return (Function(schema=schema, usage='signature'),)
+                else:
+                    return (Schema(),)
         except ValueError:
+            pass
+        except AttributeError:
             pass
         return tuple()
 
@@ -430,20 +436,15 @@ def suggest_based_on_last_token(token, stmt):
         return (Database(),)
     elif token_v == 'schema':
         # DROP SCHEMA schema_name, SET SCHEMA schema name
-        prev_keyword = stmt.reduce_to_prev_keyword(n_skip=2)
-        quoted = prev_keyword and prev_keyword.value.lower() == 'set'
-        return (Schema(quoted),)
+        return (Schema(),)
     elif token_v.endswith(',') or token_v in ('=', 'and', 'or'):
         prev_keyword = stmt.reduce_to_prev_keyword()
         if prev_keyword:
             return suggest_based_on_last_token(prev_keyword, stmt)
         else:
             return ()
-    elif token_v in ('type', '::'):
-        #   ALTER TABLE foo SET DATA TYPE bar
-        #   SELECT foo::bar
-        # Note that tables are a form of composite type in postgresql, so
-        # they're suggested here as well
+    elif token_v == 'type':
+        #   CREATE TYPE
         schema = stmt.get_identifier_schema()
         suggestions = [Datatype(schema=schema),
                        Table(schema=schema)]
