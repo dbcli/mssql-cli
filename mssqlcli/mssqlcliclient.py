@@ -1,5 +1,5 @@
+import getpass
 import logging
-import os
 import time
 import uuid
 from time import sleep
@@ -34,7 +34,7 @@ class MssqlCliClient(object):
             self.prompt_host = server_name
             self.prompt_port = 1433
         if authentication_type == u'Integrated':
-            self.user_name = os.getlogin()
+            self.user_name = getpass.getuser()
         else:
             self.user_name = user_name
         self.password = password
