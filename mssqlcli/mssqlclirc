@@ -103,7 +103,7 @@ row_limit = 1000
 # Skip intro on startup and goodbye on exit
 less_chatty = False
 
-# mysql-cli prompt
+# mssql-cli prompt
 # \t - Current date and time
 # \u - Username
 # \h - Hostname of the server

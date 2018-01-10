@@ -655,9 +655,9 @@ class MssqlCli(object):
         # mssql-cli
         string = string.replace('\\t', self.now.strftime('%x %X'))
         string = string.replace('\\u', self.mssqlcliclient_query_execution.user_name or '(none)')
-        string = string.replace('\\h', self.mssqlcliclient_query_execution.host or '(none)')
+        string = string.replace('\\h', self.mssqlcliclient_query_execution.prompt_host or '(none)')
         string = string.replace('\\d', self.mssqlcliclient_query_execution.database or '(none)')
-        string = string.replace('\\p', str(self.mssqlcliclient_query_execution.port) or '(none)')
+        string = string.replace('\\p', str(self.mssqlcliclient_query_execution.prompt_port) or '(none)')
         string = string.replace('\\n', "\n")
         return string
 
@@ -706,7 +706,7 @@ class MssqlCli(object):
 @click.option('--enable-sqltoolsservice-logging', is_flag=True,
               default=False,
               help='Enables diagnostic logging for the SqlToolsService.')
-@click.option('--prompt', help='Prompt format (Default: "\\d> ").')
+@click.option('--prompt', help='Prompt format (Default: "{}").'.format(MssqlCli.default_prompt))
 def cli(username, server, prompt_passwd, database, version, mssqlclirc, row_limit, less_chatty, auto_vertical_output,
         integrated_auth, encrypt, trust_server_certificate, connect_timeout, application_intent, multi_subnet_failover,
         packet_size, enable_sqltoolsservice_logging, dac_connection, prompt):
