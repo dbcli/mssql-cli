@@ -344,7 +344,6 @@ def suggest_based_on_last_token(token, stmt):
         return ()
     elif (token_v.endswith('join') and token.is_keyword) or \
             (token_v in ('copy', 'from', 'update', 'into', 'describe', 'truncate')):
-
         schema = stmt.get_identifier_schema()
         tables = extract_tables(stmt.text_before_cursor)
         is_join = token_v.endswith('join') and token.is_keyword
