@@ -132,8 +132,8 @@ class MssqlCliClient(object):
                 if not sql:
                     yield None, None, None, sql, False
                     continue
-                for rows, columns, status, sql, is_error in self.execute_single_batch_query(sql):
-                    yield rows, columns, status, sql, is_error
+                for rows, columns, status, statement, is_error in self.execute_single_batch_query(sql):
+                    yield rows, columns, status, statement, is_error
 
     def execute_single_batch_query(self, query):
         if not self.is_connected:
@@ -150,18 +150,14 @@ class MssqlCliClient(object):
         while not query_request.completed():
             query_response = query_request.get_response()
             if query_response:
-                if isinstance(query_response, queryservice.QueryExecuteErrorResponseEvent):
-                    yield self.tabular_results_generator(column_info=None, result_rows=None,
-                                                          query=query, message=query_response.error_message,
-                                                          is_error=True)
-                elif isinstance(query_response, queryservice.QueryMessageEvent):
+                if isinstance(query_response, queryservice.QueryMessageEvent):
                     query_messages.append(query_response)
             else:
                 sleep(time_wait_if_no_response)
 
         if query_response.exception_message:
             logger.error(u'Query response had an exception')
-            yield self.tabular_results_generator(
+            return self.tabular_results_generator(
                 column_info=None,
                 result_rows=None,
                 query=query,

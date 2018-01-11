@@ -312,7 +312,7 @@ class MssqlCli(object):
                                                                  connection_timeout=connection_timeout,
                                                                  application_intent=application_intent,
                                                                  multi_subnet_failover=multi_subnet_failover,
-                                                                 packet_size=packet_size,**kwargs)
+                                                                 packet_size=packet_size, **kwargs)
 
             if not self.mssqlcliclient_query_execution.connect():
                 click.secho(
@@ -524,8 +524,8 @@ class MssqlCli(object):
             click.secho(u'No connection to server. Exiting.')
             exit(1)
 
-        for rows, columns, status, sql, is_error in self.mssqlcliclient_query_execution.execute_multi_statement_single_batch(
-                text):
+        for rows, columns, status, sql, is_error in \
+                self.mssqlcliclient_query_execution.execute_multi_statement_single_batch(text):
             total = time() - start
             if self._should_show_limit_prompt(status, rows):
                 click.secho('The result set has more than %s rows.'
@@ -569,7 +569,7 @@ class MssqlCli(object):
                 meta_changed = meta_changed or has_meta_cmd(text)
 
         return output, MetaQuery(
-            sql, all_success, total, meta_changed, db_changed, path_changed, mutated)
+            text, all_success, total, meta_changed, db_changed, path_changed, mutated)
 
     def _handle_server_closed_connection(self):
         """Used during CLI execution"""
