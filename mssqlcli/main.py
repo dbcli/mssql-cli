@@ -309,7 +309,7 @@ class MssqlCli(object):
                                                                  connection_timeout=connection_timeout,
                                                                  application_intent=application_intent,
                                                                  multi_subnet_failover=multi_subnet_failover,
-                                                                 packet_size=packet_size,**kwargs)
+                                                                 packet_size=packet_size, **kwargs)
 
             if not self.mssqlcliclient_query_execution.connect():
                 click.secho(
