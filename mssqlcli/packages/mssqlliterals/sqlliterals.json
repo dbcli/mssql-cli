@@ -396,7 +396,9 @@
     "WHEN": [],
     "WHERE": [],
     "WHILE": [],
-    "WITH": [],
+    "WITH": [
+      "PASSWORD"
+    ],
     "WITHIN GROUP": [],
     "WRITETEXT": []
   },
