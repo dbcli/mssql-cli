@@ -1,14 +1,16 @@
+import getpass
 import logging
-from time import sleep
 import time
 import uuid
+from time import sleep
+
 import click
 import sqlparse
 
 from mssqlcli import mssqlqueries
 from mssqlcli.jsonrpc.contracts import connectionservice, queryexecutestringservice as queryservice
-from mssqlcli.sqltoolsclient import SqlToolsClient
 from mssqlcli.packages.parseutils.meta import ForeignKey
+from mssqlcli.sqltoolsclient import SqlToolsClient
 
 logger = logging.getLogger(u'mssqlcli.mssqlcliclient')
 time_wait_if_no_response = 0.05
@@ -24,8 +26,17 @@ class MssqlCliClient(object):
                  authentication_type=u'SqlLogin', database=u'master', owner_uri=None, multiple_active_result_sets=True,
                  encrypt=None, trust_server_certificate=None, connection_timeout=None, application_intent=None,
                  multi_subnet_failover=None, packet_size=None, **kwargs):
+
         self.server_name = server_name
-        self.user_name = user_name
+        if ',' in server_name:
+            self.prompt_host, self.prompt_port = self.server_name.split(',')
+        else:
+            self.prompt_host = server_name
+            self.prompt_port = 1433
+        if authentication_type == u'Integrated':
+            self.user_name = getpass.getuser()
+        else:
+            self.user_name = user_name
         self.password = password
         self.authentication_type = authentication_type
         self.database = database

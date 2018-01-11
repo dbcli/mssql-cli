@@ -98,6 +98,7 @@ Microsoft Privacy statement: https://privacy.microsoft.com/en-us/privacystatemen
 class MssqlCli(object):
 
     max_len_prompt = 30
+    default_prompt = '\\d> '
 
     def set_default_pager(self, config):
         configured_pager = config['main'].get('pager')
@@ -125,7 +126,8 @@ class MssqlCli(object):
                  mssqlclirc_file=None, row_limit=None,
                  single_connection=False, less_chatty=None,
                  auto_vertical_output=False, sql_tools_client=None,
-                 integrated_auth=False, enable_sqltoolsservice_logging=False):
+                 integrated_auth=False, enable_sqltoolsservice_logging=False,
+                 prompt=None):
 
         self.force_passwd_prompt = force_passwd_prompt
 
@@ -143,6 +145,7 @@ class MssqlCli(object):
         self.vi_mode = c['main'].as_bool('vi')
         self.auto_expand = auto_vertical_output or c['main']['expand'] == 'auto'
         self.expanded_output = c['main']['expand'] == 'always'
+        self.prompt_format = prompt or c['main'].get('prompt', self.default_prompt)
         if row_limit is not None:
             self.row_limit = row_limit
         else:
@@ -435,7 +438,7 @@ class MssqlCli(object):
             set_vi_mode_enabled=set_vi_mode)
 
         def prompt_tokens(_):
-            prompt = self.get_prompt()
+            prompt = self.get_prompt(self.prompt_format)
             return [(Token.Prompt, prompt)]
 
         def get_continuation_tokens(cli, width):
@@ -648,9 +651,14 @@ class MssqlCli(object):
             return self.completer.get_completions(
                 Document(text=text, cursor_position=cursor_positition), None)
 
-    def get_prompt(self):
+    def get_prompt(self, string):
         # mssql-cli
-        string = self.mssqlcliclient_query_execution.database + u'>'
+        string = string.replace('\\t', self.now.strftime('%x %X'))
+        string = string.replace('\\u', self.mssqlcliclient_query_execution.user_name or '(none)')
+        string = string.replace('\\h', self.mssqlcliclient_query_execution.prompt_host or '(none)')
+        string = string.replace('\\d', self.mssqlcliclient_query_execution.database or '(none)')
+        string = string.replace('\\p', str(self.mssqlcliclient_query_execution.prompt_port) or '(none)')
+        string = string.replace('\\n', "\n")
         return string
 
     def get_last_query(self):
@@ -698,9 +706,10 @@ class MssqlCli(object):
 @click.option('--enable-sqltoolsservice-logging', is_flag=True,
               default=False,
               help='Enables diagnostic logging for the SqlToolsService.')
+@click.option('--prompt', help='Prompt format (Default: "{}").'.format(MssqlCli.default_prompt))
 def cli(username, server, prompt_passwd, database, version, mssqlclirc, row_limit, less_chatty, auto_vertical_output,
         integrated_auth, encrypt, trust_server_certificate, connect_timeout, application_intent, multi_subnet_failover,
-        packet_size, enable_sqltoolsservice_logging, dac_connection):
+        packet_size, enable_sqltoolsservice_logging, dac_connection, prompt):
 
     if version:
         print('Version:', __version__)
@@ -718,7 +727,7 @@ def cli(username, server, prompt_passwd, database, version, mssqlclirc, row_limi
     if dac_connection and server and not server.lower().startswith("admin:"):
         server = "admin:" + server
 
-    mssqlcli = MssqlCli(prompt_passwd, row_limit=row_limit, single_connection=False,
+    mssqlcli = MssqlCli(force_passwd_prompt=prompt_passwd, prompt=prompt, row_limit=row_limit, single_connection=False,
                         mssqlclirc_file=mssqlclirc, less_chatty=less_chatty, auto_vertical_output=auto_vertical_output,
                         integrated_auth=integrated_auth, enable_sqltoolsservice_logging=enable_sqltoolsservice_logging)
 
