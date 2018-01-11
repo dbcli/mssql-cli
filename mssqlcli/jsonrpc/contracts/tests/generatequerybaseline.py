@@ -34,6 +34,8 @@ def generate_query_baseline(file_name):
         writer = json_rpc_client.JsonRpcWriter(tools_service_process.stdin)
         writer.send_request(u'connection/connect', parameters, id=1)
 
+        time.sleep(2)
+
         parameters = {u'OwnerUri': u'connectionservicetest',
                       u'Query': "select * from HumanResources.Department"}
         writer.send_request(u'query/executeString', parameters, id=2)
