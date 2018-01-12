@@ -30,6 +30,13 @@ using the [roadmap label](https://github.com/dbcli/mssql-cli/labels/roadmap).
   * Pipe queries via stdin
   * Pipe query results to stdout
   * sqlcmd syntax
+* Support file operations
+  * Run query from file
+  * Save query results to fil
+* Support other data formats as output
+  * CSV
+  * XML
+  * json
 
 ## Future Milestones
 * Innovation
