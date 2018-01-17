@@ -32,7 +32,7 @@ using the [roadmap label](https://github.com/dbcli/mssql-cli/labels/roadmap).
   * sqlcmd syntax
 * Support file operations
   * Run query from file
-  * Save query results to fil
+  * Save query results to file
 * Support other data formats as output
   * CSV
   * XML
