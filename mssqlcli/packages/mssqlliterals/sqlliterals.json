@@ -65,12 +65,19 @@
     "AS": [],
     "ASC": [],
     "AUTHORIZATION": [],
-    "BACKUP": [],
+    "BACKUP": [
+      "CERTIFICATE",
+      "DATABASE",
+      "MASTER KEY TO FILE",
+      "SERVICE MASTER KEY"
+    ],
     "BEGIN": [],
     "BETWEEN": [],
     "BREAK": [],
     "BROWSE": [],
-    "BULK": [],
+    "BULK": [
+      "INSERT"
+    ],
     "BY": [],
     "CASCADE": [],
     "CASE": [],
@@ -89,6 +96,7 @@
     "CONTINUE": [],
     "CONVERT": [],
     "CREATE": [
+        "AGGREGATE",
         "APPLICATION ROLE",
         "ASSEMBLY",
         "ASYMMETRIC KEY",
@@ -96,7 +104,10 @@
         "AVAILABILITY GROUP",
         "BROKER PRIORITY",
         "CERTIFICATE",
+        "COLUMNSTORE INDEX",
         "COLUMN ENCRYPTION KEY",
+        "COLUMN ENCRYPTION KEY",
+        "CONTRACT",
         "CREDENTIAL",
         "CRYPTOGRAPHIC PROVIDER",
         "DATABASE",
@@ -106,11 +117,15 @@
         "DATABASE SCOPED CREDENTIAL",
         "DATABASE SCOPED CONFIGURATION",
         "DATABASE SET",
+        "DEFAULT",
         "ENDPOINT",
+        "EVENT NOTIFICATION",
         "EVENT SESSION",
         "EXTERNAL DATA SOURCE",
         "EXTERNAL LIBRARY",
+        "EXTERNAL FILE FORMAT",
         "EXTERNAL RESOURCE POOL",
+        "EXTERNAL TABLE",
         "FULLTEXT CATALOG",
         "FULLTEXT INDEX",
         "FULLTEXT STOPLIST",
@@ -131,6 +146,7 @@
         "SCHEMA",
         "SEARCH PROPERTY LIST",
         "SECURITY POLICY",
+        "SELECTIVE XML INDEX",
         "SEQUENCE",
         "SERVER AUDIT",
         "SERVER AUDIT SPECIFICATION",
@@ -138,12 +154,16 @@
         "SERVER ROLE",
         "SERVICE",
         "SERVICE MASTER KEY",
+        "SPATIAL INDEX",
+        "STATISTICS",
         "SYMMETRIC KEY",
         "TABLE",
         "TRIGGER",
+        "TYPE",
         "USER",
         "VIEW",
         "WORKLOAD GROUP",
+        "XML INDEX",
         "XML SCHEMA COLLECTION"
     ],
     "CROSS": [],
@@ -160,6 +180,9 @@
     "DEFAULT": [],
     "DELETE": [],
     "DENY": [],
+    "DISABLE": [
+        "TRIGGER"
+    ],
     "DESC": [],
     "DISK": [],
     "DISTINCT": [],
@@ -225,6 +248,9 @@
     ],
     "DUMP": [],
     "ELSE": [],
+    "ENABLE": [
+        "TRIGGER"
+    ],
     "END": [],
     "ERRLVL": [],
     "ESCAPE": [],
@@ -303,8 +329,20 @@
     "READTEXT": [],
     "RECONFIGURE": [],
     "REFERENCES": [],
+    "RENAME": [
+        "OBJECT",
+        "DATABASE"
+    ],
     "REPLICATION": [],
-    "RESTORE": [],
+    "RESTORE": [
+        "DATABASE",
+        "FILELISTONLY",
+        "HEADERONLY",
+        "LABELONLY",
+        "MASTER KEY",
+        "REWINDONLY",
+        "VERIFYONLY"
+    ],
     "RESTRICT": [],
     "RETURN": [],
     "REVERT": [],
@@ -379,13 +417,17 @@
     "TRANSFER": [],
     "TRANSACTION": [],
     "TRIGGER": [],
-    "TRUNCATE": [],
+    "TRUNCATE": [
+        "TABLE"
+    ],
     "TRY_CONVERT": [],
     "TSEQUAL": [],
     "UNION": [],
     "UNIQUE": [],
     "UNPIVOT": [],
-    "UPDATE": [],
+    "UPDATE": [
+        "STATISTICS"
+    ],
     "UPDATETEXT": [],
     "USE": [],
     "USER": [],
