@@ -1,5 +1,4 @@
 from __future__ import print_function
-import sys
 import re
 import sqlparse
 from collections import namedtuple
@@ -9,13 +8,10 @@ from .parseutils.utils import (
 from .parseutils.tables import extract_tables
 from .parseutils.ctes import isolate_query_ctes
 
-PY2 = sys.version_info[0] == 2
-PY3 = sys.version_info[0] == 3
-
-if PY3:
-    string_types = str
-else:
-    string_types = basestring
+try:
+    string_types = basestring  # Python 2
+except NameError:
+    string_types = str         # Python 3
 
 
 Database = namedtuple('Database', [])
