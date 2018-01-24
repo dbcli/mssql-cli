@@ -157,12 +157,14 @@ class MssqlCliClient(object):
 
         if query_response.exception_message:
             logger.error(u'Query response had an exception')
-            return self.tabular_results_generator(
+
+            yield self.tabular_results_generator(
                 column_info=None,
                 result_rows=None,
                 query=query,
                 message=query_response.exception_message,
                 is_error=True)
+            return
 
         if (not query_response.batch_summaries[0].result_set_summaries) or \
            (query_response.batch_summaries[0].result_set_summaries[0].row_count == 0):
