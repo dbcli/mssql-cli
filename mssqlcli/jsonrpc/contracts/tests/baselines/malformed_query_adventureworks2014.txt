@@ -1,0 +1,7 @@
+Content-Length: 40
+
+{"jsonrpc":"2.0","id":"1","result":true}Content-Length: 645
+
+{"jsonrpc":"2.0","method":"connection/complete","params":{"ownerUri":"connectionservicetest","connectionId":"6fd410b5-cd48-487a-bc9c-90569e749772","messages":null,"errorMessage":null,"errorNumber":0,"serverInfo":{"serverMajorVersion":12,"serverMinorVersion":0,"serverReleaseVersion":2269,"engineEditionId":3,"serverVersion":"12.0.2269.0","serverLevel":"RTM","serverEdition":"Enterprise Edition (64-bit)","isCloud":false,"azureVersion":0,"osVersion":"Windows NT 6.3 <X64> (Build 9600: ) (Hypervisor)\n","machineName":"BRO-HB"},"connectionSummary":{"serverName":"bro-hb","databaseName":"AdventureWorks2014","userName":"cloudsa"},"type":"Default"}}Content-Length: 205
+
+{"jsonrpc":"2.0","id":"2","error":{"code":0,"message":"SQL Execution error: A fatal error occurred.\r\n\tIncorrect syntax was encountered while select * from [HumanResources.Department was being parsed."}}

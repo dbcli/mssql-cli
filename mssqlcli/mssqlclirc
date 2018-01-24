@@ -103,6 +103,15 @@ row_limit = 1000
 # Skip intro on startup and goodbye on exit
 less_chatty = False
 
+# mssql-cli prompt
+# \t - Current date and time
+# \u - Username
+# \h - Hostname of the server
+# \d - Database name
+# \p - Database port
+# \n - Newline
+prompt = '\d> '
+
 # Number of lines to reserve for the suggestion menu
 min_num_menu_lines = 4
 
