@@ -57,7 +57,6 @@ class QueryExecuteTests(unittest.TestCase):
             request = queryservice.QueryExecuteStringRequest(
                 2, rpc_client, parameters)
             self.verify_query_response(request=request,
-                                       expected_complete_event=1,
                                        expected_error_count=1)
             rpc_client.shutdown()
 
