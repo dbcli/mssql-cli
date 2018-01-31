@@ -50,3 +50,39 @@ def register_special_command(handler, command, shortcut, description,
         COMMANDS[cmd] = SpecialCommand(handler, command, shortcut, description,
                                        arg_type, case_sensitive=case_sensitive,
                                        hidden=True)
+
+
+@export
+def execute(mssqlcliclient, sql):
+    """Execute a special command and return the results. If the special command
+    is not supported a KeyError will be raised.
+    """
+    command, verbose, arg = parse_special_command(sql)
+
+    if (command not in COMMANDS) and (command.lower() not in COMMANDS):
+        raise CommandNotFound
+
+    try:
+        special_cmd = COMMANDS[command]
+    except KeyError:
+        special_cmd = COMMANDS[command.lower()]
+        if special_cmd.case_sensitive:
+            raise CommandNotFound('Command not found: %s' % command)
+
+    if special_cmd.arg_type == NO_QUERY:
+        return special_cmd.handler()
+    elif special_cmd.arg_type == PARSED_QUERY:
+        return special_cmd.handler(mssqlcliclient, arg=arg, verbose=verbose)
+    elif special_cmd.arg_type == RAW_QUERY:
+        return special_cmd.handler(mssqlcliclient, query=sql)
+
+
+@special_command('help', '\\?', 'Show this help.', arg_type=NO_QUERY, aliases=('\\?', '?'))
+def show_help():  # All the parameters are ignored.
+    headers = ['Command', 'Shortcut', 'Description']
+    result = []
+
+    for _, value in sorted(COMMANDS.items()):
+        if not value.hidden:
+            result.append((value.command, value.shortcut, value.description))
+    return [(result, headers, None, None, False)]

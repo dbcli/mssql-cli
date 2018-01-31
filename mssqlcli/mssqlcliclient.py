@@ -11,6 +11,7 @@ from mssqlcli import mssqlqueries
 from mssqlcli.jsonrpc.contracts import connectionservice, queryexecutestringservice as queryservice
 from mssqlcli.packages.parseutils.meta import ForeignKey
 from mssqlcli.sqltoolsclient import SqlToolsClient
+from packages import special
 
 logger = logging.getLogger(u'mssqlcli.mssqlcliclient')
 time_wait_if_no_response = 0.05
@@ -121,19 +122,25 @@ class MssqlCliClient(object):
             return self.owner_uri
 
     def execute_multi_statement_single_batch(self, query):
-        # Remove spaces, EOL and semi-colons from end
-        query = query.strip()
-        if not query:
-            yield None, None, None, query, False
-        else:
-            for sql in sqlparse.split(query):
-                # Remove spaces, EOL and semi-colons from end
-                sql = sql.strip().rstrip(';')
-                if not sql:
-                    yield None, None, None, sql, False
-                    continue
-                for rows, columns, status, statement, is_error in self.execute_single_batch_query(sql):
-                    yield rows, columns, status, statement, is_error
+        # Try to run first as special command
+        try:
+            for rows, columns, status, statement, is_error in special.execute(self, query):
+                yield rows, columns, status, statement, is_error
+        except special.CommandNotFound:
+            # Execute as normal sql
+            # Remove spaces, EOL and semi-colons from end
+            query = query.strip()
+            if not query:
+                yield None, None, None, query, False
+            else:
+                for sql in sqlparse.split(query):
+                    # Remove spaces, EOL and semi-colons from end
+                    sql = sql.strip().rstrip(';')
+                    if not sql:
+                        yield None, None, None, sql, False
+                        continue
+                    for rows, columns, status, statement, is_error in self.execute_single_batch_query(sql):
+                        yield rows, columns, status, statement, is_error
 
     def execute_single_batch_query(self, query):
         if not self.is_connected:
