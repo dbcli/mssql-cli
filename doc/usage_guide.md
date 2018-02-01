@@ -15,6 +15,8 @@ mssql-cli provides the following key enhancements over sqlcmd in the Terminal en
 - Multi-line edit mode
 - Configuration file support
 
+If you encounter any issues, see the[troubleshooting](#troubleshooting_guide.md)section for known issues and workarounds.
+
 
 ## Options
 Type **mssql-cli --help** to also see these options.
@@ -158,11 +160,3 @@ Set environment variable MSSQL_CLI_ROW_LIMIT to set threshold for row limit prom
 set MSSQL_CLI_ROW_LIMIT=10
 mssql-cli -S localhost -U sa
 ```
-
-## Troubleshooting
-
-### Unknown glyph fills up prompt:
-If you encounter the display below, it is a Windows 10 issue that can pop up on the command prompt or powershell prompt.
-The current workaround for this issue is to change the font of the prompt to Consolas.
-![alt text](https://github.com/dbcli/mssql-cli/tree/master/screenshots/mssql-cli-display-issue.png "mssql-cli display issue")
-
