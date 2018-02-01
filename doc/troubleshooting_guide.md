@@ -51,22 +51,22 @@ Failed to initialize CoreCLR, HRESULT: 0x80131500
 ### Unknown glyph fills up prompt:
 If you encounter the display below, it is a Windows 10 issue that can pop up on the command prompt or powershell prompt.
 The current workaround for this issue is to change the font of the prompt to Consolas.
-![alt text](https://github.com/dbcli/mssql-cli/tree/master/screenshots/mssql-cli-display-issue.png "mssql-cli display issue")
+![alt text](https://github.com/dbcli/mssql-cli/blob/master/screenshots/mssql-cli-display-issue.png "mssql-cli display issue")
 
 
-### <a name="Reporting_Issues"></a>Reporting Issues:
+## <a name="Reporting_Issues"></a>Reporting Issues:
 If the issue you are encountering is not listed above nor filed on our github, please file a issue here [issues](#https://github.com/dbcli/mssql-cli/issues) with the following information listed below and any other additional symptoms of your issue.
 
 * Command used to install mssql-cli
 * Python version and location
 ```
-    python -V 
-    where python 
+    $ python -V 
+    $ where python 
 ```
 * Pip Version and location
 ```
-    pip -V
-    where pip
+    $ pip -V
+    $ where pip
 ```
 * OS Distribution and version
 * Target Server and Database version and edition
