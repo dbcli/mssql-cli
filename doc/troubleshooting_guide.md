@@ -3,6 +3,7 @@ Troubleshooting Guide
 ## Table of Contents
 1. [Installation Issues](#Installation_Issues)
 2. [Usage Issues](#Usage_Issues)
+3. [Reporting Issues](#Reporting_Issues)
 
 ## <a name="Installation_Issues"></a>Installation Issues:
 
@@ -52,3 +53,20 @@ If you encounter the display below, it is a Windows 10 issue that can pop up on 
 The current workaround for this issue is to change the font of the prompt to Consolas.
 ![alt text](https://github.com/dbcli/mssql-cli/tree/master/screenshots/mssql-cli-display-issue.png "mssql-cli display issue")
 
+
+### <a name="Reporting_Issues"></a>Reporting Issues:
+If the issue you are encountering is not listed above nor filed on our github, please file a issue here [issues](#https://github.com/dbcli/mssql-cli/issues) with the following information.
+
+* Python version
+```
+    python -V
+```
+* Pip Version
+```
+    pip -V
+```
+* OS Distribution and version
+
+* Target Server and Database version and edition
+
+* Python environment variables set
