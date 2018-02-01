@@ -55,7 +55,7 @@ The current workaround for this issue is to change the font of the prompt to Con
 
 
 ### <a name="Reporting_Issues"></a>Reporting Issues:
-If the issue you are encountering is not listed above nor filed on our github, please file a issue here [issues](#https://github.com/dbcli/mssql-cli/issues) with the following information.
+If the issue you are encountering is not listed above nor filed on our github, please file a issue here [issues](#https://github.com/dbcli/mssql-cli/issues) with the following information listed below and any other additional symptoms of your issue.
 
 * Python version
 ```
