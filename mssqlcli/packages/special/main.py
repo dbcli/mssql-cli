@@ -3,7 +3,7 @@ from collections import namedtuple
 
 from . import export
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('mssqlcli.special')
 
 NO_QUERY = 0
 PARSED_QUERY = 1
@@ -57,7 +57,7 @@ def execute(mssqlcliclient, sql):
     """Execute a special command and return the results. If the special command
     is not supported a KeyError will be raised.
     """
-    command, verbose, arg = parse_special_command(sql)
+    command, verbose, pattern = parse_special_command(sql)
 
     if (command not in COMMANDS) and (command.lower() not in COMMANDS):
         raise CommandNotFound
@@ -69,10 +69,12 @@ def execute(mssqlcliclient, sql):
         if special_cmd.case_sensitive:
             raise CommandNotFound('Command not found: %s' % command)
 
+    logger.debug(u'Executing special command {0} with argument {1}.'.format(command, pattern))
+
     if special_cmd.arg_type == NO_QUERY:
         return special_cmd.handler()
     elif special_cmd.arg_type == PARSED_QUERY:
-        return special_cmd.handler(mssqlcliclient, arg=arg, verbose=verbose)
+        return special_cmd.handler(mssqlcliclient, pattern=pattern, verbose=verbose)
     elif special_cmd.arg_type == RAW_QUERY:
         return special_cmd.handler(mssqlcliclient, query=sql)
 

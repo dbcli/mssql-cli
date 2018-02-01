@@ -8,3 +8,4 @@ def export(defn):
     return defn
 
 from . import main
+from . import commands
