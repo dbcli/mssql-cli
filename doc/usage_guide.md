@@ -15,6 +15,8 @@ mssql-cli provides the following key enhancements over sqlcmd in the Terminal en
 - Multi-line edit mode
 - Configuration file support
 
+If you encounter any issues, see the[troubleshooting](#troubleshooting_guide.md)section for known issues and workarounds.
+
 
 ## Options
 Type **mssql-cli --help** to also see these options.

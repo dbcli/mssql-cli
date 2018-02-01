@@ -13,7 +13,7 @@ installed using the --user option, which does not require sudo.
 $ pip install --user mssql-cli
 ```
 
-If you are having installation issues, see the [troubleshooting](#troubleshooting) section for known issues and workarounds.
+If you are having installation issues, see the [troubleshooting](#troubleshooting_guide.md) section for known issues and workarounds.
 
 
 ## Detailed Instructions
@@ -139,45 +139,4 @@ $ sudo pip install mssql-cli
 $ sudo zypper update
 $ sudo zypper install libunwind libicu python-pip
 $ sudo pip install mssql-cli
-```
-
-# Troubleshooting
-
-If you're having installation issues, please check the below known issues and workarounds.  If you're having a different issue, please check the [issues](https://github.com/dbcli/mssql-cli/issues) page to see if the issue has already been reported.  If you don't see your issue there, filing a new issue would be appreciated.
-
-## Error: No module named mssqlcli
-If the installation was successful and this error message is encountered, this may be caused by different versions of python in the environment.
-i.e Used python 3.6 to install mssql-cli, but PATH has python 2.7 so it uses the python 2.7 interpreter which has no visibility to packages installed into python 3.6.
-
-The workaround to prevent this is to use a virtual environment, which will provide a isolated environment that is tied to a specific python version.
-More information can be found at:
-
-- [Virtual Environment Info](virtual_environment_info.md)
-
-- [Development guide](development_guide.md#Environment_Setup)
-
-## Error: Could not find version that satisfies the requirement mssql-cli
-If you see the above error running `pip install mssql-cli`, this means the pip version used is out-of-date.  Please upgrade your pip installation for your python platform and OS distribution. 
-
-## Error: System.DllNotFoundException: Unable to load DLL 'System.Security.Cryptography.Native': The specified module could not be found.
-If you encounter this error on MacOS, this means you need the latest version of OpenSSL. Later version of macOS (Sierra, and High Sierra) should not have this issue.  To install OpenSSL use the following commands:
-```shell
-$ brew update
-$ brew install openssl
-$ mkdir -p /usr/local/lib
-$ ln -s /usr/local/opt/openssl/lib/libcrypto.1.0.0.dylib /usr/local/lib/
-$ ln -s /usr/local/opt/openssl/lib/libssl.1.0.0.dylib /usr/local/lib/
-```
-
-## Error: libunwind.so: cannot open shared object file
-If you encounter the below error running mssql-cli, this means the libunwind package is not installed.  Please install the libunwind package for your Linux distribution.
-```shell
-Failed to load /usr/local/lib/python2.7/dist-packages/mssqltoolsservice/bin/libcoreclr.so, error
-libunwind.so.8: cannot open shared object file: No such file or directory
-```
-
-## Error: Failed to initialize CoreCLR, HRESULT: 0x80131500
-If you encounter the below error running mssql-cli, this means the libicu package is not installed.  Please install the libicu package for your Linux distribution.
-```shell
-Failed to initialize CoreCLR, HRESULT: 0x80131500
 ```
