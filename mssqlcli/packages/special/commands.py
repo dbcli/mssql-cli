@@ -30,3 +30,14 @@ def list_schemas(mssqlcliclient, pattern, verbose):
     return mssqlcliclient.execute_multi_statement_single_batch(base_query)
 
 
+@special_command('\\dt', '\\dt[+] [pattern]', 'List tables.')
+def list_tables(mssqlcliclient, pattern, verbose):
+    base_query = u'select {0} from INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE=\'BASE TABLE\''
+    if verbose:
+        base_query = base_query.format('*')
+    else:
+        base_query = base_query.format('table_schema, table_name')
+    if pattern:
+        base_query += "and table_name like '%{0}%'".format(pattern)
+
+    return mssqlcliclient.execute_multi_statement_single_batch(base_query)
