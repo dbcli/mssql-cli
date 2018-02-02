@@ -77,7 +77,7 @@ WHERE
      AND ind.is_unique = 0
      AND ind.is_unique_constraint = 0
      AND t.is_ms_shipped = 0
-     AND t.name like '%{pattern}%'
+     AND ind.name like '%{pattern}%'
 ORDER BY
      t.name, ind.name, ind.index_id, ic.index_column_id;
     '''
