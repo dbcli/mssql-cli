@@ -1,4 +1,5 @@
 import logging
+import click
 from .main import special_command, RAW_QUERY, PARSED_QUERY, NO_QUERY
 
 logger = logging.getLogger('mssqlcli.commands')
@@ -93,3 +94,43 @@ ORDER BY
         base_query = base_query.format(pattern='')
 
     return mssqlcliclient.execute_multi_statement_single_batch(base_query)
+
+
+@special_command('\\df', '\\df[+] [pattern]', 'List functions.')
+def list_functions(mssqlcliclient, pattern, verbose):
+    base_query = '''
+SELECT {cols}
+  FROM sys.sql_modules m
+INNER JOIN sys.objects o
+        ON m.object_id=o.object_id
+WHERE type_desc like '%function%' {pattern}
+'''
+
+    if verbose:
+        base_query = base_query.format(cols='name, type_desc', pattern='{pattern}')
+    else:
+        base_query = base_query.format(cols='name', pattern='{pattern}')
+    if pattern:
+        base_query = base_query.format(pattern='and name like \'%{0}%\''.format(pattern))
+    else:
+        base_query = base_query.format(pattern='')
+
+    return mssqlcliclient.execute_multi_statement_single_batch(base_query)
+
+
+@special_command('\\sf', '\\sf[+] FUNCNAME', 'Show a function\'s definition.')
+def show_function_definition(mssqlcliclient, pattern, verbose):
+    if not pattern:
+        click.secho('FUNCNAME is required. Usage \'\\sf FUNCNAME\'.', err=True, fg='red')
+        return []
+    base_query = '''
+SELECT definition
+  FROM sys.sql_modules m
+INNER JOIN sys.objects o
+        ON m.object_id=o.object_id
+WHERE type_desc like '%function%' and name like '{0}'
+'''.format(pattern)
+
+    return mssqlcliclient.execute_multi_statement_single_batch(base_query)
+
+
