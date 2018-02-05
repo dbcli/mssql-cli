@@ -1,5 +1,6 @@
 import getpass
 import logging
+import threading
 import time
 import uuid
 from time import sleep
@@ -61,6 +62,8 @@ class MssqlCliClient(object):
             self.owner_uri = generate_owner_uri()
 
         logger.info(u'Initialized MssqlCliClient')
+
+        self.lock = threading.Lock()
 
     def connect(self):
         """
@@ -150,68 +153,73 @@ class MssqlCliClient(object):
                 fg='red')
             exit(1)
 
-        query_request = self.sql_tools_client.create_request(u'query_execute_string_request',
-                                                             {u'OwnerUri': self.owner_uri, u'Query': query})
-        query_request.execute()
-        query_messages = []
-        while not query_request.completed():
-            query_response = query_request.get_response()
-            if query_response:
-                if isinstance(query_response, queryservice.QueryMessageEvent):
-                    query_messages.append(query_response)
-            else:
-                sleep(time_wait_if_no_response)
+        self.lock.acquire()
+        try:
+            query_request = self.sql_tools_client.create_request(u'query_execute_string_request',
+                                                                 {u'OwnerUri': self.owner_uri, u'Query': query})
+            query_request.execute()
+            query_messages = []
+            while not query_request.completed():
+                query_response = query_request.get_response()
+                if query_response:
+                    if isinstance(query_response, queryservice.QueryMessageEvent):
+                        query_messages.append(query_response)
+                else:
+                    sleep(time_wait_if_no_response)
 
-        if query_response.exception_message:
-            logger.error(u'Query response had an exception')
-
-            yield self.tabular_results_generator(
-                column_info=None,
-                result_rows=None,
-                query=query,
-                message=query_response.exception_message,
-                is_error=True)
-            return
-
-        if (not query_response.batch_summaries[0].result_set_summaries) or \
-           (query_response.batch_summaries[0].result_set_summaries[0].row_count == 0):
-            yield self.tabular_results_generator(
-                column_info=None,
-                result_rows=None,
-                query=query,
-                message=query_messages[0].message if query_messages else u'',
-                is_error=query_messages[0].is_error if query_messages else query_response.batch_summaries[0].has_error)
-
-        else:
-            for result_set_summary in query_response.batch_summaries[0].result_set_summaries:
-                query_subset_request = self.sql_tools_client.create_request(u'query_subset_request',
-                                                                            {u'OwnerUri': query_response.owner_uri,
-                                                                             u'BatchIndex': result_set_summary.batch_id,
-                                                                                u'ResultSetIndex': result_set_summary.id,
-                                                                                u'RowsStartIndex': 0,
-                                                                                u'RowCount': result_set_summary.row_count})
-
-                query_subset_request.execute()
-                while not query_subset_request.completed():
-                    subset_response = query_subset_request.get_response()
-                    if not subset_response:
-                        sleep(time_wait_if_no_response)
-
-                if subset_response.error_message:
-                    logger.error(u'Error obtaining result sets for query response')
-                    yield self.tabular_results_generator(
-                        column_info=None,
-                        result_rows=None,
-                        query=query,
-                        message=subset_response.error_message,
-                        is_error=True)
-
-                logger.info(u'Obtained result set for query')
+            if query_response.exception_message:
+                logger.error(u'Query response had an exception')
                 yield self.tabular_results_generator(
-                    column_info=result_set_summary.column_info,
-                    result_rows=subset_response.rows,
+                    column_info=None,
+                    result_rows=None,
                     query=query,
-                    message=query_messages[result_set_summary.id].message if query_messages else u'')
+                    message=query_response.exception_message,
+                    is_error=True)
+                return
+
+            if (not query_response.batch_summaries[0].result_set_summaries) or \
+               (query_response.batch_summaries[0].result_set_summaries[0].row_count == 0):
+                yield self.tabular_results_generator(
+                    column_info=None,
+                    result_rows=None,
+                    query=query,
+                    message=query_messages[0].message if query_messages else u'',
+                    is_error=query_messages[0].is_error if query_messages else query_response.batch_summaries[0].has_error)
+
+            else:
+                for result_set_summary in query_response.batch_summaries[0].result_set_summaries:
+                    query_subset_request = self.sql_tools_client.create_request(u'query_subset_request',
+                                                                                {u'OwnerUri': query_response.owner_uri,
+                                                                                 u'BatchIndex': result_set_summary.batch_id,
+                                                                                    u'ResultSetIndex': result_set_summary.id,
+                                                                                    u'RowsStartIndex': 0,
+                                                                                    u'RowCount': result_set_summary.row_count})
+
+                    query_subset_request.execute()
+                    while not query_subset_request.completed():
+                        subset_response = query_subset_request.get_response()
+                        if not subset_response:
+                            sleep(time_wait_if_no_response)
+
+                    logger.info('Getting response for id {}'.format(query_subset_request.id))
+                    if subset_response.error_message:
+                        logger.error(u'Error obtaining result sets for query response for id {}'.format(query_subset_request.id))
+                        yield self.tabular_results_generator(
+                            column_info=None,
+                            result_rows=None,
+                            query=query,
+                            message=subset_response.error_message,
+                            is_error=True)
+                        return
+
+                    logger.info(u'Obtained result set for query {}'.format(query))
+                    yield self.tabular_results_generator(
+                        column_info=result_set_summary.column_info,
+                        result_rows=subset_response.rows,
+                        query=query,
+                        message=query_messages[result_set_summary.id].message if query_messages else u'')
+        finally:
+            self.lock.release()
 
     def tabular_results_generator(
             self, column_info, result_rows, query, message, is_error=False):
