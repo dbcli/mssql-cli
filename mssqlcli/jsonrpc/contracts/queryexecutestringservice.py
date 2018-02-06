@@ -177,7 +177,7 @@ class QuerySubsetRequest(Request):
             return ResultSubset(response)
         elif u'error' in response:
             return ResultSubset(
-                None, error_message=response[u'error']['Message'])
+                None, error_message=response[u'error']['message'])
 
 
 class QuerySubsetParams(object):
