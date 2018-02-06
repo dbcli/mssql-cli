@@ -37,7 +37,7 @@ class SpecialCommandsTests(unittest.TestCase):
             list(client.execute_single_batch_query('DROP INDEX {0} ON {1};'.format(cls.index, cls.table2)))
             list(client.execute_single_batch_query('DROP TABLE {0};'.format(cls.table1)))
             list(client.execute_single_batch_query('DROP TABLE {0};'.format(cls.table2)))
-            list(client.execute_single_batch_query('DROP VIEW {0} IF EXISTS;'.format(cls.view)))
+            list(client.execute_single_batch_query('DROP VIEW {0};'.format(cls.view)))
             list(client.execute_single_batch_query('DROP SCHEMA {0};'.format(cls.schema)))
         finally:
             shutdown(client)
