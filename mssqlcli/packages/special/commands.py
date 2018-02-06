@@ -2,9 +2,11 @@ import logging
 import click
 import shlex
 import re
-import sqlparse
-from .main import special_command
+import io
+from os.path import expanduser
+from .main import special_command, NO_QUERY
 from .namedqueries import named_queries
+from . import export
 
 logger = logging.getLogger('mssqlcli.commands')
 
@@ -224,6 +226,11 @@ def delete_named_query(pattern, **_):
     return [(None, None, status, None, False)]
 
 
+@special_command('\\e', '\\e [file]', 'Edit the query with external editor.', arg_type=NO_QUERY)
+def doc_only():
+    raise RuntimeError
+
+
 def list_named_queries(verbose):
     """List of all named queries.
     Returns (rows, cols, status, sql, is_error)"""
@@ -256,3 +263,86 @@ def subst_favorite_query_args(query, args):
         return[None, 'missing substitution for ' + match.group(0) + ' in query:\n  ' + query]
 
     return [query, None]
+
+
+@export
+def editor_command(command):
+    """
+    Is this an external editor command?
+    :param command: string
+    """
+    # It is possible to have `\e filename` or `SELECT * FROM \e`. So we check
+    # for both conditions.
+    return command.strip().endswith('\\e') or command.strip().startswith('\\e ')
+
+
+@export
+def get_filename(sql):
+    if sql.strip().startswith('\\e'):
+        command, _, filename = sql.partition(' ')
+        return filename.strip() or None
+
+
+@export
+def get_watch_command(command):
+    match = re.match("(.*?)[\s]*\\\\watch (\d+);?$", command)
+    if match:
+        groups = match.groups()
+        return groups[0], int(groups[1])
+    return None, None
+
+
+@export
+def get_editor_query(sql):
+    """Get the query part of an editor command."""
+    sql = sql.strip()
+
+    # The reason we can't simply do .strip('\e') is that it strips characters,
+    # not a substring. So it'll strip "e" in the end of the sql also!
+    # Ex: "select * from style\e" -> "select * from styl".
+    pattern = re.compile('(^\\\e|\\\e$)')
+    while pattern.search(sql):
+        sql = pattern.sub('', sql)
+
+    return sql
+
+
+@export
+def open_external_editor(filename=None, sql=None):
+    """
+    Open external editor, wait for the user to type in his query,
+    return the query.
+    :return: list with one tuple, query as first element.
+    """
+
+    message = None
+    filename = filename.strip().split(' ', 1)[0] if filename else None
+
+    sql = sql or ''
+    MARKER = '# Type your query above this line.\n'
+
+    # Populate the editor buffer with the partial sql (if available) and a
+    # placeholder comment.
+    query = click.edit(u'{sql}\n\n{marker}'.format(sql=sql, marker=MARKER),
+                       filename=filename, extension='.sql')
+
+    if filename:
+        try:
+            query = read_from_file(filename)
+        except IOError:
+            message = 'Error reading file: %s.' % filename
+
+    if query is not None:
+        query = query.split(MARKER, 1)[0].rstrip('\n')
+    else:
+        # Don't return None for the caller to deal with.
+        # Empty string is ok.
+        query = sql
+
+    return (query, message)
+
+
+def read_from_file(path):
+    with io.open(expanduser(path), encoding='utf-8') as f:
+        contents = f.read()
+    return contents
