@@ -563,6 +563,7 @@ class MssqlCli(object):
 
             db_changed, new_db_name = has_change_db_cmd(sql, db_changed)
             if new_db_name:
+                logger.info('Database context changed.')
                 self.mssqlcliclient_query_execution.database = new_db_name
 
             if all_success:
@@ -594,13 +595,39 @@ class MssqlCli(object):
         :param persist_priorities: 'all' or 'keywords'
         """
 
+        mssqlclclient_completion_refresher = self.get_completion_refresher_mssqlcliclient(
+                                                self.mssqlcliclient_query_execution)
+
         callback = functools.partial(self._on_completions_refreshed,
                                      persist_priorities=persist_priorities)
 
-        self.completion_refresher.refresh(self.mssqlcliclient_query_execution,
-                                          callback, history=history, settings=self.settings)
+        self.completion_refresher.refresh(mssqcliclient=mssqlclclient_completion_refresher,
+                                          callbacks=callback,
+                                          history=history,
+                                          settings=self.settings)
+
+
+
         return [(None, None, None,
                  'Auto-completion refresh started in the background.')]
+
+    def get_completion_refresher_mssqlcliclient(self, mssqlcliclient):
+        mssqlcliclient_completion_refreshser = MssqlCliClient(
+                                                            mssqlcliclient.sql_tools_client,
+                                                            mssqlcliclient.server_name,
+                                                            mssqlcliclient.user_name,
+                                                            mssqlcliclient.password,
+                                                            database=mssqlcliclient.database,
+                                                            authentication_type=mssqlcliclient.authentication_type,
+                                                            encrypt=mssqlcliclient.encrypt,
+                                                            trust_server_certificate=mssqlcliclient.trust_server_certificate,
+                                                            connection_timeout=mssqlcliclient.connection_timeout,
+                                                            application_intent=mssqlcliclient.application_intent,
+                                                            multi_subnet_failover=mssqlcliclient.multi_subnet_failover,
+                                                            packet_size=mssqlcliclient.packet_size,
+                                                            **mssqlcliclient.extra_params)
+
+        return mssqlcliclient_completion_refreshser
 
     def _on_completions_refreshed(self, new_completer, persist_priorities):
         self._swap_completer_objects(new_completer, persist_priorities)
