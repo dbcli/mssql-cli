@@ -26,6 +26,7 @@ def list_databases(mssqlcliclient, pattern, verbose):
 
 @special_command('\\dn', '\\dn[+] [pattern]', 'List schemas.')
 def list_schemas(mssqlcliclient, pattern, verbose):
+    pattern = pattern.replace('"', '')
     base_query = u'select {0} from sys.schemas'
     if verbose:
         base_query = base_query.format('name, schema_id, principal_id')
@@ -39,6 +40,7 @@ def list_schemas(mssqlcliclient, pattern, verbose):
 
 @special_command('\\dt', '\\dt[+] [pattern]', 'List tables.')
 def list_tables(mssqlcliclient, pattern, verbose):
+    pattern = pattern.replace('"', '').split('.')[-1]
     base_query = u'select {0} from INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE=\'BASE TABLE\''
     if verbose:
         base_query = base_query.format('*')
@@ -52,6 +54,7 @@ def list_tables(mssqlcliclient, pattern, verbose):
 
 @special_command('\\dv', '\\dv[+] [pattern]', 'List views.')
 def list_views(mssqlcliclient, pattern, verbose):
+    pattern = pattern.replace('"', '').split('.')[-1]
     base_query = u'select {0} from INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE=\'VIEW\''
     if verbose:
         base_query = base_query.format('table_catalog as catalog, table_schema as schema_name, '
@@ -66,6 +69,7 @@ def list_views(mssqlcliclient, pattern, verbose):
 
 @special_command('\\di', '\\di[+] [pattern]', 'List indexes.')
 def list_indexes(mssqlcliclient, pattern, verbose):
+    pattern = pattern.replace('"', '').split('.')[-1]
     base_query = '''
 SELECT
      TableName = t.name,
@@ -104,6 +108,7 @@ ORDER BY
 
 @special_command('\\df', '\\df[+] [pattern]', 'List functions.')
 def list_functions(mssqlcliclient, pattern, verbose):
+    pattern = pattern.replace('"', '').split('.')[-1]
     base_query = '''
 SELECT {cols}
   FROM sys.sql_modules m
@@ -129,6 +134,7 @@ def show_function_definition(mssqlcliclient, pattern, verbose):
     if not pattern:
         click.secho('FUNCNAME is required. Usage \'\\sf FUNCNAME\'.', err=True, fg='red')
         return []
+    pattern = pattern.replace('"', '').split('.')[-1]
     base_query = '''
 SELECT definition
   FROM sys.sql_modules m
