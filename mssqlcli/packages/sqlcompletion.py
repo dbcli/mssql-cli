@@ -7,6 +7,7 @@ from .parseutils.utils import (
     last_word, find_prev_keyword, parse_partial_identifier)
 from .parseutils.tables import extract_tables
 from .parseutils.ctes import isolate_query_ctes
+from .special.main import parse_special_command
 
 try:
     string_types = basestring  # Python 2
@@ -14,6 +15,8 @@ except NameError:
     string_types = str         # Python 3
 
 
+Special = namedtuple('Special', [])
+NamedQuery = namedtuple('NamedQuery', [])
 Database = namedtuple('Database', [])
 Schema = namedtuple('Schema', ['quoted'])
 Schema.__new__.__defaults__ = (False,)
@@ -43,7 +46,6 @@ Column.__new__.__defaults__ = (None, None, tuple(), False, None)
 
 Keyword = namedtuple('Keyword', ['last_token'])
 Keyword.__new__.__defaults__ = (None,)
-NamedQuery = namedtuple('NamedQuery', [])
 Datatype = namedtuple('Datatype', ['schema'])
 Alias = namedtuple('Alias', ['aliases'])
 
@@ -143,6 +145,15 @@ def suggest_type(full_text, text_before_cursor):
     except (TypeError, AttributeError):
         return []
 
+    # Check for special commands and handle those separately
+    if stmt.parsed:
+        # Be careful here because trivial whitespace is parsed as a
+        # statement, but the statement won't have a first token
+        tok1 = stmt.parsed.token_first()
+        if tok1 and tok1.value == '\\':
+            text = stmt.text_before_cursor + stmt.word_before_cursor
+            return suggest_special(text)
+
     return suggest_based_on_last_token(stmt.last_token, stmt)
 
 
@@ -219,6 +230,67 @@ def _split_multiple_statements(full_text, text_before_cursor, parsed):
     return full_text, text_before_cursor, statement
 
 
+SPECIALS_SUGGESTION = {
+    'dT': Datatype,
+    'df': Function,
+    'dt': Table,
+    'dv': View,
+    'sf': Function,
+}
+
+
+def suggest_special(text):
+    text = text.lstrip()
+    cmd, _, arg = parse_special_command(text)
+
+    if cmd == text:
+        # Trying to complete the special command itself
+        return (Special(),)
+
+    if cmd in ('\\c', '\\connect'):
+        return (Database(),)
+
+    if cmd == '\\dn':
+        return (Schema(),)
+
+    if arg:
+        # Try to distinguish "\d name" from "\d schema.name"
+        # Note that this will fail to obtain a schema name if wildcards are
+        # used, e.g. "\d schema???.name"
+        parsed = sqlparse.parse(arg)[0].tokens[0]
+        try:
+            schema = parsed.get_parent_name()
+        except AttributeError:
+            schema = None
+    else:
+        schema = None
+
+    if cmd[1:] == 'd':
+        # \d can describe tables or views
+        if schema:
+            return (Table(schema=schema),
+                    View(schema=schema),)
+        else:
+            return (Schema(),
+                    Table(schema=None),
+                    View(schema=None),)
+    elif cmd[1:] in SPECIALS_SUGGESTION:
+        rel_type = SPECIALS_SUGGESTION[cmd[1:]]
+        if schema:
+            if rel_type == Function:
+                return (Function(schema=schema, usage='special'),)
+            return (rel_type(schema=schema),)
+        else:
+            if rel_type == Function:
+                return (Schema(), Function(schema=None, usage='special'),)
+            return (Schema(), rel_type(schema=None))
+
+    if cmd in ['\\n', '\\ns', '\\nd']:
+        return (NamedQuery(),)
+
+    return (Keyword(), Special())
+
+
 def suggest_based_on_last_token(token, stmt):
 
     if isinstance(token, string_types):
@@ -257,7 +329,7 @@ def suggest_based_on_last_token(token, stmt):
         token_v = token.value.lower()
 
     if not token:
-        return (Keyword(),)
+        return (Keyword(), Special())
     if token_v.endswith('('):
         p = sqlparse.parse(stmt.text_before_cursor)[0]
 
