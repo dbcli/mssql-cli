@@ -54,7 +54,7 @@ class CompletionRefresher(object):
         if not executor.connect():
             # If we were unable to connect, do not break the experience for the user.
             # Return nothing, smart completion can maintain the keywords and functions completions.
-            logger.error('Completion Refresher failed to connect to the target server.')
+            logger.error(u'Completion Refresher failed to connect to the target server.')
             return
         # If callbacks is a single function then push it into a list.
         if callable(callbacks):
