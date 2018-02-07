@@ -92,7 +92,6 @@ class JsonRpcClient(object):
             try:
                 # Block until queue contains a request.
                 request = self.request_queue.get()
-
                 if request:
                     self.writer.send_request(
                         method=request[u'method'],
@@ -122,15 +121,21 @@ class JsonRpcClient(object):
         while not self.cancel:
             try:
                 response = self.reader.read_response()
-                response_id_str = response.get(u'id')
+                logger.info(dict(response))
+
+                if u'params' in response:
+                    if u'ownerUri' in response.get(u'params'):
+                        response_id_str = response[u'params'][u'ownerUri']
+                else:
+                    response_id_str = response.get(u'id')
+
                 if response_id_str:
-                    response_id = int(response_id_str)
                     # we have a id, map it with a new queue if it doesn't
                     # exist.
-                    if response_id not in self.response_map:
-                        self.response_map[response_id] = Queue()
+                    if response_id_str not in self.response_map:
+                        self.response_map[response_id_str] = Queue()
                     # Enqueue the response.
-                    self.response_map[response_id].put(response)
+                    self.response_map[response_id_str].put(response)
                 else:
                     # Event was returned.
                     self.response_map[0].put(response)

@@ -3,7 +3,10 @@
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------
 
+import logging
 from mssqlcli.jsonrpc.contracts import Request
+
+logger = logging.getLogger(u'mssqlcli.queryexecutestringservice')
 
 
 class QueryExecuteStringRequest(Request):
@@ -13,8 +16,9 @@ class QueryExecuteStringRequest(Request):
 
     METHOD_NAME = u'query/executeString'
 
-    def __init__(self, id, json_rpc_client, parameters):
+    def __init__(self, id, owner_uri, json_rpc_client, parameters):
         self.id = id
+        self.owner_uri = owner_uri
         self.finished = False
         self.json_rpc_client = json_rpc_client
         self.params = QueryExecuteStringParams(parameters)
@@ -24,9 +28,10 @@ class QueryExecuteStringRequest(Request):
             Get latest response, event or exception if occured.
         """
         try:
-            response = self.json_rpc_client.get_response(self.id)
-            decoded_response = None
+            response = self.json_rpc_client.get_response(self.id) or \
+                       self.json_rpc_client.get_response(self.owner_uri)
 
+            decoded_response = None
             if response:
                 decoded_response = self.decode_response(response)
 
@@ -137,8 +142,9 @@ class QuerySubsetRequest(Request):
 
     METHOD_NAME = u'query/subset'
 
-    def __init__(self, id, json_rpc_client, parameters):
+    def __init__(self, id, owner_uri, json_rpc_client, parameters):
         self.id = id
+        self.owner_uri = owner_uri
         self.finished = False
         self.json_rpc_client = json_rpc_client
         self.params = QuerySubsetParams(parameters)
@@ -151,9 +157,9 @@ class QuerySubsetRequest(Request):
 
     def get_response(self):
         try:
-            response = self.json_rpc_client.get_response(self.id)
+            response = self.json_rpc_client.get_response(self.id) or \
+                       self.json_rpc_client.get_response(self.owner_uri)
             decoded_response = None
-
             if response:
                 decoded_response = self.decode_response(response)
 

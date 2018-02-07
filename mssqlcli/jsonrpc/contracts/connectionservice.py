@@ -16,8 +16,9 @@ class ConnectionRequest(Request):
     """
     METHOD_NAME = u'connection/connect'
 
-    def __init__(self, id, json_rpc_client, parameters):
+    def __init__(self, id, owner_uri, json_rpc_client, parameters):
         self.id = id
+        self.owner_uri = owner_uri
         self.finished = False
         self.json_rpc_client = json_rpc_client
         self.params = ConnectionParams(parameters)
@@ -31,9 +32,10 @@ class ConnectionRequest(Request):
             Get latest response, event or exception if it occured.
         """
         try:
-            response = self.json_rpc_client.get_response(self.id)
-            decoded_response = None
+            response = self.json_rpc_client.get_response(self.id) or \
+                       self.json_rpc_client.get_response(self.owner_uri)
 
+            decoded_response = None
             if response:
                 logger.debug(response)
                 decoded_response = self.decode_response(response)
