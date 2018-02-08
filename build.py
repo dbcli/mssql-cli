@@ -104,7 +104,8 @@ def unit_test():
         'tests/test_prioritization.py '
         'mssqlcli/jsonrpc/tests '
         'mssqlcli/jsonrpc/contracts/tests '
-        'tests/test_telemetry.py tests/test_special.py',
+        'tests/test_telemetry.py '
+        'tests/test_special.py',
         utility.ROOT_DIR,
         continue_on_error=False)
 
