@@ -32,8 +32,7 @@ class ConnectionRequest(Request):
             Get latest response, event or exception if it occured.
         """
         try:
-            response = self.json_rpc_client.get_response(self.id) or \
-                       self.json_rpc_client.get_response(self.owner_uri)
+            response = self.json_rpc_client.get_response(self.id, self.owner_uri)
             decoded_response = None
             if response:
                 logger.debug(response)
