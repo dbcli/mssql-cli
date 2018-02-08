@@ -51,6 +51,7 @@ class ConnectionRequest(Request):
             logger.debug(str(error))
             self.finished = True
             self.json_rpc_client.request_finished(self.id)
+            self.json_rpc_client.request_finished(self.owner_uri)
             return ConnectionCompleteEvent({
                 u'params': {
                     u'ownerUri': None,

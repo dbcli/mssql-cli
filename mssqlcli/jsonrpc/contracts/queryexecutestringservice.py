@@ -46,6 +46,7 @@ class QueryExecuteStringRequest(Request):
         except Exception as error:
             self.finished = True
             self.json_rpc_client.request_finished(self.id)
+            self.json_rpc_client.request_finished(self.owner_uri)
             return QueryCompleteEvent(
                 {u'params': None}, exception_message=str(error)
             )
@@ -174,6 +175,7 @@ class QuerySubsetRequest(Request):
         except Exception as error:
             self.finished = True
             self.json_rpc_client.request_finished(self.id)
+            self.json_rpc_client.request_finished(self.owner_uri)
             return ResultSubset(None, error_message=str(error))
 
     def execute(self):
