@@ -102,6 +102,35 @@ class JSONRPCContractsTests(unittest.TestCase):
                                                expected_row_count=16)
             rpc_client.shutdown()
 
+    def test_query_retrieve_correct_response(self):
+        """
+            Verify a query execute request never retrieves query request responses for a different query.
+        """
+        with open(self.get_test_baseline(
+                  u'test_query_retrieve_correct_response.txt'),
+                  u'r+b',
+                  buffering=0) as response_file:
+            request_stream = io.BytesIO()
+            rpc_client = json_rpc_client.JsonRpcClient(in_stream=request_stream,
+                                                       out_stream=response_file)
+            rpc_client.start()
+
+            owner_uri = u'mismatchquerycompleteresponse_2'
+            parameters = {u'OwnerUri': owner_uri,
+                          u'Query': "select * from HumanResources.Department"}
+            request = queryservice.QueryExecuteStringRequest(id=u'3',
+                                                             owner_uri=owner_uri,
+                                                             json_rpc_client=rpc_client,
+                                                             parameters=parameters)
+
+            # The baseline file contains responses for a different owner uri, which this request should not receive.
+            # Receiving a query complete event with a error message indicates we did not retrieve a wrong event.
+            self.verify_query_service_response(request=request,
+                                               expected_complete_event=1,
+                                               expected_error_count=1)
+
+            rpc_client.shutdown()
+
     def test_malformed_query_AdventureWorks2014(self):
         """
             Verify a failed query execute response for "select * from [HumanResources.Department"
@@ -188,6 +217,8 @@ class JSONRPCContractsTests(unittest.TestCase):
                         query_result_set_summaries = len(
                             response.batch_summaries[0].result_set_summaries)
                         query_row_count = response.batch_summaries[0].result_set_summaries[0].row_count
+                    if hasattr(response, 'exception_message') and response.exception_message:
+                        query_error_events += 1
                 elif isinstance(response, queryservice.ResultSubset):
                     query_result_subsets += 1
                     query_row_count = len(response.rows)
