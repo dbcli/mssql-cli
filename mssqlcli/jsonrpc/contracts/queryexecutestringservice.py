@@ -39,6 +39,7 @@ class QueryExecuteStringRequest(Request):
                isinstance(decoded_response, QueryExecuteErrorResponseEvent):
                 self.finished = True
                 self.json_rpc_client.request_finished(self.id)
+                self.json_rpc_client.request_finished(self.owner_uri)
 
             return decoded_response
 
@@ -166,6 +167,7 @@ class QuerySubsetRequest(Request):
             if isinstance(decoded_response, ResultSubset):
                 self.finished = True
                 self.json_rpc_client.request_finished(self.id)
+                self.json_rpc_client.request_finished(self.owner_uri)
 
             return decoded_response
 

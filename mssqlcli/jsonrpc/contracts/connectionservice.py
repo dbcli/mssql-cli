@@ -43,6 +43,7 @@ class ConnectionRequest(Request):
             if isinstance(decoded_response, ConnectionCompleteEvent):
                 self.finished = True
                 self.json_rpc_client.request_finished(self.id)
+                self.json_rpc_client.request_finished(self.owner_uri)
 
             return decoded_response
 
