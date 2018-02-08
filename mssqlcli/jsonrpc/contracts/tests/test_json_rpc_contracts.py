@@ -27,6 +27,7 @@ class JSONRPCContractsTests(unittest.TestCase):
             rpc_client = json_rpc_client.JsonRpcClient(in_stream=request_stream,
                                                        out_stream=response_file)
             rpc_client.start()
+
             owner_uri = u'connectionservicetest'
             parameters = {u'OwnerUri': owner_uri,
                           u'ServerName': u'bro-hb',
@@ -36,100 +37,102 @@ class JSONRPCContractsTests(unittest.TestCase):
                           u'AuthenticationType': u'Integrated',
                           u'MultipleActiveResultSets': True}
 
-            request = connectionservice.ConnectionRequest(id=1,
+            request = connectionservice.ConnectionRequest(id=u'1',
                                                           owner_uri=owner_uri,
                                                           json_rpc_client=rpc_client,
                                                           parameters=parameters)
-            self.verify_success_response(request=request)
+            self.verify_connection_service_response(request=request,
+                                                    expected_response_event=1,
+                                                    expected_complete_event=1)
             rpc_client.shutdown()
 
     def test_query_execute_response_AdventureWorks2014(self):
         """
-            Verify a successful query execute response for "select * from HumanResources.Department"
+           Verify a successful query execute response for "select * from HumanResources.Department"
         """
-
         with open(self.get_test_baseline(
                   u'select_from_humanresources_department_adventureworks2014.txt'),
                   u'r+b',
                   buffering=0) as response_file:
-
             request_stream = io.BytesIO()
             rpc_client = json_rpc_client.JsonRpcClient(in_stream=request_stream,
                                                        out_stream=response_file)
             rpc_client.start()
             # Submit a dummy request.
-            owner_uri = u'queryexecutetest'
+            owner_uri = u'connectionservicetest'
             parameters = {u'OwnerUri': owner_uri,
                           u'Query': "select * from HumanResources.Department"}
-
             request = queryservice.QueryExecuteStringRequest(id=2,
                                                              owner_uri=owner_uri,
                                                              json_rpc_client=rpc_client,
                                                              parameters=parameters)
-            self.verify_query_response(request=request,
-                                       expected_message_event=1,
-                                       expected_complete_event=1,
-                                       expected_batch_summaries=1,
-                                       expected_result_set_summaries=1,
-                                       expected_row_count=16)
-            rpc_client.shutdown()
-
-    def test_malformed_query_AdventureWorks2014(self):
-        """
-            Verify a failed query execute response for "select * from [HumanResources.Department"
-        """
-
-        with open(self.get_test_baseline(
-                  u'malformed_query_adventureworks2014.txt'),
-                  u'r+b',
-                  buffering=0) as response_file:
-
-            request_stream = io.BytesIO()
-            rpc_client = json_rpc_client.JsonRpcClient(in_stream=request_stream,
-                                                       out_stream=response_file)
-            rpc_client.start()
-            # Submit a dummy request.
-            owner_uri = u'malformedquerytest'
-            parameters = {u'OwnerUri': owner_uri,
-                          u'Query': "select * from [HumanResources.Department"}
-
-            request = queryservice.QueryExecuteStringRequest(id=2,
-                                                             owner_uri=owner_uri,
-                                                             json_rpc_client=rpc_client,
-                                                             parameters=parameters)
-            self.verify_query_response(request=request,
-                                       expected_error_count=1)
+            self.verify_query_service_response(request=request,
+                                               expected_message_event=1,
+                                               expected_complete_event=1,
+                                               expected_batch_summaries=1,
+                                               expected_result_set_summaries=1,
+                                               expected_row_count=16)
             rpc_client.shutdown()
 
     def test_query_subset_response_AdventureWorks2014(self):
         """
             Test the retrieval of the actual rows for "select * from HumanResources.Department"
         """
-
         with open(self.get_test_baseline(
                   u'select_from_humanresources_department_adventureworks2014.txt'),
                   u'r+b',
                   buffering=0) as response_file:
-
             request_stream = io.BytesIO()
             rpc_client = json_rpc_client.JsonRpcClient(
                 request_stream, response_file)
             rpc_client.start()
             # Submit a dummy request.
+            owner_uri = u'connectionservicetest'
             parameters = {u'OwnerUri': u'connectionservicetest',
                           u'BatchIndex': 0,
                           u'ResultSetIndex': 0,
                           u'RowsStartIndex': 0,
                           u'RowCount': 16}
-
-            request = queryservice.QuerySubsetRequest(
-                3, rpc_client, parameters)
-            self.verify_subset_response(request=request)
+            request = queryservice.QuerySubsetRequest(id=u'3',
+                                                      owner_uri=owner_uri,
+                                                      json_rpc_client=rpc_client,
+                                                      parameters=parameters)
+            self.verify_query_service_response(request=request,
+                                               expected_result_subsets=1,
+                                               expected_row_count=16)
             rpc_client.shutdown()
 
-    def verify_success_response(self, request):
+    def test_malformed_query_AdventureWorks2014(self):
+        """
+            Verify a failed query execute response for "select * from [HumanResources.Department"
+        """
+        with open(self.get_test_baseline(
+                  u'malformed_query_adventureworks2014.txt'),
+                  u'r+b',
+                  buffering=0) as response_file:
+            request_stream = io.BytesIO()
+            rpc_client = json_rpc_client.JsonRpcClient(in_stream=request_stream,
+                                                       out_stream=response_file)
+            rpc_client.start()
+            # Submit a dummy request.
+            owner_uri = u'connectionservicetest'
+            parameters = {u'OwnerUri': owner_uri,
+                          u'Query': "select * from [HumanResources.Department"}
+            request = queryservice.QueryExecuteStringRequest(id=u'2',
+                                                             owner_uri=owner_uri,
+                                                             json_rpc_client=rpc_client,
+                                                             parameters=parameters)
+            self.verify_query_service_response(request=request,
+                                               expected_error_count=1)
+            rpc_client.shutdown()
+
+    def verify_connection_service_response(self,
+                                           request,
+                                           expected_response_event=0,
+                                           expected_complete_event=0):
         response_event = 0
         complete_event = 0
+
         request.execute()
         time.sleep(1)
 
@@ -144,8 +147,60 @@ class JSONRPCContractsTests(unittest.TestCase):
                         self.assertTrue(connectionservice.handle_connection_response(response).connection_id,
                                         response.connection_id)
 
-        self.assertEqual(response_event, 1)
-        self.assertEqual(complete_event, 1)
+        self.assertEqual(response_event, expected_response_event)
+        self.assertEqual(complete_event, expected_complete_event)
+
+    def verify_query_service_response(self,
+                                      request,
+                                      expected_message_event=0,
+                                      expected_complete_event=0,
+                                      expected_batch_summaries=0,
+                                      expected_result_set_summaries=0,
+                                      expected_result_subsets=0,
+                                      expected_row_count=0,
+                                      expected_error_count=0):
+        # QueryExecuteString responses
+        query_message_events = 0
+        query_complete_events = 0
+        query_batch_summaries = 0
+        query_result_set_summaries = 0
+
+        # QuerySubsetRequest responses
+        query_result_subsets = 0
+
+        query_row_count = 0
+        query_error_events = 0
+
+        request.execute()
+        time.sleep(1)
+
+        while not request.completed():
+            response = request.get_response()
+            if response:
+                if isinstance(response, queryservice.QueryMessageEvent):
+                    query_message_events += 1
+                elif isinstance(response, queryservice.QueryExecuteErrorResponseEvent):
+                    query_error_events += 1
+                elif isinstance(response, queryservice.QueryCompleteEvent):
+                    query_complete_events += 1
+                    if hasattr(response, 'batch_summaries'):
+                        query_batch_summaries = len(response.batch_summaries)
+                        query_result_set_summaries = len(
+                            response.batch_summaries[0].result_set_summaries)
+                        query_row_count = response.batch_summaries[0].result_set_summaries[0].row_count
+                elif isinstance(response, queryservice.ResultSubset):
+                    query_result_subsets += 1
+                    query_row_count = len(response.rows)
+
+        self.assertEqual(query_message_events, expected_message_event)
+        self.assertEqual(query_complete_events, expected_complete_event)
+        self.assertEqual(query_batch_summaries, expected_batch_summaries)
+        self.assertEqual(query_result_set_summaries, expected_result_set_summaries)
+
+        self.assertEqual(query_result_subsets, expected_result_subsets)
+
+        self.assertEqual(query_row_count, expected_row_count)
+        self.assertEqual(query_error_events, expected_error_count)
 
     def get_test_baseline(self, file_name):
         """
