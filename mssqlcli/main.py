@@ -595,7 +595,7 @@ class MssqlCli(object):
         :param persist_priorities: 'all' or 'keywords'
         """
 
-        mssqlclclient_completion_refresher = self.get_completion_refresher_mssqlcliclient(
+        mssqlclclient_completion_refresher = self.create_completion_refresher_mssqlcliclient(
                                                 self.mssqlcliclient_query_execution)
 
         callback = functools.partial(self._on_completions_refreshed,
@@ -611,7 +611,7 @@ class MssqlCli(object):
         return [(None, None, None,
                  'Auto-completion refresh started in the background.')]
 
-    def get_completion_refresher_mssqlcliclient(self, mssqlcliclient):
+    def create_completion_refresher_mssqlcliclient(self, mssqlcliclient):
         mssqlcliclient_completion_refresher = MssqlCliClient(
                                                             mssqlcliclient.sql_tools_client,
                                                             mssqlcliclient.server_name,
