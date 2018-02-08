@@ -19,7 +19,7 @@ class JSONRPCContractsTests(unittest.TestCase):
         """
 
         with open(self.get_test_baseline(
-                  u'select_from_humanresources_department_adventureworks2014.txt'),
+                  u'test_simple_query.txt'),
                   u'r+b',
                   buffering=0) as response_file:
 
@@ -51,7 +51,7 @@ class JSONRPCContractsTests(unittest.TestCase):
            Verify a successful query execute response for "select * from HumanResources.Department"
         """
         with open(self.get_test_baseline(
-                  u'select_from_humanresources_department_adventureworks2014.txt'),
+                  u'test_simple_query.txt'),
                   u'r+b',
                   buffering=0) as response_file:
             request_stream = io.BytesIO()
@@ -79,7 +79,7 @@ class JSONRPCContractsTests(unittest.TestCase):
             Test the retrieval of the actual rows for "select * from HumanResources.Department"
         """
         with open(self.get_test_baseline(
-                  u'select_from_humanresources_department_adventureworks2014.txt'),
+                  u'test_simple_query.txt'),
                   u'r+b',
                   buffering=0) as response_file:
             request_stream = io.BytesIO()
@@ -136,7 +136,7 @@ class JSONRPCContractsTests(unittest.TestCase):
             Verify a failed query execute response for "select * from [HumanResources.Department"
         """
         with open(self.get_test_baseline(
-                  u'malformed_query_adventureworks2014.txt'),
+                  u'test_malformed_query.txt'),
                   u'r+b',
                   buffering=0) as response_file:
             request_stream = io.BytesIO()
