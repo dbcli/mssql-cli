@@ -612,7 +612,7 @@ class MssqlCli(object):
                  'Auto-completion refresh started in the background.')]
 
     def get_completion_refresher_mssqlcliclient(self, mssqlcliclient):
-        mssqlcliclient_completion_refreshser = MssqlCliClient(
+        mssqlcliclient_completion_refresher = MssqlCliClient(
                                                             mssqlcliclient.sql_tools_client,
                                                             mssqlcliclient.server_name,
                                                             mssqlcliclient.user_name,
@@ -627,7 +627,7 @@ class MssqlCli(object):
                                                             packet_size=mssqlcliclient.packet_size,
                                                             **mssqlcliclient.extra_params)
 
-        return mssqlcliclient_completion_refreshser
+        return mssqlcliclient_completion_refresher
 
     def _on_completions_refreshed(self, new_completer, persist_priorities):
         self._swap_completer_objects(new_completer, persist_priorities)
