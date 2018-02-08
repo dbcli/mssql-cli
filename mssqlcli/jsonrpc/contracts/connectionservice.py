@@ -34,7 +34,6 @@ class ConnectionRequest(Request):
         try:
             response = self.json_rpc_client.get_response(self.id) or \
                        self.json_rpc_client.get_response(self.owner_uri)
-
             decoded_response = None
             if response:
                 logger.debug(response)
@@ -54,7 +53,7 @@ class ConnectionRequest(Request):
             self.json_rpc_client.request_finished(self.owner_uri)
             return ConnectionCompleteEvent({
                 u'params': {
-                    u'ownerUri': None,
+                    u'ownerUri': self.owner_uri,
                     u'connectionId': None,
                     u'messages': str(error),
                     u'errorMessage': u'Connection request encountered an exception',
