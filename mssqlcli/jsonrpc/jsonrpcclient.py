@@ -122,6 +122,7 @@ class JsonRpcClient(object):
             try:
                 response = self.reader.read_response()
                 logger.info(dict(response))
+                response_id_str = None
 
                 if u'params' in response:
                     if u'ownerUri' in response.get(u'params'):
