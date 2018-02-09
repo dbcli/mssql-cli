@@ -63,26 +63,29 @@ class SqlToolsClient(object):
         self.json_rpc_client.start()
         logger.info(u'Sql Tools Client Initialized')
 
-    def create_request(self, request_type, parameters):
+    def create_request(self, request_type, parameters, owner_uri):
         """
             Create request of request type passed in.
         """
         request = None
-        self.current_id = uuid.uuid4().int
+        self.current_id = str(uuid.uuid4().int)
 
         if request_type == u'connection_request':
-            logger.info(u'SqlToolsClient connection request Id {0}'.format(self.current_id))
-            request = connection.ConnectionRequest(self.current_id, self.json_rpc_client, parameters)
+            logger.info(u'SqlToolsClient connection request Id {0} and owner Uri {1}'.format(self.current_id,
+                                                                                             owner_uri))
+            request = connection.ConnectionRequest(self.current_id, owner_uri, self.json_rpc_client, parameters)
             return request
 
         if request_type == u'query_execute_string_request':
-            logger.info(u'SqlToolsClient execute string request Id {0}'.format(self.current_id))
-            request = query.QueryExecuteStringRequest(self.current_id, self.json_rpc_client, parameters)
+            logger.info(u'SqlToolsClient execute string request Id {0} and owner Uri {1}'.format(self.current_id,
+                                                                                                 owner_uri))
+            request = query.QueryExecuteStringRequest(self.current_id, owner_uri, self.json_rpc_client, parameters)
             return request
 
         if request_type == u'query_subset_request':
-            logger.info(u'SqlToolsClient subset request Id {0}'.format(self.current_id))
-            request = query.QuerySubsetRequest(self.current_id, self.json_rpc_client, parameters)
+            logger.info(u'SqlToolsClient subset request Id {0} and owner Uri {1}'.format(self.current_id,
+                                                                                         owner_uri))
+            request = query.QuerySubsetRequest(self.current_id, owner_uri, self.json_rpc_client, parameters)
             return request
 
     def shutdown(self):

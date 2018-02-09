@@ -604,6 +604,7 @@ class MssqlCli(object):
 
             db_changed, new_db_name = has_change_db_cmd(sql, db_changed)
             if new_db_name:
+                logger.info('Database context changed.')
                 self.mssqlcliclient_query_execution.database = new_db_name
 
             if all_success:
@@ -634,12 +635,17 @@ class MssqlCli(object):
 
         :param persist_priorities: 'all' or 'keywords'
         """
+        # Clone mssqlcliclient to create a new connection with a new owner Uri.
+        mssqlclclient_completion_refresher = self.mssqlcliclient_query_execution.clone()
 
         callback = functools.partial(self._on_completions_refreshed,
                                      persist_priorities=persist_priorities)
 
-        self.completion_refresher.refresh(self.mssqlcliclient_query_execution,
-                                          callback, history=history, settings=self.settings)
+        self.completion_refresher.refresh(mssqcliclient=mssqlclclient_completion_refresher,
+                                          callbacks=callback,
+                                          history=history,
+                                          settings=self.settings)
+
         return [(None, None, None,
                  'Auto-completion refresh started in the background.')]
 

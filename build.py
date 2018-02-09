@@ -95,9 +95,17 @@ def unit_test():
     Run all unit tests.
     """
     utility.exec_command(
-        'pytest --cov mssqlcli tests/test_mssqlcliclient.py tests/test_main.py tests/test_fuzzy_completion.py '
-        'tests/test_rowlimit.py tests/test_sqlcompletion.py tests/test_prioritization.py mssqlcli/jsonrpc/contracts/tests '
-        'tests/test_telemetry.py tests/test_special.py',
+        'pytest --cov mssqlcli '
+        'tests/test_mssqlcliclient.py '
+        'tests/test_main.py '
+        'tests/test_fuzzy_completion.py '
+        'tests/test_rowlimit.py '
+        'tests/test_sqlcompletion.py '
+        'tests/test_prioritization.py '
+        'mssqlcli/jsonrpc/tests '
+        'mssqlcli/jsonrpc/contracts/tests '
+        'tests/test_telemetry.py '
+        'tests/test_special.py',
         utility.ROOT_DIR,
         continue_on_error=False)
 
