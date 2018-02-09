@@ -7,8 +7,10 @@ from collections import namedtuple, defaultdict, OrderedDict
 from prompt_toolkit.completion import Completer, Completion
 from prompt_toolkit.contrib.completers import PathCompleter
 from prompt_toolkit.document import Document
+from .packages import special
+from .packages.special.namedqueries import named_queries
 from .packages.sqlcompletion import (FromClauseItem,
-                                     suggest_type, Database, Schema, Table, Function, Column, View,
+                                     suggest_type, Special, NamedQuery, Database, Schema, Table, Function, Column, View,
                                      Keyword, Datatype, Alias, Path, JoinCondition, Join)
 from .packages.parseutils.meta import ColumnMetadata, ForeignKey
 from .packages.parseutils.utils import last_word
@@ -16,7 +18,7 @@ from .packages.parseutils.tables import TableReference
 from .packages.mssqlliterals.main import get_literals
 from .packages.prioritization import PrevalenceCounter
 
-_logger = logging.getLogger(__name__)
+_logger = logging.getLogger('mssqlcli.mssqlcompleter')
 
 Match = namedtuple('Match', ['completion', 'priority'])
 
@@ -812,6 +814,12 @@ class MssqlCompleter(Completer):
         for c in completer.get_completions(document, None):
             yield Match(completion=c, priority=(0,))
 
+    def get_special_matches(self, _, word_before_cursor):
+        commands = special.main.COMMANDS
+        cmds = commands.keys()
+        cmds = [Candidate(cmd, 0, commands[cmd].description) for cmd in cmds]
+        return self.find_matches(word_before_cursor, cmds, mode='strict')
+
     def get_datatype_matches(self, suggestion, word_before_cursor):
         # suggest custom datatypes
         types = self.populate_schema_objects(suggestion.schema, 'datatypes')
@@ -825,6 +833,10 @@ class MssqlCompleter(Completer):
 
         return matches
 
+    def get_namedquery_matches(self, _, word_before_cursor):
+        return self.find_matches(
+            word_before_cursor, named_queries.list(), meta='named query')
+
     suggestion_matchers = {
         FromClauseItem: get_from_clause_item_matches,
         JoinCondition: get_join_condition_matches,
@@ -837,7 +849,9 @@ class MssqlCompleter(Completer):
         Alias: get_alias_matches,
         Database: get_database_matches,
         Keyword: get_keyword_matches,
+        Special: get_special_matches,
         Datatype: get_datatype_matches,
+        NamedQuery: get_namedquery_matches,
         Path: get_path_matches,
     }
 

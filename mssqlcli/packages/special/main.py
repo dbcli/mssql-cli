@@ -74,9 +74,9 @@ def execute(mssqlcliclient, sql):
     if special_cmd.arg_type == NO_QUERY:
         return special_cmd.handler()
     elif special_cmd.arg_type == PARSED_QUERY:
-        return special_cmd.handler(mssqlcliclient, pattern=pattern, verbose=verbose)
+        return special_cmd.handler(mssqlcliclient=mssqlcliclient, pattern=pattern, verbose=verbose)
     elif special_cmd.arg_type == RAW_QUERY:
-        return special_cmd.handler(mssqlcliclient, query=sql)
+        return special_cmd.handler(mssqlcliclient=mssqlcliclient, query=sql)
 
 
 @special_command('help', '\\?', 'Show this help.', arg_type=NO_QUERY, aliases=('\\?', '?'))

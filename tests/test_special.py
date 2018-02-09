@@ -13,6 +13,8 @@ class SpecialCommandsTests(unittest.TestCase):
     database = 'mssql_cli_db_{0}'.format(session_guid)
     schema = 'mssql_cli_schema_{0}'.format(session_guid)
     index = 'mssql_cli_index_{0}'.format(session_guid)
+    function = 'mssql_cli_func_{0}'.format(session_guid)
+    login = 'mssql_cli_login_{0}'.format(session_guid)
 
     @classmethod
     def setUpClass(cls):
@@ -25,6 +27,9 @@ class SpecialCommandsTests(unittest.TestCase):
             list(client.execute_single_batch_query('CREATE VIEW {0} as SELECT a from {1};'.format(cls.view, cls.table1)))
             list(client.execute_single_batch_query('CREATE SCHEMA {0};'.format(cls.schema)))
             list(client.execute_single_batch_query('CREATE INDEX {0} ON {1} (x);'.format(cls.index, cls.table2)))
+            list(client.execute_single_batch_query('CREATE FUNCTION {0}() RETURNS TABLE AS RETURN (select 1 as number);'
+                                                   .format(cls.function)))
+            list(client.execute_single_batch_query('CREATE LOGIN {0} WITH PASSWORD=\'yoloC123445!\''.format(cls.login)))
         finally:
             shutdown(client)
 
@@ -37,8 +42,10 @@ class SpecialCommandsTests(unittest.TestCase):
             list(client.execute_single_batch_query('DROP INDEX {0} ON {1};'.format(cls.index, cls.table2)))
             list(client.execute_single_batch_query('DROP TABLE {0};'.format(cls.table1)))
             list(client.execute_single_batch_query('DROP TABLE {0};'.format(cls.table2)))
-            list(client.execute_single_batch_query('DROP VIEW {0} IF EXISTS;'.format(cls.view)))
+            list(client.execute_single_batch_query('DROP VIEW {0};'.format(cls.view)))
             list(client.execute_single_batch_query('DROP SCHEMA {0};'.format(cls.schema)))
+            list(client.execute_single_batch_query('DROP FUNCTION {0}'.format(cls.function)))
+            list(client.execute_single_batch_query('DROP LOGIN {0}'.format(cls.login)))
         finally:
             shutdown(client)
 
@@ -61,6 +68,67 @@ class SpecialCommandsTests(unittest.TestCase):
     def test_list_databases_command(self):
         self.command('\\l', self.database, min_rows_expected=1, rows_expected_pattern_query=1, cols_expected=1,
                      cols_expected_verbose=4)
+
+    def test_list_logins_command(self):
+        self.command('\\dl', self.login, min_rows_expected=1, rows_expected_pattern_query=1, cols_expected=2,
+                     cols_expected_verbose=5)
+
+    def test_list_functions_command(self):
+        self.command('\\df', self.function, min_rows_expected=1, rows_expected_pattern_query=1, cols_expected=1,
+                     cols_expected_verbose=2)
+
+    def test_show_function_definition_command(self):
+        try:
+            client = create_mssql_cli_client()
+            for rows, col, message, query, is_error in \
+                client.execute_multi_statement_single_batch('\\sf {0}'.format(self.function)):
+                    self.assertTrue(len(rows) == 1)
+                    self.assertTrue(len(col) == 1)
+        finally:
+            shutdown(client)
+
+    def test_describe_object_command(self):
+        try:
+            client = create_mssql_cli_client()
+            result_set_count = 0
+            for rows, col, message, query, is_error in \
+                client.execute_multi_statement_single_batch('\\d {0}'.format(self.function)):
+                    result_set_count += 1
+
+            self.assertTrue(result_set_count == 2)
+        finally:
+            shutdown(client)
+
+    def test_named_queries_commands(self):
+        try:
+            client = create_mssql_cli_client()
+
+            # Save named queries
+            list(client.execute_multi_statement_single_batch('\\ns test123 select 1'))
+            list(client.execute_multi_statement_single_batch('\\ns test234 select 2'))
+
+            # List named queries
+            for rows, col, message, sql, is_error in client.execute_multi_statement_single_batch('\\n'):
+                self.assertTrue(len(rows) >= 2)
+                num_queries = len(rows)
+
+            # Execute named query created above
+            for rows, col, message, sql, is_error in client.execute_multi_statement_single_batch('\\n test123'):
+                self.assertTrue(len(rows) == 1)
+                self.assertTrue(len(col) == 1)
+
+            # Delete a named query that was created
+            list(client.execute_multi_statement_single_batch('\\nd test123'))
+
+            # Number of named queries should have reduced by 1
+            for rows, col, message, sql, is_error in client.execute_multi_statement_single_batch('\\n'):
+                self.assertTrue(num_queries-1 == len(rows))
+
+            # Clean up the second named query created
+            list(client.execute_multi_statement_single_batch('\\nd test234'))
+
+        finally:
+            shutdown(client)
 
     def test_add_new_special_command(self):
         @special_command('\\empty', '\\empty[+]', 'returns an empty list', arg_type=NO_QUERY)
@@ -88,7 +156,6 @@ class SpecialCommandsTests(unittest.TestCase):
                 self.assertTrue(len(col) == cols_expected_verbose)
         finally:
             shutdown(client)
-
 
 
 if __name__ == u'__main__':
