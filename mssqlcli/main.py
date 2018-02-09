@@ -58,7 +58,7 @@ from collections import namedtuple
 # mssql-cli imports
 from mssqlcli.sqltoolsclient import SqlToolsClient
 from mssqlcli.mssqlcliclient import MssqlCliClient, reset_connection_and_clients
-from packages import special
+from mssqlcli.packages import special
 import mssqlcli.telemetry as telemetry_session
 
 # Query tuples are used for maintaining history

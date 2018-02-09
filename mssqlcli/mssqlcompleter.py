@@ -7,8 +7,8 @@ from collections import namedtuple, defaultdict, OrderedDict
 from prompt_toolkit.completion import Completer, Completion
 from prompt_toolkit.contrib.completers import PathCompleter
 from prompt_toolkit.document import Document
-from packages import special
-from packages.special.namedqueries import named_queries
+from .packages import special
+from .packages.special.namedqueries import named_queries
 from .packages.sqlcompletion import (FromClauseItem,
                                      suggest_type, Special, NamedQuery, Database, Schema, Table, Function, Column, View,
                                      Keyword, Datatype, Alias, Path, JoinCondition, Join)

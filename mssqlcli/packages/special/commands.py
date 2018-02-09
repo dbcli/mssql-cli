@@ -4,9 +4,9 @@ import shlex
 import re
 import io
 from os.path import expanduser
-from .main import special_command, NO_QUERY
-from .namedqueries import named_queries
-from . import export
+from mssqlcli.packages.special.main import special_command, NO_QUERY
+from mssqlcli.packages.special.namedqueries import named_queries
+from mssqlcli.packages.special import export
 
 logger = logging.getLogger('mssqlcli.commands')
 
