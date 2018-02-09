@@ -428,15 +428,12 @@ class MssqlCompleter(Completer):
         if smart_completion is None:
             smart_completion = self.smart_completion
 
-        # If smart_completion is off then match any word that starts with
-        # 'word_before_cursor'.
-        if not smart_completion:
-            matches = self.find_matches(word_before_cursor, self.all_completions,
-                                        mode='strict')
-            completions = [m.completion for m in matches]
-            return sorted(completions, key=operator.attrgetter('text'))
-
+        # If smart_completion is off then return nothing.
+        # Our notion of smart completion is all or none unlike PGCLI and MyCLI.
         matches = []
+        if not smart_completion:
+            return matches
+
         suggestions = suggest_type(document.text, document.text_before_cursor)
 
         for suggestion in suggestions:

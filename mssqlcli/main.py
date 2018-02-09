@@ -171,6 +171,8 @@ class MssqlCli(object):
 
         self.query_history = []
 
+        # Initialize completer
+        smart_completion = True if c['main'].get('smart_completion', 'True') == 'True' else False
         keyword_casing = c['main']['keyword_casing']
         self.settings = {
             'casing_file': get_casing_file(c),
@@ -185,7 +187,7 @@ class MssqlCli(object):
             'keyword_casing': keyword_casing,
         }
 
-        completer = MssqlCompleter(settings=self.settings)
+        completer = MssqlCompleter(smart_completion=smart_completion, settings=self.settings)
 
         self.completer = completer
         self._completer_lock = threading.Lock()
