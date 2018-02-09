@@ -612,22 +612,10 @@ class MssqlCli(object):
                  'Auto-completion refresh started in the background.')]
 
     def create_completion_refresher_mssqlcliclient(self, mssqlcliclient):
-        mssqlcliclient_completion_refresher = MssqlCliClient(
-                                                            mssqlcliclient.sql_tools_client,
-                                                            mssqlcliclient.server_name,
-                                                            mssqlcliclient.user_name,
-                                                            mssqlcliclient.password,
-                                                            database=mssqlcliclient.database,
-                                                            authentication_type=mssqlcliclient.authentication_type,
-                                                            encrypt=mssqlcliclient.encrypt,
-                                                            trust_server_certificate=mssqlcliclient.trust_server_certificate,
-                                                            connection_timeout=mssqlcliclient.connection_timeout,
-                                                            application_intent=mssqlcliclient.application_intent,
-                                                            multi_subnet_failover=mssqlcliclient.multi_subnet_failover,
-                                                            packet_size=mssqlcliclient.packet_size,
-                                                            **mssqlcliclient.extra_params)
-
-        return mssqlcliclient_completion_refresher
+        """
+            Clone a new mssqlcliclient with a new owner uri
+        """
+        return mssqlcliclient.clone(None)
 
     def _on_completions_refreshed(self, new_completer, persist_priorities):
         self._swap_completer_objects(new_completer, persist_priorities)

@@ -232,6 +232,28 @@ class MssqlCliClient(object):
 
         return rows, columns, message, query, is_error
 
+    def clone(self, new_owner_uri=None):
+        if not new_owner_uri:
+            new_owner_uri = generate_owner_uri()
+
+        cloned_mssqlcli_client = MssqlCliClient(
+                                                self.sql_tools_client,
+                                                self.server_name,
+                                                self.user_name,
+                                                self.password,
+                                                database=self.database,
+                                                owner_uri=new_owner_uri,
+                                                authentication_type=self.authentication_type,
+                                                encrypt=self.encrypt,
+                                                trust_server_certificate=self.trust_server_certificate,
+                                                connection_timeout=self.connection_timeout,
+                                                application_intent=self.application_intent,
+                                                multi_subnet_failover=self.multi_subnet_failover,
+                                                packet_size=self.packet_size,
+                                                **self.extra_params)
+
+        return cloned_mssqlcli_client
+
     def schemas(self):
         """ Returns a list of schema names"""
         query = mssqlqueries.get_schemas()
