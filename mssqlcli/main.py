@@ -594,9 +594,8 @@ class MssqlCli(object):
 
         :param persist_priorities: 'all' or 'keywords'
         """
-
-        mssqlclclient_completion_refresher = self.create_completion_refresher_mssqlcliclient(
-                                                self.mssqlcliclient_query_execution)
+        # Clone mssqlcliclient to create a new connection with a new owner Uri.
+        mssqlclclient_completion_refresher = self.mssqlcliclient_query_execution.clone()
 
         callback = functools.partial(self._on_completions_refreshed,
                                      persist_priorities=persist_priorities)
@@ -606,16 +605,8 @@ class MssqlCli(object):
                                           history=history,
                                           settings=self.settings)
 
-
-
         return [(None, None, None,
                  'Auto-completion refresh started in the background.')]
-
-    def create_completion_refresher_mssqlcliclient(self, mssqlcliclient):
-        """
-            Clone a new mssqlcliclient with a new owner uri
-        """
-        return mssqlcliclient.clone(None)
 
     def _on_completions_refreshed(self, new_completer, persist_priorities):
         self._swap_completer_objects(new_completer, persist_priorities)
