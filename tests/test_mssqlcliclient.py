@@ -43,7 +43,7 @@ class MssqlCliClientTests(unittest.TestCase):
                     u'baselines',
                     file_name))
 
-        with open(get_test_baseline(u'select_from_humanresources_department_adventureworks2014.txt'), u'r+b', buffering=0) as response_file:
+        with open(get_test_baseline(u'test_simple_query.txt'), u'r+b', buffering=0) as response_file:
             request_stream = io.BytesIO()
             self.sql_tools_client = sqltoolsclient.SqlToolsClient(
                 input_stream=request_stream, output_stream=response_file)
