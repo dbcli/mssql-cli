@@ -58,6 +58,7 @@ from collections import namedtuple
 # mssql-cli imports
 from mssqlcli.sqltoolsclient import SqlToolsClient
 from mssqlcli.mssqlcliclient import MssqlCliClient, reset_connection_and_clients
+from mssqlcli.packages import special
 import mssqlcli.telemetry as telemetry_session
 
 # Query tuples are used for maintaining history
@@ -170,6 +171,8 @@ class MssqlCli(object):
 
         self.query_history = []
 
+        # Initialize completer
+        smart_completion = True if c['main'].get('smart_completion', 'True') == 'True' else False
         keyword_casing = c['main']['keyword_casing']
         self.settings = {
             'casing_file': get_casing_file(c),
@@ -184,7 +187,7 @@ class MssqlCli(object):
             'keyword_casing': keyword_casing,
         }
 
-        completer = MssqlCompleter(settings=self.settings)
+        completer = MssqlCompleter(smart_completion=smart_completion, settings=self.settings)
 
         self.completer = completer
         self._completer_lock = threading.Lock()
@@ -330,6 +333,38 @@ class MssqlCli(object):
             click.secho(str(e), err=True, fg='red')
             exit(1)
 
+    def handle_editor_command(self, cli, document):
+        r"""
+        Editor command is any query that is prefixed or suffixed
+        by a '\e'. The reason for a while loop is because a user
+        might edit a query multiple times.
+        For eg:
+        "select * from \e"<enter> to edit it in vim, then come
+        back to the prompt with the edited query "select * from
+        blah where q = 'abc'\e" to edit it again.
+        :param cli: CommandLineInterface
+        :param document: Document
+        :return: Document
+        """
+        # FIXME: using application.pre_run_callables like this here is not the best solution.
+        # It's internal api of prompt_toolkit that may change. This was added to fix #668.
+        # We may find a better way to do it in the future.
+        saved_callables = cli.application.pre_run_callables
+        while special.editor_command(document.text):
+            filename = special.get_filename(document.text)
+            query = (special.get_editor_query(document.text) or
+                     self.get_last_query())
+            sql, message = special.open_external_editor(filename, sql=query)
+            if message:
+                # Something went wrong. Raise an exception and bail.
+                raise RuntimeError(message)
+            cli.current_buffer.document = Document(sql, cursor_position=len(sql))
+            cli.application.pre_run_callables = []
+            document = cli.run()
+            continue
+        cli.application.pre_run_callables = saved_callables
+        return document
+
     def execute_command(self, text, query):
         logger = self.logger
 
@@ -410,6 +445,14 @@ class MssqlCli(object):
                 # statement.
                 if quit_command(document.text):
                     raise EOFError
+
+                try:
+                    document = self.handle_editor_command(self.cli, document)
+                except RuntimeError as e:
+                    self.logger.error("sql: %r, error: %r", document.text, e)
+                    self.logger.error("traceback: %r", traceback.format_exc())
+                    click.secho(str(e), err=True, fg='red')
+                    continue
 
                 # Initialize default metaquery in case execution fails
                 query = MetaQuery(query=document.text, successful=False)
@@ -563,6 +606,7 @@ class MssqlCli(object):
 
             db_changed, new_db_name = has_change_db_cmd(sql, db_changed)
             if new_db_name:
+                logger.info('Database context changed.')
                 self.mssqlcliclient_query_execution.database = new_db_name
 
             if all_success:
@@ -593,12 +637,17 @@ class MssqlCli(object):
 
         :param persist_priorities: 'all' or 'keywords'
         """
+        # Clone mssqlcliclient to create a new connection with a new owner Uri.
+        mssqlclclient_completion_refresher = self.mssqlcliclient_query_execution.clone()
 
         callback = functools.partial(self._on_completions_refreshed,
                                      persist_priorities=persist_priorities)
 
-        self.completion_refresher.refresh(self.mssqlcliclient_query_execution,
-                                          callback, history=history, settings=self.settings)
+        self.completion_refresher.refresh(mssqcliclient=mssqlclclient_completion_refresher,
+                                          callbacks=callback,
+                                          history=history,
+                                          settings=self.settings)
+
         return [(None, None, None,
                  'Auto-completion refresh started in the background.')]
 

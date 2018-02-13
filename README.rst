@@ -34,7 +34,7 @@ Please refer to the `installation guide`_ for detailed install instructions.
 Usage
 -----
 
-Please refer to the `usage guide`_ for details on options and example usage.
+Please refer to the `usage guide`_ for details on options and example usage. If you are having any issues using mssql-cli, please see the `troubleshooting guide`_.
 
 For general help content, pass in the ``-h`` parameter:
 
@@ -65,14 +65,10 @@ License
 
 mssql-cli is licensed under the `BSD-3 license`_.
 
-Disclaimer for mssql_cli 0.0.3 users
-----------------------------------------
-
-For users of the older mssql_cli 0.0.3, please specifically download 0.0.3 as that version is no longer being maintained.
-
 .. _mssql-cli: https://github.com/dbcli/mssql-cli
 .. _dbcli.org community: https://github.com/dbcli
 .. _installation guide: https://github.com/dbcli/mssql-cli/tree/master/doc/installation_guide.md
+.. _troubleshooting guide: https://github.com/dbcli/mssql-cli/blob/master/doc/troubleshooting_guide.md
 .. _development guide: https://github.com/dbcli/mssql-cli/tree/master/doc/development_guide.md
 .. _usage guide: https://github.com/dbcli/mssql-cli/tree/master/doc/usage_guide.md
 .. _telemetry guide: https://github.com/dbcli/mssql-cli/tree/master/doc/telemetry_guide.md

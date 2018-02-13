@@ -1,9 +1,7 @@
-import sys
-
-PY2 = sys.version_info[0] == 2
-PY3 = sys.version_info[0] == 3
-
-text_type = unicode if PY2 else str
+try:
+    text_type = unicode
+except NameError:
+    text_type = str
 
 
 def unicode2utf8(arg):
@@ -12,8 +10,11 @@ def unicode2utf8(arg):
     In Python 3 the args are expected as unicode.
     """
 
-    if PY2 and isinstance(arg, unicode):
-        return arg.encode('utf-8')
+    try:
+        if isinstance(arg, unicode):
+            return arg.encode('utf-8')
+    except NameError:
+        pass  # Python 3
     return arg
 
 
@@ -23,6 +24,9 @@ def utf8tounicode(arg):
     In Python 3 the errors are returned as unicode.
     """
 
-    if PY2 and isinstance(arg, str):
-        return arg.decode('utf-8')
+    try:
+        if isinstance(arg, unicode):
+            return arg.decode('utf-8')
+    except NameError:
+        pass  # Python 3
     return arg

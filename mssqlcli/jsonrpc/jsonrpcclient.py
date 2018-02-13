@@ -1,7 +1,3 @@
-# --------------------------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for license information.
-# --------------------------------------------------------------------------------------------
 from __future__ import division
 from queue import Queue
 
@@ -54,7 +50,7 @@ class JsonRpcClient(object):
         """
             Submit json rpc request to input stream.
         """
-        if (method is None or params is None):
+        if not method or not params:
             raise ValueError(u'Method or Parameter was not found in request')
 
         request = {u'method': method, u'params': params, u'id': id}
@@ -68,13 +64,17 @@ class JsonRpcClient(object):
             logger.debug('Request with id: {} has completed.'.format(id))
             del self.response_map[id]
 
-    def get_response(self, id=0):
+    def get_response(self, id=0, owner_uri=0):
         """
             Get latest response. Priority order: Response, Event, Exception.
         """
         if id in self.response_map:
             if not self.response_map[id].empty():
                 return self.response_map[id].get()
+
+        if owner_uri in self.response_map:
+            if not self.response_map[owner_uri].empty():
+                return self.response_map[owner_uri].get()
 
         if not self.response_map[0].empty():
             return self.response_map[0].get()
@@ -92,7 +92,6 @@ class JsonRpcClient(object):
             try:
                 # Block until queue contains a request.
                 request = self.request_queue.get()
-
                 if request:
                     self.writer.send_request(
                         method=request[u'method'],
@@ -122,15 +121,22 @@ class JsonRpcClient(object):
         while not self.cancel:
             try:
                 response = self.reader.read_response()
-                response_id_str = response.get(u'id')
+                logger.info(dict(response))
+                response_id_str = None
+
+                if u'params' in response:
+                    if u'ownerUri' in response.get(u'params'):
+                        response_id_str = response[u'params'][u'ownerUri']
+                else:
+                    response_id_str = response.get(u'id')
+
                 if response_id_str:
-                    response_id = int(response_id_str)
                     # we have a id, map it with a new queue if it doesn't
                     # exist.
-                    if response_id not in self.response_map:
-                        self.response_map[response_id] = Queue()
+                    if response_id_str not in self.response_map:
+                        self.response_map[response_id_str] = Queue()
                     # Enqueue the response.
-                    self.response_map[response_id].put(response)
+                    self.response_map[response_id_str].put(response)
                 else:
                     # Event was returned.
                     self.response_map[0].put(response)

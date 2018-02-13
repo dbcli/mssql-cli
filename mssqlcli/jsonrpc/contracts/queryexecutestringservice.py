@@ -1,9 +1,7 @@
-# --------------------------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for license information.
-# --------------------------------------------------------------------------------------------
-
+import logging
 from mssqlcli.jsonrpc.contracts import Request
+
+logger = logging.getLogger(u'mssqlcli.queryexecutestringservice')
 
 
 class QueryExecuteStringRequest(Request):
@@ -13,8 +11,9 @@ class QueryExecuteStringRequest(Request):
 
     METHOD_NAME = u'query/executeString'
 
-    def __init__(self, id, json_rpc_client, parameters):
+    def __init__(self, id, owner_uri, json_rpc_client, parameters):
         self.id = id
+        self.owner_uri = owner_uri
         self.finished = False
         self.json_rpc_client = json_rpc_client
         self.params = QueryExecuteStringParams(parameters)
@@ -24,9 +23,9 @@ class QueryExecuteStringRequest(Request):
             Get latest response, event or exception if occured.
         """
         try:
-            response = self.json_rpc_client.get_response(self.id)
-            decoded_response = None
+            response = self.json_rpc_client.get_response(self.id, self.owner_uri)
 
+            decoded_response = None
             if response:
                 decoded_response = self.decode_response(response)
 
@@ -34,12 +33,14 @@ class QueryExecuteStringRequest(Request):
                isinstance(decoded_response, QueryExecuteErrorResponseEvent):
                 self.finished = True
                 self.json_rpc_client.request_finished(self.id)
+                self.json_rpc_client.request_finished(self.owner_uri)
 
             return decoded_response
 
         except Exception as error:
             self.finished = True
             self.json_rpc_client.request_finished(self.id)
+            self.json_rpc_client.request_finished(self.owner_uri)
             return QueryCompleteEvent(
                 {u'params': None}, exception_message=str(error)
             )
@@ -137,8 +138,9 @@ class QuerySubsetRequest(Request):
 
     METHOD_NAME = u'query/subset'
 
-    def __init__(self, id, json_rpc_client, parameters):
+    def __init__(self, id, owner_uri, json_rpc_client, parameters):
         self.id = id
+        self.owner_uri = owner_uri
         self.finished = False
         self.json_rpc_client = json_rpc_client
         self.params = QuerySubsetParams(parameters)
@@ -151,21 +153,22 @@ class QuerySubsetRequest(Request):
 
     def get_response(self):
         try:
-            response = self.json_rpc_client.get_response(self.id)
+            response = self.json_rpc_client.get_response(self.id, self.owner_uri)
             decoded_response = None
-
             if response:
                 decoded_response = self.decode_response(response)
 
             if isinstance(decoded_response, ResultSubset):
                 self.finished = True
                 self.json_rpc_client.request_finished(self.id)
+                self.json_rpc_client.request_finished(self.owner_uri)
 
             return decoded_response
 
         except Exception as error:
             self.finished = True
             self.json_rpc_client.request_finished(self.id)
+            self.json_rpc_client.request_finished(self.owner_uri)
             return ResultSubset(None, error_message=str(error))
 
     def execute(self):
@@ -177,7 +180,7 @@ class QuerySubsetRequest(Request):
             return ResultSubset(response)
         elif u'error' in response:
             return ResultSubset(
-                None, error_message=response[u'error']['Message'])
+                None, error_message=response[u'error']['message'])
 
 
 class QuerySubsetParams(object):

@@ -9,6 +9,7 @@ import sqlparse
 
 from mssqlcli import mssqlqueries
 from mssqlcli.jsonrpc.contracts import connectionservice, queryexecutestringservice as queryservice
+from mssqlcli.packages import special
 from mssqlcli.packages.parseutils.meta import ForeignKey
 from mssqlcli.sqltoolsclient import SqlToolsClient
 
@@ -59,7 +60,7 @@ class MssqlCliClient(object):
         if not owner_uri:
             self.owner_uri = generate_owner_uri()
 
-        logger.info(u'Initialized MssqlCliClient')
+        logger.info(u'Initialized MssqlCliClient with owner Uri {}'.format(self.owner_uri))
 
     def connect(self):
         """
@@ -95,7 +96,7 @@ class MssqlCliClient(object):
         connection_params.update(self.extra_params)
 
         connection_request = self.sql_tools_client.create_request(
-            u'connection_request', connection_params)
+            u'connection_request', connection_params, self.owner_uri)
         connection_request.execute()
 
         while not connection_request.completed():
@@ -121,19 +122,25 @@ class MssqlCliClient(object):
             return self.owner_uri
 
     def execute_multi_statement_single_batch(self, query):
-        # Remove spaces, EOL and semi-colons from end
-        query = query.strip()
-        if not query:
-            yield None, None, None, query, False
-        else:
-            for sql in sqlparse.split(query):
-                # Remove spaces, EOL and semi-colons from end
-                sql = sql.strip().rstrip(';')
-                if not sql:
-                    yield None, None, None, sql, False
-                    continue
-                for rows, columns, status, statement, is_error in self.execute_single_batch_query(sql):
-                    yield rows, columns, status, statement, is_error
+        # Try to run first as special command
+        try:
+            for rows, columns, status, statement, is_error in special.execute(self, query):
+                yield rows, columns, status, statement, is_error
+        except special.CommandNotFound:
+            # Execute as normal sql
+            # Remove spaces, EOL and semi-colons from end
+            query = query.strip()
+            if not query:
+                yield None, None, None, query, False
+            else:
+                for sql in sqlparse.split(query):
+                    # Remove spaces, EOL and semi-colons from end
+                    sql = sql.strip().rstrip(';')
+                    if not sql:
+                        yield None, None, None, sql, False
+                        continue
+                    for rows, columns, status, statement, is_error in self.execute_single_batch_query(sql):
+                        yield rows, columns, status, statement, is_error
 
     def execute_single_batch_query(self, query):
         if not self.is_connected:
@@ -144,7 +151,9 @@ class MssqlCliClient(object):
             exit(1)
 
         query_request = self.sql_tools_client.create_request(u'query_execute_string_request',
-                                                             {u'OwnerUri': self.owner_uri, u'Query': query})
+                                                                {u'OwnerUri': self.owner_uri,
+                                                                 u'Query': query},
+                                                             self.owner_uri)
         query_request.execute()
         query_messages = []
         while not query_request.completed():
@@ -157,7 +166,6 @@ class MssqlCliClient(object):
 
         if query_response.exception_message:
             logger.error(u'Query response had an exception')
-
             yield self.tabular_results_generator(
                 column_info=None,
                 result_rows=None,
@@ -178,11 +186,13 @@ class MssqlCliClient(object):
         else:
             for result_set_summary in query_response.batch_summaries[0].result_set_summaries:
                 query_subset_request = self.sql_tools_client.create_request(u'query_subset_request',
-                                                                            {u'OwnerUri': query_response.owner_uri,
-                                                                             u'BatchIndex': result_set_summary.batch_id,
+                                                                            {
+                                                                                u'OwnerUri': query_response.owner_uri,
+                                                                                u'BatchIndex': result_set_summary.batch_id,
                                                                                 u'ResultSetIndex': result_set_summary.id,
                                                                                 u'RowsStartIndex': 0,
-                                                                                u'RowCount': result_set_summary.row_count})
+                                                                                u'RowCount': result_set_summary.row_count},
+                                                                            self.owner_uri)
 
                 query_subset_request.execute()
                 while not query_subset_request.completed():
@@ -190,8 +200,10 @@ class MssqlCliClient(object):
                     if not subset_response:
                         sleep(time_wait_if_no_response)
 
+                logger.info('Getting response for id {}'.format(query_subset_request.id))
                 if subset_response.error_message:
-                    logger.error(u'Error obtaining result sets for query response')
+                    logger.error(u'Error obtaining result sets for query response for id {}'.format(query_subset_request.id))
+                    logger.error(u'Error Message: {}'.format(subset_response.error_message))
                     yield self.tabular_results_generator(
                         column_info=None,
                         result_rows=None,
@@ -199,12 +211,12 @@ class MssqlCliClient(object):
                         message=subset_response.error_message,
                         is_error=True)
 
-                logger.info(u'Obtained result set for query')
                 yield self.tabular_results_generator(
                     column_info=result_set_summary.column_info,
                     result_rows=subset_response.rows,
                     query=query,
                     message=query_messages[result_set_summary.id].message if query_messages else u'')
+
 
     def tabular_results_generator(
             self, column_info, result_rows, query, message, is_error=False):
@@ -219,6 +231,28 @@ class MssqlCliClient(object):
                  for result_row in result_rows]) if result_rows else ()
 
         return rows, columns, message, query, is_error
+
+    def clone(self, new_owner_uri=None):
+        if not new_owner_uri:
+            new_owner_uri = generate_owner_uri()
+
+        cloned_mssqlcli_client = MssqlCliClient(
+                                                self.sql_tools_client,
+                                                self.server_name,
+                                                self.user_name,
+                                                self.password,
+                                                database=self.database,
+                                                owner_uri=new_owner_uri,
+                                                authentication_type=self.authentication_type,
+                                                encrypt=self.encrypt,
+                                                trust_server_certificate=self.trust_server_certificate,
+                                                connection_timeout=self.connection_timeout,
+                                                application_intent=self.application_intent,
+                                                multi_subnet_failover=self.multi_subnet_failover,
+                                                packet_size=self.packet_size,
+                                                **self.extra_params)
+
+        return cloned_mssqlcli_client
 
     def schemas(self):
         """ Returns a list of schema names"""

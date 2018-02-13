@@ -1,7 +1,3 @@
-# --------------------------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for license information.
-# --------------------------------------------------------------------------------------------
 from mssqlcli.jsonrpc.contracts import Request
 
 import sys
@@ -16,8 +12,9 @@ class ConnectionRequest(Request):
     """
     METHOD_NAME = u'connection/connect'
 
-    def __init__(self, id, json_rpc_client, parameters):
+    def __init__(self, id, owner_uri, json_rpc_client, parameters):
         self.id = id
+        self.owner_uri = owner_uri
         self.finished = False
         self.json_rpc_client = json_rpc_client
         self.params = ConnectionParams(parameters)
@@ -31,9 +28,8 @@ class ConnectionRequest(Request):
             Get latest response, event or exception if it occured.
         """
         try:
-            response = self.json_rpc_client.get_response(self.id)
+            response = self.json_rpc_client.get_response(self.id, self.owner_uri)
             decoded_response = None
-
             if response:
                 logger.debug(response)
                 decoded_response = self.decode_response(response)
@@ -41,6 +37,7 @@ class ConnectionRequest(Request):
             if isinstance(decoded_response, ConnectionCompleteEvent):
                 self.finished = True
                 self.json_rpc_client.request_finished(self.id)
+                self.json_rpc_client.request_finished(self.owner_uri)
 
             return decoded_response
 
@@ -48,9 +45,10 @@ class ConnectionRequest(Request):
             logger.debug(str(error))
             self.finished = True
             self.json_rpc_client.request_finished(self.id)
+            self.json_rpc_client.request_finished(self.owner_uri)
             return ConnectionCompleteEvent({
                 u'params': {
-                    u'ownerUri': None,
+                    u'ownerUri': self.owner_uri,
                     u'connectionId': None,
                     u'messages': str(error),
                     u'errorMessage': u'Connection request encountered an exception',
