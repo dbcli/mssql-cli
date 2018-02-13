@@ -4,6 +4,7 @@ Contents
 * [Options](#options)
 * [Examples](#examples)
 *  [Environment Variables](#environment-variables)
+* [Special Commands](#special-commands)
 
 ## Description
 mssql-cli is a new and interactive command line query tool for SQL Server. This open source tool works cross-platform and is a proud member of the dbcli community.
@@ -160,3 +161,67 @@ Set environment variable MSSQL_CLI_ROW_LIMIT to set threshold for row limit prom
 set MSSQL_CLI_ROW_LIMIT=10
 mssql-cli -S localhost -U sa
 ```
+
+## Special Commands
+Special commands are meant to make your life easier. They are shortcuts to a lot of commonly performed tasks and queries.
+Moreover you can save your own commonly used queries as shortcuts. 
+
+All special commands start with a backslash ('\\') and doing so will bring up an autocomplete with all special commands and their descriptions. 
+
+For more help simply type '\\?' inside the mssql-cli prompt to list all the special commands, their usage and description.
+
+```bash
+mssql-cli>\?
+```
+
+Here are a few examples:
+
+### Example 1: List tables
+Show all tables which contain foo in their names:
+```bash
+mssql-cli>\dt foo
+```
+For verbose output:
+```bash
+mssql-cli>\dt+ foo
+```
+
+
+### Example 2: Named queries
+Save 'select * from HumanResources.Department' as a named query called 'dept':
+```bash
+mssql-cli>\ns dept select * from "HumanResources"."Department"
+```
+Run the named query:
+```bash
+mssql-cli>\n dept
+```
+
+You can even add parameters to your saved query:
+```bash
+mssql-cli>\ns dept select * from "HumanResources"."Department" where "Name" like '%$1%'
+```
+Run the named query 'dept' with a parameter:
+```bash
+mssql-cli>\n dept Human
+```
+
+### Full list of special commands
+Below table summarizes the special commands supported
+
+| Command | Usage | Description
+| --- | --- | --- |
+| \\d | \\d OBJECT | List or describe database objects. Calls sp_help.
+| \\df | \\df[+] [pattern] | List functions.
+| \\di | \\di[+] [pattern] | List indexes.
+| \\dl | \\dl[+] [pattern] | Show logins and associated roles.
+| \\dn | \\dn[+] [pattern] | List schemas.
+| \\dt | \\dt[+] [pattern] | List tables.
+| \\dv | \\dv[+] [pattern]| List views.
+| \\e | \\e [File] | Edit query with external editor.
+| \\l | \\l[+] [pattern]| List databases.
+| \\n | \\n[+] [name] [param1 param2 ...] | List or execute named queries.
+| \\nd | \\nd [name] | Delete a named query.
+| \\ns | \\ns name query | Save a named query.
+| \\sf | \\sf FUNCNAME | Show a functions definition.
+| \\? | \\? | Show this help.
