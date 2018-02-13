@@ -1,4 +1,4 @@
-from mssqlcli.packages.sqlcompletion import (
+from mssqlcli.packages.sqlsuggestion import (
     suggest_type, Special, Database, Schema, Table, Column, View, Keyword,
     FromClauseItem, Function, Datatype, Alias, JoinCondition, Join)
 from mssqlcli.packages.parseutils.tables import TableReference
