@@ -165,3 +165,47 @@ def get_foreignkeys():
             AND kcu2.constraint_name = rc.unique_constraint_name
             AND kcu2.ordinal_position = kcu1.ordinal_position
             ORDER BY 3, 4'''
+
+
+def get_user_defined_functions():
+    """
+    Query string for returning user defined functions and their parameters
+    :return: string
+    """
+    return '''	
+        SELECT	
+            schema_name(schema_id) AS schema_name, 
+            SO.name AS function_name,
+            P.parameter_id AS param_id,
+            P.name AS param_name,
+            type_name(P.user_type_id) AS param_type
+        FROM sys.objects AS SO
+        INNER JOIN sys.parameters AS P ON SO.object_id = P.object_id
+        WHERE SO.object_id IN ( 
+            SELECT object_id    
+            FROM sys.objects
+            WHERE TYPE IN ('FN'))
+            AND P.is_output = 0
+        ORDER BY schema_name, function_name, P.parameter_id'''
+
+
+def get_stored_procedures():
+    """
+    Query string for returning user defined procedures and their parameters
+    :return: string
+    """
+    return '''
+        SELECT	
+            schema_name(schema_id) AS schema_name, 
+            SO.name AS procedure_name,
+            P.parameter_id AS param_id,
+            P.name AS param_name,
+            type_name(P.user_type_id) AS param_type
+        FROM sys.objects AS SO
+        INNER JOIN sys.parameters AS P ON SO.object_id = P.object_id
+        WHERE SO.object_id IN ( 
+            SELECT object_id    
+            FROM sys.objects
+            WHERE TYPE IN ('P'))
+            AND P.is_output = 0
+        ORDER BY schema_name, procedure_name, P.parameter_id'''
