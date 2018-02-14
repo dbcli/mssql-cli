@@ -157,7 +157,7 @@ def describe_object(mssqlcliclient, pattern, verbose):
     return mssqlcliclient.execute_multi_statement_single_batch(base_query)
 
 
-@special_command('\\ll', '\\ll[+] [pattern]', 'Show logins and associated roles.')
+@special_command('\\ll', '\\ll[+] [pattern]', 'List logins and associated roles.')
 def list_logins(mssqlcliclient, pattern, verbose):
     base_query = '''
 SELECT {cols}

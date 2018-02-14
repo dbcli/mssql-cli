@@ -217,7 +217,7 @@ Below table summarizes the special commands supported
 |\ld  | \ld[+] [pattern]                 | List databases.                                  
 |\lf  | \lf[+] [pattern]                 | List functions.                                  
 |\li  | \li[+] [pattern]                 | List indexes.                                    
-|\ll  | \ll[+] [pattern]                 | Show logins and associated roles.                
+|\ll  | \ll[+] [pattern]                 | List logins and associated roles.                
 |\ln  | \ln[+] [name] [param1 param2 ...]| List or execute named queries.                   
 |\ls  | \ls[+] [pattern]                 | List schemas.                                    
 |\lt  | \lt[+] [pattern]                 | List tables.                                     
