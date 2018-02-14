@@ -217,11 +217,11 @@ Below table summarizes the special commands supported
 |\ld  | \ld[+] [pattern]                 | List databases.                                  
 |\lf  | \lf[+] [pattern]                 | List functions.                                  
 |\li  | \li[+] [pattern]                 | List indexes.                                    
-|\ll  | \ll[+] [pattern]                 | List logins and associated roles.                
-|\ln  | \ln[+] [name] [param1 param2 ...]| List or execute named queries.                   
+|\ll  | \ll[+] [pattern]                 | List logins and associated roles.                                
 |\ls  | \ls[+] [pattern]                 | List schemas.                                    
 |\lt  | \lt[+] [pattern]                 | List tables.                                     
-|\lv  | \lv[+] [pattern]                 | List views.                                      
+|\lv  | \lv[+] [pattern]                 | List views.      
+|\n   | \n[+] [name] [param1 param2 ...] | List or execute named queries.                                   
 |\sf  | \sf FUNCNAME                     | Show a function's definition.                    
 |\sn  | \sn name query                   | Save a named query.                              
 |help | \?                               | Show this help.                                  

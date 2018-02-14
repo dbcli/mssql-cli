@@ -108,12 +108,12 @@ class SpecialCommandsTests(unittest.TestCase):
             list(client.execute_multi_statement_single_batch('\\sn test234 select 2'))
 
             # List named queries
-            for rows, col, message, sql, is_error in client.execute_multi_statement_single_batch('\\ln'):
+            for rows, col, message, sql, is_error in client.execute_multi_statement_single_batch('\\n'):
                 self.assertTrue(len(rows) >= 2)
                 num_queries = len(rows)
 
             # Execute named query created above
-            for rows, col, message, sql, is_error in client.execute_multi_statement_single_batch('\\ln test123'):
+            for rows, col, message, sql, is_error in client.execute_multi_statement_single_batch('\\n test123'):
                 self.assertTrue(len(rows) == 1)
                 self.assertTrue(len(col) == 1)
 
@@ -121,7 +121,7 @@ class SpecialCommandsTests(unittest.TestCase):
             list(client.execute_multi_statement_single_batch('\\dn test123'))
 
             # Number of named queries should have reduced by 1
-            for rows, col, message, sql, is_error in client.execute_multi_statement_single_batch('\\ln'):
+            for rows, col, message, sql, is_error in client.execute_multi_statement_single_batch('\\n'):
                 self.assertTrue(num_queries-1 == len(rows))
 
             # Clean up the second named query created

@@ -180,7 +180,7 @@ ORDER BY name, type_desc
     return mssqlcliclient.execute_multi_statement_single_batch(base_query)
 
 
-@special_command('\\ln', '\\ln[+] [name] [param1 param2 ...]', 'List or execute named queries.')
+@special_command('\\n', '\\n[+] [name] [param1 param2 ...]', 'List or execute named queries.')
 def execute_named_query(mssqlcliclient, pattern, **__):
     if pattern == '':
         return list_named_queries(True)

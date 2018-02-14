@@ -11,7 +11,7 @@ Examples:
     > \\sn simple select * from abc where a is not Null;
 
     # List all named queries.
-    > \\ln
+    > \\n
     +--------+----------------------------------------+
     | Name   | Query                                  |
     |--------+----------------------------------------|
