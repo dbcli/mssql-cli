@@ -11,7 +11,7 @@ from mssqlcli.packages.special import export
 logger = logging.getLogger('mssqlcli.commands')
 
 
-@special_command('\\l', '\\l[+] [pattern]', 'List databases.', aliases=('\\list',))
+@special_command('\\ld', '\\ld[+] [pattern]', 'List databases.')
 def list_databases(mssqlcliclient, pattern, verbose):
     base_query = u'select {0} from sys.databases'
     if verbose:
@@ -24,7 +24,7 @@ def list_databases(mssqlcliclient, pattern, verbose):
     return mssqlcliclient.execute_multi_statement_single_batch(base_query)
 
 
-@special_command('\\dn', '\\dn[+] [pattern]', 'List schemas.')
+@special_command('\\ls', '\\ls[+] [pattern]', 'List schemas.')
 def list_schemas(mssqlcliclient, pattern, verbose):
     pattern = pattern.replace('"', '')
     base_query = u'select {0} from sys.schemas'
@@ -38,7 +38,7 @@ def list_schemas(mssqlcliclient, pattern, verbose):
     return mssqlcliclient.execute_multi_statement_single_batch(base_query)
 
 
-@special_command('\\dt', '\\dt[+] [pattern]', 'List tables.')
+@special_command('\\lt', '\\lt[+] [pattern]', 'List tables.')
 def list_tables(mssqlcliclient, pattern, verbose):
     pattern = pattern.replace('"', '').split('.')[-1]
     base_query = u'select {0} from INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE=\'BASE TABLE\''
@@ -52,7 +52,7 @@ def list_tables(mssqlcliclient, pattern, verbose):
     return mssqlcliclient.execute_multi_statement_single_batch(base_query)
 
 
-@special_command('\\dv', '\\dv[+] [pattern]', 'List views.')
+@special_command('\\lv', '\\lv[+] [pattern]', 'List views.')
 def list_views(mssqlcliclient, pattern, verbose):
     pattern = pattern.replace('"', '').split('.')[-1]
     base_query = u'select {0} from INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE=\'VIEW\''
@@ -67,7 +67,7 @@ def list_views(mssqlcliclient, pattern, verbose):
     return mssqlcliclient.execute_multi_statement_single_batch(base_query)
 
 
-@special_command('\\di', '\\di[+] [pattern]', 'List indexes.')
+@special_command('\\li', '\\li[+] [pattern]', 'List indexes.')
 def list_indexes(mssqlcliclient, pattern, verbose):
     pattern = pattern.replace('"', '').split('.')[-1]
     base_query = '''
@@ -106,7 +106,7 @@ ORDER BY
     return mssqlcliclient.execute_multi_statement_single_batch(base_query)
 
 
-@special_command('\\df', '\\df[+] [pattern]', 'List functions.')
+@special_command('\\lf', '\\lf[+] [pattern]', 'List functions.')
 def list_functions(mssqlcliclient, pattern, verbose):
     pattern = pattern.replace('"', '').split('.')[-1]
     base_query = '''
@@ -157,7 +157,7 @@ def describe_object(mssqlcliclient, pattern, verbose):
     return mssqlcliclient.execute_multi_statement_single_batch(base_query)
 
 
-@special_command('\\dl', '\\dl[+] [pattern]', 'Show logins and associated roles.')
+@special_command('\\ll', '\\ll[+] [pattern]', 'List logins and associated roles.')
 def list_logins(mssqlcliclient, pattern, verbose):
     base_query = '''
 SELECT {cols}
@@ -200,7 +200,7 @@ def execute_named_query(mssqlcliclient, pattern, **__):
             return mssqlcliclient.execute_multi_statement_single_batch(query)
 
 
-@special_command('\\ns', '\\ns name query', 'Save a named query.')
+@special_command('\\sn', '\\sn name query', 'Save a named query.')
 def save_favorite_query(pattern, **_):
     """Save a new favorite query.
     Returns (rows, cols, status, sql, is_error)"""
@@ -219,11 +219,11 @@ def save_favorite_query(pattern, **_):
     return [(None, None, "Saved.", None, False)]
 
 
-@special_command('\\nd', '\\nd [name]', 'Delete a named query.')
+@special_command('\\dn', '\\dn [name]', 'Delete a named query.')
 def delete_named_query(pattern, **_):
     """Delete an existing named query.
     """
-    usage = 'Syntax: \\nd name.\n\n' + named_queries.usage
+    usage = 'Syntax: \\dn name.\n\n' + named_queries.usage
     if not pattern:
         return [(None, None, usage, None, False)]
 

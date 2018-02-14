@@ -50,31 +50,31 @@ class SpecialCommandsTests(unittest.TestCase):
             shutdown(client)
 
     def test_list_tables_command(self):
-        self.command('\\dt', self.table1, min_rows_expected=2, rows_expected_pattern_query=1, cols_expected=2,
+        self.command('\\lt', self.table1, min_rows_expected=2, rows_expected_pattern_query=1, cols_expected=2,
                      cols_expected_verbose=4)
 
     def test_list_views_command(self):
-        self.command('\\dv', self.view, min_rows_expected=1, rows_expected_pattern_query=1, cols_expected=2,
+        self.command('\\lv', self.view, min_rows_expected=1, rows_expected_pattern_query=1, cols_expected=2,
                      cols_expected_verbose=3)
 
     def test_list_schemas_command(self):
-        self.command('\\dn', self.schema, min_rows_expected=1, rows_expected_pattern_query=1, cols_expected=1,
+        self.command('\\ls', self.schema, min_rows_expected=1, rows_expected_pattern_query=1, cols_expected=1,
                      cols_expected_verbose=3)
 
     def test_list_indices_command(self):
-        self.command('\\di', self.index, min_rows_expected=1, rows_expected_pattern_query=1, cols_expected=3,
+        self.command('\\li', self.index, min_rows_expected=1, rows_expected_pattern_query=1, cols_expected=3,
                      cols_expected_verbose=5)
 
     def test_list_databases_command(self):
-        self.command('\\l', self.database, min_rows_expected=1, rows_expected_pattern_query=1, cols_expected=1,
+        self.command('\\ld', self.database, min_rows_expected=1, rows_expected_pattern_query=1, cols_expected=1,
                      cols_expected_verbose=4)
 
     def test_list_logins_command(self):
-        self.command('\\dl', self.login, min_rows_expected=1, rows_expected_pattern_query=1, cols_expected=2,
+        self.command('\\ll', self.login, min_rows_expected=1, rows_expected_pattern_query=1, cols_expected=2,
                      cols_expected_verbose=5)
 
     def test_list_functions_command(self):
-        self.command('\\df', self.function, min_rows_expected=1, rows_expected_pattern_query=1, cols_expected=1,
+        self.command('\\lf', self.function, min_rows_expected=1, rows_expected_pattern_query=1, cols_expected=1,
                      cols_expected_verbose=2)
 
     def test_show_function_definition_command(self):
@@ -104,8 +104,8 @@ class SpecialCommandsTests(unittest.TestCase):
             client = create_mssql_cli_client()
 
             # Save named queries
-            list(client.execute_multi_statement_single_batch('\\ns test123 select 1'))
-            list(client.execute_multi_statement_single_batch('\\ns test234 select 2'))
+            list(client.execute_multi_statement_single_batch('\\sn test123 select 1'))
+            list(client.execute_multi_statement_single_batch('\\sn test234 select 2'))
 
             # List named queries
             for rows, col, message, sql, is_error in client.execute_multi_statement_single_batch('\\n'):
@@ -118,14 +118,14 @@ class SpecialCommandsTests(unittest.TestCase):
                 self.assertTrue(len(col) == 1)
 
             # Delete a named query that was created
-            list(client.execute_multi_statement_single_batch('\\nd test123'))
+            list(client.execute_multi_statement_single_batch('\\dn test123'))
 
             # Number of named queries should have reduced by 1
             for rows, col, message, sql, is_error in client.execute_multi_statement_single_batch('\\n'):
                 self.assertTrue(num_queries-1 == len(rows))
 
             # Clean up the second named query created
-            list(client.execute_multi_statement_single_batch('\\nd test234'))
+            list(client.execute_multi_statement_single_batch('\\dn test234'))
 
         finally:
             shutdown(client)

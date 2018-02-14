@@ -179,18 +179,18 @@ Here are a few examples:
 ### Example 1: List tables
 Show all tables which contain foo in their names:
 ```bash
-mssql-cli>\dt foo
+mssql-cli>\lt foo
 ```
 For verbose output:
 ```bash
-mssql-cli>\dt+ foo
+mssql-cli>\lt+ foo
 ```
 
 
 ### Example 2: Named queries
 Save 'select * from HumanResources.Department' as a named query called 'dept':
 ```bash
-mssql-cli>\ns dept select * from "HumanResources"."Department"
+mssql-cli>\sn dept select * from "HumanResources"."Department"
 ```
 Run the named query:
 ```bash
@@ -199,7 +199,7 @@ mssql-cli>\n dept
 
 You can even add parameters to your saved query:
 ```bash
-mssql-cli>\ns dept select * from "HumanResources"."Department" where "Name" like '%$1%'
+mssql-cli>\sn dept select * from "HumanResources"."Department" where "Name" like '%$1%'
 ```
 Run the named query 'dept' with a parameter:
 ```bash
@@ -211,17 +211,18 @@ Below table summarizes the special commands supported
 
 | Command | Usage | Description
 | --- | --- | --- |
-| \\d | \\d OBJECT | List or describe database objects. Calls sp_help.
-| \\df | \\df[+] [pattern] | List functions.
-| \\di | \\di[+] [pattern] | List indexes.
-| \\dl | \\dl[+] [pattern] | Show logins and associated roles.
-| \\dn | \\dn[+] [pattern] | List schemas.
-| \\dt | \\dt[+] [pattern] | List tables.
-| \\dv | \\dv[+] [pattern]| List views.
-| \\e | \\e [File] | Edit query with external editor.
-| \\l | \\l[+] [pattern]| List databases.
-| \\n | \\n[+] [name] [param1 param2 ...] | List or execute named queries.
-| \\nd | \\nd [name] | Delete a named query.
-| \\ns | \\ns name query | Save a named query.
-| \\sf | \\sf FUNCNAME | Show a functions definition.
-| \\? | \\? | Show this help.
+|\d   | \d OBJECT                        | List or describe database objects. Calls sp_help.
+|\dn  | \dn [name]                       | Delete a named query.                            
+|\e   | \e [file]                        | Edit the query with external editor.             
+|\ld  | \ld[+] [pattern]                 | List databases.                                  
+|\lf  | \lf[+] [pattern]                 | List functions.                                  
+|\li  | \li[+] [pattern]                 | List indexes.                                    
+|\ll  | \ll[+] [pattern]                 | List logins and associated roles.                                
+|\ls  | \ls[+] [pattern]                 | List schemas.                                    
+|\lt  | \lt[+] [pattern]                 | List tables.                                     
+|\lv  | \lv[+] [pattern]                 | List views.      
+|\n   | \n[+] [name] [param1 param2 ...] | List or execute named queries.                                   
+|\sf  | \sf FUNCNAME                     | Show a function's definition.                    
+|\sn  | \sn name query                   | Save a named query.                              
+|help | \?                               | Show this help.                                  
+

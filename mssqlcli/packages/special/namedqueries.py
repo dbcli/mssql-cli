@@ -8,7 +8,7 @@ with a short name. Think of them as favorites.
 Examples:
 
     # Save a new named query.
-    > \\ns simple select * from abc where a is not Null;
+    > \\sn simple select * from abc where a is not Null;
 
     # List all named queries.
     > \\n
@@ -27,7 +27,7 @@ Examples:
     +-----+
 
     # Delete a named query.
-    > \\nd simple
+    > \\dn simple
     simple: Deleted
 '''
 
