@@ -83,6 +83,7 @@ def execute(mssqlcliclient, sql):
 def show_help():  # All the parameters are ignored.
     headers = ['Command', 'Shortcut', 'Description']
     result = []
+
     for _, value in sorted(COMMANDS.items()):
         if not value.hidden:
             result.append((value.command, value.shortcut, value.description))

@@ -231,7 +231,6 @@ def _split_multiple_statements(full_text, text_before_cursor, parsed):
 
 
 SPECIALS_SUGGESTION = {
-    'dT': Datatype,
     'lf': Function,
     'lt': Table,
     'lv': View,
@@ -265,7 +264,7 @@ def suggest_special(text):
     else:
         schema = None
 
-    if cmd[1:] == 'l':
+    if cmd[1:] == 'd':
         # \d can describe tables or views
         if schema:
             return (Table(schema=schema),
