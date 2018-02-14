@@ -11,7 +11,7 @@ from mssqlcli.packages.special import export
 logger = logging.getLogger('mssqlcli.commands')
 
 
-@special_command('\\ld', '\\ld[+] [pattern]', 'List databases.', aliases=('\\list',))
+@special_command('\\ld', '\\ld[+] [pattern]', 'List databases.')
 def list_databases(mssqlcliclient, pattern, verbose):
     base_query = u'select {0} from sys.databases'
     if verbose:
