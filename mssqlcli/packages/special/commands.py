@@ -161,15 +161,24 @@ def describe_object(mssqlcliclient, pattern, verbose):
 def list_logins(mssqlcliclient, pattern, verbose):
     base_query = '''
 SELECT {cols}
-FROM sys.server_principals
+FROM {table}
 WHERE TYPE IN ('U', 'S', 'G')
 and name not like '%##%' {pattern}
 ORDER BY name, type_desc
 '''
+    base_query = base_query.format(
+                                cols='{cols}',
+                                table='sys.database_principals'
+                                if mssqlcliclient.is_cloud else 'sys.server_principals',
+                                pattern='{pattern}')
 
     if verbose:
-        base_query = base_query.format(cols='name, type_desc, default_database_name, type, create_date',
-                                       pattern='{pattern}')
+        if mssqlcliclient.is_cloud:
+            base_query = base_query.format(cols='name, type_desc, default_schema_name, type, create_date',
+                                           pattern='{pattern}')
+        else:
+            base_query = base_query.format(cols='name, type_desc, default_database_name, type, create_date',
+                                           pattern='{pattern}')
     else:
         base_query = base_query.format(cols='name, type_desc', pattern='{pattern}')
     if pattern:
