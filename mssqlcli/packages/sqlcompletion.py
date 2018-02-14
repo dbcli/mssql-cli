@@ -232,9 +232,9 @@ def _split_multiple_statements(full_text, text_before_cursor, parsed):
 
 SPECIALS_SUGGESTION = {
     'dT': Datatype,
-    'df': Function,
-    'dt': Table,
-    'dv': View,
+    'lf': Function,
+    'lt': Table,
+    'lv': View,
     'sf': Function,
 }
 
@@ -250,7 +250,7 @@ def suggest_special(text):
     if cmd in ('\\c', '\\connect'):
         return (Database(),)
 
-    if cmd == '\\dn':
+    if cmd == '\\ls':
         return (Schema(),)
 
     if arg:
@@ -265,7 +265,7 @@ def suggest_special(text):
     else:
         schema = None
 
-    if cmd[1:] == 'd':
+    if cmd[1:] == 'l':
         # \d can describe tables or views
         if schema:
             return (Table(schema=schema),
