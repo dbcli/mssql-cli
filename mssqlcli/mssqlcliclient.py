@@ -65,10 +65,10 @@ class MssqlCliClient(object):
     def connect(self):
         """
         Connects to the SQL Server instance using specified credentials
-        :return: OwnerUri if connection established else None
+        :return: Tuple (OwnerURI, list of error messages)
         """
         if self.is_connected:
-            return self.owner_uri
+            return self.owner_uri, []
 
         # Required params
         connection_params = {u'ServerName': self.server_name,
@@ -99,11 +99,15 @@ class MssqlCliClient(object):
             u'connection_request', connection_params, self.owner_uri)
         connection_request.execute()
 
+        error_messages = []
         while not connection_request.completed():
             response = connection_request.get_response()
-            if response:
-                response = connectionservice.handle_connection_response(
-                    response)
+
+            if isinstance(response, connectionservice.ConnectionCompleteEvent):
+                if response.error_message:
+                    error_messages.append(u'Error message: {}'.format(response.error_message))
+                if response.messages:
+                    logger.error(response.messages)
             else:
                 time.sleep(time_wait_if_no_response)
 
@@ -119,7 +123,10 @@ class MssqlCliClient(object):
             logger.info(
                 u'Connection Successful. Connection Id {0}'.format(
                     response.connection_id))
-            return self.owner_uri
+
+            return self.owner_uri, []
+
+        return None, error_messages
 
     def execute_multi_statement_single_batch(self, query):
         # Try to run first as special command
@@ -158,9 +165,8 @@ class MssqlCliClient(object):
         query_messages = []
         while not query_request.completed():
             query_response = query_request.get_response()
-            if query_response:
-                if isinstance(query_response, queryservice.QueryMessageEvent):
-                    query_messages.append(query_response)
+            if isinstance(query_response, queryservice.QueryMessageEvent):
+                query_messages.append(query_response)
             else:
                 sleep(time_wait_if_no_response)
 

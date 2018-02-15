@@ -173,8 +173,6 @@ class JSONRPCContractsTests(unittest.TestCase):
                 elif isinstance(response, connectionservice.ConnectionCompleteEvent):
                     if response.connection_id:
                         complete_event += 1
-                        self.assertTrue(connectionservice.handle_connection_response(response).connection_id,
-                                        response.connection_id)
 
         self.assertEqual(response_event, expected_response_event)
         self.assertEqual(complete_event, expected_complete_event)

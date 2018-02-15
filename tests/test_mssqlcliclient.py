@@ -1,8 +1,4 @@
 # coding=utf-8
-# --------------------------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for license information.
-# --------------------------------------------------------------------------------------------
 import os
 import io
 import unittest
@@ -204,6 +200,7 @@ class MssqlCliClientTests(unittest.TestCase):
             list(client.execute_single_batch_query(del_stored_proc))
         finally:
             shutdown(client)
+
 
 if __name__ == u'__main__':
     unittest.main()

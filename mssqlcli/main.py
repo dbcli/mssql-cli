@@ -317,11 +317,12 @@ class MssqlCli(object):
                                                                  multi_subnet_failover=multi_subnet_failover,
                                                                  packet_size=packet_size, **kwargs)
 
-            if not self.mssqlcliclient_query_execution.connect():
+            owner_uri, error_messages = self.mssqlcliclient_query_execution.connect()
+            if not owner_uri:
                 click.secho(
-                    '\nUnable to connect. Please try again',
+                    '\n'.join(error_messages),
                     err=True,
-                    fg='red')
+                    fg='yellow')
                 exit(1)
 
             telemetry_session.set_server_information(
