@@ -70,7 +70,7 @@ class ConnectionRequest(Request):
         if u'result' in obj:
             return ConnectionResponse(obj)
 
-        elif u'params' in obj:
+        elif 'method' in obj and obj['method'] == 'connection/complete':
             return ConnectionCompleteEvent(obj)
 
         # Could not decode return st
