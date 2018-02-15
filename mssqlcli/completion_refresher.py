@@ -51,10 +51,12 @@ class CompletionRefresher(object):
         completer = MssqlCompleter(smart_completion=True, settings=settings)
 
         executor = mssqlcliclient
-        if not executor.connect():
+        owner_uri, error_messages = executor.connect()
+
+        if not owner_uri:
             # If we were unable to connect, do not break the experience for the user.
             # Return nothing, smart completion can maintain the keywords and functions completions.
-            logger.error(u'Completion Refresher failed to connect to the target server.')
+            logger.error(u'Completion refresher connection failure.'.join(error_messages))
             return
         # If callbacks is a single function then push it into a list.
         if callable(callbacks):
