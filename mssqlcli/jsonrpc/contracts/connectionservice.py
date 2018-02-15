@@ -31,7 +31,7 @@ class ConnectionRequest(Request):
             response = self.json_rpc_client.get_response(self.id, self.owner_uri)
             decoded_response = None
             if response:
-                logger.info(response)
+                logger.debug(response)
                 decoded_response = self.decode_response(response)
 
             if isinstance(decoded_response, ConnectionCompleteEvent):
@@ -42,7 +42,7 @@ class ConnectionRequest(Request):
             return decoded_response
 
         except Exception as error:
-            logger.info(str(error))
+            logger.debug(str(error))
             self.finished = True
             self.json_rpc_client.request_finished(self.id)
             self.json_rpc_client.request_finished(self.owner_uri)
