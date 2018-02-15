@@ -101,10 +101,7 @@ class MssqlCliClient(object):
 
         while not connection_request.completed():
             response = connection_request.get_response()
-            if response:
-                response = connectionservice.handle_connection_response(
-                    response)
-            else:
+            if not response:
                 time.sleep(time_wait_if_no_response)
 
         if response and response.connection_id:

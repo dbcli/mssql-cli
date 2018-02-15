@@ -1,6 +1,5 @@
 from mssqlcli.jsonrpc.contracts import Request
 
-import sys
 import logging
 
 logger = logging.getLogger(u'mssqlcli.connectionservice')
@@ -42,7 +41,7 @@ class ConnectionRequest(Request):
             return decoded_response
 
         except Exception as error:
-            logger.debug(str(error))
+            logger.info(str(error))
             self.finished = True
             self.json_rpc_client.request_finished(self.id)
             self.json_rpc_client.request_finished(self.owner_uri)
@@ -144,38 +143,3 @@ class ConnectionResponse(object):
     def __init__(self, params):
         self.result = params[u'result']
         self.id = params[u'id']
-
-
-#
-#   Handle Connection Events.
-#
-
-def handle_connection_response(response):
-    # Handles complete notification and return ConnectionCompleteEvent object
-    # if connection successful.
-    def handle_connection_complete_notification(response):
-        if not response.connection_id:
-            sys.stderr.write(u'\nConnection did not succeed.')
-            if response.error_message:
-                sys.stderr.write(u'\nError message: ' + response.error_message)
-                logger.error(response.error_message)
-            if response.messages:
-                logger.error(response.messages)
-
-        return response
-
-    def handle_connection_response_notification(response):
-        if not response.result:
-            sys.stderr.write(
-                u'\nIncorrect json rpc request. Connection not successful.')
-        return None
-
-    response_handlers = {
-        u'ConnectionResponse': handle_connection_response_notification,
-        u'ConnectionCompleteEvent': handle_connection_complete_notification
-    }
-
-    response_name = type(response).__name__
-
-    if response_name in response_handlers:
-        return response_handlers[response_name](response)
