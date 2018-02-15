@@ -107,7 +107,7 @@ class MssqlCliClient(object):
                 if response.error_message:
                     error_messages.append(u'Error message: {}'.format(response.error_message))
                 if response.messages:
-                    error_messages.append(u'Additional message: {}'.format(response.messages))
+                    logger.error(response.messages)
             else:
                 time.sleep(time_wait_if_no_response)
 
