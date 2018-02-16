@@ -158,7 +158,7 @@ def suggest_type(full_text, text_before_cursor):
     return suggest_based_on_last_token(stmt.last_token, stmt)
 
 
-named_query_regex = re.compile(r'^\s*\\ns\s+[A-z0-9\-_]+\s+')
+named_query_regex = re.compile(r'^\s*\\sn\s+[A-z0-9\-_]+\s+')
 
 
 def _strip_named_query(txt):
@@ -232,10 +232,9 @@ def _split_multiple_statements(full_text, text_before_cursor, parsed):
 
 
 SPECIALS_SUGGESTION = {
-    'dT': Datatype,
-    'df': Function,
-    'dt': Table,
-    'dv': View,
+    'lf': Function,
+    'lt': Table,
+    'lv': View,
     'sf': Function,
 }
 
@@ -251,7 +250,7 @@ def suggest_special(text):
     if cmd in ('\\c', '\\connect'):
         return (Database(),)
 
-    if cmd == '\\dn':
+    if cmd == '\\ls':
         return (Schema(),)
 
     if arg:
@@ -286,7 +285,7 @@ def suggest_special(text):
                 return (Schema(), Function(schema=None, usage='special'),)
             return (Schema(), rel_type(schema=None))
 
-    if cmd in ['\\n', '\\ns', '\\nd']:
+    if cmd in ['\\n', '\\sn', '\\dn']:
         return (NamedQuery(),)
 
     return (Keyword(), Special())
