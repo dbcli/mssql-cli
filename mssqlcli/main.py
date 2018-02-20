@@ -56,7 +56,8 @@ except ImportError:
 from collections import namedtuple
 
 # mssql-cli imports
-from mssqlcli.sqltoolsclient import SqlToolsClient
+import mssqlclioptionsparser as parser
+import mssqlcli.sqltoolsclient as SqlToolsClient
 from mssqlcli.mssqlcliclient import MssqlCliClient, reset_connection_and_clients
 from mssqlcli.packages import special
 import mssqlcli.telemetry as telemetry_session
@@ -123,17 +124,12 @@ class MssqlCli(object):
             os.environ['LESS'] = '-SRXF'
 
     # mssql-cli
-    def __init__(self, force_passwd_prompt=False,
-                 mssqlclirc_file=None, row_limit=None,
-                 single_connection=False, less_chatty=None,
-                 auto_vertical_output=False, sql_tools_client=None,
-                 integrated_auth=False, enable_sqltoolsservice_logging=False,
-                 prompt=None):
+    def __init__(self, options, sql_tools_client=None):
 
-        self.force_passwd_prompt = force_passwd_prompt
+        self.force_passwd_prompt = options.force_passwd_prompt
 
         # Load config.
-        c = self.config = get_config(mssqlclirc_file)
+        c = self.config = get_config(options.mssqlclirc_file)
 
         self.logger = logging.getLogger(u'mssqlcli.main')
         self.initialize_logging()
@@ -144,11 +140,11 @@ class MssqlCli(object):
         self.multi_line = c['main'].as_bool('multi_line')
         self.multiline_mode = c['main'].get('multi_line_mode', 'tsql')
         self.vi_mode = c['main'].as_bool('vi')
-        self.auto_expand = auto_vertical_output or c['main']['expand'] == 'auto'
+        self.auto_expand = options.auto_vertical_output or c['main']['expand'] == 'auto'
         self.expanded_output = c['main']['expand'] == 'always'
-        self.prompt_format = prompt or c['main'].get('prompt', self.default_prompt)
-        if row_limit is not None:
-            self.row_limit = row_limit
+        self.prompt_format = options.prompt or c['main'].get('prompt', self.default_prompt)
+        if options.row_limit:
+            self.row_limit = options.row_limit
         else:
             self.row_limit = c['main'].as_int('row_limit')
 
@@ -159,7 +155,7 @@ class MssqlCli(object):
         self.cli_style = c['colors']
         self.wider_completion_menu = c['main'].as_bool('wider_completion_menu')
         self.less_chatty = bool(
-            less_chatty) or c['main'].as_bool('less_chatty')
+            options.less_chatty) or c['main'].as_bool('less_chatty')
         self.null_string = c['main'].get('null_string', '<null>')
         self.on_error = c['main']['on_error'].upper()
         self.decimal_format = c['data_formats']['decimal']
@@ -182,8 +178,8 @@ class MssqlCli(object):
             'qualify_columns': c['main']['qualify_columns'],
             'case_column_headers': c['main'].as_bool('case_column_headers'),
             'search_path_filter': c['main'].as_bool('search_path_filter'),
-            'single_connection': single_connection,
-            'less_chatty': less_chatty,
+            'single_connection': options.single_connection,
+            'less_chatty': options.less_chatty,
             'keyword_casing': keyword_casing,
         }
 
@@ -197,9 +193,9 @@ class MssqlCli(object):
 
         # mssql-cli
         self.sqltoolsclient = sql_tools_client if sql_tools_client else SqlToolsClient(
-            enable_logging=enable_sqltoolsservice_logging)
+            enable_logging=options.enable_sqltoolsservice_logging)
         self.mssqlcliclient_query_execution = None
-        self.integrated_auth = integrated_auth
+        self.integrated_auth = options.integrated_auth
 
     def __del__(self):
         # Shut-down sqltoolsservice
@@ -262,26 +258,19 @@ class MssqlCli(object):
         root_logger.info('Initializing mssqlcli logging.')
         root_logger.debug('Log file %r.', log_file)
 
-    def connect(self, database='', server='', user='', port='', passwd='',
-                dsn='', encrypt=None, trust_server_certificate=None, connection_timeout=None, application_intent=None,
-                multi_subnet_failover=None, packet_size=None, **kwargs):
+    def connect(self, options, user='', port='', passwd='', **kwargs):
         # Connect to the database.
 
-        if not user and not self.integrated_auth:
+        if options.user and not self.integrated_auth:
+            # TODO
             user = click.prompt(
                 'Username (press enter for sa)',
                 default=u'sa',
                 show_default=False)
 
-        if not server:
-            server = u'localhost'
-
-        if not database:
-            database = u'master'
-
         # If password prompt is not forced but no password is provided, try
         # getting it from environment variable.
-        if not self.force_passwd_prompt and not passwd:
+        if not self.force_passwd_prompt and not options.passwd:
             passwd = os.environ.get('MSSQL_CLI_PASSWORD', '')
 
         if not self.integrated_auth:
@@ -290,7 +279,7 @@ class MssqlCli(object):
             # no-password exception.
             # If we successfully parsed a password from a URI, there's no need to
             # prompt for it, even with the -W flag
-            if self.force_passwd_prompt and not passwd:
+            if self.force_passwd_prompt and not options.passwd:
                 passwd = click.prompt('Password', hide_input=True,
                                       show_default=False, type=str)
 
@@ -307,15 +296,17 @@ class MssqlCli(object):
             if self.integrated_auth:
                 authentication_type = u'Integrated'
 
-            self.mssqlcliclient_query_execution = MssqlCliClient(self.sqltoolsclient, server, user, passwd,
-                                                                 database=database,
+            self.mssqlcliclient_query_execution = MssqlCliClient(self.sqltoolsclient,
+                                                                 options.server,
+                                                                 user, passwd,
+                                                                 database=options.database,
                                                                  authentication_type=authentication_type,
-                                                                 encrypt=encrypt,
-                                                                 trust_server_certificate=trust_server_certificate,
-                                                                 connection_timeout=connection_timeout,
-                                                                 application_intent=application_intent,
-                                                                 multi_subnet_failover=multi_subnet_failover,
-                                                                 packet_size=packet_size, **kwargs)
+                                                                 encrypt=options.encrypt,
+                                                                 trust_server_certificate=options.trust_server_certificate,
+                                                                 connection_timeout=options.connection_timeout,
+                                                                 application_intent=options.application_intent,
+                                                                 multi_subnet_failover=options.multi_subnet_failover,
+                                                                 packet_size=options.packet_size, **kwargs)
 
             owner_uri, error_messages = self.mssqlcliclient_query_execution.connect()
             if not owner_uri:
@@ -716,52 +707,14 @@ class MssqlCli(object):
         return self.query_history[-1][0] if self.query_history else None
 
 
-@click.command()
-@click.option('-S', '--server', default='', envvar='MSSQL_CLI_SERVER',
-              help='SQL Server instance name or address.')
-@click.option('-U', '--username', 'username', envvar='MSSQL_CLI_USER',
-              help='Username to connect to the database.')
-@click.option('-W', '--password', 'prompt_passwd', is_flag=True, default=False,
-              help='Force password prompt.')
-@click.option('-E', '--integrated', 'integrated_auth', is_flag=True, default=False,
-              help='Use integrated authentication on windows.')
-@click.option('-v', '--version', is_flag=True, help='Version of mssql-cli.')
-@click.option('-d', '--database', default='', envvar='MSSQL_CLI_DATABASE',
-              help='database name to connect to.')
-@click.option('--mssqlclirc', default=config_location() + 'config',
-              envvar='MSSQL_CLI_RC', help='Location of mssqlclirc config file.')
-@click.option('--row-limit', default=None, envvar='MSSQL_CLI_ROW_LIMIT', type=click.INT,
-              help='Set threshold for row limit prompt. Use 0 to disable prompt.')
-@click.option('--less-chatty', 'less_chatty', is_flag=True,
-              default=False,
-              help='Skip intro on startup and goodbye on exit.')
-@click.option('--auto-vertical-output', is_flag=True,
-              help='Automatically switch to vertical output mode if the result is wider than the terminal width.')
-@click.option('-N', '--encrypt', is_flag=True, default=False,
-              help='SQL Server uses SSL encryption for all data if the server has a certificate installed.')
-@click.option('-C', '--trust-server-certificate', is_flag=True, default=False,
-              help='The channel will be encrypted while bypassing walking the certificate chain to validate trust.')
-@click.option('-l', '--connect-timeout', default=0, type=int,
-              help='Time in seconds to wait for a connection to the server before terminating request.')
-@click.option('-K', '--application-intent', default='',
-              help='Declares the application workload type when connecting to a database in a SQL Server Availability '
-                   'Group.')
-@click.option('-M', '--multi-subnet-failover', is_flag=True, default=False,
-              help='If application is connecting to AlwaysOn AG on different subnets, setting this provides faster '
-                   'detection and connection to currently active server.')
-@click.option('-a', '--packet-size', default=0, type=int,
-              help='Size in bytes of the network packets used to communicate with SQL Server.')
-@click.option('-A', '--dac-connection', is_flag=True, default=False,
-              help='Connect to SQL Server using the dedicated administrator connection.')
-@click.option('--enable-sqltoolsservice-logging', is_flag=True,
-              default=False,
-              help='Enables diagnostic logging for the SqlToolsService.')
-@click.option('--prompt', help='Prompt format (Default: "{}").'.format(MssqlCli.default_prompt))
-def cli(username, server, prompt_passwd, database, version, mssqlclirc, row_limit, less_chatty, auto_vertical_output,
-        integrated_auth, encrypt, trust_server_certificate, connect_timeout, application_intent, multi_subnet_failover,
-        packet_size, enable_sqltoolsservice_logging, dac_connection, prompt):
+def run_cli(username, server, prompt_passwd,
+        database, version, mssqlclirc,
+        row_limit, less_chatty, auto_vertical_output,
+        integrated_auth, encrypt, trust_server_certificate,
+        connect_timeout, application_intent, multi_subnet_failover,
+        packet_size, enable_sqltoolsservice_logging, dac_connection, prompt, options):
 
-    if version:
+    if options.version:
         print('Version:', __version__)
         sys.exit(0)
 
@@ -770,16 +723,14 @@ def cli(username, server, prompt_passwd, database, version, mssqlclirc, row_limi
         os.makedirs(config_dir)
         display_telemetry_message()
 
-    if platform.system().lower() != 'windows' and integrated_auth:
-        integrated_auth = False
+    if platform.system().lower() != 'windows' and options.integrated_auth:
+        options.integrated_auth = False
         print (u'Integrated authentication not supported on this platform')
 
-    if dac_connection and server and not server.lower().startswith("admin:"):
-        server = "admin:" + server
+    if dac_connection and options.server and not options.server.lower().startswith("admin:"):
+        options.server = "admin:" + options.server
 
-    mssqlcli = MssqlCli(force_passwd_prompt=prompt_passwd, prompt=prompt, row_limit=row_limit, single_connection=False,
-                        mssqlclirc_file=mssqlclirc, less_chatty=less_chatty, auto_vertical_output=auto_vertical_output,
-                        integrated_auth=integrated_auth, enable_sqltoolsservice_logging=enable_sqltoolsservice_logging)
+    mssqlcli = MssqlCli(options)
 
     mssqlcli.connect(database, server, username, port='', encrypt=encrypt,
                      trust_server_certificate=trust_server_certificate, connection_timeout=connect_timeout,
@@ -923,7 +874,8 @@ def format_output(title, cur, headers, status, settings):
 if __name__ == "__main__":
     try:
         telemetry_session.start()
-        cli()
+        options = parser.parse(sys.argv[1:])
+        run_cli(options)
     finally:
         # Upload telemetry async in a separate process.
         telemetry_session.conclude()
