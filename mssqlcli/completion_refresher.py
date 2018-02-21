@@ -51,7 +51,7 @@ class CompletionRefresher(object):
         completer = MssqlCompleter(smart_completion=True, settings=settings)
 
         executor = mssqlcliclient
-        owner_uri, error_messages = executor.connect()
+        owner_uri, error_messages = executor.connect_to_database()
 
         if not owner_uri:
             # If we were unable to connect, do not break the experience for the user.

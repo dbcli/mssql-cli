@@ -1,4 +1,5 @@
-import getpass
+
+import copy
 import logging
 import time
 import uuid
@@ -11,7 +12,6 @@ from mssqlcli import mssqlqueries
 from mssqlcli.jsonrpc.contracts import connectionservice, queryexecutestringservice as queryservice
 from mssqlcli.packages import special
 from mssqlcli.packages.parseutils.meta import ForeignKey
-from mssqlcli.sqltoolsclient import SqlToolsClient
 
 logger = logging.getLogger(u'mssqlcli.mssqlcliclient')
 time_wait_if_no_response = 0.05
@@ -23,83 +23,85 @@ def generate_owner_uri():
 
 class MssqlCliClient(object):
 
-    def __init__(self, sql_tools_client, server_name, user_name, password,
-                 authentication_type=u'SqlLogin', database=u'master', owner_uri=None, multiple_active_result_sets=True,
-                 encrypt=None, trust_server_certificate=None, connection_timeout=None, application_intent=None,
-                 multi_subnet_failover=None, packet_size=None, **kwargs):
+    def __init__(self, mssqlcli_options, sql_tools_client, owner_uri=None, **kwargs):
 
-        self.server_name = server_name
-        if ',' in server_name:
+        self.server_name = mssqlcli_options.server
+        if ',' in mssqlcli_options.server:
             self.prompt_host, self.prompt_port = self.server_name.split(',')
         else:
-            self.prompt_host = server_name
+            self.prompt_host = mssqlcli_options.server
             self.prompt_port = 1433
-        if authentication_type == u'Integrated':
-            self.user_name = getpass.getuser()
-        else:
-            self.user_name = user_name
-        self.password = password
-        self.authentication_type = authentication_type
-        self.database = database
+
+        self.user_name = mssqlcli_options.username
+        self.password = mssqlcli_options.password
+        self.authentication_type = u'Integrated' if mssqlcli_options.integrated_auth else u'SqlLogin'
+        self.database = mssqlcli_options.database
+        self.encrypt = mssqlcli_options.encrypt
+        self.trust_server_certificate = mssqlcli_options.trust_server_certificate
+        self.connection_timeout = mssqlcli_options.connection_timeout
+        self.application_intent = mssqlcli_options.application_intent
+        self.multi_subnet_failover = mssqlcli_options.multi_subnet_failover
+        self.packet_size = mssqlcli_options.packet_size
+
+        self.extra_params = {k: v for k, v in kwargs.items()}
         self.owner_uri = owner_uri
         self.is_connected = False
-        self.multiple_active_result_sets = multiple_active_result_sets
-        self.encrypt = encrypt
-        self.trust_server_certificate = trust_server_certificate
-        self.connection_timeout = connection_timeout
-        self.application_intent = application_intent
-        self.multi_subnet_failover = multi_subnet_failover
-        self.packet_size = packet_size
-        self.extra_params = {k: v for k, v in kwargs.items()}
         self.sql_tools_client = sql_tools_client
         self.server_version = None
         self.server_edition = None
         self.is_cloud = False
-        # If no owner_uri which depicts a connection is passed, generate one
-        # and use that.
+
         if not owner_uri:
             self.owner_uri = generate_owner_uri()
 
         logger.info(u'Initialized MssqlCliClient with owner Uri {}'.format(self.owner_uri))
 
-    def connect(self):
-        """
-        Connects to the SQL Server instance using specified credentials
-        :return: Tuple (OwnerURI, list of error messages)
-        """
+    def get_base_connection_params(self):
+        return {u'ServerName': self.server_name,
+                u'DatabaseName': self.database,
+                u'UserName': self.user_name,
+                u'Password': self.password,
+                u'AuthenticationType': self.authentication_type,
+                u'OwnerUri': self.owner_uri
+                }
+
+    def add_optional_connection_params(self, base_connection_params):
+        if self.encrypt:
+            base_connection_params[u'Encrypt'] = self.encrypt
+        if self.trust_server_certificate:
+            base_connection_params[u'TrustServerCertificate'] = self.trust_server_certificate
+        if self.connection_timeout:
+            base_connection_params[u'ConnectTimeout'] = self.connection_timeout
+        if self.application_intent:
+            base_connection_params[u'ApplicationIntent'] = self.application_intent
+        if self.multi_subnet_failover:
+            base_connection_params[u'MultiSubnetFailover'] = self.multi_subnet_failover
+        if self.packet_size:
+            base_connection_params[u'PacketSize'] = self.packet_size
+
+        base_connection_params.update(self.extra_params)
+
+        return base_connection_params
+
+    def connect_to_database(self):
+        connection_params = self.get_base_connection_params()
+        connection_params = self.add_optional_connection_params(connection_params)
+
+        owner_uri, error_messages = self.execute_connection_request_with(connection_params)
+
+        return owner_uri, error_messages
+
+    def execute_connection_request_with(self, connection_params):
         if self.is_connected:
             return self.owner_uri, []
 
-        # Required params
-        connection_params = {u'ServerName': self.server_name,
-                             u'DatabaseName': self.database,
-                             u'UserName': self.user_name,
-                             u'Password': self.password,
-                             u'AuthenticationType': self.authentication_type,
-                             u'OwnerUri': self.owner_uri,
-                             u'MultipleActiveResultSets': self.multiple_active_result_sets}
-
-        # Optional params
-        if self.encrypt:
-            connection_params[u'Encrypt'] = self.encrypt
-        if self.trust_server_certificate:
-            connection_params[u'TrustServerCertificate'] = self.trust_server_certificate
-        if self.connection_timeout:
-            connection_params[u'ConnectTimeout'] = self.connection_timeout
-        if self.application_intent:
-            connection_params[u'ApplicationIntent'] = self.application_intent
-        if self.multi_subnet_failover:
-            connection_params[u'MultiSubnetFailover'] = self.multi_subnet_failover
-        if self.packet_size:
-            connection_params[u'PacketSize'] = self.packet_size
-
-        connection_params.update(self.extra_params)
-
-        connection_request = self.sql_tools_client.create_request(
-            u'connection_request', connection_params, self.owner_uri)
+        connection_request = self.sql_tools_client.create_request(u'connection_request',
+                                                                  connection_params,
+                                                                  self.owner_uri)
         connection_request.execute()
-
         error_messages = []
+        response = None
+
         while not connection_request.completed():
             response = connection_request.get_response()
 
@@ -112,8 +114,6 @@ class MssqlCliClient(object):
                 time.sleep(time_wait_if_no_response)
 
         if response and response.connection_id:
-            # response owner_uri should be the same as owner_uri used, else
-            # something is weird :)
             assert response.owner_uri == self.owner_uri
             self.is_connected = True
             self.server_version = response.server_version
@@ -154,12 +154,12 @@ class MssqlCliClient(object):
             click.secho(
                 u'No connection established with the server.',
                 err=True,
-                fg='red')
+                fg='yellow')
             exit(1)
 
         query_request = self.sql_tools_client.create_request(u'query_execute_string_request',
-                                                                {u'OwnerUri': self.owner_uri,
-                                                                 u'Query': query},
+                                                             {u'OwnerUri': self.owner_uri,
+                                                              u'Query': query},
                                                              self.owner_uri)
         query_request.execute()
         query_messages = []
@@ -192,12 +192,11 @@ class MssqlCliClient(object):
         else:
             for result_set_summary in query_response.batch_summaries[0].result_set_summaries:
                 query_subset_request = self.sql_tools_client.create_request(u'query_subset_request',
-                                                                            {
-                                                                                u'OwnerUri': query_response.owner_uri,
-                                                                                u'BatchIndex': result_set_summary.batch_id,
-                                                                                u'ResultSetIndex': result_set_summary.id,
-                                                                                u'RowsStartIndex': 0,
-                                                                                u'RowCount': result_set_summary.row_count},
+                                                                            {u'OwnerUri': query_response.owner_uri,
+                                                                             u'BatchIndex': result_set_summary.batch_id,
+                                                                             u'ResultSetIndex': result_set_summary.id,
+                                                                             u'RowsStartIndex': 0,
+                                                                             u'RowCount': result_set_summary.row_count},
                                                                             self.owner_uri)
 
                 query_subset_request.execute()
@@ -223,9 +222,7 @@ class MssqlCliClient(object):
                     query=query,
                     message=query_messages[result_set_summary.id].message if query_messages else u'')
 
-
-    def tabular_results_generator(
-            self, column_info, result_rows, query, message, is_error=False):
+    def tabular_results_generator(self, column_info, result_rows, query, message, is_error=False):
         # Returns a generator of rows, columns, status(rows affected) or
         # message, sql (the query), is_error
         if is_error:
@@ -238,25 +235,10 @@ class MssqlCliClient(object):
 
         return rows, columns, message, query, is_error
 
-    def clone(self, new_owner_uri=None):
-        if not new_owner_uri:
-            new_owner_uri = generate_owner_uri()
-
-        cloned_mssqlcli_client = MssqlCliClient(
-                                                self.sql_tools_client,
-                                                self.server_name,
-                                                self.user_name,
-                                                self.password,
-                                                database=self.database,
-                                                owner_uri=new_owner_uri,
-                                                authentication_type=self.authentication_type,
-                                                encrypt=self.encrypt,
-                                                trust_server_certificate=self.trust_server_certificate,
-                                                connection_timeout=self.connection_timeout,
-                                                application_intent=self.application_intent,
-                                                multi_subnet_failover=self.multi_subnet_failover,
-                                                packet_size=self.packet_size,
-                                                **self.extra_params)
+    def clone(self):
+        cloned_mssqlcli_client = copy.copy(self)
+        cloned_mssqlcli_client.owner_uri = generate_owner_uri()
+        cloned_mssqlcli_client.is_connected = False
 
         return cloned_mssqlcli_client
 
@@ -325,29 +307,3 @@ class MssqlCliClient(object):
     def shutdown(self):
         self.sql_tools_client.shutdown()
         logger.info(u'Shutdown MssqlCliClient')
-
-
-def reset_connection_and_clients(sql_tools_client, *mssqlcliclients):
-    """
-    Restarts the sql_tools_client and establishes new connections for each of the
-    mssqlcliclients passed
-    """
-    try:
-        sql_tools_client.shutdown()
-        new_tools_client = SqlToolsClient()
-        for mssqlcliclient in mssqlcliclients:
-            mssqlcliclient.sql_tools_client = new_tools_client
-            mssqlcliclient.is_connected = False
-            mssqlcliclient.owner_uri = generate_owner_uri()
-            if not mssqlcliclient.connect():
-                click.secho('Unable reconnect to server {0}; database {1}.'.format(mssqlcliclient.server_name, mssqlcliclient.database),
-                            err=True, fg='red')
-                logger.info(
-                    u'Unable to reset connection to server {0}; database {1}'.format(
-                        mssqlcliclient.server_name,
-                        mssqlcliclient.database))
-                exit(1)
-
-    except Exception as e:
-        logger.error(u'Error in reset_connection : {0}'.format(e.message))
-        raise e

@@ -88,7 +88,6 @@ class ConnectionDetails(object):
         self.UserName = parameters[u'UserName']
         self.Password = parameters[u'Password']
         self.AuthenticationType = parameters[u'AuthenticationType']
-        self.MultipleActiveResultSets = parameters[u'MultipleActiveResultSets']
         # Optional Params
         if u'Encrypt' in parameters:
             self.Encrypt = parameters[u'Encrypt']

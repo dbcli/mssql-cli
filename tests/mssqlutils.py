@@ -33,7 +33,7 @@ def create_mssql_cli_client(owner_uri=None, connect=True):
                                                          extra_string_param=u'stringparam',
                                                          extra_int_param=5)
         if connect:
-            mssql_cli_client.connect()
+            mssql_cli_client.connect_to_database()
         return mssql_cli_client
     except Exception as e:
         print('Connection failed')

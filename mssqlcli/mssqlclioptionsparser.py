@@ -2,15 +2,14 @@ import argparse
 import mssqlcli
 import os
 
+from .config import config_location
+
 MSSQL_CLI_USER = u'MSSQL_CLI_USER'
 MSSQL_CLI_PASSWORD = u'MSSQL_CLI_PASSWORD'
 MSSQL_CLI_DATABASE = u'MSSQL_CLI_DATABASE'
 MSSQL_CLI_SERVER = u'MSSQL_CLI_SERVER'
 MSSQL_CLI_ROW_LIMIT = u'MSSQL_CLI_ROW_LIMIT'
 MSSQL_CLI_RC = u'MSSQL_CLI_RC'
-
-# Look at how to get password prompt if it's not set
-# Get the default config
 
 
 def initialize():
@@ -28,10 +27,10 @@ def initialize():
 
     parser.add_argument(
         u'-P', u'--password',
-        dest=u'prompt_passwd',
+        dest=u'password',
         default=os.environ.get(MSSQL_CLI_PASSWORD, None),
         metavar=u'',
-        help=u'Force password prompt')
+        help=u'If not supplied, defaults to value in environment variable MSSQL_CLI_PASSWORD.')
 
     parser.add_argument(
         u'-d', u'--database',
@@ -52,7 +51,6 @@ def initialize():
         dest=u'integrated_auth',
         action=u'store_true',
         default=False,
-        metavar=u'',
         help=u'Use integrated authentication on windows.')
 
     parser.add_argument(
@@ -60,12 +58,11 @@ def initialize():
         dest=u'version',
         action=u'store_true',
         default=False,
-        metavar=u'',
         help=u'Version of mssql-cli.')
 
     parser.add_argument(
         u'--mssqlclirc',
-        dest=u'mssqlclirc',
+        dest=u'mssqlclirc_file',
         default=os.environ.get(MSSQL_CLI_RC, config_location() + 'config'),
         metavar=u'',
         help=u'Location of mssqlclirc config file.')
@@ -82,7 +79,6 @@ def initialize():
         dest=u'less_chatty',
         action=u'store_true',
         default=False,
-        metavar=u'',
         help=u'Skip intro on startup and goodbye on exit.')
 
     parser.add_argument(
@@ -90,7 +86,6 @@ def initialize():
         dest=u'auto_vertical_output',
         action=u'store_true',
         default=False,
-        metavar=u'',
         help=u'Automatically switch to vertical output mode if the result is wider than the terminal width.')
 
     parser.add_argument(
@@ -98,7 +93,6 @@ def initialize():
         dest=u'encrypt',
         action=u'store_true',
         default=False,
-        metavar=u'',
         help=u'SQL Server uses SSL encryption for all data if the server has a certificate installed.')
 
     parser.add_argument(
@@ -106,12 +100,11 @@ def initialize():
         dest=u'trust_server_certificate',
         action=u'store_true',
         default=False,
-        metavar=u'',
         help=u'The channel will be encrypted while bypassing walking the certificate chain to validate trust.')
 
     parser.add_argument(
         u'-l', u'--connect-timeout',
-        dest=u'connect_timeout',
+        dest=u'connection_timeout',
         default=0,
         metavar=u'',
         help=u'Time in seconds to wait for a connection to the server before terminating request.')
@@ -127,7 +120,6 @@ def initialize():
         dest=u'multi_subnet_failover',
         action=u'store_true',
         default=False,
-        metavar=u'',
         help=u'If application is connecting to AlwaysOn AG on different subnets, setting this provides faster '
              u'detection and connection to currently active server.')
 
@@ -143,7 +135,6 @@ def initialize():
         dest=u'dac_connection',
         action=u'store_true',
         default=False,
-        metavar=u'',
         help=u'Connect to SQL Server using the dedicated administrator connection.')
 
     parser.add_argument(
@@ -151,14 +142,13 @@ def initialize():
         dest=u'enable_sqltoolsservice_logging',
         action=u'store_true',
         default=False,
-        metavar=u'',
         help=u'Enables diagnostic logging for the SqlToolsService.')
 
     parser.add_argument(
         u'--prompt',
         dest=u'prompt',
         metavar=u'',
-        help=u'Prompt format (Default: "{}").'.format(MssqlCli.default_prompt))
+        help=u'Prompt format (Default: \\d> ')
 
     return parser
 
@@ -167,5 +157,5 @@ parser = initialize()
 
 
 def parse(args):
-    options = parser.parse(args)
+    options = parser.parse_args(args)
     return options
