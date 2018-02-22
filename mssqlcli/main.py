@@ -366,18 +366,17 @@ class MssqlCli(object):
         try:
             sql_tools_client.shutdown()
             new_tools_client = SqlToolsClient()
-            for mssqlcliclient in mssqlcliclients:
-                mssqlcliclient.sql_tools_client = new_tools_client
-                mssqlcliclient.is_connected = False
-                mssqlcliclient.owner_uri = generate_owner_uri()
-                if not mssqlcliclient.connect_to_database_with():
-                    click.secho('Unable reconnect to server {0}; database {1}.'.format(mssqlcliclient.server_name,
-                                                                                       mssqlcliclient.database),
-                                err=True, fg='red')
-                    self.logger.info(
-                        u'Unable to reset connection to server {0}; database {1}'.format(
-                            mssqlcliclient.server_name,
-                            mssqlcliclient.database))
+            for mssqlcli_client in mssqlcliclients:
+                mssqlcli_client.sql_tools_client = new_tools_client
+                mssqlcli_client.is_connected = False
+                mssqlcli_client.owner_uri = generate_owner_uri()
+                if not mssqlcli_client.connect_to_database_with():
+                    click.secho('Unable reconnect to server {0}; database {1}.'.format(mssqlcli_client.server_name,
+                                                                                       mssqlcli_client.database),
+                                err=True, fg='yellow')
+                    self.logger.info(u'Unable to reset connection to server {0}; database {1}'.format(
+                            mssqlcli_client.server_name,
+                            mssqlcli_client.database))
                     exit(1)
 
         except Exception as e:
@@ -533,7 +532,7 @@ class MssqlCli(object):
             exit(1)
 
         for rows, columns, status, sql, is_error in \
-                self.mssqlcliclient_main.execute_multi_statement_single_batch(text):
+                self.mssqlcliclient_main.execute_multi_statement(text):
             total = time() - start
             if self._should_show_limit_prompt(status, rows):
                 click.secho('The result set has more than %s rows.'
@@ -829,7 +828,7 @@ def format_output(title, cur, headers, status, settings):
     if not settings.floatfmt:
         output_kwargs['preprocessors'] = (align_decimals, )
 
-    if title:  # Only print the title if it's not None.
+    if title:
         output.append(title)
 
     if cur:
