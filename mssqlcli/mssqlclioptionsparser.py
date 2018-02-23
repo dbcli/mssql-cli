@@ -12,7 +12,7 @@ MSSQL_CLI_ROW_LIMIT = u'MSSQL_CLI_ROW_LIMIT'
 MSSQL_CLI_RC = u'MSSQL_CLI_RC'
 
 
-def initialize():
+def create_parser():
     args_parser = argparse.ArgumentParser(
         prog=u'mssql-cli',
         description=u'Microsoft SQL Server CLI. ' +
@@ -151,9 +151,4 @@ def initialize():
         help=u'Prompt format (Default: \\d> ')
 
     return args_parser
-
-
-def get_parser():
-    parser = initialize()
-    return parser
 

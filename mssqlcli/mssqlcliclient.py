@@ -10,7 +10,6 @@ from mssqlcli import mssqlqueries
 from mssqlcli.jsonrpc.contracts import connectionservice, queryexecutestringservice as queryservice
 from mssqlcli.packages import special
 from mssqlcli.packages.parseutils.meta import ForeignKey
-from mssqlcli.sqltoolsclient import SqlToolsClient
 from time import sleep
 
 logger = logging.getLogger(u'mssqlcli.mssqlcliclient')
@@ -89,7 +88,7 @@ class MssqlCliClient(object):
 
         return owner_uri, error_messages
 
-    def execute_multi_statement(self, query):
+    def execute_query(self, query):
         # Try to run first as special command
         try:
             for rows, columns, status, statement, is_error in special.execute(self, query):
@@ -105,13 +104,13 @@ class MssqlCliClient(object):
                     # Remove spaces, EOL and semi-colons from end
                     single_query = single_query.strip().rstrip(';')
                     if single_query:
-                        for rows, columns, status, statement, is_error in self.execute_single_statement(single_query):
+                        for rows, columns, status, statement, is_error in self._execute_query(single_query):
                             yield rows, columns, status, statement, is_error
                     else:
                         yield None, None, None, None, False
                         continue
 
-    def execute_single_statement(self, query):
+    def _execute_query(self, query):
         query_response, query_messages, query_had_error = self._execute_query_execute_request_for(query)
 
         if self._exception_found_in(query_response):
@@ -271,21 +270,21 @@ class MssqlCliClient(object):
         """ Returns a list of schema names"""
         query = mssqlqueries.get_schemas()
         logger.info(u'Schemas query: {0}'.format(query))
-        for tabular_result in self.execute_single_statement(query):
+        for tabular_result in self.execute_query(query):
             return [x[0] for x in tabular_result[0]]
 
     def get_databases(self):
         """ Returns a list of database names"""
         query = mssqlqueries.get_databases()
         logger.info(u'Databases query: {0}'.format(query))
-        for tabular_result in self.execute_single_statement(query):
+        for tabular_result in self.execute_query(query):
             return [x[0] for x in tabular_result[0]]
 
     def get_tables(self):
         """ Yields (schema_name, table_name) tuples"""
         query = mssqlqueries.get_tables()
         logger.info(u'Tables query: {0}'.format(query))
-        for tabular_result in self.execute_single_statement(query):
+        for tabular_result in self.execute_query(query):
             for row in tabular_result[0]:
                 yield (row[0], row[1])
 
@@ -293,7 +292,7 @@ class MssqlCliClient(object):
         """ Yields (schema_name, table_name, column_name, data_type, column_default) tuples"""
         query = mssqlqueries.get_table_columns()
         logger.info(u'Table columns query: {0}'.format(query))
-        for tabular_result in self.execute_single_statement(query):
+        for tabular_result in self.execute_query(query):
             for row in tabular_result[0]:
                 yield (row[0], row[1], row[2], row[3], row[4])
 
@@ -301,7 +300,7 @@ class MssqlCliClient(object):
         """ Yields (schema_name, table_name) tuples"""
         query = mssqlqueries.get_views()
         logger.info(u'Views query: {0}'.format(query))
-        for tabular_result in self.execute_single_statement(query):
+        for tabular_result in self.execute_query(query):
             for row in tabular_result[0]:
                 yield (row[0], row[1])
 
@@ -309,7 +308,7 @@ class MssqlCliClient(object):
         """ Yields (schema_name, table_name, column_name, data_type, column_default) tuples"""
         query = mssqlqueries.get_view_columns()
         logger.info(u'View columns query: {0}'.format(query))
-        for tabular_result in self.execute_single_statement(query):
+        for tabular_result in self.execute_query(query):
             for row in tabular_result[0]:
                 yield (row[0], row[1], row[2], row[3], row[4])
 
@@ -317,7 +316,7 @@ class MssqlCliClient(object):
         """ Yields (schema_name, type_name) tuples"""
         query = mssqlqueries.get_user_defined_types()
         logger.info(u'UDTs query: {0}'.format(query))
-        for tabular_result in self.execute_single_statement(query):
+        for tabular_result in self.execute_query(query):
             for row in tabular_result[0]:
                 yield (row[0], row[1])
 
@@ -325,36 +324,11 @@ class MssqlCliClient(object):
         """ Yields (parent_schema, parent_table, parent_column, child_schema, child_table, child_column) typles"""
         query = mssqlqueries.get_foreignkeys()
         logger.info(u'Foreign keys query: {0}'.format(query))
-        for tabular_result in self.execute_single_statement(query):
+        for tabular_result in self.execute_query(query):
             for row in tabular_result[0]:
                 yield ForeignKey(*row)
 
     def shutdown(self):
         self.sql_tools_client.shutdown()
         logger.info(u'Shutdown MssqlCliClient')
-
-
-def reset_connection_and_clients(sql_tools_client, *mssqlcliclients):
-    """
-    Restarts the sql_tools_client and establishes new connections for each of the
-    mssqlcliclients passed
-    """
-    try:
-        sql_tools_client.shutdown()
-        new_tools_client = SqlToolsClient()
-        for mssqlcli_client in mssqlcliclients:
-            mssqlcli_client.sql_tools_client = new_tools_client
-            mssqlcli_client.is_connected = False
-            mssqlcli_client.owner_uri = generate_owner_uri()
-            if not mssqlcli_client.connect_to_database():
-                click.secho('Unable reconnect to server {0}; database {1}.'.format(mssqlcli_client.server_name,
-                                                                                   mssqlcli_client.database),
-                            err=True, fg='yellow')
-                logger.info(u'Unable to reset connection to server {0}; database {1}'.format(
-                    mssqlcli_client.server_name,
-                    mssqlcli_client.database))
-                exit(1)
-    except Exception as e:
-        logger.error(u'Error in reset_connection : {0}'.format(e.message))
-        raise e
 

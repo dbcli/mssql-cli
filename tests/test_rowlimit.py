@@ -32,14 +32,14 @@ def test_set_row_limit():
     assert result is True
 
 
-#def test_no_limit():
-#    cli_options = create_mssql_cli_options(row_limit=0)
-#    cli = MssqlCli(cli_options)
-#    assert cli.row_limit is 0
-#    stmt = "SELECT * FROM students"
-#
-#    result = cli._should_show_limit_prompt(stmt, ['row']*over_limit)
-#    assert result is False
+def test_no_limit():
+    cli_options = create_mssql_cli_options(row_limit=0)
+    cli = MssqlCli(cli_options)
+    assert cli.row_limit is 0
+    stmt = "SELECT * FROM students"
+
+    result = cli._should_show_limit_prompt(stmt, ['row']*over_limit)
+    assert result is False
 
 
 def test_row_limit_on_non_select():

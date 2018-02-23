@@ -58,9 +58,9 @@ except ImportError:
 from collections import namedtuple
 
 # mssql-cli imports
-from mssqlcli.mssqlclioptionsparser import get_parser
+from mssqlcli.mssqlclioptionsparser import create_parser
 from mssqlcli.sqltoolsclient import SqlToolsClient
-from mssqlcli.mssqlcliclient import MssqlCliClient, reset_connection_and_clients
+from mssqlcli.mssqlcliclient import MssqlCliClient, generate_owner_uri
 from mssqlcli.packages import special
 import mssqlcli.telemetry as telemetry_session
 
@@ -316,8 +316,7 @@ class MssqlCli(object):
             # Right now the sql_tools_service process is killed and we restart
             # it with a new connection.
             click.secho(u'Cancelling query...', err=True, fg='red')
-            reset_connection_and_clients(self.sqltoolsclient,
-                                         self.mssqlcliclient_main)
+            self.reset_connection()
             logger.debug("cancelled query, sql: %r", text)
             click.secho("Query cancelled.", err=True, fg='red')
 
@@ -505,7 +504,7 @@ class MssqlCli(object):
             exit(1)
 
         for rows, columns, status, sql, is_error in \
-                self.mssqlcliclient_main.execute_multi_statement(text):
+                self.mssqlcliclient_main.execute_query(text):
             total = time() - start
             if self._should_show_limit_prompt(status, rows):
                 click.secho('The result set has more than %s rows.'
@@ -560,12 +559,37 @@ class MssqlCli(object):
             show_default=False, type=bool, default=True)
         if reconnect:
             try:
-                self.reset_connection_and_clients(self.sqltoolsclient,
-                                                  self.mssqlcliclient_main)
+                self.reset_connection()
 
                 click.secho('Reconnected!\nTry the command again.', fg='green')
             except Exception as e:
                 click.secho(str(e), err=True, fg='red')
+
+    def reset_connection(self):
+        """
+        Reset mssqlcli client with a new sql tools service and connection.
+        """
+        try:
+            self.sqltoolsclient.shutdown()
+            self.sqltoolsclient = SqlToolsClient()
+
+            self.mssqlcliclient_main.sql_tools_client = self.sqltoolsclient
+            self.mssqlcliclient_main.is_connected = False
+            self.mssqlcliclient_main.owner_uri = generate_owner_uri()
+
+            if not self.mssqlcliclient_main.connect_to_database():
+                click.secho('Unable reconnect to server {0}; database {1}.'.format(
+                    self.mssqlcliclient_main.server_name,
+                    self.mssqlcliclient_main.database),
+                            err=True, fg='yellow')
+
+                self.logger.info(u'Unable to reset connection to server {0}; database {1}'.format(
+                    self.mssqlcliclient_main.server_name,
+                    self.mssqlcliclient_main.database))
+                exit(1)
+        except Exception as e:
+            self.logger.error(u'Error in reset_connection : {0}'.format(e.message))
+            raise e
 
     def refresh_completions(self, history=None, persist_priorities='all'):
         """ Refresh outdated completions
@@ -828,7 +852,7 @@ def format_output(title, cur, headers, status, settings):
 if __name__ == "__main__":
     try:
         telemetry_session.start()
-        mssqlcli_options_parser = get_parser()
+        mssqlcli_options_parser = create_parser()
         mssqlcli_options = mssqlcli_options_parser.parse_args(sys.argv[1:])
         run_cli_with(mssqlcli_options)
     finally:

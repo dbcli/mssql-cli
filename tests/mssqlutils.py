@@ -3,7 +3,7 @@ import mssqlcli.mssqlcliclient as mssqlcliclient
 
 from argparse import Namespace
 from mssqlcli.main import format_output, OutputSettings
-from mssqlcli.mssqlclioptionsparser import get_parser
+from mssqlcli.mssqlclioptionsparser import create_parser
 
 
 def create_mssql_cli_client(options=None, owner_uri=None, connect=True, sql_tools_client=None, **additional_params):
@@ -35,7 +35,7 @@ def create_mssql_cli_client(options=None, owner_uri=None, connect=True, sql_tool
 
 def create_mssql_cli_options(**nondefault_options):
 
-    parser = get_parser()
+    parser = create_parser()
 
     default_mssql_cli_options = parser.parse_args('')
 
@@ -62,7 +62,7 @@ def run_and_return_string_from_formatter(client, sql, join=False, expanded=False
     :return: formatted string
     """
 
-    for rows, col, message, query, is_error in client.execute_single_statement(sql):
+    for rows, col, message, query, is_error in client.execute_query(sql):
         settings = OutputSettings(table_format='psql', dcmlfmt='d', floatfmt='g',
                                   expanded=expanded)
         formatted = format_output(None, rows, col, message, settings)
