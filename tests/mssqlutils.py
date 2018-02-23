@@ -9,10 +9,11 @@ from mssqlcli.mssqlclioptionsparser import get_parser
 def create_mssql_cli_client(options=None, owner_uri=None, connect=True, sql_tools_client=None, **additional_params):
     """
     Retrieve a mssqlcliclient connection.
+    :param options: options
     :param owner_uri: string
     :param connect: boolean
     :param sql_tools_client: SqlToolsClient
-    :param options: options
+    :param additional_params: kwargs
     :return: MssqlCliClient
     """
     try:
@@ -35,13 +36,14 @@ def create_mssql_cli_client(options=None, owner_uri=None, connect=True, sql_tool
 def create_mssql_cli_options(**nondefault_options):
 
     parser = get_parser()
+
     default_mssql_cli_options = parser.parse_args('')
 
     if nondefault_options:
         updateable_mssql_cli_options = vars(default_mssql_cli_options)
         for option in nondefault_options.keys():
             if option not in updateable_mssql_cli_options.keys():
-                raise Exception('Invalid mssql cli option specified {}'.format(option))
+                raise Exception('Invalid mssql-cli option specified: {}'.format(option))
 
             updateable_mssql_cli_options[option] = nondefault_options.get(option)
 
@@ -57,11 +59,11 @@ def run_and_return_string_from_formatter(client, sql, join=False, expanded=False
     :param sql: string
     :param join: boolean
     :param expanded: boolean
-    :return:
+    :return: formatted string
     """
 
     for rows, col, message, query, is_error in client.execute_single_statement(sql):
-        settings = OutputSettings(table_format='psql', dcmlfmt='d', floatfmt='g',
+        settings = OutputSettings(table_format='mssql', dcmlfmt='d', floatfmt='g',
                                   expanded=expanded)
         formatted = format_output(None, rows, col, message, settings)
         if join:
