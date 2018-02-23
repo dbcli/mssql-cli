@@ -63,7 +63,7 @@ def run_and_return_string_from_formatter(client, sql, join=False, expanded=False
     """
 
     for rows, col, message, query, is_error in client.execute_single_statement(sql):
-        settings = OutputSettings(table_format='mssql', dcmlfmt='d', floatfmt='g',
+        settings = OutputSettings(table_format='psql', dcmlfmt='d', floatfmt='g',
                                   expanded=expanded)
         formatted = format_output(None, rows, col, message, settings)
         if join:

@@ -141,8 +141,9 @@ if __name__ == '__main__':
     actions = sys.argv[1:] or default_actions
 
     for action in actions:
-        if action in targets:
-            targets[action]()
+        current_action = action.lower()
+        if current_action in targets:
+            targets[current_action]()
         else:
-            print('{0} is not a supported action'.format(action[1]))
+            print('{0} is not a supported action'.format(current_action[1]))
             print('Supported actions are {}'.format(list(targets.keys())))
