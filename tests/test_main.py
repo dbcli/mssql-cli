@@ -1,9 +1,9 @@
 # coding=utf-8
 from __future__ import unicode_literals
 import os
-from mssqlutils import create_mssql_cli_client, shutdown, run_and_return_string_from_formatter
+from mssqlutils import create_mssql_cli_options, create_mssql_cli_client, shutdown, run_and_return_string_from_formatter
 from time import sleep
-import pytest
+
 from mssqlcli.main import (
     format_output, MssqlCli, OutputSettings
 )
@@ -110,7 +110,8 @@ def test_format_output_auto_expand():
 def test_missing_rc_dir(tmpdir):
     try:
         rcfile = str(tmpdir.join("subdir").join("rcfile"))
-        mssqlcli = MssqlCli(mssqlclirc_file=rcfile)
+        mssql_cli_options = create_mssql_cli_options(mssqlclirc_file=rcfile)
+        mssqlcli = MssqlCli(mssql_cli_options)
         assert os.path.exists(rcfile)
     finally:
         mssqlcli.sqltoolsclient.shutdown()

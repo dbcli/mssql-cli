@@ -12,6 +12,7 @@ from mssqlcli import mssqlqueries
 from mssqlcli.jsonrpc.contracts import connectionservice, queryexecutestringservice as queryservice
 from mssqlcli.packages import special
 from mssqlcli.packages.parseutils.meta import ForeignKey
+from mssqlcli.sqltoolsclient import SqlToolsClient
 
 logger = logging.getLogger(u'mssqlcli.mssqlcliclient')
 time_wait_if_no_response = 0.05
@@ -20,10 +21,6 @@ time_wait_if_no_response = 0.05
 def generate_owner_uri():
     return u'mssql-cli-' + uuid.uuid4().urn
 
-
-SQLTOOLSSERVICE_CONNECTION_REQUEST = u'connection_request'
-SQLTOOLSSERVICE_QUERY_EXECUTE_STRING_REQUEST = u'query_execute_string_request'
-SQLTOOLSSERVICE_QUERY_SUBSET_REQUEST = u'query_subset_request'
 
 class MssqlCliClient(object):
 
@@ -119,34 +116,32 @@ class MssqlCliClient(object):
         query_response, query_messages, query_had_error = self._execute_query_execute_request_for(query)
 
         if self._exception_found_in(query_response):
-            yield self._generate_query_results(query=query,
-                                               message=query_response.exception_message,
-                                               is_error=query_had_error)
+            yield self._generate_query_results_to_tuples(query=query,
+                                                         message=query_response.exception_message,
+                                                         is_error=query_had_error)
             return
 
         if self._no_results_found_in(query_response) or self._no_rows_found_in(query_response):
             query_message = query_messages[0].message if query_messages else u''
-            yield self._generate_query_results(query=query,
-                                               message=query_message,
-                                               is_error=query_had_error)
+            yield self._generate_query_results_to_tuples(query=query,
+                                                         message=query_message,
+                                                         is_error=query_had_error)
+        else:
+            query_subset_responses_and_summaries = self._execute_query_subset_request_for(query_response)
 
-            return
+            for query_subset_response, result_set_summary, query_subset_error in query_subset_responses_and_summaries:
+                if self._error_message_found_in(query_subset_response):
+                    yield self._generate_query_results_to_tuples(query=query,
+                                                                 message=query_subset_response.error_message,
+                                                                 is_error=query_subset_error)
 
-        query_subset_responses_and_summaries = self._execute_query_subset_request_for(query_response)
+                query_message_for_current_result_set = query_messages[result_set_summary.id].message \
+                    if query_messages else u''
 
-        for query_subset_response, result_set_summary in query_subset_responses_and_summaries:
-            if self._error_message_found_in(query_subset_response):
-                yield self._generate_query_results(query=query,
-                                                   message=query_subset_response.error_message,
-                                                   is_error=True)
-
-            query_message_for_current_result_set = query_messages[result_set_summary.id].message \
-                                                    if query_messages else u''
-
-            yield self._generate_query_results(column_info=result_set_summary.column_info,
-                                               result_rows=query_subset_response.rows,
-                                               query=query,
-                                               message=query_message_for_current_result_set)
+                yield self._generate_query_results_to_tuples(column_info=result_set_summary.column_info,
+                                                             result_rows=query_subset_response.rows,
+                                                             query=query,
+                                                             message=query_message_for_current_result_set)
 
     def clone(self):
         cloned_mssqlcli_client = copy.copy(self)
@@ -215,9 +210,11 @@ class MssqlCliClient(object):
 
         query_has_exception = query_response.exception_message
         query_has_error_messages = query_messages[0].is_error if query_messages else False
-        query_has_batch_error = query_response.batch_summaries[0].has_error
+        query_has_batch_error = query_response.batch_summaries[0].has_error \
+            if hasattr(query_response, 'batch_summaries') else False
 
         query_failed = query_has_exception or query_has_batch_error or query_has_error_messages
+
         return query_response, query_messages, query_failed
 
     def _execute_query_subset_request_for(self, query_response):
@@ -239,7 +236,10 @@ class MssqlCliClient(object):
                 if not query_subset_response:
                     sleep(time_wait_if_no_response)
 
-            subset_responses_and_summaries.add((query_subset_response, result_set_summary))
+            query_subset_had_error = query_subset_request.error_message \
+                if hasattr(query_subset_request, 'error_message') else False
+
+            subset_responses_and_summaries.append((query_subset_response, result_set_summary, query_subset_had_error))
 
         return subset_responses_and_summaries
 
@@ -255,7 +255,7 @@ class MssqlCliClient(object):
     def _no_rows_found_in(self, query_response):
         return query_response.batch_summaries[0].result_set_summaries[0].row_count == 0
 
-    def _generate_query_results(self, query, message, column_info=None, result_rows=None, is_error=False):
+    def _generate_query_results_to_tuples(self, query, message, column_info=None, result_rows=None, is_error=False):
         # Returns a generator of rows, columns, status(rows affected) or
         # message, sql (the query), is_error
         if is_error:
@@ -333,3 +333,29 @@ class MssqlCliClient(object):
     def shutdown(self):
         self.sql_tools_client.shutdown()
         logger.info(u'Shutdown MssqlCliClient')
+
+
+def reset_connection_and_clients(sql_tools_client, *mssqlcliclients):
+    """
+    Restarts the sql_tools_client and establishes new connections for each of the
+    mssqlcliclients passed
+    """
+    try:
+        sql_tools_client.shutdown()
+        new_tools_client = SqlToolsClient()
+        for mssqlcli_client in mssqlcliclients:
+            mssqlcli_client.sql_tools_client = new_tools_client
+            mssqlcli_client.is_connected = False
+            mssqlcli_client.owner_uri = generate_owner_uri()
+            if not mssqlcli_client.connect_to_database():
+                click.secho('Unable reconnect to server {0}; database {1}.'.format(mssqlcli_client.server_name,
+                                                                                   mssqlcli_client.database),
+                            err=True, fg='yellow')
+                logger.info(u'Unable to reset connection to server {0}; database {1}'.format(
+                    mssqlcli_client.server_name,
+                    mssqlcli_client.database))
+                exit(1)
+    except Exception as e:
+        logger.error(u'Error in reset_connection : {0}'.format(e.message))
+        raise e
+

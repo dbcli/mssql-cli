@@ -58,9 +58,9 @@ except ImportError:
 from collections import namedtuple
 
 # mssql-cli imports
-import mssqlcli.mssqlclioptionsparser as parser
+from mssqlcli.mssqlclioptionsparser import get_parser
 from mssqlcli.sqltoolsclient import SqlToolsClient
-from mssqlcli.mssqlcliclient import MssqlCliClient, generate_owner_uri
+from mssqlcli.mssqlcliclient import MssqlCliClient, reset_connection_and_clients
 from mssqlcli.packages import special
 import mssqlcli.telemetry as telemetry_session
 
@@ -131,8 +131,8 @@ class MssqlCli(object):
         # Load config.
         c = self.config = get_config(options.mssqlclirc_file)
 
-        self.logger = logging.getLogger(u'mssqlcli.main')
         self.initialize_logging()
+        self.logger = logging.getLogger(u'mssqlcli.main')
 
         self.set_default_pager(c)
         self.output_file = None
@@ -143,7 +143,7 @@ class MssqlCli(object):
         self.auto_expand = options.auto_vertical_output or c['main']['expand'] == 'auto'
         self.expanded_output = c['main']['expand'] == 'always'
         self.prompt_format = options.prompt or c['main'].get('prompt', self.default_prompt)
-        if options.row_limit:
+        if options.row_limit is not None:
             self.row_limit = options.row_limit
         else:
             self.row_limit = c['main'].as_int('row_limit')
@@ -188,10 +188,10 @@ class MssqlCli(object):
 
         self.eventloop = create_eventloop()
         self.cli = None
+        self.integrated_auth = options.integrated_auth
 
         self.sqltoolsclient = SqlToolsClient(enable_logging=options.enable_sqltoolsservice_logging)
-        self.mssqlcliclient_main = None
-        self.integrated_auth = options.integrated_auth
+        self.mssqlcliclient_main = MssqlCliClient(options, self.sqltoolsclient)
 
     def __del__(self):
         # Shut-down sqltoolsservice
@@ -254,18 +254,19 @@ class MssqlCli(object):
         root_logger.info('Initializing mssqlcli logging.')
         root_logger.debug('Log file %r.', log_file)
 
-    def connect_to_database_with(self, mssqlcli_client):
+    def set_main_mssqlcli_client(self, mssqlcli_client):
+        self.mssqlcliclient_main = mssqlcli_client
+
+    def connect_to_database(self):
 
         try:
-
-            self.mssqlcliclient_main = mssqlcli_client
             owner_uri, error_messages = self.mssqlcliclient_main.connect_to_database()
             if not owner_uri and error_messages:
                 click.secho('\n'.join(error_messages),
                             err=True,
                             fg='yellow')
                 exit(1)
-
+            telemetry_session.set_server_information(self.mssqlcliclient_main)
         except Exception as e:
             self.logger.debug('Database connection failed: %r.', e)
             self.logger.error("traceback: %r", traceback.format_exc())
@@ -357,31 +358,6 @@ class MssqlCli(object):
                 self.refresh_completions(persist_priorities='all')
 
         return query
-
-    def reset_connection_and_clients(self, sql_tools_client, *mssqlcliclients):
-        """
-        Restarts the sql_tools_client and establishes new connections for each of the
-        mssqlcliclients passed
-        """
-        try:
-            sql_tools_client.shutdown()
-            new_tools_client = SqlToolsClient()
-            for mssqlcli_client in mssqlcliclients:
-                mssqlcli_client.sql_tools_client = new_tools_client
-                mssqlcli_client.is_connected = False
-                mssqlcli_client.owner_uri = generate_owner_uri()
-                if not mssqlcli_client.connect_to_database_with():
-                    click.secho('Unable reconnect to server {0}; database {1}.'.format(mssqlcli_client.server_name,
-                                                                                       mssqlcli_client.database),
-                                err=True, fg='yellow')
-                    self.logger.info(u'Unable to reset connection to server {0}; database {1}'.format(
-                            mssqlcli_client.server_name,
-                            mssqlcli_client.database))
-                    exit(1)
-
-        except Exception as e:
-            self.logger.error(u'Error in reset_connection : {0}'.format(e.message))
-            raise e
 
     def run(self):
         history_file = self.config['main']['history_file']
@@ -512,9 +488,6 @@ class MssqlCli(object):
 
         returns (results, MetaQuery)
         """
-        logger = self.logger
-        logger.debug('sql: %r', text)
-
         all_success = True
         meta_changed = False  # CREATE, ALTER, DROP, etc
         mutated = False  # INSERT, DELETE, etc
@@ -527,7 +500,7 @@ class MssqlCli(object):
         start = time()
 
         # mssql-cli
-        if not self.mssqlcliclient_main.connect_to_database_with():
+        if not self.mssqlcliclient_main.connect_to_database():
             click.secho(u'No connection to server. Exiting.')
             exit(1)
 
@@ -569,8 +542,9 @@ class MssqlCli(object):
             output.extend(formatted)
 
             db_changed, new_db_name = has_change_db_cmd(sql, db_changed)
+
             if new_db_name:
-                logger.info('Database context changed.')
+                self.logger.info('Database context changed.')
                 self.mssqlcliclient_main.database = new_db_name
 
             if all_success:
@@ -690,12 +664,7 @@ def run_cli_with(options):
     configure_and_update_options(options)
 
     mssqlcli = MssqlCli(options)
-
-    mssqlcli_client = MssqlCliClient(options, mssqlcli.sqltoolsclient)
-    mssqlcli.connect_to_database_with(mssqlcli_client)
-
-    telemetry_session.set_server_information(mssqlcli_client)
-
+    mssqlcli.connect_to_database()
     mssqlcli.run()
 
 
@@ -704,10 +673,10 @@ def configure_and_update_options(options):
         options.server = "admin:" + options.server
 
     if not options.integrated_auth:
-        if not mssqlcli_options.username:
-            mssqlcli_options.username = input(u'Username (press enter for sa)') or u'sa'
-        if not mssqlcli_options.password:
-            mssqlcli_options.password = getpass.getpass()
+        if not options.username:
+            options.username = input(u'Username (press enter for sa)') or u'sa'
+        if not options.password:
+            options.password = getpass.getpass()
 
 
 def create_config_dir_for_first_use():
@@ -859,7 +828,8 @@ def format_output(title, cur, headers, status, settings):
 if __name__ == "__main__":
     try:
         telemetry_session.start()
-        mssqlcli_options = parser.parse(sys.argv[1:])
+        mssqlcli_options_parser = get_parser()
+        mssqlcli_options = mssqlcli_options_parser.parse_args(sys.argv[1:])
         run_cli_with(mssqlcli_options)
     finally:
         # Upload telemetry async in a separate process.

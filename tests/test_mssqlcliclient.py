@@ -7,7 +7,7 @@ from time import sleep
 import mssqlcli.sqltoolsclient as sqltoolsclient
 import mssqlcli.mssqlcliclient as mssqlcliclient
 from mssqlcli.jsonrpc.jsonrpcclient import JsonRpcWriter
-from mssqlutils import create_mssql_cli_client, shutdown
+from mssqlutils import create_mssql_cli_options, create_mssql_cli_client, shutdown
 
 
 # All tests apart from test_mssqlcliclient_request_response require a live connection to an
@@ -49,17 +49,15 @@ class MssqlCliClientTests(unittest.TestCase):
             # issue24262
             sleep(0.5)
 
-        self.client = mssqlcliclient.MssqlCliClient(self.sql_tools_client,
-                                                    u'bro-hb',
-                                                    u'*',
-                                                    u'*',
-                                                    authentication_type=u'Integrated',
-                                                    database=u'AdventureWorks2014',
-                                                    owner_uri=u'connectionservicetest',
-                                                    extra_bool_param=True,
-                                                    extra_string_param=u'stringparam',
-                                                    extra_int_param=5)
-        self.client.sql_tools_client.shutdown()
+        self.mssql_cli_options = create_mssql_cli_options(integrated_auth=True)
+        self.mssql_cli_client = create_mssql_cli_client(self.mssql_cli_options,
+                                                        owner_uri=u'connectionservicetest',
+                                                        sql_tools_client=self.sql_tools_client,
+                                                        extra_bool_param=True,
+                                                        extra_string_param=u'stringparam',
+                                                        extra_int_param=5)
+
+        self.mssql_cli_client.shutdown()
 
     def test_connection(self):
         """
