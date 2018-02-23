@@ -2,12 +2,12 @@
 import os
 import io
 import unittest
-from time import sleep
-
 import mssqlcli.sqltoolsclient as sqltoolsclient
 import mssqlcli.mssqlcliclient as mssqlcliclient
+
 from mssqlcli.jsonrpc.jsonrpcclient import JsonRpcWriter
 from mssqlutils import create_mssql_cli_options, create_mssql_cli_client, shutdown
+from time import sleep
 
 
 # All tests apart from test_mssqlcliclient_request_response require a live connection to an

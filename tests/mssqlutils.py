@@ -1,9 +1,9 @@
 import mssqlcli.sqltoolsclient as sqltoolsclient
 import mssqlcli.mssqlcliclient as mssqlcliclient
 
+from argparse import Namespace
 from mssqlcli.main import format_output, OutputSettings
 from mssqlcli.mssqlclioptionsparser import get_parser
-from argparse import Namespace
 
 
 def create_mssql_cli_client(options=None, owner_uri=None, connect=True, sql_tools_client=None, **additional_params):
@@ -57,7 +57,6 @@ def run_and_return_string_from_formatter(client, sql, join=False, expanded=False
     :param sql: string
     :param join: boolean
     :param expanded: boolean
-    :param exception_formatter: boolean
     :return:
     """
 
