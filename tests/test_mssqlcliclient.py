@@ -138,7 +138,7 @@ class MssqlCliClientTests(unittest.TestCase):
         try:
             default_options = create_mssql_cli_options()
             mssqlcli = MssqlCli(default_options)
-            mssqlcli.reset_connection()
+            mssqlcli.reset()
         finally:
             shutdown(mssqlcli.mssqlcliclient_main)
 

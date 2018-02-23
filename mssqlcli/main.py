@@ -316,7 +316,7 @@ class MssqlCli(object):
             # Right now the sql_tools_service process is killed and we restart
             # it with a new connection.
             click.secho(u'Cancelling query...', err=True, fg='red')
-            self.reset_connection()
+            self.reset()
             logger.debug("cancelled query, sql: %r", text)
             click.secho("Query cancelled.", err=True, fg='red')
 
@@ -559,13 +559,13 @@ class MssqlCli(object):
             show_default=False, type=bool, default=True)
         if reconnect:
             try:
-                self.reset_connection()
+                self.reset()
 
                 click.secho('Reconnected!\nTry the command again.', fg='green')
             except Exception as e:
                 click.secho(str(e), err=True, fg='red')
 
-    def reset_connection(self):
+    def reset(self):
         """
         Reset mssqlcli client with a new sql tools service and connection.
         """
@@ -573,9 +573,7 @@ class MssqlCli(object):
             self.sqltoolsclient.shutdown()
             self.sqltoolsclient = SqlToolsClient()
 
-            self.mssqlcliclient_main.sql_tools_client = self.sqltoolsclient
-            self.mssqlcliclient_main.is_connected = False
-            self.mssqlcliclient_main.owner_uri = generate_owner_uri()
+            self.mssqlcliclient_main = self.mssqlcliclient_main.clone(self.sqltoolsclient)
 
             if not self.mssqlcliclient_main.connect_to_database():
                 click.secho('Unable reconnect to server {0}; database {1}.'.format(

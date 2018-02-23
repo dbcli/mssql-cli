@@ -141,10 +141,13 @@ class MssqlCliClient(object):
                                                              query=query,
                                                              message=query_message_for_current_result_set)
 
-    def clone(self):
+    def clone(self, sqltoolsclient=None):
         cloned_mssqlcli_client = copy.copy(self)
         cloned_mssqlcli_client.owner_uri = generate_owner_uri()
         cloned_mssqlcli_client.is_connected = False
+
+        if sqltoolsclient:
+            cloned_mssqlcli_client.sql_tools_client = sqltoolsclient
 
         return cloned_mssqlcli_client
 
