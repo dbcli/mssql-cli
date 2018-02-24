@@ -586,7 +586,7 @@ class MssqlCli(object):
                     self.mssqlcliclient_main.database))
                 exit(1)
         except Exception as e:
-            self.logger.error(u'Error in reset_connection : {0}'.format(e.message))
+            self.logger.error(u'Error in reset : {0}'.format(e.message))
             raise e
 
     def refresh_completions(self, history=None, persist_priorities='all'):
