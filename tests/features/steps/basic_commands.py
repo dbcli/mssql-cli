@@ -14,7 +14,7 @@ import wrappers
 
 @when('we run dbcli')
 def step_run_cli(context):
-    wrappers.run_cli(context)
+    wrappers.run(context)
 
 
 @when('we wait for prompt')

@@ -549,7 +549,7 @@ class MssqlCompleter(Completer):
         joins = []
         # Iterate over FKs in existing tables to find potential joins
         fks = ((fk, rtbl, rcol) for rtbl, rcols in cols.items()
-               for rcol in rcols for fk in rcol.foreignkeys)
+               for rcol in rcols for fk in rcol.get_foreign_keys)
         col = namedtuple('col', 'schema tbl col')
         for fk, rtbl, rcol in fks:
             right = col(rtbl.schema, rtbl.name, rcol.name)
@@ -614,7 +614,7 @@ class MssqlCompleter(Completer):
                             for t, c in cols if t.ref != lref)
         # For each fk from the left table, generate a join condition if
         # the other table is also in the scope
-        fks = ((fk, lcol.name) for lcol in lcols for fk in lcol.foreignkeys)
+        fks = ((fk, lcol.name) for lcol in lcols for fk in lcol.get_foreign_keys)
         for fk, lcol in fks:
             left = col(ltbl.schema, ltbl.name, lcol)
             child = col(fk.childschema, fk.childtable, fk.childcolumn)

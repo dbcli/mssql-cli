@@ -51,7 +51,7 @@ class CompletionRefresher(object):
         completer = MssqlCompleter(smart_completion=True, settings=settings)
 
         executor = mssqlcliclient
-        owner_uri, error_messages = executor.connect()
+        owner_uri, error_messages = executor.connect_to_database()
 
         if not owner_uri:
             # If we were unable to connect, do not break the experience for the user.
@@ -100,31 +100,31 @@ def refresher(name, refreshers=CompletionRefresher.refreshers):
 @refresher('schemata')
 @decorators.suppress_all_exceptions()
 def refresh_schemata(completer, mssqlcliclient):
-    completer.extend_schemata(mssqlcliclient.schemas())
+    completer.extend_schemata(mssqlcliclient.get_schemas())
 
 
 @refresher('tables')
 @decorators.suppress_all_exceptions()
 def refresh_tables(completer, mssqlcliclient):
-    completer.extend_relations(mssqlcliclient.tables(), kind='tables')
-    completer.extend_columns(mssqlcliclient.table_columns(), kind='tables')
-    completer.extend_foreignkeys(mssqlcliclient.foreignkeys())
+    completer.extend_relations(mssqlcliclient.get_tables(), kind='tables')
+    completer.extend_columns(mssqlcliclient.get_table_columns(), kind='tables')
+    completer.extend_foreignkeys(mssqlcliclient.get_foreign_keys())
 
 
 @refresher('views')
 @decorators.suppress_all_exceptions()
 def refresh_views(completer, mssqlcliclient):
-    completer.extend_relations(mssqlcliclient.views(), kind='views')
-    completer.extend_columns(mssqlcliclient.view_columns(), kind='views')
+    completer.extend_relations(mssqlcliclient.get_views(), kind='views')
+    completer.extend_columns(mssqlcliclient.get_view_columns(), kind='views')
 
 
 @refresher('databases')
 @decorators.suppress_all_exceptions()
 def refresh_databases(completer, mssqlcliclient):
-    completer.extend_database_names(mssqlcliclient.databases())
+    completer.extend_database_names(mssqlcliclient.get_databases())
 
 
 @refresher('types')
 @decorators.suppress_all_exceptions()
 def refresh_types(completer, mssqlcliclient):
-    completer.extend_datatypes(mssqlcliclient.user_defined_types())
+    completer.extend_datatypes(mssqlcliclient.get_user_defined_types())

@@ -9,7 +9,7 @@ import wrappers
 
 @when('we run dbcli with {arg}')
 def step_run_cli_with_arg(context, arg):
-    wrappers.run_cli(context, run_args=arg.split('='))
+    wrappers.run(context, run_args=arg.split('='))
 
 
 @when('we execute a small query')

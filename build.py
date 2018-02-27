@@ -128,6 +128,14 @@ def test():
     integration_test()
 
 
+def validate_actions(user_actions, valid_targets):
+    for user_action in user_actions:
+        if user_action.lower() not in valid_targets.keys():
+            print('{0} is not a supported action'.format(user_action))
+            print('Supported actions are {}'.format(list(valid_targets.keys())))
+            sys.exit(1)
+
+
 if __name__ == '__main__':
     default_actions = ['build', 'unit_test']
 
@@ -140,9 +148,7 @@ if __name__ == '__main__':
     }
     actions = sys.argv[1:] or default_actions
 
+    validate_actions(actions, targets)
+
     for action in actions:
-        if action in targets:
-            targets[action]()
-        else:
-            print('{0} is not a supported action'.format(action[1]))
-            print('Supported actions are {}'.format(list(targets.keys())))
+        targets[action]()

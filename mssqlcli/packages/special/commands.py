@@ -21,7 +21,7 @@ def list_databases(mssqlcliclient, pattern, verbose):
     if pattern:
         base_query += " where name like '%{0}%'".format(pattern)
 
-    return mssqlcliclient.execute_multi_statement_single_batch(base_query)
+    return mssqlcliclient.execute_query(base_query)
 
 
 @special_command('\\ls', '\\ls[+] [pattern]', 'List schemas.')
@@ -35,7 +35,7 @@ def list_schemas(mssqlcliclient, pattern, verbose):
     if pattern:
         base_query += " where name like '%{0}%'".format(pattern)
 
-    return mssqlcliclient.execute_multi_statement_single_batch(base_query)
+    return mssqlcliclient.execute_query(base_query)
 
 
 @special_command('\\lt', '\\lt[+] [pattern]', 'List tables.')
@@ -49,7 +49,7 @@ def list_tables(mssqlcliclient, pattern, verbose):
     if pattern:
         base_query += "and table_name like '%{0}%'".format(pattern)
 
-    return mssqlcliclient.execute_multi_statement_single_batch(base_query)
+    return mssqlcliclient.execute_query(base_query)
 
 
 @special_command('\\lv', '\\lv[+] [pattern]', 'List views.')
@@ -64,7 +64,7 @@ def list_views(mssqlcliclient, pattern, verbose):
     if pattern:
         base_query += "and table_name like '%{0}%'".format(pattern)
 
-    return mssqlcliclient.execute_multi_statement_single_batch(base_query)
+    return mssqlcliclient.execute_query(base_query)
 
 
 @special_command('\\li', '\\li[+] [pattern]', 'List indexes.')
@@ -103,7 +103,7 @@ ORDER BY
     else:
         base_query = base_query.format(pattern='')
 
-    return mssqlcliclient.execute_multi_statement_single_batch(base_query)
+    return mssqlcliclient.execute_query(base_query)
 
 
 @special_command('\\lf', '\\lf[+] [pattern]', 'List functions.')
@@ -126,7 +126,7 @@ WHERE type_desc like '%function%' {pattern}
     else:
         base_query = base_query.format(pattern='')
 
-    return mssqlcliclient.execute_multi_statement_single_batch(base_query)
+    return mssqlcliclient.execute_query(base_query)
 
 
 @special_command('\\sf', '\\sf FUNCNAME', 'Show a function\'s definition.')
@@ -143,7 +143,7 @@ INNER JOIN sys.objects o
 WHERE type_desc like '%function%' and name like '{0}'
 '''.format(pattern)
 
-    return mssqlcliclient.execute_multi_statement_single_batch(base_query)
+    return mssqlcliclient.execute_query(base_query)
 
 
 @special_command('describe', 'DESCRIBE OBJECT', '', hidden=True, case_sensitive=False)
@@ -154,7 +154,7 @@ def describe_object(mssqlcliclient, pattern, verbose):
         return []
 
     base_query = 'exec sp_help [{0}]'.format(pattern)
-    return mssqlcliclient.execute_multi_statement_single_batch(base_query)
+    return mssqlcliclient.execute_query(base_query)
 
 
 @special_command('\\ll', '\\ll[+] [pattern]', 'List logins and associated roles.')
@@ -186,7 +186,7 @@ ORDER BY name, type_desc
     else:
         base_query = base_query.format(pattern='')
 
-    return mssqlcliclient.execute_multi_statement_single_batch(base_query)
+    return mssqlcliclient.execute_query(base_query)
 
 
 @special_command('\\n', '\\n[+] [name] [param1 param2 ...]', 'List or execute named queries.')
@@ -206,7 +206,7 @@ def execute_named_query(mssqlcliclient, pattern, **__):
         if arg_error:
             return [(None, None, arg_error, None, False)]
         else:
-            return mssqlcliclient.execute_multi_statement_single_batch(query)
+            return mssqlcliclient.execute_query(query)
 
 
 @special_command('\\sn', '\\sn name query', 'Save a named query.')

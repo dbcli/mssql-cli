@@ -1,8 +1,3 @@
-# --------------------------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for license information.
-# --------------------------------------------------------------------------------------------
-
 import logging
 import subprocess
 import io
@@ -23,6 +18,9 @@ class SqlToolsClient(object):
     """
         Create sql tools service requests.
     """
+    CONNECTION_REQUEST = u'connection_request'
+    QUERY_EXECUTE_STRING_REQUEST = u'query_execute_string_request'
+    QUERY_SUBSET_REQUEST = u'query_subset_request'
 
     def __init__(self, input_stream=None, output_stream=None, enable_logging=False):
         """
