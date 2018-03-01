@@ -1,20 +1,15 @@
 from __future__ import unicode_literals
 from __future__ import print_function
 
-import click
 import getpass
 import os
 import sys
 import platform
 
 from builtins import input
-
-from mssqlcli import MssqlCli
-from mssqlcli.config import config_location
-from mssqlcli.__init__ import __version__
-from mssqlcli.mssqlclioptionsparser import create_parser
-
-import mssqlcli.telemetry as telemetry_session
+import click
+from .config import config_location
+from .__init__ import __version__
 
 click.disable_unicode_literals_warning = True
 
@@ -22,6 +17,10 @@ try:
     from urlparse import urlparse, unquote, parse_qs
 except ImportError:
     from urllib.parse import urlparse, unquote, parse_qs
+
+from mssqlcli.mssql_cli import MssqlCli
+from mssqlcli.mssqlclioptionsparser import create_parser
+import mssqlcli.telemetry as telemetry_session
 
 
 MSSQLCLI_TELEMETRY_PROMPT = """
@@ -49,8 +48,6 @@ def run_cli_with(options):
 
     mssqlcli = MssqlCli(options)
     mssqlcli.connect_to_database()
-
-    telemetry_session.set_server_information(mssqlcli.mssqlcliclient_main)
     mssqlcli.run()
 
 
