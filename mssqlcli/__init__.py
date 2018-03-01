@@ -72,12 +72,12 @@ OutputSettings.__new__.__defaults__ = (
 
 class MssqlFileHistory(FileHistory):
     def __init__(self, filename):
-        self.keywords_to_flag = ['password', 'secret', 'key_path']
+        self.keywords_to_flag = ['password', 'secret']
         super(self.__class__, self).__init__(filename)
 
     def append(self, string):
-        tokens = string.lower().split()
-        keywords_flagged = [token for token in tokens if token in self.keywords_to_flag]
+        tokens = string.lower()
+        keywords_flagged = [keyword for keyword in self.keywords_to_flag if keyword in tokens]
         if keywords_flagged:
             return
 
