@@ -5,8 +5,12 @@ import unittest
 import mssqlcli.sqltoolsclient as sqltoolsclient
 
 from mssqlcli.jsonrpc.jsonrpcclient import JsonRpcWriter
-from mssqlutils import create_mssql_cli_options, create_mssql_cli_client, shutdown
-from mssqlcli.main import MssqlCli
+from mssqltestutils import (
+    create_mssql_cli,
+    create_mssql_cli_options,
+    create_mssql_cli_client,
+    shutdown
+)
 from time import sleep
 
 
@@ -136,8 +140,7 @@ class MssqlCliClientTests(unittest.TestCase):
             Verify if the MssqlCliClient can successfully reset its connection
         """
         try:
-            default_options = create_mssql_cli_options()
-            mssqlcli = MssqlCli(default_options)
+            mssqlcli = create_mssql_cli()
             mssqlcli.reset()
         finally:
             shutdown(mssqlcli.mssqlcliclient_main)

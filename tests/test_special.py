@@ -1,6 +1,6 @@
 import unittest
 import uuid
-from mssqlutils import create_mssql_cli_client, shutdown
+from mssqltestutils import create_mssql_cli_client, shutdown
 from mssqlcli.packages.special.main import special_command, execute, NO_QUERY
 
 

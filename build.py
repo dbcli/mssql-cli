@@ -151,4 +151,4 @@ if __name__ == '__main__':
     validate_actions(actions, targets)
 
     for action in actions:
-        targets[action]()
+        targets[action.lower()]()

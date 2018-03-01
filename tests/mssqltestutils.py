@@ -2,8 +2,15 @@ import mssqlcli.sqltoolsclient as sqltoolsclient
 import mssqlcli.mssqlcliclient as mssqlcliclient
 
 from argparse import Namespace
-from mssqlcli.main import format_output, OutputSettings
+from mssqlcli.mssql_cli import MssqlCli
 from mssqlcli.mssqlclioptionsparser import create_parser
+
+
+def create_mssql_cli(**non_default_options):
+    mssqlcli_options = create_mssql_cli_options(**non_default_options)
+    mssql_cli = MssqlCli(mssqlcli_options)
+
+    return mssql_cli
 
 
 def create_mssql_cli_client(options=None, owner_uri=None, connect=True, sql_tools_client=None, **additional_params):
@@ -50,26 +57,6 @@ def create_mssql_cli_options(**nondefault_options):
         return Namespace(**updateable_mssql_cli_options)
 
     return default_mssql_cli_options
-
-
-def run_and_return_string_from_formatter(client, sql, join=False, expanded=False):
-    """
-    Return string output for the sql to be run
-    :param client: MssqlCliClient
-    :param sql: string
-    :param join: boolean
-    :param expanded: boolean
-    :return: formatted string
-    """
-
-    for rows, col, message, query, is_error in client.execute_query(sql):
-        settings = OutputSettings(table_format='psql', dcmlfmt='d', floatfmt='g',
-                                  expanded=expanded)
-        formatted = format_output(None, rows, col, message, settings)
-        if join:
-            formatted = '\n'.join(formatted)
-
-        return formatted
 
 
 def shutdown(connection):

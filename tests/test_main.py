@@ -1,18 +1,26 @@
 # coding=utf-8
 from __future__ import unicode_literals
 import os
-from mssqlutils import create_mssql_cli_options, create_mssql_cli_client, shutdown, run_and_return_string_from_formatter
+
 from time import sleep
 
-from mssqlcli.main import (
-    format_output, MssqlCli, OutputSettings
+from mssqltestutils import (
+    create_mssql_cli,
+    create_mssql_cli_options,
+    create_mssql_cli_client,
+    shutdown
 )
+from mssqlcli.mssql_cli import OutputSettings
 
 
 def test_format_output():
+    mssqlcli = create_mssql_cli()
     settings = OutputSettings(table_format='psql', dcmlfmt='d', floatfmt='g')
-    results = format_output('Title', [('abc', 'def')], ['head1', 'head2'],
-                            'test status', settings)
+    results = mssqlcli.format_output('Title',
+                                     [('abc', 'def')],
+                                     ['head1', 'head2'],
+                                     'test status',
+                                     settings)
     expected = [
         'Title',
         '+---------+---------+',
@@ -33,8 +41,8 @@ def test_format_output_live_connection():
         select 3, 'Night'
     """
     try:
-        client = create_mssql_cli_client()
-        result = run_and_return_string_from_formatter(client, statement)
+        mssqlcli = create_mssql_cli()
+        result = run_and_return_string_from_formatter(mssqlcli, statement)
         expected = [
             u'+-----------+--------+',
             u'| ShiftID   | Name   |',
@@ -47,7 +55,7 @@ def test_format_output_live_connection():
         ]
         assert list(result) == expected
     finally:
-        shutdown(client)
+        shutdown(mssqlcli.mssqlcliclient_main)
 
 
 def test_format_output_expanded_live_connection():
@@ -58,8 +66,8 @@ def test_format_output_expanded_live_connection():
     """
 
     try:
-        client = create_mssql_cli_client()
-        result = run_and_return_string_from_formatter(client, statement, expanded=True)
+        mssqlcli = create_mssql_cli()
+        result = run_and_return_string_from_formatter(mssqlcli, statement, expanded=True)
 
         expected = [
             '-[ RECORD 1 ]-------------------------',
@@ -72,14 +80,21 @@ def test_format_output_expanded_live_connection():
             ]
         assert list(result) == expected
     finally:
-        shutdown(client)
+        shutdown(mssqlcli.mssqlcliclient_main)
 
 
 def test_format_output_auto_expand():
+    mssqlcli = create_mssql_cli()
     settings = OutputSettings(
-        table_format='psql', dcmlfmt='d', floatfmt='g', max_width=100)
-    table_results = format_output('Title', [('abc', 'def')],
-                                  ['head1', 'head2'], 'test status', settings)
+        table_format='psql',
+        dcmlfmt='d',
+        floatfmt='g',
+        max_width=100)
+    table_results = mssqlcli.format_output('Title',
+                                           [('abc', 'def')],
+                                           ['head1', 'head2'],
+                                           'test status',
+                                           settings)
     table = [
         'Title',
         '+---------+---------+',
@@ -90,7 +105,7 @@ def test_format_output_auto_expand():
         'test status'
     ]
     assert list(table_results) == table
-    expanded_results = format_output(
+    expanded_results = mssqlcli.format_output(
         'Title',
         [('abc', 'def')],
         ['head1', 'head2'],
@@ -110,8 +125,25 @@ def test_format_output_auto_expand():
 def test_missing_rc_dir(tmpdir):
     try:
         rcfile = str(tmpdir.join("subdir").join("rcfile"))
-        mssql_cli_options = create_mssql_cli_options(mssqlclirc_file=rcfile)
-        mssqlcli = MssqlCli(mssql_cli_options)
+        mssqlcli = create_mssql_cli(mssqlclirc_file=rcfile)
         assert os.path.exists(rcfile)
     finally:
         mssqlcli.sqltoolsclient.shutdown()
+
+
+def run_and_return_string_from_formatter(mssql_cli, sql, join=False, expanded=False):
+    """
+    Return string output for the sql to be run.
+    """
+    mssql_cli.connect_to_database()
+    mssql_cli_client = mssql_cli.mssqlcliclient_main
+    for rows, col, message, query, is_error in mssql_cli_client.execute_query(sql):
+        settings = OutputSettings(table_format='psql',
+                                  dcmlfmt='d',
+                                  floatfmt='g',
+                                  expanded=expanded)
+        formatted = mssql_cli.format_output(None, rows, col, message, settings)
+        if join:
+            formatted = '\n'.join(formatted)
+
+        return formatted
