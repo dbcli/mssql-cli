@@ -35,7 +35,7 @@ def has_change_db_cmd(query):
     return False, None
 
 
-def has_password_in_cmd(query):
+def has_security_statement_in_cmd(query):
     """Determines if the statement contains a PASSWORD keyword
     """
     try:

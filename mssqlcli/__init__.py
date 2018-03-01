@@ -50,15 +50,16 @@ from pygments.token import Token
 MetaQuery = namedtuple(
     'Query',
     [
-        'query',                # The entire text of the command
-        'successful',           # True If all subqueries were successful
-        'total_time',           # Time elapsed executing the query
-        'meta_changed',         # True if any subquery executed create/alter/drop
-        'db_changed',           # True if any subquery changed the database
-        'path_changed',         # True if any subquery changed the search path
-        'mutated',              # True if any subquery executed insert/update/delete
+        'query',                        # The entire text of the command
+        'successful',                   # True If all subqueries were successful
+        'total_time',                   # Time elapsed executing the query
+        'meta_changed',                 # True if any subquery executed create/alter/drop
+        'db_changed',                   # True if any subquery changed the database
+        'path_changed',                 # True if any subquery changed the search path
+        'mutated',                      # True if any subquery executed insert/update/delete
+        'contains_secure_statement',    # True if any subquery contains the security statement
     ])
-MetaQuery.__new__.__defaults__ = ('', False, 0, False, False, False, False)
+MetaQuery.__new__.__defaults__ = ('', False, 0, False, False, False, False, False)
 
 OutputSettings = namedtuple(
     'OutputSettings',
@@ -67,6 +68,20 @@ OutputSettings = namedtuple(
 OutputSettings.__new__.__defaults__ = (
     None, None, None, '<null>', False, None, lambda x: x
 )
+
+
+class MssqlFileHistory(FileHistory):
+    def __init__(self, filename):
+        self.keywords_to_flag = ['password', 'secret', 'key_path']
+        super(self.__class__, self).__init__(filename)
+
+    def append(self, string):
+        tokens = string.lower().split()
+        keywords_flagged = [token for token in tokens if token in self.keywords_to_flag]
+        if keywords_flagged:
+            return
+
+        super(self.__class__, self).append(string)
 
 
 class MssqlCli(object):
@@ -332,7 +347,7 @@ class MssqlCli(object):
         history_file = self.config['main']['history_file']
         if history_file == 'default':
             history_file = config_location() + 'history'
-        history = FileHistory(os.path.expanduser(history_file))
+        history = MssqlFileHistory(os.path.expanduser(history_file))
 
         self.refresh_completions(history=history,
                                  persist_priorities='none')
@@ -369,11 +384,11 @@ class MssqlCli(object):
                 self.now = dt.datetime.today()
 
                 # Allow MssqlCompleter to learn user's preferred keywords, etc.
+                if not query.contains_secure_statement:
+                    with self._completer_lock:
+                        self.completer.extend_query_history(document.text)
 
-                with self._completer_lock:
-                    self.completer.extend_query_history(document.text)
-
-                self.query_history.append(query)
+                    self.query_history.append(query)
 
         except EOFError:
             self.mssqlcliclient_main.shutdown()
@@ -461,6 +476,7 @@ class MssqlCli(object):
         meta_changed = False  # CREATE, ALTER, DROP, etc
         mutated = False  # INSERT, DELETE, etc
         db_changed = False
+        contains_secure_statement = False
         path_changed = False
         output = []
         total = 0
@@ -483,6 +499,8 @@ class MssqlCli(object):
                 if not click.confirm('Do you want to continue?'):
                     click.secho("Aborted!", err=True, fg='red')
                     break
+
+            contains_secure_statement = mssqlutils.has_security_statement_in_cmd(sql)
 
             if is_error:
                 output.append(status)
@@ -521,7 +539,7 @@ class MssqlCli(object):
                 meta_changed = meta_changed or mssqlutils.has_meta_cmd(text)
 
         return output, MetaQuery(
-            text, all_success, total, meta_changed, db_changed, path_changed, mutated)
+            text, all_success, total, meta_changed, db_changed, path_changed, mutated, contains_secure_statement)
 
     def _handle_server_closed_connection(self):
         """Used during CLI execution"""
