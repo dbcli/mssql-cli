@@ -35,17 +35,6 @@ def has_change_db_cmd(query):
     return False, None
 
 
-def has_password_in_cmd(query):
-    """Determines if the statement contains a PASSWORD keyword
-    """
-    try:
-        tokens = query.lower().split()
-        return 'password' in tokens
-
-    except Exception:
-        return False
-
-
 def quit_command(sql):
     return (sql.strip().lower() == 'exit' or
             sql.strip().lower() == 'quit' or
