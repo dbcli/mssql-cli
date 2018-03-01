@@ -1,11 +1,17 @@
 # coding=utf-8
 from __future__ import unicode_literals
 import os
-from mssqlutils import create_mssql_cli_options, create_mssql_cli_client, shutdown, run_and_return_string_from_formatter
+
 from time import sleep
 
-from mssqlcli.main import (
-    format_output, MssqlCli, OutputSettings
+from mssqlcli import MssqlCli, OutputSettings
+from mssqlcli.mssqlutils import format_output
+
+from mssqltestutils import (
+    create_mssql_cli_options,
+    create_mssql_cli_client,
+    shutdown,
+    run_and_return_string_from_formatter
 )
 
 

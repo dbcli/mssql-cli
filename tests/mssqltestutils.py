@@ -2,7 +2,8 @@ import mssqlcli.sqltoolsclient as sqltoolsclient
 import mssqlcli.mssqlcliclient as mssqlcliclient
 
 from argparse import Namespace
-from mssqlcli.main import format_output, OutputSettings
+from mssqlcli import OutputSettings
+from mssqlcli.mssqlutils import format_output
 from mssqlcli.mssqlclioptionsparser import create_parser
 
 

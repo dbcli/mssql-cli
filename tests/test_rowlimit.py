@@ -1,5 +1,5 @@
 from mssqlcli.main import MssqlCli
-from mssqlutils import create_mssql_cli_options
+from mssqltestutils import create_mssql_cli_options
 
 
 DEFAULT_OPTIONS = create_mssql_cli_options()

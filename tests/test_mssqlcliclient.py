@@ -5,7 +5,7 @@ import unittest
 import mssqlcli.sqltoolsclient as sqltoolsclient
 
 from mssqlcli.jsonrpc.jsonrpcclient import JsonRpcWriter
-from mssqlutils import create_mssql_cli_options, create_mssql_cli_client, shutdown
+from mssqltestutils import create_mssql_cli_options, create_mssql_cli_client, shutdown
 from mssqlcli.main import MssqlCli
 from time import sleep
 
