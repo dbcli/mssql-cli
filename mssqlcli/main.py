@@ -1,14 +1,13 @@
 from __future__ import unicode_literals
 from __future__ import print_function
 
+import click
 import getpass
 import os
 import sys
 import platform
 
 from builtins import input
-
-import click
 from .config import config_location
 from .__init__ import __version__
 

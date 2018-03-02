@@ -388,8 +388,8 @@ class MssqlCli(object):
                 query = self.execute_command(document.text, query)
                 self.now = dt.datetime.today()
 
-                # Allow MssqlCompleter to learn user's preferred keywords, etc.
                 if not query.contains_secure_statement:
+                    # Allow MssqlCompleter to learn user's preferred keywords, etc.
                     with self._completer_lock:
                         self.completer.extend_query_history(document.text)
 
@@ -685,12 +685,12 @@ class MssqlCli(object):
 
         return False, None
 
-    def has_security_statement_in_cmd(self, uery):
-        """Determines if the statement contains a PASSWORD keyword
+    def has_security_statement_in_cmd(self, query):
+        """Determines if the statement contains a PASSWORD or SECRET keyword
         """
         try:
-            tokens = query.lower().split()
-            return 'password' in tokens
+            tokens = query.lower()
+            return 'password' in tokens or 'secret' in tokens
 
         except Exception:
             return False
