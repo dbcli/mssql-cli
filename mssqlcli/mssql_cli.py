@@ -74,10 +74,12 @@ OutputSettings.__new__.__defaults__ = (
     None, None, None, '<null>', False, None, lambda x: x
 )
 
+security_keywords = ['password', 'secret']
+
 
 class MssqlFileHistory(FileHistory):
     def __init__(self, filename):
-        self.keywords_to_flag = ['password', 'secret']
+        self.keywords_to_flag = security_keywords
         super(self.__class__, self).__init__(filename)
 
     def append(self, string):
@@ -690,7 +692,8 @@ class MssqlCli(object):
         """
         try:
             tokens = query.lower()
-            return 'password' in tokens or 'secret' in tokens
+            keywords_flagged = [keyword for keyword in security_keywords if keyword in tokens]
+            return keywords_flagged
 
         except Exception:
             return False
