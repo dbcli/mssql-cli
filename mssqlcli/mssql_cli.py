@@ -77,7 +77,7 @@ OutputSettings.__new__.__defaults__ = (
 security_keywords = ['password', 'secret', 'encrypted_value']
 
 
-def query_contains_security_words(query):
+def security_words_found_in(query):
     try:
         tokens = query.lower()
         return any([keyword for keyword in security_keywords if keyword in tokens])
@@ -90,7 +90,7 @@ class MssqlFileHistory(FileHistory):
         super(self.__class__, self).__init__(filename)
 
     def append(self, string):
-        if query_contains_security_words(string):
+        if security_words_found_in(string):
             return
 
         super(self.__class__, self).append(string)
@@ -511,7 +511,7 @@ class MssqlCli(object):
                     click.secho("Aborted!", err=True, fg='red')
                     break
 
-            contains_secure_statement = query_contains_security_words(sql)
+            contains_secure_statement = security_words_found_in(sql)
 
             if is_error:
                 output.append(status)
