@@ -74,18 +74,23 @@ OutputSettings.__new__.__defaults__ = (
     None, None, None, '<null>', False, None, lambda x: x
 )
 
-security_keywords = ['password', 'secret']
+security_keywords = ['password', 'secret', 'encrypted_value']
+
+
+def query_contains_security_words(query):
+    try:
+        tokens = query.lower()
+        return any([keyword for keyword in security_keywords if keyword in tokens])
+    except Exception:
+        return False
 
 
 class MssqlFileHistory(FileHistory):
     def __init__(self, filename):
-        self.keywords_to_flag = security_keywords
         super(self.__class__, self).__init__(filename)
 
     def append(self, string):
-        tokens = string.lower()
-        keywords_flagged = [keyword for keyword in self.keywords_to_flag if keyword in tokens]
-        if keywords_flagged:
+        if query_contains_security_words(string):
             return
 
         super(self.__class__, self).append(string)
@@ -117,7 +122,6 @@ class MssqlCli(object):
         if not os.environ.get('LESS'):
             os.environ['LESS'] = '-SRXF'
 
-    # mssql-cli
     def __init__(self, options):
 
         # Load config.
@@ -507,7 +511,7 @@ class MssqlCli(object):
                     click.secho("Aborted!", err=True, fg='red')
                     break
 
-            contains_secure_statement = self.has_security_statement_in_cmd(sql)
+            contains_secure_statement = query_contains_security_words(sql)
 
             if is_error:
                 output.append(status)
@@ -686,17 +690,6 @@ class MssqlCli(object):
             return False, None
 
         return False, None
-
-    def has_security_statement_in_cmd(self, query):
-        """Determines if the statement contains a PASSWORD or SECRET keyword
-        """
-        try:
-            tokens = query.lower()
-            keywords_flagged = [keyword for keyword in security_keywords if keyword in tokens]
-            return keywords_flagged
-
-        except Exception:
-            return False
 
     def quit_command(self, sql):
         return (sql.strip().lower() == 'exit' or
