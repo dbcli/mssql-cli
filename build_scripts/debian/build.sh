@@ -50,15 +50,15 @@ make
 sudo apt-get install -y zlib1g-dev
 make install
 
-# note: This installation step could happen in debian/rules but was unable to escape $ char.
-# It does not affect the built .deb file though.
+# Build mssql-cli wheel from source.
 $source_dir/python_env/bin/pip3 install wheel
 $source_dir/python_env/bin/python3 setup.py bdist_wheel -d $tmp_pkg_dir;
 
+# Install mssql-cli wheel.
 all_modules=`find $tmp_pkg_dir -name "*.whl"`
 $source_dir/python_env/bin/pip3 install $all_modules
 
-# Add the debian files
+# Add the debian files.
 mkdir $source_dir/debian
 # Create temp dir for the debian/ directory used for CLI build.
 cli_debian_dir_tmp=$(mktemp -d)

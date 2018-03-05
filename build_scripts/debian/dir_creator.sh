@@ -77,6 +77,7 @@ override_dh_install:
 ${TAB}mkdir -p debian/mssql-cli
 ${TAB}cp -a python_env/* debian/mssql-cli
 ${TAB}mkdir -p debian/mssql-cli/usr/bin/
+${TAB}echo "if [ -z ${PYTHONIOENCODING+x} ]; then export PYTHONIOENCODING=utf8; fi" > debian/mssql-cli/usr/bin/mssql-cli
 ${TAB}echo "\043!/usr/bin/env bash\n/bin/python3 -Im mssqlcli.main \"\044\100\"" > debian/mssql-cli/usr/bin/mssql-cli
 ${TAB}chmod 0755 debian/mssql-cli/usr/bin/mssql-cli
 ${TAB}dpkg-shlibdeps -v --warnings=7 -Tdebian/mssql-cli.substvars -dDepends -edebian/mssql-cli/opt/mssql-cli/bin/python3 debian/mssql-cli/opt/mssql-cli/lib/python3.6/lib-dynload/_ssl.cpython-36m-x86_64-linux-gnu.so
