@@ -22,14 +22,14 @@ def test_history_file_not_store_credentials():
         'CREATE MASTER KEY WITH SECRET=xyz',
     ]
 
-    with tempfile.TemporaryFile(delete=False) as temp_file:
+    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
         temp_file_path = temp_file.name
         file_history = MssqlFileHistory(temp_file_path)
 
         for statement in statements:
             file_history.append(statement)
 
-        assert len(file_history) == 0
+    assert len(file_history) == 0
 
 
 def test_format_output():
