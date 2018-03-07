@@ -51,15 +51,15 @@ make install
 source_dir=%{repo_path}
 dist_dir=$(mktemp -d)
 
-%{buildroot}%{cli_lib_dir}/bin/pip3 install wheel
-
 cd $source_dir
-%{buildroot}%{cli_lib_dir}/bin/python3 $source_dir/setup.py bdist_wheel -d $dist_dir
+%{buildroot}%{cli_lib_dir}/bin/pip3 install -r $source_dir/requirements-dev.txt
+%{buildroot}%{cli_lib_dir}/bin/python3 $source_dir/build.py build
 cd -
 
 
 %install
 # Install mssql-cli
+dist_dir=$source_dir/dist
 all_modules=`find $dist_dir -name "*.whl"`
 %{buildroot}%{cli_lib_dir}/bin/pip3  install $all_modules
 

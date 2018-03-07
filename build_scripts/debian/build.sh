@@ -51,14 +51,14 @@ sudo apt-get install -y zlib1g-dev
 make install
 
 # Build mssql-cli wheel from source.
-$source_dir/python_env/bin/pip3 install wheel
-
 cd $source_dir
-$source_dir/python_env/bin/python3 $source_dir/setup.py bdist_wheel -d $tmp_pkg_dir;
+$source_dir/python_env/bin/pip3 install -r $source_dir/requirements-dev.txt
+$source_dir/python_env/bin/python3 $source_dir/build.py build;
 cd -
 
 # Install mssql-cli wheel.
-all_modules=`find $tmp_pkg_dir -name "*.whl"`
+dist_dir=$source_dir/dist
+all_modules=`find $dist_dir -name "*.whl"`
 $source_dir/python_env/bin/pip3 install $all_modules
 
 # Add the debian files.
