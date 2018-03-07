@@ -1,6 +1,7 @@
 # coding=utf-8
 from __future__ import unicode_literals
 import os
+import tempfile
 
 from time import sleep
 
@@ -10,7 +11,25 @@ from mssqltestutils import (
     create_mssql_cli_client,
     shutdown
 )
-from mssqlcli.mssql_cli import OutputSettings
+from mssqlcli.mssql_cli import OutputSettings, MssqlFileHistory
+
+
+def test_history_file_not_store_credentials():
+    # Used by prompt tool kit, verify statements that contain password or secret
+    # are not stored by the history file.
+    statements = [
+        'Create Database Scoped Credential With Password = <secret>',
+        'CREATE MASTER KEY WITH SECRET=xyz',
+    ]
+
+    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+        temp_file_path = temp_file.name
+        file_history = MssqlFileHistory(temp_file_path)
+
+        for statement in statements:
+            file_history.append(statement)
+
+    assert len(file_history) == 0
 
 
 def test_format_output():

@@ -1,13 +1,13 @@
 from __future__ import unicode_literals
 from __future__ import print_function
 
+import click
 import getpass
 import os
 import sys
 import platform
 
 from builtins import input
-import click
 from .config import config_location
 from .__init__ import __version__
 
@@ -21,7 +21,6 @@ except ImportError:
 from mssqlcli.mssql_cli import MssqlCli
 from mssqlcli.mssqlclioptionsparser import create_parser
 import mssqlcli.telemetry as telemetry_session
-
 
 MSSQLCLI_TELEMETRY_PROMPT = """
 Telemetry
@@ -48,6 +47,8 @@ def run_cli_with(options):
 
     mssqlcli = MssqlCli(options)
     mssqlcli.connect_to_database()
+
+    telemetry_session.set_server_information(mssqlcli.mssqlcliclient_main)
     mssqlcli.run()
 
 
