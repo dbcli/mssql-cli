@@ -19,7 +19,7 @@ script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 debian_directory_creator=$script_dir/dir_creator.sh
 
 # Install dependencies for the build
-sudo apt-get install -y libssl-dev libffi-dev python3-dev debhelper
+sudo apt-get install -y libssl-dev libffi-dev debhelper
 # Download, Extract, Patch, Build CLI
 tmp_pkg_dir=$(mktemp -d)
 working_dir=$(mktemp -d)
@@ -32,7 +32,6 @@ if [ -d "$source_dir/debian" ]
   then
     rm -rf $source_dir/debian
 fi
-[ -d $local_repo/privates ] && cp $local_repo/privates/*.whl $tmp_pkg_dir
 
 # Freeze mssql-cli
 cd $source_dir
