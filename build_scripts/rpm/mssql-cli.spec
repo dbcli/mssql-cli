@@ -51,7 +51,7 @@ make install
 source_dir=%{repo_path}
 dist_dir=$(mktemp -d)
 
-%{buildroot}%{cli_lib_dir}/pip3 install wheel
+%{buildroot}%{cli_lib_dir}/bin/pip3 install wheel
 
 cd $source_dir
 %{buildroot}%{cli_lib_dir}/bin/python3 $source_dir/setup.py bdist_wheel -d $dist_dir
