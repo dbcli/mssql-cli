@@ -75,7 +75,7 @@ def validate_package():
         Install mssql-cli package locally.
     """
     root_dir = os.path.abspath(os.path.join(os.path.abspath(__file__), '..'))
-    # Local install of mssql-scripter.
+    # Local install of mssql-cli.
     mssqlcli_wheel_dir = os.listdir(utility.MSSQLCLI_DIST_DIRECTORY)
     # To ensure we have a clean install, we disable the cache as to prevent
     # cache overshadowing actual changes made.
