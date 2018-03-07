@@ -5,6 +5,10 @@ import utility
 import mssqlcli.mssqltoolsservice.externals as mssqltoolsservice
 
 
+PIP = 'pip3' if sys.version_info[0] == 3 else 'pip'
+PYTHON = 'python3' if sys.version_info[0] == 3 else 'python'
+
+
 def print_heading(heading, f=None):
     print('{0}\n{1}\n{0}'.format('=' * len(heading), heading), file=f)
 
@@ -38,12 +42,12 @@ def build():
 
     # install general requirements.
     utility.exec_command(
-        'pip install -r requirements-dev.txt',
+        '{0} install -r requirements-dev.txt'.format(PIP),
         utility.ROOT_DIR)
 
     # convert windows line endings to unix for mssql-cli bash script
     utility.exec_command(
-        'python dos2unix.py mssql-cli mssql-cli',
+        '{0} dos2unix.py mssql-cli mssql-cli'.format(PYTHON),
         utility.ROOT_DIR)
 
     # run flake8
@@ -61,8 +65,8 @@ def build():
         utility.clean_up(utility.MSSQLCLI_BUILD_DIRECTORY)
 
         print_heading('Building mssql-cli pip package')
-        utility.exec_command('python --version', utility.ROOT_DIR)
-        utility.exec_command('python setup.py check -r -s bdist_wheel --plat-name {}'.format(platform),
+        utility.exec_command('{0} --version'.format(PYTHON), utility.ROOT_DIR)
+        utility.exec_command('{0} setup.py check -r -s bdist_wheel --plat-name {1}'.format(PYTHON, platform),
                              utility.ROOT_DIR,
                              continue_on_error=False)
 
@@ -84,7 +88,8 @@ def validate_package():
     mssqlcli_wheel_name = [
         pkge for pkge in mssqlcli_wheel_dir if current_platform in pkge]
     utility.exec_command(
-        'pip install --no-cache-dir --no-index ./dist/{}'.format(
+        '{0} install --no-cache-dir --no-index ./dist/{1}'.format(
+            PIP,
             mssqlcli_wheel_name[0]),
         root_dir, continue_on_error=False
     )
