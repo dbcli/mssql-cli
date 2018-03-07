@@ -28,50 +28,39 @@ def code_analysis():
         utility.ROOT_DIR)
 
 
-def build():
+def freeze():
     """
-        Builds mssql-cli package.
+        Freeze mssql-cli package.
     """
     print_heading('Cleanup')
 
     # clean
-    utility.clean_up(utility.MSSQLCLI_DIST_DIRECTORY)
+    utility.clean_up(utility.MSSQLCLI_BUILD_DIRECTORY)
     utility.clean_up_egg_info_sub_directories(utility.ROOT_DIR)
 
     print_heading('Running setup')
 
-    # install general requirements.
     utility.exec_command(
         '{0} install -r requirements-dev.txt'.format(PIP),
-        utility.ROOT_DIR)
-
-    # convert windows line endings to unix for mssql-cli bash script
-    utility.exec_command(
-        '{0} dos2unix.py mssql-cli mssql-cli'.format(PYTHON),
         utility.ROOT_DIR)
 
     # run flake8
     code_analysis()
 
-    if utility.get_current_platform().startswith('win'):
-        platforms_to_build = ['win32', 'win_amd64']
-    else:
-        platforms_to_build = [utility.get_current_platform()]
+    current_platform = utility.get_current_platform()
 
-    for platform in platforms_to_build:
-        # For the current platform, populate the appropriate binaries and
-        # generate the wheel.
-        clean_and_copy_sqltoolsservice(platform)
-        utility.clean_up(utility.MSSQLCLI_BUILD_DIRECTORY)
-
-        print_heading('Building mssql-cli pip package')
-        utility.exec_command('{0} --version'.format(PYTHON), utility.ROOT_DIR)
-        utility.exec_command('{0} setup.py check -r -s bdist_wheel --plat-name {1}'.format(PYTHON, platform),
-                             utility.ROOT_DIR,
-                             continue_on_error=False)
+    # For the current platform, populate the appropriate binaries and
+    # generate the wheel.
+    clean_and_copy_sqltoolsservice(current_platform)
+    utility.clean_up(utility.MSSQLCLI_BUILD_DIRECTORY)
+    print_heading('Freezing mssql-cli package')
+    utility.exec_command('{0} --version'.format(PYTHON), utility.ROOT_DIR)
+    utility.exec_command('{0} setup.py build'.format(PYTHON),
+                         utility.ROOT_DIR,
+                         continue_on_error=False)
 
     # Copy back the SqlToolsService binaries for this platform.
-    clean_and_copy_sqltoolsservice(utility.get_current_platform())
+    clean_and_copy_sqltoolsservice(current_platform)
 
 
 def validate_package():
@@ -145,7 +134,7 @@ if __name__ == '__main__':
     default_actions = ['build', 'unit_test']
 
     targets = {
-        'build': build,
+        'freeze': freeze,
         'validate_package': validate_package,
         'unit_test': unit_test,
         'integration_test': integration_test,

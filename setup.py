@@ -1,14 +1,10 @@
-# --------------------------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for license information.
-# --------------------------------------------------------------------------------------------
+from cx_Freeze import setup, Executable
 
 import ast
 import os
 import re
 import datetime
 
-from setuptools import setup, find_packages
 
 _version_re = re.compile(r'__version__\s+=\s+(.*)')
 
@@ -30,20 +26,9 @@ def get_timestamped_version(version):
     return version + '.dev' + datetime.datetime.now().strftime("%y%m%d%H%M")
 
 
-install_requirements = [
-    'click >= 4.1',
-    'argparse >= 1.4.0',
-    'Pygments >= 2.0',  # Pygments has to be Capitalcased.
-    'prompt_toolkit>=1.0.10,<1.1.0',
-    'sqlparse >=0.2.2,<0.3.0',
-    'configobj >= 5.0.6',
-    'humanize >= 0.5.1',
-    'cli_helpers >= 0.2.3, < 1.0.0',
-    'applicationinsights>=0.11.1',
-    'future>=0.16.0',
-    'wheel>=0.29.0',
-    'enum34>=1.1.6'
-]
+# Without explicitly adding humanize, cx_freeze pulls in a partial copy the package,
+# which leads to a module not found error during runtime.
+build_exe_options = {"packages": ['humanize']}
 
 setup(
     name='mssql-cli',
@@ -52,17 +37,10 @@ setup(
     version=version if os.environ.get('MSSQL_CLI_OFFICIAL_BUILD', '') else get_timestamped_version(version),
     license='BSD-3',
     url='https://github.com/dbcli/mssql-cli',
-    packages=find_packages(),
     package_data={'mssqlcli': ['mssqlclirc',
                                'packages/mssqlliterals/sqlliterals.json']},
     description=description,
     long_description=open('README.rst').read(),
-    install_requires=install_requirements,
-    include_package_data=True,
-    scripts=[
-        'mssql-cli.bat',
-        'mssql-cli'
-    ],
     classifiers=[
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
@@ -79,4 +57,6 @@ setup(
         'Topic :: Software Development',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
+    options={"build_exe": build_exe_options},
+    executables=[Executable("mssqlcli/main.py")]
 )

@@ -117,7 +117,7 @@ def start():
 
 
 @decorators.suppress_all_exceptions(raise_in_diagnostics=True)
-def conclude(service_endpoint_uri='https://vortex.data.microsoft.com/collect/v1', separate_process=True):
+def conclude(service_endpoint_uri='https://vortex.data.microsoft.com/collect/v1', separate_process=False):
     _session.end_time = datetime.datetime.now()
 
     payload = _session.generate_payload()
