@@ -43,7 +43,7 @@ tar -xvzf $python_archive -C %{_builddir}
 make clean || echo "Nothing to clean"
 
 # Build Python from source
-%{_builddir}/*/configure --srcdir %{_builddir}/* --prefix %{buildroot}%{cli_lib_dir}/bin/python
+%{_builddir}/*/configure --srcdir %{_builddir}/* --prefix %{buildroot}%{cli_lib_dir}
 make
 make install
 
@@ -52,15 +52,16 @@ source_dir=%{repo_path}
 dist_dir=$(mktemp -d)
 
 cd $source_dir
-%{buildroot}%{cli_lib_dir}/bin/python $source_dir/setup.py bdist_wheel -d $dist_dir
+%{buildroot}%{cli_lib_dir}/bin/pip3 install -r $source_dir/requirements-dev.txt
+%{buildroot}%{cli_lib_dir}/bin/python3 $source_dir/build.py build
 cd -
 
 
 %install
 # Install mssql-cli
+dist_dir=$source_dir/dist
 all_modules=`find $dist_dir -name "*.whl"`
-%{buildroot}%{cli_lib_dir}/bin/pip install wheel
-%{buildroot}%{cli_lib_dir}/bin/pip install $all_modules
+%{buildroot}%{cli_lib_dir}/bin/pip3  install $all_modules
 
 # Fix up %{buildroot} appearing in some files...
 for d in %{buildroot}%{cli_lib_dir}/bin/*; do perl -p -i -e "s#%{buildroot}##g" $d; done;
@@ -68,7 +69,7 @@ for d in %{buildroot}%{cli_lib_dir}/bin/*; do perl -p -i -e "s#%{buildroot}##g" 
 # Create executable
 mkdir -p %{buildroot}%{_bindir}
 printf "if [ -z ${PYTHONIOENCODING+x} ]; then export PYTHONIOENCODING=utf8; fi" > %{buildroot}%{_bindir}/mssql-cli
-printf '#!/usr/bin/env bash\n%{cli_lib_dir}/bin/python -Esm mssqlcli.main "$@"' > %{buildroot}%{_bindir}/mssql-cli
+printf '#!/usr/bin/env bash\n%{cli_lib_dir}/bin/python3 -Esm mssqlcli.main "$@"' > %{buildroot}%{_bindir}/mssql-cli
 
 
 %files
