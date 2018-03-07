@@ -50,7 +50,10 @@ make install
 # Build mssql-cli wheel from source.
 source_dir=%{repo_path}
 dist_dir=$(mktemp -d)
+
+cd $source_dir
 %{buildroot}%{cli_lib_dir}/bin/python $source_dir/setup.py bdist_wheel -d $dist_dir
+cd -
 
 
 %install

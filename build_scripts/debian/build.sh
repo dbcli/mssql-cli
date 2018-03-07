@@ -52,7 +52,10 @@ make install
 
 # Build mssql-cli wheel from source.
 $source_dir/python_env/bin/pip3 install wheel
+
+cd $source_dir
 $source_dir/python_env/bin/python3 $source_dir/setup.py bdist_wheel -d $tmp_pkg_dir;
+cd -
 
 # Install mssql-cli wheel.
 all_modules=`find $tmp_pkg_dir -name "*.whl"`
