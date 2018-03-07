@@ -18,17 +18,24 @@ if [ -z "$2" ]
     exit 1
 fi
 
+if [ -z "$3" ]
+  then
+    echo "No argument supplied for cli version."
+    exit 1
+fi
+
 TAB=$'\t'
 
 debian_dir=$1
 source_dir=$2
+cli_version=$3
 mkdir $debian_dir/source
 
 echo '1.0' > $debian_dir/source/format
 echo '9' > $debian_dir/compat
 
 cat > $debian_dir/changelog <<- EOM
-mssql-cli (${CLI_VERSION}-${CLI_VERSION_REVISION:=1}) unstable; urgency=low
+mssql-cli ($cli_version-${CLI_VERSION_REVISION:=1}) unstable; urgency=low
 
   * Debian package release.
 

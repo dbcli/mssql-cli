@@ -66,7 +66,7 @@ mkdir $source_dir/debian
 # Create temp dir for the debian/ directory used for CLI build.
 cli_debian_dir_tmp=$(mktemp -d)
 
-$debian_directory_creator $cli_debian_dir_tmp $source_dir
+$debian_directory_creator $cli_debian_dir_tmp $source_dir $CLI_VERSION
 cp -r $cli_debian_dir_tmp/* $source_dir/debian
 cd $source_dir
 dpkg-buildpackage -us -uc
