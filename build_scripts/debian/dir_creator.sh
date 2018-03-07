@@ -74,18 +74,18 @@ cat > $debian_dir/rules << EOM
 #!/usr/bin/make -f
 
 # Uncomment this to turn on verbose mode.
-export DH_VERBOSE=1
-export DH_OPTIONS=-v
+#export DH_VERBOSE=1
+#export DH_OPTIONS=-v
 
 %:
 ${TAB}dh \$@ --sourcedirectory $source_dir
 
 override_dh_install:
 ${TAB}mkdir -p debian/mssql-cli/mssql-cli
-${TAB}cp -a python_env/* debian/mssql-cli/mssql-cli
+${TAB}cp -a build/./* debian/mssql-cli/mssql-cli
 ${TAB}mkdir -p debian/mssql-cli/usr/bin/
 ${TAB}echo "if [ -z ${PYTHONIOENCODING+x} ]; then export PYTHONIOENCODING=utf8; fi" > debian/mssql-cli/usr/bin/mssql-cli
-${TAB}echo "\043!/usr/bin/env bash\n/mssql-cli/bin/python3 -Im mssqlcli.main \"\044\100\"" > debian/mssql-cli/usr/bin/mssql-cli
+${TAB}echo "\043!/usr/bin/env bash\n/mssql-cli/main \"\044\100\"" > debian/mssql-cli/usr/bin/mssql-cli
 ${TAB}chmod 0755 debian/mssql-cli/usr/bin/mssql-cli
 ${TAB}dpkg-shlibdeps -v --warnings=7 -Tdebian/mssql-cli.substvars -dDepends -edebian/mssql-cli/mssql-cli/bin/python3 debian/mssql-cli/mssql-cli/lib/python3.6/lib-dynload/_ssl.cpython-36m-x86_64-linux-gnu.so
 

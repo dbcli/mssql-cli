@@ -34,32 +34,10 @@ if [ -d "$source_dir/debian" ]
 fi
 [ -d $local_repo/privates ] && cp $local_repo/privates/*.whl $tmp_pkg_dir
 
-# Build Python from source and include
-python_dir=$(mktemp -d)
-python_archive=$(mktemp)
-wget https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tgz -qO $python_archive
-tar -xvzf $python_archive -C $python_dir
-echo "Python dir is $python_dir"
-
-#  clean any previous make files
-make clean || echo "Nothing to clean"
-
-$python_dir/*/configure --srcdir $python_dir/* --prefix $source_dir/python_env
-make
-#  required to run the 'make install'
-sudo apt-get install -y zlib1g-dev
-make install
-
-# Build mssql-cli wheel from source.
+# Freeze mssql-cli
 cd $source_dir
-$source_dir/python_env/bin/pip3 install -r $source_dir/requirements-dev.txt
-$source_dir/python_env/bin/python3 $source_dir/build.py build;
+python3 $source_dir/build.py freeze;
 cd -
-
-# Install mssql-cli wheel.
-dist_dir=$source_dir/dist
-all_modules=`find $dist_dir -name "*.whl"`
-$source_dir/python_env/bin/pip3 install $all_modules
 
 # Add the debian files.
 mkdir $source_dir/debian
