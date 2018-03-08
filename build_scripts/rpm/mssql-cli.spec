@@ -50,8 +50,8 @@ make install
 export PYTHON_PATH=%{buildroot}%{cli_lib_dir}/bin/python3
 export PIP_PATH=%{buildroot}%{cli_lib_dir}/bin/pip3
 
-cd ${repo_path}
-{buildroot}%{cli_lib_dir}/bin/python3 build.py freeze
+cd %{repo_path}
+%{buildroot}%{cli_lib_dir}/bin/python3 build.py freeze
 cp -a build/./* {buildroot}%{cli_lib_dir}
 cd -
 
