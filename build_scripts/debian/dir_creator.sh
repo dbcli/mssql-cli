@@ -48,7 +48,7 @@ Source: mssql-cli
 Section: python
 Priority: extra
 Maintainer: Microsoft SQL Server CLI Team <sqlcli@microsoft.com>
-Build-Depends: debhelper (>= 9), libssl-dev, libffi-dev, python3-dev
+Build-Depends: debhelper (>= 9), libssl-dev, libffi-dev
 Standards-Version: 3.9.5
 Homepage: https://github.com/dbcli/mssql-cli
 
