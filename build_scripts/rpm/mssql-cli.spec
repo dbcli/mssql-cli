@@ -56,13 +56,13 @@ export CUSTOM_PIP=%{buildroot}%{cli_lib_dir}/bin/pip3
 source_dir=%{repo_path}
 dist_dir=$(mktemp -d)
 
-cd %source_dir
+cd %{source_dir}
 %{buildroot}%{cli_lib_dir}/bin/python3 build.py build
 cd -
 
 # Install mssql-cli
-dist_dir=%source_dir/dist
-all_modules=`find $dist_dir -name "*.whl"`
+dist_dir=%{source_dir}/dist
+all_modules=`find %{dist_dir} -name "*.whl"`
 %{buildroot}%{cli_lib_dir}/bin/pip3  install $all_modules
 
 # Fix up %{buildroot} appearing in some files...
