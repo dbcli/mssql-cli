@@ -50,8 +50,8 @@ make install
 
 # Build mssql-cli wheel from source.
 # Set env var to ensure build.py uses the python we built from source.
-export CUSTOM_PYTHON=$source_dir/python_env/bin/python3
-export CUSTOM_PIP=$source_dir/python_env/bin/pip3
+export CUSTOM_PYTHON=%{buildroot}%{cli_lib_dir}/bin/python3
+export CUSTOM_PIP=%{buildroot}%{cli_lib_dir}/bin/pip3
 
 source_dir=%{repo_path}
 dist_dir=$(mktemp -d)
