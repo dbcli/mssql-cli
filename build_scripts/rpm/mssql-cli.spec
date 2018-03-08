@@ -10,7 +10,6 @@
 %define release        1%{?dist}
 %define version        0.10.0
 %define repo_path      %{getenv:REPO_PATH}
-%define python_url     https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tgz
 %define cli_lib_dir    %{_libdir}/mssql-cli
 
 Summary:        Microsoft SQL Server CLI
@@ -33,7 +32,7 @@ BuildRequires:  openssl-devel
     This open source tool works cross-platform and proud to be a part of the dbcli.org community.
 
 %install
-cd $source_dir
+cd $repo_path
 python3 build.py freeze
 cp -a build/./* {buildroot}%{cli_lib_dir}
 cd -
