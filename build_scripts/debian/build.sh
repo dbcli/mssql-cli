@@ -33,9 +33,28 @@ if [ -d "$source_dir/debian" ]
     rm -rf $source_dir/debian
 fi
 
+# Build Python from source and include
+python_dir=$(mktemp -d)
+python_archive=$(mktemp)
+wget https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tgz -qO $python_archive
+tar -xvzf $python_archive -C $python_dir
+echo "Python dir is $python_dir"
+
+#  clean any previous make files
+make clean || echo "Nothing to clean"
+
+$python_dir/*/configure --srcdir $python_dir/* --prefix $source_dir/python_env
+make
+#  required to run the 'make install'
+sudo apt-get install -y zlib1g-dev
+make install
+
 # Freeze mssql-cli
+export PYTHON_PATH=$source_dir/python_env/bin/python3
+export PIP_PATH=$source_dir/python_env/bin/pip3
+
 cd $source_dir
-python3 build.py freeze;
+$source_dir/python_env/bin/python3 build.py freeze;
 cd -
 
 # Add the debian files.

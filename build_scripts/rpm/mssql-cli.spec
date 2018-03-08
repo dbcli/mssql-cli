@@ -32,7 +32,7 @@ BuildRequires:  openssl-devel
     This open source tool works cross-platform and proud to be a part of the dbcli.org community.
 
 %install
-cd $repo_path
+cd ${repo_path}
 python3 build.py freeze
 cp -a build/./* {buildroot}%{cli_lib_dir}
 cd -
