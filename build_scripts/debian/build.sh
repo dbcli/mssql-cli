@@ -35,7 +35,7 @@ fi
 
 # Freeze mssql-cli
 cd $source_dir
-python3 $source_dir/build.py freeze;
+python3 build.py freeze;
 cd -
 
 # Add the debian files.

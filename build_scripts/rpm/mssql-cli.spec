@@ -32,48 +32,17 @@ BuildRequires:  openssl-devel
     We’re excited to introduce mssql-cli, a new and interactive command line query tool for SQL Server.
     This open source tool works cross-platform and proud to be a part of the dbcli.org community.
 
-
-%prep
-# Download, Extract Python3
-python_archive=$(mktemp)
-wget https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tgz -qO $python_archive
-tar -xvzf $python_archive -C %{_builddir}
-
-# clean any previous make files
-make clean || echo "Nothing to clean"
-
-# Build Python from source
-%{_builddir}/*/configure --srcdir %{_builddir}/* --prefix %{buildroot}%{cli_lib_dir}
-make
-make install
-
-# Build mssql-cli wheel from source.
-source_dir=%{repo_path}
-dist_dir=$(mktemp -d)
-
-cd $source_dir
-%{buildroot}%{cli_lib_dir}/bin/pip3 install -r $source_dir/requirements-dev.txt
-%{buildroot}%{cli_lib_dir}/bin/python3 $source_dir/build.py build
-cd -
-
-
 %install
-# Install mssql-cli
-dist_dir=$source_dir/dist
-all_modules=`find $dist_dir -name "*.whl"`
-%{buildroot}%{cli_lib_dir}/bin/pip3  install $all_modules
-
-# Fix up %{buildroot} appearing in some files...
-for d in %{buildroot}%{cli_lib_dir}/bin/*; do perl -p -i -e "s#%{buildroot}##g" $d; done;
+cd $source_dir
+python3 build.py freeze
+cp -a build/./* {buildroot}%{cli_lib_dir}
+cd -
 
 # Create executable
 mkdir -p %{buildroot}%{_bindir}
 printf "if [ -z ${PYTHONIOENCODING+x} ]; then export PYTHONIOENCODING=utf8; fi" > %{buildroot}%{_bindir}/mssql-cli
-printf '#!/usr/bin/env bash\n%{cli_lib_dir}/bin/python3 -Esm mssqlcli.main "$@"' > %{buildroot}%{_bindir}/mssql-cli
-
+printf '#!/usr/bin/env bash\n%{cli_lib_dir}/main "$@"' > %{buildroot}%{_bindir}/mssql-cli
 
 %files
-# Include mssql-cli directory which includes it's own python.
-# Include executable mssql-cli.
 %attr(-,root,root) %{cli_lib_dir}
 %attr(0755,root,root) %{_bindir}/mssql-cli
