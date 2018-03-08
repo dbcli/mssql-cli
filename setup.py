@@ -40,7 +40,6 @@ setup(
     package_data={'mssqlcli': ['mssqlclirc',
                                'packages/mssqlliterals/sqlliterals.json']},
     description=description,
-    long_description=open('README.rst').read(),
     classifiers=[
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
