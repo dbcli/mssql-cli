@@ -45,7 +45,8 @@ def freeze():
         utility.ROOT_DIR)
 
     # run flake8
-    code_analysis()
+    # todo: reenable when we pick a design for passing custom paths.
+    #code_analysis()
 
     current_platform = utility.get_current_platform()
 
