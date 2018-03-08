@@ -85,7 +85,7 @@ ${TAB}mkdir -p debian/mssql-cli/mssql-cli
 ${TAB}cp -a build/./* debian/mssql-cli/mssql-cli
 ${TAB}mkdir -p debian/mssql-cli/usr/bin/
 ${TAB}echo "if [ -z ${PYTHONIOENCODING+x} ]; then export PYTHONIOENCODING=utf8; fi" > debian/mssql-cli/usr/bin/mssql-cli
-${TAB}echo "\043!/usr/bin/env bash\n/mssql-cli/main \"\044\100\"" > debian/mssql-cli/usr/bin/mssql-cli
+${TAB}echo "\043!/usr/bin/env bash\n/mssql-cli/./main \"\044\100\"" > debian/mssql-cli/usr/bin/mssql-cli
 ${TAB}chmod 0755 debian/mssql-cli/usr/bin/mssql-cli
 
 

@@ -42,23 +42,23 @@ tar -xvzf $python_archive -C %{_builddir}
 make clean || echo "Nothing to clean"
 
 # Build Python from source
-%{_builddir}/*/configure --srcdir %{_builddir}/* --prefix %{buildroot}%{cli_lib_dir}
+%{_builddir}/*/configure --srcdir %{_builddir}/* --prefix %{repo_path}/python_env
 make
 make install
 
 %install
-export PYTHON_PATH=%{buildroot}%{cli_lib_dir}/bin/python3
-export PIP_PATH=%{buildroot}%{cli_lib_dir}/bin/pip3
+export PYTHON_PATH=%{repo_path}/python_env/bin/python3
+export PIP_PATH=%{repo_path}/python_env/bin/pip3
 
 cd %{repo_path}
-%{buildroot}%{cli_lib_dir}/bin/python3 build.py freeze
-cp -a build/./* {buildroot}%{cli_lib_dir}
+%{repo_path}/python_env/bin/python3 build.py freeze
+cp -a build/./* %{buildroot}%{cli_lib_dir}
 cd -
 
 # Create executable
 mkdir -p %{buildroot}%{_bindir}
 printf "if [ -z ${PYTHONIOENCODING+x} ]; then export PYTHONIOENCODING=utf8; fi" > %{buildroot}%{_bindir}/mssql-cli
-printf '#!/usr/bin/env bash\n%{cli_lib_dir}/main "$@"' > %{buildroot}%{_bindir}/mssql-cli
+printf '#!/usr/bin/env bash\n%{cli_lib_dir}/./main "$@"' > %{buildroot}%{_bindir}/mssql-cli
 
 %files
 %attr(-,root,root) %{cli_lib_dir}
