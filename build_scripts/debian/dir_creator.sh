@@ -78,7 +78,7 @@ cat > $debian_dir/rules << EOM
 #export DH_OPTIONS=-v
 
 %:
-${TAB}dh \$@ --sourcedirectory $source_dir
+${TAB}dh \$@ --sourcedirectory $source_dir --with python3 --buildsystem=pybuild
 
 override_dh_install:
 ${TAB}mkdir -p debian/mssql-cli/mssql-cli
