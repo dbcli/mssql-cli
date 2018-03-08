@@ -2,11 +2,10 @@ from __future__ import print_function
 import os
 import sys
 import utility
-import mssqlcli.mssqltoolsservice.externals as mssqltoolsservice
 
 
-PIP = 'pip3' if sys.version_info[0] == 3 else 'pip'
-PYTHON = 'python3' if sys.version_info[0] == 3 else 'python'
+PIP = os.getenv('CUSTOM_PIP', 'pip')
+PYTHON = os.getenv('CUSTOM_PYTHON', 'python')
 
 
 def print_heading(heading, f=None):
@@ -18,13 +17,16 @@ def clean_and_copy_sqltoolsservice(platform):
         Cleans the SqlToolsService directory and copies over the SqlToolsService binaries for the given platform.
         :param platform: string
     """
+
+    import mssqlcli.mssqltoolsservice.externals as mssqltoolsservice
+
     mssqltoolsservice.clean_up_sqltoolsservice()
     mssqltoolsservice.copy_sqltoolsservice(platform)
 
 
 def code_analysis():
     utility.exec_command(
-        'flake8 mssqlcli setup.py dev_setup.py build.py utility.py dos2unix.py',
+        '{0} -m flake8 mssqlcli setup.py dev_setup.py build.py utility.py dos2unix.py'.format(PYTHON),
         utility.ROOT_DIR)
 
 

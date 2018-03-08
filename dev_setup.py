@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 from __future__ import print_function
-import sys
+import os
 import utility
 
-PIP = 'pip3' if sys.version_info[0] == 3 else 'pip'
+PIP = os.getenv('CUSTOM_PIP', 'pip')
 
 print('Running dev setup...')
 print('Root directory \'{}\'\n'.format(utility.ROOT_DIR))
