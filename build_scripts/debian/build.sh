@@ -50,9 +50,12 @@ make
 sudo apt-get install -y zlib1g-dev
 make install
 
+# Set env var to ensure build.py uses the python we built from source.
+export CUSTOM_PYTHON=$source_dir/python_env/bin/python3
+export CUSTOM_PIP=$source_dir/python_env/bin/pip3
+
 # Build mssql-cli wheel from source.
 cd $source_dir
-$source_dir/python_env/bin/pip3 install -r $source_dir/requirements-dev.txt
 $source_dir/python_env/bin/python3 $source_dir/build.py build;
 cd -
 

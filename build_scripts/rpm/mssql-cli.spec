@@ -39,6 +39,7 @@ python_archive=$(mktemp)
 wget https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tgz -qO $python_archive
 tar -xvzf $python_archive -C %{_builddir}
 
+%install
 # clean any previous make files
 make clean || echo "Nothing to clean"
 
@@ -48,18 +49,19 @@ make
 make install
 
 # Build mssql-cli wheel from source.
+# Set env var to ensure build.py uses the python we built from source.
+export CUSTOM_PYTHON=$source_dir/python_env/bin/python3
+export CUSTOM_PIP=$source_dir/python_env/bin/pip3
+
 source_dir=%{repo_path}
 dist_dir=$(mktemp -d)
 
-cd $source_dir
-%{buildroot}%{cli_lib_dir}/bin/pip3 install -r $source_dir/requirements-dev.txt
-%{buildroot}%{cli_lib_dir}/bin/python3 $source_dir/build.py build
+cd %source_dir
+%{buildroot}%{cli_lib_dir}/bin/python3 build.py build
 cd -
 
-
-%install
 # Install mssql-cli
-dist_dir=$source_dir/dist
+dist_dir=%source_dir/dist
 all_modules=`find $dist_dir -name "*.whl"`
 %{buildroot}%{cli_lib_dir}/bin/pip3  install $all_modules
 

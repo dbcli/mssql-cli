@@ -74,8 +74,8 @@ cat > $debian_dir/rules << EOM
 #!/usr/bin/make -f
 
 # Uncomment this to turn on verbose mode.
-export DH_VERBOSE=1
-export DH_OPTIONS=-v
+#export DH_VERBOSE=1
+#export DH_OPTIONS=-v
 
 %:
 ${TAB}dh \$@ --sourcedirectory $source_dir
