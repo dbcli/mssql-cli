@@ -26,7 +26,7 @@ Verification
 
 ```
 sudo rpm -i RPMS/*/mssql-cli-0.10.0-1.noarch.rpm
-az --version
+mssql-cli --version
 ```
 
 Check the file permissions of the package:  
