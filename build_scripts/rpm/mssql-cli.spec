@@ -11,17 +11,15 @@
 %define name           mssql-cli
 %define release        1%{?dist}
 %define time_stamp     %(date +%y%m%d%H%M)
-%define base_version   0.10.0
+%define version        0.10.0
 %define python_dir     %{_builddir}/python_env
 %define python_url     https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tgz
 %define cli_lib_dir    %{_libdir}/mssql-cli
 %define repo_path      %{getenv:REPO_PATH}
 %define official_build %{getenv:MSSQL_CLI_OFFICIAL_BUILD}
 
-%if "%{official_build}" == "True"
-  %define version %{base_version}
-%else
-  %define version %{base_version}.dev%{time_stamp}
+%if "%{official_build}" != "True"
+  %define version %{version}.dev%{time_stamp}
 %endif
 
 AutoReq:        no
@@ -36,6 +34,8 @@ BuildArch:      x86_64
 BuildRequires:  gcc
 BuildRequires:  libffi-devel
 BuildRequires:  openssl-devel
+
+Requires:       libunwind, libicu
 
 %description
     We’re excited to introduce mssql-cli, a new and interactive command line query tool for SQL Server.

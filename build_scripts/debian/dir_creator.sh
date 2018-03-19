@@ -54,7 +54,7 @@ Homepage: https://github.com/dbcli/mssql-cli
 
 Package: mssql-cli
 Architecture: all
-Depends: \${shlibs:Depends}, \${misc:Depends}
+Depends: libunwund8, libicu52 | libicu55 | libicu57
 Description: mssql-cli
     We’re excited to introduce mssql-cli, a new and interactive command line query tool for SQL Server.
     This open source tool works cross-platform and proud to be a part of the dbcli.org community.
@@ -87,8 +87,6 @@ ${TAB}mkdir -p debian/mssql-cli/usr/bin/
 ${TAB}echo "if [ -z ${PYTHONIOENCODING+x} ]; then export PYTHONIOENCODING=utf8; fi" > debian/mssql-cli/usr/bin/mssql-cli
 ${TAB}echo "\043!/usr/bin/env bash\n/mssql-cli/bin/python3 -Im mssqlcli.main \"\044\100\"" > debian/mssql-cli/usr/bin/mssql-cli
 ${TAB}chmod 0755 debian/mssql-cli/usr/bin/mssql-cli
-${TAB}dpkg-shlibdeps -v --warnings=7 -Tdebian/mssql-cli.substvars -dDepends -edebian/mssql-cli/mssql-cli/bin/python3 debian/mssql-cli/mssql-cli/lib/python3.6/lib-dynload/_ssl.cpython-36m-x86_64-linux-gnu.so
-
 
 override_dh_strip:
 ${TAB}dh_strip --exclude=_cffi_backend
