@@ -32,7 +32,7 @@ def get_timestamped_version(version):
 
 install_requirements = [
     'click >= 4.1',
-    'argparse >= 1.4.0',
+    'argparse >= 1.2.1',
     'Pygments >= 2.0',  # Pygments has to be Capitalcased.
     'prompt_toolkit>=1.0.10,<1.1.0',
     'sqlparse >=0.2.2,<0.3.0',
