@@ -25,6 +25,6 @@ Verification
 CLI_VERSION can be found in *build_scripts/debian/build.sh*
 ```
 sudo dpkg -i mssql-cli_${CLI_VERSION}-1_all.deb
-az
-az --version
+mssql-cli --version
+mssql-cli -h
 ```
