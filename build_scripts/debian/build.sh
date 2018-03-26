@@ -2,9 +2,6 @@
 
 CLI_VERSION=0.10.0
 
-set -ex
-: "${BUILD_ARTIFACT_DIR:?BUILD_ARTIFACT_DIR environment variable not set.}"
-
 if [ -z "$1" ]
   then
     echo "Argument should be path to local repo."
@@ -80,6 +77,3 @@ cp -r $cli_debian_dir_tmp/* $source_dir/debian
 cd $source_dir
 dpkg-buildpackage -us -uc
 echo "The archive is available at $working_dir/mssql-cli_$CLI_VERSION-${CLI_VERSION_REVISION:=1}_all.deb"
-cp $deb_file ${BUILD_ARTIFACT_DIR}
-echo "The archive has also been copied to ${BUILD_ARTIFACT_DIR}"
-echo "Done."
