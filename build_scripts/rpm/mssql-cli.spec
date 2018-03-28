@@ -11,7 +11,7 @@
 %define name           mssql-cli
 %define release        1%{?dist}
 %define time_stamp     %(date +%y%m%d%H%M)
-%define version        0.10.0
+%define base_version   0.10.0
 %define python_dir     %{_builddir}/python_env
 %define python_url     https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tgz
 %define cli_lib_dir    %{_libdir}/mssql-cli
@@ -19,7 +19,9 @@
 %define official_build %{getenv:MSSQL_CLI_OFFICIAL_BUILD}
 
 %if "%{official_build}" != "True"
-  %define version %{version}.dev%{time_stamp}
+  %define version %{base_version}.dev%{time_stamp}
+%else
+  %define version %{base_version}
 %endif
 
 AutoReq:        no
