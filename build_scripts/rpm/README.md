@@ -17,8 +17,7 @@ Note: use the full path to the repo path, not a relative path.
 ```
 git clone https://github.com/dbcli/mssql-cli
 cd mssql-cli
-export REPO_PATH=$(pwd)
-rpmbuild -v -bb --clean build_scripts/rpm/mssql-cli.spec
+build_scripts/rpm/build.sh $(pwd)
 ```
 
 Verification
