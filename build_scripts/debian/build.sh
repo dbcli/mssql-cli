@@ -36,6 +36,12 @@ if [ -d "$source_dir/debian" ]
   then
     rm -rf $source_dir/debian
 fi
+
+if [ -d "$source_dir/../debian_output" ]
+  then
+    rm -rf $source_dir/../debian_output
+fi
+
 [ -d $local_repo/privates ] && cp $local_repo/privates/*.whl $tmp_pkg_dir
 
 # Build Python from source and include
