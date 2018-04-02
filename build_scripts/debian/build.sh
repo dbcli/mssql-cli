@@ -26,7 +26,7 @@ sudo apt-get install -y libssl-dev libffi-dev debhelper
 # Download, Extract, Patch, Build CLI
 tmp_pkg_dir=$(mktemp -d)
 working_dir=$(mktemp -d)
-output_dir=$ (mkdir $local_repo/debian_output)
+output_dir=$(mkdir $local_repo/debian_output)
 
 cd $working_dir
 source_dir=$local_repo
