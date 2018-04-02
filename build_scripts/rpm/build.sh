@@ -8,11 +8,11 @@ fi
 
 export REPO_PATH=$1
 
-rpmbuild -v -bb --clean mssql-cli.spec
-
 # Clean output dir.
 rm -rf ~/rpmbuild
 rm -rf ${REPO_PATH}/../rpm_output
+
+rpmbuild -v -bb --clean mssql-cli.spec
 
 # Copy build artifact to output dir.
 mkdir ${REPO_PATH}/../rpm_output
