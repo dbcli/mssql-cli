@@ -26,7 +26,6 @@ sudo apt-get install -y libssl-dev libffi-dev debhelper
 # Download, Extract, Patch, Build CLI
 tmp_pkg_dir=$(mktemp -d)
 working_dir=$(mktemp -d)
-output_dir=$(mkdir $local_repo/debian_output)
 
 cd $working_dir
 source_dir=$local_repo
@@ -71,6 +70,8 @@ $source_dir/python_env/bin/pip3 install $all_modules
 
 # Add the debian files.
 mkdir $source_dir/debian
+mkdir $source_dir/../debian_output
+
 # Create temp dir for the debian/ directory used for CLI build.
 cli_debian_dir_tmp=$(mktemp -d)
 
@@ -78,5 +79,5 @@ $debian_directory_creator $cli_debian_dir_tmp $source_dir $CLI_VERSION
 cp -r $cli_debian_dir_tmp/* $source_dir/debian
 cd $source_dir
 dpkg-buildpackage -us -uc
-cp $deb_file $output_dir
-echo "The archive has also been outputted to $output_dir"
+cp $deb_file $source_dir/../debian_output
+echo "The archive has also been outputted to $source_dir/../debian_output"
