@@ -10,7 +10,7 @@ export REPO_PATH=$1
 
 rpmbuild -v -bb --clean mssql-cli.spec
 
-if [ -d "${REPO_PATH}/../rpm_output" ]
+if [ -d ${REPO_PATH}/../rpm_output ]
   then
     rm -rf ${REPO_PATH}/../rpm_output
 fi
