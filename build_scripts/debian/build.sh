@@ -26,6 +26,8 @@ sudo apt-get install -y libssl-dev libffi-dev debhelper
 # Download, Extract, Patch, Build CLI
 tmp_pkg_dir=$(mktemp -d)
 working_dir=$(mktemp -d)
+output_dir=$ (mkdir $local_repo/debian_output)
+
 cd $working_dir
 source_dir=$local_repo
 deb_file=$local_repo/../mssql-cli_$CLI_VERSION-${CLI_VERSION_REVISION:=1}_all.deb
@@ -76,4 +78,5 @@ $debian_directory_creator $cli_debian_dir_tmp $source_dir $CLI_VERSION
 cp -r $cli_debian_dir_tmp/* $source_dir/debian
 cd $source_dir
 dpkg-buildpackage -us -uc
-echo "The archive is available at $working_dir/mssql-cli_$CLI_VERSION-${CLI_VERSION_REVISION:=1}_all.deb"
+cp $deb_file $output_dir
+echo "The archive has also been outputted to $output_dir"
