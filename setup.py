@@ -51,8 +51,7 @@ setup(
     package_data={'mssqlcli': ['mssqlclirc',
                                'packages/mssqlliterals/sqlliterals.json']},
     description=description,
-    #TODO: Reenable when issue on CentOS is fixed.
-    #long_description=open('README.rst').read(),
+    long_description=open('README.rst').read(),
     install_requires=install_requirements,
     include_package_data=True,
     scripts=[
