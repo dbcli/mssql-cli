@@ -32,15 +32,8 @@ source_dir=$local_repo
 deb_file=$local_repo/../mssql-cli_$CLI_VERSION-${CLI_VERSION_REVISION:=1}_all.deb
 
 # clean up old build output
-if [ -d "$source_dir/debian" ]
-  then
-    rm -rf $source_dir/debian
-fi
-
-if [ -d "$source_dir/../debian_output" ]
-  then
-    rm -rf $source_dir/../debian_output
-fi
+rm -rf $source_dir/debian
+rm -rf $source_dir/../debian_output
 
 [ -d $local_repo/privates ] && cp $local_repo/privates/*.whl $tmp_pkg_dir
 

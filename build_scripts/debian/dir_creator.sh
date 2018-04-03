@@ -54,7 +54,7 @@ Homepage: https://github.com/dbcli/mssql-cli
 
 Package: mssql-cli
 Architecture: all
-Depends: libunwund8, libicu52 | libicu55 | libicu57
+Depends: libunwind8, libicu52 | libicu55 | libicu57
 Description: mssql-cli
     We’re excited to introduce mssql-cli, a new and interactive command line query tool for SQL Server.
     This open source tool works cross-platform and proud to be a part of the dbcli.org community.
