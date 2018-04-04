@@ -1,5 +1,5 @@
 applicationinsights >= 0.11.1
-argparse >= 1.4.0
+argparse >= 1.2.1
 enum34 >= 1.1.6
 future >= 0.16.0
 setuptools >= 36.0.1

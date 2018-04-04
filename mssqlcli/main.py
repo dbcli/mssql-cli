@@ -8,8 +8,10 @@ import sys
 import platform
 
 from builtins import input
+
 from mssqlcli.config import config_location
 from mssqlcli.__init__ import __version__
+
 
 click.disable_unicode_literals_warning = True
 
