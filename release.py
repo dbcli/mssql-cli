@@ -34,9 +34,9 @@ def _upload_index_file(service, blob_name, title, links):
     )
 
 
-def _gen_pkg_index_html(service, pkg_name):
+def _gen_pkg_index_html(service, folder_name='whl'):
     links = []
-    index_file_name = pkg_name + '/'
+    index_file_name = folder_name + '/'
     for blob in list(service.list_blobs(
             BLOB_CONTAINER_NAME, prefix=index_file_name)):
         if blob.name == index_file_name:
@@ -46,15 +46,15 @@ def _gen_pkg_index_html(service, pkg_name):
     _upload_index_file(
         service,
         index_file_name,
-        'Links for {}'.format(pkg_name),
+        'Links for {}'.format(folder_name),
         links)
     UPLOADED_PACKAGE_LINKS.append(index_file_name)
 
 
-def _upload_package(service, file_path, pkg_name):
+def _upload_package(service, file_path, folder_name='whl'):
     print('Uploading {}'.format(file_path))
     file_name = os.path.basename(file_path)
-    blob_name = '{}/{}'.format(pkg_name, file_name)
+    blob_name = '{}/{}'.format(folder_name, file_name)
     service.create_blob_from_path(
         container_name=BLOB_CONTAINER_NAME,
         blob_name=blob_name,
@@ -122,9 +122,9 @@ def publish_daily():
     for pkg in os.listdir(utility.MSSQLCLI_DIST_DIRECTORY):
         pkg_path = os.path.join(utility.MSSQLCLI_DIST_DIRECTORY, pkg)
         print('Uploading package {}'.format(pkg_path))
-        _upload_package(blob_service, pkg_path, 'mssql-cli')
+        _upload_package(blob_service, pkg_path)
 
-    _gen_pkg_index_html(blob_service, 'mssql-cli')
+    _gen_pkg_index_html(blob_service)
     _upload_index_file(
         blob_service,
         'index.html',
