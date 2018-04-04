@@ -2,7 +2,12 @@ from __future__ import print_function
 import os
 import sys
 import utility
-import mssqlcli.mssqltoolsservice.externals as mssqltoolsservice
+
+# Environment variables below allow the build process to use a python interpreter and pip version different
+# from the user's PATH. When building our linux packages on various distros, we want to be build machine agnostic, so we
+# redirect python calls to the python we bundle in. Usage of these variables can be seen in our build_scripts folder.
+PIP = os.getenv('CUSTOM_PIP', 'pip')
+PYTHON = os.getenv('CUSTOM_PYTHON', 'python')
 
 
 def print_heading(heading, f=None):
@@ -14,13 +19,16 @@ def clean_and_copy_sqltoolsservice(platform):
         Cleans the SqlToolsService directory and copies over the SqlToolsService binaries for the given platform.
         :param platform: string
     """
+
+    import mssqlcli.mssqltoolsservice.externals as mssqltoolsservice
+
     mssqltoolsservice.clean_up_sqltoolsservice()
     mssqltoolsservice.copy_sqltoolsservice(platform)
 
 
 def code_analysis():
     utility.exec_command(
-        'flake8 mssqlcli setup.py dev_setup.py build.py utility.py dos2unix.py',
+        '{0} -m flake8 mssqlcli setup.py dev_setup.py build.py utility.py dos2unix.py'.format(PYTHON),
         utility.ROOT_DIR)
 
 
@@ -38,12 +46,12 @@ def build():
 
     # install general requirements.
     utility.exec_command(
-        'pip install -r requirements-dev.txt',
+        '{0} install -r requirements-dev.txt'.format(PIP),
         utility.ROOT_DIR)
 
     # convert windows line endings to unix for mssql-cli bash script
     utility.exec_command(
-        'python dos2unix.py mssql-cli mssql-cli',
+        '{0} dos2unix.py mssql-cli mssql-cli'.format(PYTHON),
         utility.ROOT_DIR)
 
     # run flake8
@@ -61,8 +69,8 @@ def build():
         utility.clean_up(utility.MSSQLCLI_BUILD_DIRECTORY)
 
         print_heading('Building mssql-cli pip package')
-        utility.exec_command('python --version', utility.ROOT_DIR)
-        utility.exec_command('python setup.py check -r -s bdist_wheel --plat-name {}'.format(platform),
+        utility.exec_command('{0} --version'.format(PYTHON), utility.ROOT_DIR)
+        utility.exec_command('{0} setup.py check -r -s bdist_wheel --plat-name {1}'.format(PYTHON, platform),
                              utility.ROOT_DIR,
                              continue_on_error=False)
 
@@ -84,7 +92,8 @@ def validate_package():
     mssqlcli_wheel_name = [
         pkge for pkge in mssqlcli_wheel_dir if current_platform in pkge]
     utility.exec_command(
-        'pip install --no-cache-dir --no-index ./dist/{}'.format(
+        '{0} install --no-cache-dir --no-index ./dist/{1}'.format(
+            PIP,
             mssqlcli_wheel_name[0]),
         root_dir, continue_on_error=False
     )

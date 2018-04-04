@@ -8,8 +8,10 @@ import sys
 import platform
 
 from builtins import input
-from .config import config_location
-from .__init__ import __version__
+
+from mssqlcli.config import config_location
+from mssqlcli.__init__ import __version__
+
 
 click.disable_unicode_literals_warning = True
 
@@ -31,7 +33,7 @@ The data is collected by Microsoft.
 
 Disable telemetry collection by setting environment variable MSSQL_CLI_TELEMETRY_OPTOUT to 'True' or '1'.
 
-Microsoft Privacy statement: https://privacy.microsoft.com/en-us/privacystatement
+Microsoft Privacy statement: https://privacy.microsoft.com/privacystatement
 """
 
 

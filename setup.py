@@ -1,14 +1,10 @@
-# --------------------------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See License.txt in the project root for license information.
-# --------------------------------------------------------------------------------------------
-
 import ast
 import os
 import re
 import datetime
 
 from setuptools import setup, find_packages
+from codecs import open
 
 _version_re = re.compile(r'__version__\s+=\s+(.*)')
 
@@ -56,7 +52,7 @@ setup(
     package_data={'mssqlcli': ['mssqlclirc',
                                'packages/mssqlliterals/sqlliterals.json']},
     description=description,
-    long_description=open('README.rst').read(),
+    long_description=open('README.rst', encoding='utf-8').read(),
     install_requires=install_requirements,
     include_package_data=True,
     scripts=[

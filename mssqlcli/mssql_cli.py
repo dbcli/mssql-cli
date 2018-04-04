@@ -5,6 +5,7 @@ import humanize
 import itertools
 import logging
 import os
+import sys
 import threading
 import traceback
 
@@ -261,13 +262,13 @@ class MssqlCli(object):
                 click.secho('\n'.join(error_messages),
                             err=True,
                             fg='yellow')
-                exit(1)
+                sys.exit(1)
 
         except Exception as e:
             self.logger.debug('Database connection failed: %r.', e)
             self.logger.error("traceback: %r", traceback.format_exc())
             click.secho(str(e), err=True, fg='yellow')
-            exit(1)
+            sys.exit(1)
 
     def handle_editor_command(self, cli, document):
         r"""
