@@ -151,4 +151,3 @@ def create_parser():
         help=u'Prompt format (Default: \\d> ')
 
     return args_parser
-
