@@ -3,7 +3,9 @@ import os
 import sys
 import utility
 
-
+# Environment variables below allow the build process to use a python interpreter and pip version different
+# from the user's PATH. When building our linux packages on various distros, we want to be build machine agnostic, so we
+# redirect python calls to the python we bundle in. Usage of these variables can be seen in our build_scripts folder.
 PIP = os.getenv('CUSTOM_PIP', 'pip')
 PYTHON = os.getenv('CUSTOM_PYTHON', 'python')
 
