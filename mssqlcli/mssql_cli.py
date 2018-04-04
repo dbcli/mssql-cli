@@ -579,7 +579,7 @@ class MssqlCli(object):
                 click.secho('Unable reconnect to server {0}; database {1}.'.format(
                     self.mssqlcliclient_main.server_name,
                     self.mssqlcliclient_main.database),
-                            err=True, fg='yellow')
+                    err=True, fg='yellow')
 
                 self.logger.info(u'Unable to reset connection to server {0}; database {1}'.format(
                     self.mssqlcliclient_main.server_name,

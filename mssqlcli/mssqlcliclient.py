@@ -334,4 +334,3 @@ class MssqlCliClient(object):
     def shutdown(self):
         self.sql_tools_client.shutdown()
         logger.info(u'Shutdown MssqlCliClient')
-
