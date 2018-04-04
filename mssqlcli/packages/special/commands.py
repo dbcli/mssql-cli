@@ -166,11 +166,10 @@ WHERE TYPE IN ('U', 'S', 'G')
 and name not like '%##%' {pattern}
 ORDER BY name, type_desc
 '''
-    base_query = base_query.format(
-                                cols='{cols}',
-                                table='sys.database_principals'
-                                if mssqlcliclient.is_cloud else 'sys.server_principals',
-                                pattern='{pattern}')
+    base_query = base_query.format(cols='{cols}',
+                                   table='sys.database_principals'
+                                   if mssqlcliclient.is_cloud else 'sys.server_principals',
+                                   pattern='{pattern}')
 
     if verbose:
         if mssqlcliclient.is_cloud:
