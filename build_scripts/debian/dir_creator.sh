@@ -80,6 +80,8 @@ cat > $debian_dir/rules << EOM
 %:
 ${TAB}dh \$@ --sourcedirectory $source_dir
 
+override_dh_auto_build:
+override_dh_auto_install:
 override_dh_install:
 ${TAB}mkdir -p debian/mssql-cli/mssql-cli
 ${TAB}cp -a python_env/* debian/mssql-cli/mssql-cli
