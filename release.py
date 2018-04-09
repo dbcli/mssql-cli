@@ -18,7 +18,7 @@ def print_heading(heading, f=None):
 def _upload_index_file(service, blob_name, title, links):
     print('Uploading index file {}'.format(blob_name))
     service.create_blob_from_text(
-        container_name=BLOB_CONTAINER_NAME,
+        container_name=BLOB_CONTAINER_NAME + '/whl',
         blob_name=blob_name,
         text="<html><head><title>{0}</title></head><body><h1>{0}</h1>{1}</body></html>"
         .format(title, '\n'.join(
