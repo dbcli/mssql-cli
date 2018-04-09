@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-CLI_VERSION=0.10.0
-
 if [ -z "$1" ]
   then
     echo "Argument should be path to local repo."
@@ -20,5 +18,5 @@ rpmbuild -v -bb --clean mssql-cli.spec
 mkdir ${REPO_PATH}/../rpm_output
 cp ~/rpmbuild/RPMS/x86_64/*.rpm ${REPO_PATH}/../rpm_output
 # Create a second copy for latest dev version to be used by homepage.
-cp ~/rpmbuild/RPMS/x86_64/*.rpm ${REPO_PATH}/../rpm_output/mssql-cli_$CLI_VERSION-Latest.rpm
+cp ~/rpmbuild/RPMS/x86_64/*.rpm ${REPO_PATH}/../rpm_output/mssql-cli-Latest.rpm
 echo "The archive has also been outputted to ${REPO_PATH}/../rpm_output"
