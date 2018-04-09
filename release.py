@@ -36,10 +36,10 @@ def _upload_index_file(service, subdirectory, blob_name, title, links):
 
 def _gen_pkg_index_html(service, pkg_name):
     links = []
-    prefx_to_search = 'whl/' + pkg_name + '/'
+    prefix_to_search = 'whl/' + pkg_name + '/'
     index_file_name = pkg_name
     for blob in list(service.list_blobs(
-            BLOB_CONTAINER_NAME, prefix=prefx_to_search)):
+            BLOB_CONTAINER_NAME, prefix=prefix_to_search)):
         if blob.name == pkg_name:
             # Exclude the index file from being added to the list
             continue
