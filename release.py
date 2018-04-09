@@ -7,7 +7,7 @@ import utility
 AZURE_STORAGE_CONNECTION_STRING = os.environ.get(
     'AZURE_STORAGE_CONNECTION_STRING')
 BLOB_MSSQL_CLI_DAILY_CONTAINER_NAME = 'daily/whl/mssql-cli'
-BLOB_CONTAINER_NAME = 'daily/whl'
+BLOB_CONTAINER_NAME = 'daily'
 UPLOADED_PACKAGE_LINKS = []
 
 
@@ -15,10 +15,10 @@ def print_heading(heading, f=None):
     print('{0}\n{1}\n{0}'.format('=' * len(heading), heading), file=f)
 
 
-def _upload_index_file(service, blob_name, title, links):
+def _upload_index_file(service, subdirectory, blob_name, title, links):
     print('Uploading index file {}'.format(blob_name))
     service.create_blob_from_text(
-        container_name=BLOB_CONTAINER_NAME,
+        container_name=BLOB_CONTAINER_NAME + subdirectory,
         blob_name=blob_name,
         text="<html><head><title>{0}</title></head><body><h1>{0}</h1>{1}</body></html>"
         .format(title, '\n'.join(
@@ -36,15 +36,17 @@ def _upload_index_file(service, blob_name, title, links):
 
 def _gen_pkg_index_html(service, pkg_name):
     links = []
-    index_file_name = pkg_name + '/'
+    prefx_to_search = 'whl/' + pkg_name + '/'
+    index_file_name = pkg_name
     for blob in list(service.list_blobs(
-            BLOB_CONTAINER_NAME, prefix=index_file_name)):
-        if blob.name == index_file_name:
+            BLOB_CONTAINER_NAME, prefix=prefx_to_search)):
+        if blob.name == pkg_name:
             # Exclude the index file from being added to the list
             continue
-        links.append(blob.name.replace(index_file_name, ''))
+        links.append(blob.name.replace(prefix_to_search, ''))
     _upload_index_file(
         service,
+        'whl/' + pkg_name,
         index_file_name,
         'Links for {}'.format(pkg_name),
         links)
@@ -127,6 +129,7 @@ def publish_daily():
     _gen_pkg_index_html(blob_service, 'mssql-cli')
     _upload_index_file(
         blob_service,
+        'whl',
         'index.html',
         'Simple Index',
         UPLOADED_PACKAGE_LINKS)
