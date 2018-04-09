@@ -7,7 +7,7 @@ import utility
 AZURE_STORAGE_CONNECTION_STRING = os.environ.get(
     'AZURE_STORAGE_CONNECTION_STRING')
 BLOB_MSSQL_CLI_DAILY_CONTAINER_NAME = 'daily/whl/mssql-cli'
-BLOB_CONTAINER_NAME = 'daily'
+BLOB_CONTAINER_NAME = 'daily/whl'
 UPLOADED_PACKAGE_LINKS = []
 
 
@@ -18,7 +18,7 @@ def print_heading(heading, f=None):
 def _upload_index_file(service, blob_name, title, links):
     print('Uploading index file {}'.format(blob_name))
     service.create_blob_from_text(
-        container_name=BLOB_CONTAINER_NAME + '/whl',
+        container_name=BLOB_CONTAINER_NAME,
         blob_name=blob_name,
         text="<html><head><title>{0}</title></head><body><h1>{0}</h1>{1}</body></html>"
         .format(title, '\n'.join(
@@ -36,7 +36,7 @@ def _upload_index_file(service, blob_name, title, links):
 
 def _gen_pkg_index_html(service, pkg_name):
     links = []
-    index_file_name = 'whl/' + pkg_name + '/'
+    index_file_name = pkg_name + '/'
     for blob in list(service.list_blobs(
             BLOB_CONTAINER_NAME, prefix=index_file_name)):
         if blob.name == index_file_name:
