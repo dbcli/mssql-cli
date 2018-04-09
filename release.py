@@ -38,7 +38,7 @@ def _gen_pkg_index_html(service, pkg_name):
     links = []
     prefix_to_search = 'whl/' + pkg_name + '/'
     index_file_name = pkg_name
-    print('Listing all blobs in container:{0} with prefix:{1}', BLOB_CONTAINER_NAME, prefix_to_search)
+    print('Listing all blobs in container:{0} with prefix:{1}'.format(BLOB_CONTAINER_NAME, prefix_to_search))
     for blob in list(service.list_blobs(
             BLOB_CONTAINER_NAME, prefix=prefix_to_search)):
         if blob.name == index_file_name:
