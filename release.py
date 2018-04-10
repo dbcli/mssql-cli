@@ -40,7 +40,6 @@ def _gen_pkg_index_html(service, pkg_name):
     index_file_name = pkg_name + '/'
     for blob in list(service.list_blobs(
             BLOB_CONTAINER_NAME, prefix=full_path_prefix_to_search)):
-        print(blob.name)
         if blob.name == full_path_prefix_to_search:
             # Exclude the index file from being added to the list
             continue
