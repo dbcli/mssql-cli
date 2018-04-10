@@ -15,10 +15,10 @@ def print_heading(heading, f=None):
     print('{0}\n{1}\n{0}'.format('=' * len(heading), heading), file=f)
 
 
-def _upload_index_file(service, subdirectory, blob_name, title, links):
+def _upload_index_file(service, blob_name, title, links):
     print('Uploading index file {}'.format(blob_name))
     service.create_blob_from_text(
-        container_name=BLOB_CONTAINER_NAME + subdirectory,
+        container_name=BLOB_CONTAINER_NAME,
         blob_name=blob_name,
         text="<html><head><title>{0}</title></head><body><h1>{0}</h1>{1}</body></html>"
         .format(title, '\n'.join(
@@ -36,19 +36,18 @@ def _upload_index_file(service, subdirectory, blob_name, title, links):
 
 def _gen_pkg_index_html(service, pkg_name):
     links = []
-    prefix_to_search = 'whl/' + pkg_name + '/'
-    index_file_name = pkg_name
-    print('Listing all blobs in container:{0} with prefix:{1}'.format(BLOB_CONTAINER_NAME, prefix_to_search))
+    full_path_prefix_to_search = 'whl/' + pkg_name + '/'
+    index_file_name = pkg_name + '/'
     for blob in list(service.list_blobs(
-            BLOB_CONTAINER_NAME, prefix=prefix_to_search)):
-        if blob.name == index_file_name:
+            BLOB_CONTAINER_NAME, prefix=full_path_prefix_to_search)):
+        print(blob.name)
+        if blob.name == full_path_prefix_to_search:
             # Exclude the index file from being added to the list
             continue
-        links.append(blob.name.replace(prefix_to_search, ''))
+        links.append(blob.name.replace(full_path_prefix_to_search, ''))
     _upload_index_file(
         service,
-        'whl/' + pkg_name,
-        index_file_name,
+        full_path_prefix_to_search,
         'Links for {}'.format(pkg_name),
         links)
     UPLOADED_PACKAGE_LINKS.append(index_file_name)
@@ -57,7 +56,7 @@ def _gen_pkg_index_html(service, pkg_name):
 def _upload_package(service, file_path, pkg_name):
     print('Uploading {}'.format(file_path))
     file_name = os.path.basename(file_path)
-    blob_name = '{}/{}'.format(pkg_name, file_name)
+    blob_name = 'whl/{}/{}'.format(pkg_name, file_name)
     service.create_blob_from_path(
         container_name=BLOB_CONTAINER_NAME,
         blob_name=blob_name,
@@ -130,8 +129,7 @@ def publish_daily():
     _gen_pkg_index_html(blob_service, 'mssql-cli')
     _upload_index_file(
         blob_service,
-        'whl',
-        'index.html',
+        'whl/index.html',
         'Simple Index',
         UPLOADED_PACKAGE_LINKS)
 
