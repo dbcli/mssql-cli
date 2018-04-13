@@ -80,5 +80,5 @@ cd $source_dir
 dpkg-buildpackage -us -uc
 cp $deb_file $source_dir/../debian_output
 # Create a second copy for latest dev version to be used by homepage.
-cp $deb_file $source_dir/../debian_output/mssql-cli-latest.deb
+cp $deb_file $source_dir/../debian_output/mssql-cli-dev-latest.deb
 echo "The archive has also been outputted to $source_dir/../debian_output"

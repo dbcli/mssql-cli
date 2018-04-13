@@ -18,5 +18,5 @@ rpmbuild -v -bb --clean mssql-cli.spec
 mkdir ${REPO_PATH}/../rpm_output
 cp ~/rpmbuild/RPMS/x86_64/*.rpm ${REPO_PATH}/../rpm_output
 # Create a second copy for latest dev version to be used by homepage.
-cp ~/rpmbuild/RPMS/x86_64/*.rpm ${REPO_PATH}/../rpm_output/mssql-cli-latest.rpm
+cp ~/rpmbuild/RPMS/x86_64/*.rpm ${REPO_PATH}/../rpm_output/mssql-cli-dev-latest.rpm
 echo "The archive has also been outputted to ${REPO_PATH}/../rpm_output"
