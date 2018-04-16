@@ -55,7 +55,7 @@ $ sudo pip install mssql-cli --ignore-installed six
 
 # Linux Installation
 
-#apt
+# apt
 ## Ubuntu 14.04
 ```shell
 wget -qO- https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
@@ -78,7 +78,7 @@ Sudo apt-get update
 Sudo apt-get install mssql-cli
 ```
 
-##Debian 8.7 or later
+## Debian 8.7 or later
 ```shell
 wget -qO- https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
 sudo add-apt-repository "$(wget -qO- https://packages.microsoft.com/config/debian/8/prod.list)"
@@ -86,7 +86,7 @@ Sudo apt-get update
 Sudo apt-get install mssql-cli
 ```
 
-#Yum
+# Yum
 ## Red Hat Enterprise Linux (RHEL) 7, Fedora 25 or 26
 ```shell
 sudo curl -o /etc/yum.repos.d/mssql-cli.repo https://packages.microsoft.com/config/rhel/7/prod.repo
@@ -99,14 +99,14 @@ sudo curl -o /etc/yum.repos.d/mssql-cli.repo https://packages.microsoft.com/conf
 sudo yum install -y mssql-cli
 ```
 
-#Zypper
-##SUSE Enterprise Linux (SLES) 12 SP2 or later
+# Zypper
+## SUSE Enterprise Linux (SLES) 12 SP2 or later
 ```shell
 sudo zypper addrepo -fc https://packages.microsoft.com/config/sles/12/prod.repo
 sudo zypper --gpg-auto-import-keys refresh 
 sudo zypper install -y mssql-cli
 ```
-##openSUSE 42.2 or later
+## openSUSE 42.2 or later
 ```shell
 sudo zypper addrepo -fc https://packages.microsoft.com/config/opensuse/12/prod.repo
 sudo zypper --gpg-auto-import-keys refresh 
