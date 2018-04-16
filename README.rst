@@ -55,8 +55,6 @@ Get mssql-cli
 |  Fedora 26                                 | `.rpm`_                       | `Install on fedora26`_        |
 +--------------------------------------------+-------------------------------+-------------------------------+
 
-If you are having installation issues, see the [troubleshooting](#troubleshooting_guide.md) section for known issues and workarounds.
-
 
 Installation
 ------------
@@ -65,7 +63,7 @@ Installation
 
     $ pip install mssql-cli
 
-Please refer to the table above for detailed install instructions.
+Please refer to `Get mssql-cli`_ for detailed install instructions.
 
 Usage
 -----
