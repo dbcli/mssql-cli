@@ -55,88 +55,60 @@ $ sudo pip install mssql-cli --ignore-installed six
 
 # Linux Installation
 
-On Linux, Python 2.7 is generally pre-installed. There are two prerequisite packages to run mssql-cli on Linux: libunwind and libicu.
-
-## Install Red Hat Enterprise Linux (RHEL) 7
+#apt
+## Ubuntu 14.04
 ```shell
-$ wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm 
-$ sudo yum -y install ./epel-release-latest-7.noarch.rpm
-$ sudo yum -y install icu libunwind python-pip 
-$ sudo pip install mssql-cli
+wget -qO- https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+sudo add-apt-repository "$(wget -qO- https://packages.microsoft.com/config/ubuntu/14.04/prod.list)"
+Sudo apt-get update
+Sudo apt-get install mssql-cli
+```
+## Ubuntu 16.04
+```shell
+wget -qO- https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+sudo add-apt-repository "$(wget -qO- https://packages.microsoft.com/config/ubuntu/16.04/prod.list)"
+Sudo apt-get update
+Sudo apt-get install mssql-cli
+```
+## Ubuntu 17.04
+```shell
+wget -qO- https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+sudo add-apt-repository "$(wget -qO- https://packages.microsoft.com/config/ubuntu/17.04/prod.list)"
+Sudo apt-get update
+Sudo apt-get install mssql-cli
 ```
 
-## Install CentOS 7
+##Debian 8.7 or later
 ```shell
-$ sudo yum -y install epel-release 
-$ sudo yum -y install libunwind libicu python-pip 
-$ sudo pip install mssql-cli
+wget -qO- https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+sudo add-apt-repository "$(wget -qO- https://packages.microsoft.com/config/debian/8/prod.list)"
+Sudo apt-get update
+Sudo apt-get install mssql-cli
 ```
 
-## Install Fedora 25, Fedora 26
+#Yum
+## Red Hat Enterprise Linux (RHEL) 7, Fedora 25 or 26
 ```shell
-$ dnf upgrade
-$ dnf install libunwind libicu python-pip
-$ sudo pip install mssql-cli
+sudo curl -o /etc/yum.repos.d/mssql-cli.repo https://packages.microsoft.com/config/rhel/7/prod.repo
+sudo yum install -y mssql-cli
 ```
 
-## Install Debian 8.7 or later
+## CentOS 7
 ```shell
-$ echo deb http://ftp.us.debian.org/debian jessie main | sudo tee -a /etc/apt/sources.list
-$ sudo apt-get update & sudo apt-get install -y libunwind8 python-pip
-$ sudo pip install --upgrade pip
-$ sudo pip install mssql-cli
+sudo curl -o /etc/yum.repos.d/mssql-cli.repo https://packages.microsoft.com/config/centos/7/prod.repo
+sudo yum install -y mssql-cli
 ```
 
-## Install Ubuntu 17.04, Ubuntu 16.04, Ubuntu 14.04
-
-### Install Ubuntu 17.04
+#Zypper
+##SUSE Enterprise Linux (SLES) 12 SP2 or later
 ```shell
-$ sudo apt-get update & sudo apt-get install -y libunwind8 python-pip libicu57
-$ sudo pip install --upgrade pip
-$ sudo pip install mssql-cli
+sudo zypper addrepo -fc https://packages.microsoft.com/config/sles/12/prod.repo
+sudo zypper --gpg-auto-import-keys refresh 
+sudo zypper install -y mssql-cli
 ```
-
-### Install Ubuntu 16.04
+##openSUSE 42.2 or later
 ```shell
-$ sudo apt-get update & sudo apt-get install -y libunwind8 python-pip libicu55 
-$ sudo pip install --upgrade pip
-$ sudo pip install mssql-cli
-```
-
-### Install Ubuntu 14.04
-```shell
-$ sudo apt-get update & sudo apt-get install -y libunwind8 python-pip libicu52
-$ sudo pip install --upgrade pip
-$ sudo pip install mssql-cli
-```
-
-## Install Linux Mint 18, Linux Mint 17
-
-### Install Linux Mint 18
-```shell
-$ sudo apt-get update & sudo apt-get install -y libunwind8 python-pip libicu57
-$ sudo pip install --upgrade pip
-$ sudo pip install mssql-cli
-```
-
-### Install Linux Mint 17
-```shell
-$ sudo apt-get update & sudo apt-get install -y libunwind8 python-pip libicu55
-$ sudo pip install --upgrade pip
-$ sudo pip install mssql-cli
-```
-
-### Install OpenSUSE 42.2 or later
-```shell
-$ sudo zypper update
-$ sudo zypper install libunwind libicu python-pip
-$ sudo pip install mssql-cli
-```
- 
- 
-### Install SUSE Enterprise Linux (SLES) 12 SP2 or later
-```shell
-$ sudo zypper update
-$ sudo zypper install libunwind libicu python-pip
-$ sudo pip install mssql-cli
+sudo zypper addrepo -fc https://packages.microsoft.com/config/opensuse/12/prod.repo
+sudo zypper --gpg-auto-import-keys refresh 
+sudo zypper install -y mssql-cli
 ```
