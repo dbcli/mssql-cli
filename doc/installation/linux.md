@@ -1,10 +1,22 @@
 # Package Installation Instructions
 
-Supports [Ubuntu 14.04][u14][Ubuntu 16.04][u16], [Ubuntu 17.04][u17], [Debian 8][deb8], [Debian 9][deb9],
-[CentOS 7][cos], [Red Hat Enterprise Linux (RHEL) 7][rhel7], [OpenSUSE 42.2][opensuse], [Fedora 25][fed25],
-[Fedora 26][fed26].
+Supports:
 
-All packages are available on our GitHub [releases][] page.
+- [Ubuntu 14.04][u14]
+- [Ubuntu 16.04][u16]
+- [Ubuntu 17.04][u17]
+- [Debian 8][deb8],
+- [Debian 9][deb9],
+- [CentOS 7][cos]
+- [Red Hat Enterprise Linux (RHEL) 7][rhel7], 
+- [OpenSUSE 42.2][opensuse]
+- [Fedora 25][fed25],
+- [Fedora 26][fed26].
+
+Daily preview dev packages can be found at:
+
+[Latest preview mssql-cli](https://github.com/dbcli/mssql-cli/blob/master/README.rst)
+
 Once the package is installed, run `mssql-cli` from a terminal.
 
 [u14]: #ubuntu-1404
@@ -27,7 +39,7 @@ This is the preferred method.
 
 ```sh
 # Import the public repository GPG keys
-curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+wget -qO- https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
 
 # Register the Microsoft Ubuntu repository
 sudo curl -o /etc/apt/sources.list.d/microsoft.list https://packages.microsoft.com/config/ubuntu/14.04/prod.list
@@ -49,7 +61,7 @@ from then on, you just need to use `sudo apt-get upgrade mssql-cli` to update it
 
 Download the Debian package
 `mssql-cli-dev-latest.deb`
-from the [releases][] page onto the Ubuntu machine.
+from the [Latest][] page onto the Ubuntu machine.
 
 Then execute the following in the terminal:
 
@@ -77,7 +89,7 @@ This is the preferred method.
 
 ```sh
 # Import the public repository GPG keys
-curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+wget -qO- https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
 
 # Register the Microsoft Ubuntu repository
 sudo curl -o /etc/apt/sources.list.d/microsoft.list https://packages.microsoft.com/config/ubuntu/16.04/prod.list
@@ -99,7 +111,7 @@ from then on, you just need to use `sudo apt-get upgrade mssql-cli` to update it
 
 Download the Debian package
 `mssql-cli-dev-latest.deb`
-from the [releases][] page onto the Ubuntu machine.
+from the [Latest preview mssql-cli] page onto the Ubuntu machine.
 
 Then execute the following in the terminal:
 
@@ -126,7 +138,7 @@ This is the preferred method.
 
 ```sh
 # Import the public repository GPG keys
-curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+wget -qO- https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
 
 # Register the Microsoft Ubuntu repository
 sudo curl -o /etc/apt/sources.list.d/microsoft.list https://packages.microsoft.com/config/ubuntu/17.04/prod.list
@@ -148,7 +160,7 @@ from then on, you just need to use `sudo apt-get upgrade mssql-cli` to update it
 
 Download the Debian package
 `mssql-cli-dev-latest.deb`
-from the [releases][] page onto the Ubuntu machine.
+from the [Latest preview mssql-cli] page onto the Ubuntu machine.
 
 Then execute the following in the terminal:
 
@@ -180,7 +192,7 @@ sudo apt-get update
 sudo apt-get install curl apt-transport-https
 
 # Import the public repository GPG keys
-curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+wget -qO- https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
 
 # Register the Microsoft Product feed
 sudo add-apt-repository "$(wget -qO- https://packages.microsoft.com/config/debian/8/prod.list)"
@@ -202,7 +214,7 @@ from then on, you just need to use `sudo apt-get upgrade mssql-cli` to update it
 
 Download the Debian package
 `mssql-cli-dev-latest.deb`
-from the [releases][] page onto the Debian machine.
+from the [Latest preview mssql-cli] page onto the Debian machine.
 
 Then execute the following in the terminal:
 
@@ -230,7 +242,7 @@ This is the preferred method.
 
 ```sh
 # Import the public repository GPG keys
-curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+wget -qO- https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
 
 # Register the Microsoft Product feed
 sudo add-apt-repository "$(wget -qO- https://packages.microsoft.com/config/debian/8/prod.list)"
@@ -252,7 +264,7 @@ from then on, you just need to use `sudo apt-get upgrade mssql-cli` to update it
 
 Download the Debian package
 `mssql-cli-dev-latest.deb`
-from the [releases][] page onto the Debian machine.
+from the [Latest preview mssql-cli] page onto the Debian machine.
 
 Then execute the following in the terminal:
 
@@ -297,7 +309,7 @@ you just need to use `sudo yum update mssql-cli` to update PowerShell.
 
 Using [CentOS 7][], download the RPM package
 `mssql-cli-dev-latest.rpm`
-from the [releases][] page onto the CentOS machine.
+from the [Latest preview mssql-cli] page onto the CentOS machine.
 
 Then execute the following in the terminal:
 
@@ -343,7 +355,7 @@ you just need to use `sudo yum update mssql-cli` to update PowerShell.
 
 Download the RPM package
 `mssql-cli-dev-latest.rpm`
-from the [releases][] page onto the Red Hat Enterprise Linux machine.
+from the [Latest preview mssql-cli] page onto the Red Hat Enterprise Linux machine.
 
 Then execute the following in the terminal:
 
@@ -389,7 +401,7 @@ mssql-cli
 ### Installation via Direct Download - OpenSUSE 42.2
 
 Download the RPM package `mssql-cli-dev-latest.rpm`
-from the [releases][] page onto the OpenSUSE machine.
+from the [Latest preview mssql-cli] page onto the OpenSUSE machine.
 
 ```sh
 sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
@@ -433,7 +445,7 @@ mssql-cli
 
 Download the RPM package
 `mssql-cli-dev-latest.rpm`
-from the [releases][] page onto the Fedora machine.
+from the [Latest preview mssql-cli] page onto the Fedora machine.
 
 Then execute the following in the terminal:
 
@@ -477,7 +489,7 @@ mssql-cli
 
 Download the RPM package
 `mssql-cli-dev-latest.rpm`
-from the [releases][] page onto the Fedora machine.
+from the [Latest preview mssql-cli] page onto the Fedora machine.
 
 Then execute the following in the terminal:
 
