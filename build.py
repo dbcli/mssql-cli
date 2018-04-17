@@ -1,4 +1,6 @@
 from __future__ import print_function
+from shutil import copyfile
+
 import os
 import sys
 import utility
@@ -76,6 +78,19 @@ def build():
 
     # Copy back the SqlToolsService binaries for this platform.
     clean_and_copy_sqltoolsservice(utility.get_current_platform())
+    copy_and_rename_wheels()
+
+
+def copy_and_rename_wheels():
+    # Create a additional copy of each build artifact with a ever green name with 'dev-latest' as it's version.
+    for pkg_name in os.listdir(utility.MSSQLCLI_DIST_DIRECTORY):
+        first_dash = pkg_name.find('-')
+        second_dash = pkg_name.find('-', first_dash + 1, len(pkg_name))
+        pkg_daily_name = pkg_name.replace(pkg_name[first_dash + 1:second_dash], 'dev-latest')
+
+        original_path = os.path.join(utility.MSSQLCLI_DIST_DIRECTORY, pkg_name)
+        updated_path = os.path.join(utility.MSSQLCLI_DIST_DIRECTORY, pkg_daily_name)
+        copyfile(original_path, updated_path)
 
 
 def validate_package():
@@ -90,7 +105,8 @@ def validate_package():
     current_platform = utility.get_current_platform()
 
     mssqlcli_wheel_name = [
-        pkge for pkge in mssqlcli_wheel_dir if current_platform in pkge]
+        pkge for pkge in mssqlcli_wheel_dir if current_platform in pkge and
+        'dev-latest' not in pkge]
     utility.exec_command(
         '{0} install --no-cache-dir --no-index ./dist/{1}'.format(
             PIP,
