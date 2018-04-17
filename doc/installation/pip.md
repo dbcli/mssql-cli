@@ -27,7 +27,7 @@ installed using the --user option, which does not require sudo.
 $ pip install --user mssql-cli
 ```
 
-If you are having installation issues, see the [troubleshooting](#troubleshooting_guide.md) section for known issues and workarounds.
+If you are having installation issues, see the [troubleshooting](https://github.com/dbcli/mssql-cli/blob/master/doc/troubleshooting_guide.md) section for known issues and workarounds.
 
 
 ## Detailed Instructions
