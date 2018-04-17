@@ -15,7 +15,9 @@ Supports:
 
 Daily preview dev packages can be found at:
 
-[Latest preview mssql-cli](https://github.com/dbcli/mssql-cli/blob/master/README.rst)
+[Latest preview mssql-cli] [downloads]
+
+[downloads]:(https://github.com/dbcli/mssql-cli/tree/master#get-mssql-cli)
 
 Once the package is installed, run `mssql-cli` from a terminal.
 
@@ -32,7 +34,7 @@ Once the package is installed, run `mssql-cli` from a terminal.
 
 ## Ubuntu 14.04
 
-### Installation via Package Repository - Ubuntu 14.04
+### Installation for latest stable version via Package Repository - Ubuntu 14.04
 
 mssql-cli, for Linux, is published to package repositories for easy installation (and updates).
 This is the preferred method.
@@ -57,11 +59,11 @@ mssql-cli
 After registering the Microsoft repository once as superuser,
 from then on, you just need to use `sudo apt-get upgrade mssql-cli` to update it.
 
-### Installation via Direct Download - Ubuntu 14.04
+### Installation for latest preview version via Direct Download - Ubuntu 14.04
 
 Download the Debian package
 `mssql-cli-dev-latest.deb`
-from the [Latest][] page onto the Ubuntu machine.
+from the [Latest preview mssql-cli] page onto the Ubuntu machine.
 
 Then execute the following in the terminal:
 
@@ -82,7 +84,7 @@ sudo apt-get remove mssql-cli
 
 ## Ubuntu 16.04
 
-### Installation via Package Repository - Ubuntu 16.04
+### Installation for latest stable version via Package Repository - Ubuntu 16.04
 
 mssql-cli, for Linux, is published to package repositories for easy installation (and updates).
 This is the preferred method.
@@ -107,7 +109,7 @@ mssql-cli
 After registering the Microsoft repository once as superuser,
 from then on, you just need to use `sudo apt-get upgrade mssql-cli` to update it.
 
-### Installation via Direct Download - Ubuntu 16.04
+### Installation for latest preview version  via Direct Download - Ubuntu 16.04
 
 Download the Debian package
 `mssql-cli-dev-latest.deb`
@@ -132,7 +134,7 @@ sudo apt-get remove mssql-cli
 
 ## Ubuntu 17.04
 
-### Installation via Package Repository - Ubuntu 17.04
+### Installation for latest stable version via Package Repository - Ubuntu 17.04
 mssql-cli, for Linux, is published to package repositories for easy installation (and updates).
 This is the preferred method.
 
@@ -156,7 +158,7 @@ mssql-cli
 After registering the Microsoft repository once as superuser,
 from then on, you just need to use `sudo apt-get upgrade mssql-cli` to update it.
 
-### Installation via Direct Download - Ubuntu 17.04
+### Installation for latest preview version via Direct Download - Ubuntu 17.04
 
 Download the Debian package
 `mssql-cli-dev-latest.deb`
@@ -181,7 +183,7 @@ sudo apt-get remove mssql-cli
 
 ## Debian 8.7
 
-### Installation via Package Repository - Debian 8.7
+### Installation for latest stable version via Package Repository - Debian 8.7
 
 mssql-cli, for Linux, is published to package repositories for easy installation (and updates).
 This is the preferred method.
@@ -210,7 +212,7 @@ mssql-cli
 After registering the Microsoft repository once as superuser,
 from then on, you just need to use `sudo apt-get upgrade mssql-cli` to update it.
 
-### Installation via Direct Download - Debian 8
+### Installation for latest preview version via Direct Download - Debian 8
 
 Download the Debian package
 `mssql-cli-dev-latest.deb`
@@ -235,7 +237,7 @@ sudo apt-get remove mssql-cli
 
 ## Debian 9
 
-### Installation via Package Repository - Debian 9
+### Installation for latest stable version via Package Repository - Debian 9
 
 mssql-cli, for Linux, is published to package repositories for easy installation (and updates).
 This is the preferred method.
@@ -260,7 +262,7 @@ mssql-cli
 After registering the Microsoft repository once as superuser,
 from then on, you just need to use `sudo apt-get upgrade mssql-cli` to update it.
 
-### Installation via Direct Download - Debian 9
+### Installation for latest preview version via Direct Download - Debian 9
 
 Download the Debian package
 `mssql-cli-dev-latest.deb`
@@ -287,7 +289,7 @@ sudo apt-get remove mssql-cli
 
 > This package also works on Oracle Linux 7.
 
-### Installation via Package Repository (preferred) - CentOS 7
+### Installation for latest stable version via Package Repository (preferred) - CentOS 7
 
 mssql-cli for Linux is published to official Microsoft repositories for easy installation (and updates).
 
@@ -305,7 +307,7 @@ mssql-cli
 After registering the Microsoft repository once as superuser,
 you just need to use `sudo yum update mssql-cli` to update mssql-cli.
 
-### Installation via Direct Download - CentOS 7
+### Installation for latest preview version via Direct Download - CentOS 7
 
 Using [CentOS 7][], download the RPM package
 `mssql-cli-dev-latest.rpm`
@@ -333,7 +335,7 @@ sudo yum remove mssql-cli
 
 ## Red Hat Enterprise Linux (RHEL) 7
 
-### Installation via Package Repository (preferred) - Red Hat Enterprise Linux (RHEL) 7
+### Installation for latest stable version via Package Repository (preferred) - Red Hat Enterprise Linux (RHEL) 7
 
 mssql-cli for Linux is published to official Microsoft repositories for easy installation (and updates).
 
@@ -351,7 +353,7 @@ mssql-cli
 After registering the Microsoft repository once as superuser,
 you just need to use `sudo yum update mssql-cli` to update mssql-cli.
 
-### Installation via Direct Download - Red Hat Enterprise Linux (RHEL) 7
+### Installation for latest preview version via Direct Download - Red Hat Enterprise Linux (RHEL) 7
 
 Download the RPM package
 `mssql-cli-dev-latest.rpm`
@@ -377,7 +379,7 @@ sudo yum remove mssql-cli
 
 ## OpenSUSE 42.2
 
-### Installation via Package Repository (preferred) - OpenSUSE 42.2
+### Installation for latest stable version via Package Repository (preferred) - OpenSUSE 42.2
 
 mssql-cli for Linux is published to official Microsoft repositories for easy installation (and updates).
 
@@ -398,7 +400,7 @@ sudo zypper install mssql-cli
 mssql-cli
 ```
 
-### Installation via Direct Download - OpenSUSE 42.2
+### Installation for latest preview version via Direct Download - OpenSUSE 42.2
 
 Download the RPM package `mssql-cli-dev-latest.rpm`
 from the [Latest preview mssql-cli] page onto the OpenSUSE machine.
@@ -423,7 +425,7 @@ sudo zypper remove mssql-cli
 
 ## Fedora 25
 
-### Installation via Package Repository (preferred) - Fedora 25
+### Installation for latest stable version via Package Repository (preferred) - Fedora 25
 
 mssql-cli for Linux is published to official Microsoft repositories for easy installation (and updates).
 
@@ -441,7 +443,7 @@ sudo dnf install -y mssql-cli
 mssql-cli
 ```
 
-### Installation via Direct Download - Fedora 25
+### Installation for latest preview version via Direct Download - Fedora 25
 
 Download the RPM package
 `mssql-cli-dev-latest.rpm`
@@ -467,7 +469,7 @@ sudo dnf remove mssql-cli
 
 ## Fedora 26
 
-### Installation via Package Repository (preferred) - Fedora 26
+### Installation for latest stable version via Package Repository (preferred) - Fedora 26
 
 mssql-cli for Linux is published to official Microsoft repositories for easy installation (and updates).
 
@@ -485,7 +487,7 @@ sudo dnf install -y mssql-cli
 mssql-cli
 ```
 
-### Installation via Direct Download - Fedora 26
+### Installation for latest preview version via Direct Download - Fedora 26
 
 Download the RPM package
 `mssql-cli-dev-latest.rpm`
