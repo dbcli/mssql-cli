@@ -28,31 +28,31 @@ Get mssql-cli
 +--------------------------------------------+--------------------------------+-------------------------------+-------------------------------+
 | Supported Platform                         | Downloads (stable)             | Downloads (preview)           | How to Install                |
 +============================================+================================+===============================+===============================+
-|  Windows (x64)                             | `.whl windows (x64) `_         | `.whl windows (x64)`_         | `Install on windows`_         |
+|  Windows (x64)                             | `.whl windows (x64)`_          | `.whl windows (x64) (dev)`_   | `Install on windows`_         |
 +--------------------------------------------+--------------------------------+-------------------------------+-------------------------------+
-|  Windows (x86)                             | `.whl windows (x86) `_         | `.whl windows (x86)`_         | `Install on windows`_         |
+|  Windows (x86)                             | `.whl windows (x86)`_          | `.whl windows (x86) (dev)`_   | `Install on windows`_         |
 +--------------------------------------------+--------------------------------+-------------------------------+-------------------------------+
-|  macOS 10.12+                              | `.whl `_                       | `.whl`_                       | `Install on macos`_           |
+|  macOS 10.12+                              | `.whl`_                        | `.whl (dev)`_                 | `Install on macos`_           |
 +--------------------------------------------+--------------------------------+-------------------------------+-------------------------------+
-|  Ubuntu 17.04                              | `.deb `_                       | `.deb`_                       | `Install on ubuntu17`_        |
+|  Ubuntu 17.04                              | `.deb`_                        | `.deb (dev)`_                 | `Install on ubuntu17`_        |
 +--------------------------------------------+--------------------------------+-------------------------------+-------------------------------+
-|  Ubuntu 16.04                              | `.deb `_                       | `.deb`_                       | `Install on ubuntu16`_        |
+|  Ubuntu 16.04                              | `.deb`_                        | `.deb (dev)`_                 | `Install on ubuntu16`_        |
 +--------------------------------------------+--------------------------------+-------------------------------+-------------------------------+
-|  Ubuntu 14.04                              | `.deb `_                       | `.deb`_                       | `Install on ubuntu14`_        |
+|  Ubuntu 14.04                              | `.deb`_                        | `.deb (dev)`_                 | `Install on ubuntu14`_        |
 +--------------------------------------------+--------------------------------+-------------------------------+-------------------------------+
-|  Debian 8.7+                               | `.deb `_                       | `.deb`_                       | `Install on debian8`_         |
+|  Debian 8.7+                               | `.deb`_                        | `.deb (dev)`_                 | `Install on debian8`_         |
 +--------------------------------------------+--------------------------------+-------------------------------+-------------------------------+
-|  Debian 9                                  | `.deb `_                       | `.deb`_                       | `Install on debian9`_         |
+|  Debian 9                                  | `.deb`_                        | `.deb (dev)`_                 | `Install on debian9`_         |
 +--------------------------------------------+--------------------------------+-------------------------------+-------------------------------+
-|  CentOS 7                                  | `.rpm `_                       | `.rpm`_                       | `Install on centos`_          |
+|  CentOS 7                                  | `.rpm`_                        | `.rpm (dev)`_                 | `Install on centos`_          |
 +--------------------------------------------+--------------------------------+-------------------------------+-------------------------------+
-|  Red Hat Enterprise Linux 7                | `.rpm `_                       | `.rpm`_                       | `Install on rhel7`_           |
+|  Red Hat Enterprise Linux 7                | `.rpm`_                        | `.rpm (dev)`_                 | `Install on rhel7`_           |
 +--------------------------------------------+--------------------------------+-------------------------------+-------------------------------+
-|  OpenSUSE 42.2                             | `.rpm `_                       | `.rpm`_                       | `Install on opensuse42`_      |
+|  OpenSUSE 42.2                             | `.rpm`_                        | `.rpm (dev)`_                 | `Install on opensuse42`_      |
 +--------------------------------------------+--------------------------------+-------------------------------+-------------------------------+
-|  Fedora 25                                 | `.rpm `_                       | `.rpm`_                       | `Install on fedora25`_        |
+|  Fedora 25                                 | `.rpm`_                        | `.rpm (dev)`_                 | `Install on fedora25`_        |
 +--------------------------------------------+--------------------------------+-------------------------------+-------------------------------+
-|  Fedora 26                                 | `.rpm `_                       | `.rpm`_                       | `Install on fedora26`_        |
+|  Fedora 26                                 | `.rpm`_                        | `.rpm (dev)`_                 | `Install on fedora26`_        |
 +--------------------------------------------+--------------------------------+-------------------------------+-------------------------------+
 
 
@@ -124,16 +124,16 @@ mssql-cli is licensed under the `BSD-3 license`_.
 .. _Install on fedora25: https://github.com/dbcli/mssql-cli/tree/master/docs/installation/linux.md#fedora-25
 .. _Install on fedora26: https://github.com/dbcli/mssql-cli/tree/master/docs/installation/linux.md#fedora-26
 
-.. _.whl windows (x64): https://mssqlcli.blob.core.windows.net/daily/whl/mssql-cli/mssql_cli-dev-latest-py2.py3-none-win_amd64.whl
-.. _.whl windows (x86): https://mssqlcli.blob.core.windows.net/daily/whl/mssql-cli/mssql_cli-dev-latest-py2.py3-none-win32.whl
-.. _.whl: https://mssqlcli.blob.core.windows.net/daily/whl/mssql-cli/mssql_cli-dev-latest-py2.py3-none-macosx_10_11_intel.whl
+.. _.whl windows (x64) (dev): https://mssqlcli.blob.core.windows.net/daily/whl/mssql-cli/mssql_cli-dev-latest-py2.py3-none-win_amd64.whl
+.. _.whl windows (x86) (dev): https://mssqlcli.blob.core.windows.net/daily/whl/mssql-cli/mssql_cli-dev-latest-py2.py3-none-win32.whl
+.. _.whl (dev): https://mssqlcli.blob.core.windows.net/daily/whl/mssql-cli/mssql_cli-dev-latest-py2.py3-none-macosx_10_11_intel.whl
 
-.. _.deb: https://mssqlcli.blob.core.windows.net/daily/deb/mssql-cli-dev-latest.deb
-.. _.rpm: https://mssqlcli.blob.core.windows.net/daily/rpm/mssql-cli-dev-latest.rpm
+.. _.deb (dev): https://mssqlcli.blob.core.windows.net/daily/deb/mssql-cli-dev-latest.deb
+.. _.rpm (dev): https://mssqlcli.blob.core.windows.net/daily/rpm/mssql-cli-dev-latest.rpm
 
-.. _.deb :https://packages.microsoft.com/ubuntu/14.04/prod/pool/main/m/mssql-cli/mssql-cli_0.10.0-1_all.deb
-.. _.rpm :https://packages.microsoft.com/rhel/7/prod/mssql-cli-0.10.0-1.el7.x86_64.rpm
+.. _.deb:https://packages.microsoft.com/ubuntu/14.04/prod/pool/main/m/mssql-cli/mssql-cli_0.10.0-1_all.deb
+.. _.rpm:https://packages.microsoft.com/rhel/7/prod/mssql-cli-0.10.0-1.el7.x86_64.rpm
 
-.. _.whl windows (x64) :https://files.pythonhosted.org/packages/0d/7c/5e2bcbed3d6215196118337aec9793a7d74ab5cca10b1d834873cb6ac492/mssql_cli-0.10.0-py2.py3-none-win_amd64.whl
-.. _.whl windows (x86) :https://files.pythonhosted.org/packages/4c/84/ba083d0677641f70ed11394fa93414275598161d1e8b6f444b67533079fa/mssql_cli-0.10.0-py2.py3-none-win32.whl
-.. _.whl :https://files.pythonhosted.org/packages/a6/de/55b73b6aa03e9890585ef5df5dac5717708db1a5018acde2582526b42fc9/mssql_cli-0.10.0-py2.py3-none-macosx_10_11_intel.whl
+.. _.whl windows (x64):https://files.pythonhosted.org/packages/0d/7c/5e2bcbed3d6215196118337aec9793a7d74ab5cca10b1d834873cb6ac492/mssql_cli-0.10.0-py2.py3-none-win_amd64.whl
+.. _.whl windows (x86):https://files.pythonhosted.org/packages/4c/84/ba083d0677641f70ed11394fa93414275598161d1e8b6f444b67533079fa/mssql_cli-0.10.0-py2.py3-none-win32.whl
+.. _.whl:https://files.pythonhosted.org/packages/a6/de/55b73b6aa03e9890585ef5df5dac5717708db1a5018acde2582526b42fc9/mssql_cli-0.10.0-py2.py3-none-macosx_10_11_intel.whl
