@@ -17,6 +17,7 @@ $ mssql-cli -h
 ```
 
 ## Installation with daily preview build
+Daily preview builds are dropped in our storage account. To install the latest available version of mssql-cli, use the below command:
 ```shell
 # Install pip
 $ sudo easy_install pip

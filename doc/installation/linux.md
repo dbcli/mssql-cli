@@ -5,13 +5,13 @@ Supports:
 - [Ubuntu 14.04][u14]
 - [Ubuntu 16.04][u16]
 - [Ubuntu 17.04][u17]
-- [Debian 8][deb8],
-- [Debian 9][deb9],
+- [Debian 8][deb8]
+- [Debian 9][deb9]
 - [CentOS 7][cos]
-- [Red Hat Enterprise Linux (RHEL) 7][rhel7], 
+- [Red Hat Enterprise Linux (RHEL) 7][rhel7]
 - [OpenSUSE 42.2][opensuse]
-- [Fedora 25][fed25],
-- [Fedora 26][fed26].
+- [Fedora 25][fed25]
+- [Fedora 26][fed26]
 
 Daily preview dev packages can be found at:
 
