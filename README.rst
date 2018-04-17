@@ -131,9 +131,9 @@ mssql-cli is licensed under the `BSD-3 license`_.
 .. _.deb (dev): https://mssqlcli.blob.core.windows.net/daily/deb/mssql-cli-dev-latest.deb
 .. _.rpm (dev): https://mssqlcli.blob.core.windows.net/daily/rpm/mssql-cli-dev-latest.rpm
 
-.. _.deb:https://packages.microsoft.com/ubuntu/14.04/prod/pool/main/m/mssql-cli/mssql-cli_0.10.0-1_all.deb
-.. _.rpm:https://packages.microsoft.com/rhel/7/prod/mssql-cli-0.10.0-1.el7.x86_64.rpm
+.. _.deb: https://packages.microsoft.com/ubuntu/14.04/prod/pool/main/m/mssql-cli/mssql-cli_0.10.0-1_all.deb
+.. _.rpm: https://packages.microsoft.com/rhel/7/prod/mssql-cli-0.10.0-1.el7.x86_64.rpm
 
-.. _.whl windows (x64):https://files.pythonhosted.org/packages/0d/7c/5e2bcbed3d6215196118337aec9793a7d74ab5cca10b1d834873cb6ac492/mssql_cli-0.10.0-py2.py3-none-win_amd64.whl
-.. _.whl windows (x86):https://files.pythonhosted.org/packages/4c/84/ba083d0677641f70ed11394fa93414275598161d1e8b6f444b67533079fa/mssql_cli-0.10.0-py2.py3-none-win32.whl
-.. _.whl:https://files.pythonhosted.org/packages/a6/de/55b73b6aa03e9890585ef5df5dac5717708db1a5018acde2582526b42fc9/mssql_cli-0.10.0-py2.py3-none-macosx_10_11_intel.whl
+.. _.whl windows (x64): https://files.pythonhosted.org/packages/0d/7c/5e2bcbed3d6215196118337aec9793a7d74ab5cca10b1d834873cb6ac492/mssql_cli-0.10.0-py2.py3-none-win_amd64.whl
+.. _.whl windows (x86): https://files.pythonhosted.org/packages/4c/84/ba083d0677641f70ed11394fa93414275598161d1e8b6f444b67533079fa/mssql_cli-0.10.0-py2.py3-none-win32.whl
+.. _.whl: https://files.pythonhosted.org/packages/a6/de/55b73b6aa03e9890585ef5df5dac5717708db1a5018acde2582526b42fc9/mssql_cli-0.10.0-py2.py3-none-macosx_10_11_intel.whl
