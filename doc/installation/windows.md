@@ -9,7 +9,6 @@ Python is not installed by default on Windows.  The latest Python installation p
 NOTE: If Python was installed into the "Program Files" directory, you may need to open the command prompt as an administrator for the above command to succeed.
 Once Python is installed and in the PATH environment variable, open a command prompt, and install mssql-cli using the below command.  
 
-For detailed i
 ## Installation via pip
 ```shell
 C:\> pip install mssql-cli
