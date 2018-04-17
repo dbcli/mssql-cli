@@ -34,15 +34,15 @@ Get mssql-cli
 +--------------------------------------------+--------------------------------+-------------------------------+-------------------------------+
 |  macOS 10.12+                              | `.whl`_                        | `.whl (dev)`_                 | `Install on macos`_           |
 +--------------------------------------------+--------------------------------+-------------------------------+-------------------------------+
-|  Ubuntu 17.04                              | `.deb `_                       | `.deb (dev)`_                 | `Install on ubuntu17`_        |
+|  Ubuntu 17.04                              | `.deb`_                        | `.deb (dev)`_                 | `Install on ubuntu17`_        |
 +--------------------------------------------+--------------------------------+-------------------------------+-------------------------------+
-|  Ubuntu 16.04                              | `.deb `_                       | `.deb (dev)`_                 | `Install on ubuntu16`_        |
+|  Ubuntu 16.04                              | `.deb`_                        | `.deb (dev)`_                 | `Install on ubuntu16`_        |
 +--------------------------------------------+--------------------------------+-------------------------------+-------------------------------+
-|  Ubuntu 14.04                              | `.deb `_                       | `.deb (dev)`_                 | `Install on ubuntu14`_        |
+|  Ubuntu 14.04                              | `.deb`_                        | `.deb (dev)`_                 | `Install on ubuntu14`_        |
 +--------------------------------------------+--------------------------------+-------------------------------+-------------------------------+
-|  Debian 8.7+                               | `.deb `_                       | `.deb (dev)`_                 | `Install on debian8`_         |
+|  Debian 8.7+                               | `.deb`_                        | `.deb (dev)`_                 | `Install on debian8`_         |
 +--------------------------------------------+--------------------------------+-------------------------------+-------------------------------+
-|  Debian 9                                  | `.deb `_                       | `.deb (dev)`_                 | `Install on debian9`_         |
+|  Debian 9                                  | `.deb`_                        | `.deb (dev)`_                 | `Install on debian9`_         |
 +--------------------------------------------+--------------------------------+-------------------------------+-------------------------------+
 |  CentOS 7                                  | `.rpm`_                        | `.rpm (dev)`_                 | `Install on centos`_          |
 +--------------------------------------------+--------------------------------+-------------------------------+-------------------------------+
@@ -131,7 +131,7 @@ mssql-cli is licensed under the `BSD-3 license`_.
 .. _.deb (dev): https://mssqlcli.blob.core.windows.net/daily/deb/mssql-cli-dev-latest.deb
 .. _.rpm (dev): https://mssqlcli.blob.core.windows.net/daily/rpm/mssql-cli-dev-latest.rpm
 
-.. _.deb : https://packages.microsoft.com/ubuntu/14.04/prod/pool/main/m/mssql-cli/mssql-cli_0.10.0-1_all.deb
+.. _.deb: https://packages.microsoft.com/ubuntu/14.04/prod/pool/main/m/mssql-cli/mssql-cli_0.10.0-1_all.deb
 .. _.rpm: https://packages.microsoft.com/rhel/7/prod/mssql-cli-0.10.0-1.el7.x86_64.rpm
 
 .. _.whl windows (x64): https://files.pythonhosted.org/packages/0d/7c/5e2bcbed3d6215196118337aec9793a7d74ab5cca10b1d834873cb6ac492/mssql_cli-0.10.0-py2.py3-none-win_amd64.whl
