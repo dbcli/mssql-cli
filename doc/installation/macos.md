@@ -1,5 +1,8 @@
 # macOS Installation
 
+## Supported OS versions:
+* macOS (x64) 10.12+
+
 ## Installation via pip
 On macOS, Python 2.7 is generally pre-installed. You may have to upgrade pip with the following easy_install commands.
 ```shell
