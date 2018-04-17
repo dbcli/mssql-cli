@@ -56,14 +56,20 @@ Get mssql-cli
 +--------------------------------------------+--------------------------------+-------------------------------+-------------------------------+
 
 
-Installation
-------------
+Installation via apt, yum
+-------------------------
+Please refer to `Get mssql-cli`_ for detailed install instructions per platform.
+
+
+Installation via pip
+--------------------
 
 .. code:: bash
 
     $ pip install mssql-cli
 
-Please refer to `Get mssql-cli`_ for detailed install instructions.
+Please refer to `Install via pip`_ for detailed install instructions via pip on each platform
+
 
 Usage
 -----
@@ -110,6 +116,7 @@ mssql-cli is licensed under the `BSD-3 license`_.
 .. _Code of Conduct FAQ: https://opensource.microsoft.com/codeofconduct/faq/
 .. _BSD-3 license: https://github.com/dbcli/mssql-cli/blob/master/LICENSE.txt
 
+.. _Install via pip: https://github.com/dbcli/mssql-cli/blob/tree/master/docs/installation/pip.md
 
 .. _Install on windows: https://github.com/dbcli/mssql-cli/tree/master/docs/installation/windows.md#windows-installation
 .. _Install on macos: https://github.com/dbcli/mssql-cli/tree/master/docs/installation/macos.md#macos-installation
