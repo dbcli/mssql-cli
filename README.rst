@@ -116,20 +116,20 @@ mssql-cli is licensed under the `BSD-3 license`_.
 .. _Code of Conduct FAQ: https://opensource.microsoft.com/codeofconduct/faq/
 .. _BSD-3 license: https://github.com/dbcli/mssql-cli/blob/master/LICENSE.txt
 
-.. _Install via pip: https://github.com/dbcli/mssql-cli/blob/tree/master/docs/installation/pip.md
+.. _Install via pip: https://github.com/dbcli/mssql-cli/blob/master/doc/installation/pip.md
 
-.. _Install on windows: https://github.com/dbcli/mssql-cli/tree/master/docs/installation/windows.md#windows-installation
-.. _Install on macos: https://github.com/dbcli/mssql-cli/tree/master/docs/installation/macos.md#macos-installation
-.. _Install on ubuntu14: https://github.com/dbcli/mssql-cli/tree/master/docs/installation/linux.md#ubuntu-1404
-.. _Install on ubuntu16: https://github.com/dbcli/mssql-cli/tree/master/docs/installation/linux.md#ubuntu-1604
-.. _Install on ubuntu17: https://github.com/dbcli/mssql-cli/tree/master/docs/installation/linux.md#ubuntu-1704
-.. _Install on debian8: https://github.com/dbcli/mssql-cli/tree/master/docs/installation/linux.md#debian-8
-.. _Install on debian9: https://github.com/dbcli/mssql-cli/tree/master/docs/installation/linux.md#debian-9
-.. _Install on centos: https://github.com/dbcli/mssql-cli/tree/master/docs/installation/linux.md#centos-7
-.. _Install on rhel7: https://github.com/dbcli/mssql-cli/tree/master/docs/installation/linux.md#red-hat-enterprise-linux-rhel-7
-.. _Install on opensuse42: https://github.com/dbcli/mssql-clidbcli/mssql-cli/tree/master/docs/installation/linux.md#opensuse-422
-.. _Install on fedora25: https://github.com/dbcli/mssql-cli/tree/master/docs/installation/linux.md#fedora-25
-.. _Install on fedora26: https://github.com/dbcli/mssql-cli/tree/master/docs/installation/linux.md#fedora-26
+.. _Install on windows: https://github.com/dbcli/mssql-cli/blob/master/doc/installation/windows.md#windows-installation
+.. _Install on macos: https://github.com/dbcli/mssql-cli/blob/master/doc/installation/macos.md#macos-installation
+.. _Install on ubuntu14: https://github.com/dbcli/mssql-cli/blob/master/doc/installation/linux.md#ubuntu-1404
+.. _Install on ubuntu16: https://github.com/dbcli/mssql-cli/blob/master/doc/installation/linux.md#ubuntu-1604
+.. _Install on ubuntu17: https://github.com/dbcli/mssql-cli/blob/master/doc/installation/linux.md#ubuntu-1704
+.. _Install on debian8: https://github.com/dbcli/mssql-cli/blob/master/doc/installation/linux.md#debian-8
+.. _Install on debian9: https://github.com/dbcli/mssql-cli/blob/master/doc/installation/linux.md#debian-9
+.. _Install on centos: https://github.com/dbcli/mssql-cli/blob/master/doc/installation/linux.md#centos-7
+.. _Install on rhel7: https://github.com/dbcli/mssql-cli/blob/master/doc/installation/linux.md#red-hat-enterprise-linux-rhel-7
+.. _Install on opensuse42: https://github.com/dbcli/mssql-cli/blob/master/doc/installation/linux.md#opensuse-422
+.. _Install on fedora25: https://github.com/dbcli/mssql-cli/blob/master/doc/installation/linux.md#fedora-25
+.. _Install on fedora26: https://github.com/dbcli/mssql-cli/blob/master/doc/installation/linux.md#fedora-26
 
 .. _.whl windows (x64) (dev): https://mssqlcli.blob.core.windows.net/daily/whl/mssql-cli/mssql_cli-dev-latest-py2.py3-none-win_amd64.whl
 .. _.whl windows (x86) (dev): https://mssqlcli.blob.core.windows.net/daily/whl/mssql-cli/mssql_cli-dev-latest-py2.py3-none-win32.whl
