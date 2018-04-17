@@ -124,8 +124,8 @@ mssql-cli is licensed under the `BSD-3 license`_.
 .. _Install on fedora25: https://github.com/dbcli/mssql-cli/tree/master/docs/installation/linux.md#fedora-25
 .. _Install on fedora26: https://github.com/dbcli/mssql-cli/tree/master/docs/installation/linux.md#fedora-26
 
-.. _.whl windows (x64): https://mssqlcli.blob.core.windows.net/daily/mssql-cli/mssql_cli-dev-latest-py2.py3-none-win_amd64.whl
-.. _.whl windows (x86): https://mssqlcli.blob.core.windows.net/daily/mssql-cli/mssql_cli-dev-latest-py2.py3-none-win32.whl
-.. _.whl: https://mssqlcli.blob.core.windows.net/daily/mssql-cli/mssql_cli-dev-latest-py2.py3-none-macosx_10_11_intel.whl
+.. _.whl windows (x64): https://mssqlcli.blob.core.windows.net/daily/whl/mssql-cli/mssql_cli-dev-latest-py2.py3-none-win_amd64.whl
+.. _.whl windows (x86): https://mssqlcli.blob.core.windows.net/daily/whl/mssql-cli/mssql_cli-dev-latest-py2.py3-none-win32.whl
+.. _.whl: https://mssqlcli.blob.core.windows.net/daily/whl/mssql-cli/mssql_cli-dev-latest-py2.py3-none-macosx_10_11_intel.whl
 .. _.rpm: https://mssqlcli.blob.core.windows.net/daily/rpm/mssql-cli-dev-latest.rpm
 .. _.deb: https://mssqlcli.blob.core.windows.net/daily/deb/mssql-cli-dev-latest.deb
