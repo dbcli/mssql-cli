@@ -47,7 +47,7 @@ sudo curl -o /etc/apt/sources.list.d/microsoft.list https://packages.microsoft.c
 # Update the list of products
 sudo apt-get update
 
-# Install PowerShell
+# Install mssql-cli
 sudo apt-get install -y mssql-cli
 
 # Start mssql-cli
@@ -183,7 +183,7 @@ sudo apt-get remove mssql-cli
 
 ### Installation via Package Repository - Debian 8.7
 
-PowerShell Core, for Linux, is published to package repositories for easy installation (and updates).
+mssql-cli, for Linux, is published to package repositories for easy installation (and updates).
 This is the preferred method.
 
 ```sh
@@ -295,7 +295,7 @@ mssql-cli for Linux is published to official Microsoft repositories for easy ins
 # Register the Microsoft RedHat repository
 sudo curl -o /etc/yum.repos.d/mssql-cli.repo https://packages.microsoft.com/config/rhel/7/prod.repo
 
-# Install PowerShell
+# Install mssql-cli
 sudo yum install -y mssql-cli
 
 # Start mssql-cli
@@ -303,7 +303,7 @@ mssql-cli
 ```
 
 After registering the Microsoft repository once as superuser,
-you just need to use `sudo yum update mssql-cli` to update PowerShell.
+you just need to use `sudo yum update mssql-cli` to update mssql-cli.
 
 ### Installation via Direct Download - CentOS 7
 
@@ -341,7 +341,7 @@ mssql-cli for Linux is published to official Microsoft repositories for easy ins
 # Register the Microsoft RedHat repository
 curl https://packages.microsoft.com/config/rhel/7/prod.repo | sudo tee /etc/yum.repos.d/microsoft.repo
 
-# Install PowerShell
+# Install mssql-cli
 sudo yum install -y mssql-cli
 
 # Start mssql-cli
@@ -349,7 +349,7 @@ mssql-cli
 ```
 
 After registering the Microsoft repository once as superuser,
-you just need to use `sudo yum update mssql-cli` to update PowerShell.
+you just need to use `sudo yum update mssql-cli` to update mssql-cli.
 
 ### Installation via Direct Download - Red Hat Enterprise Linux (RHEL) 7
 
@@ -391,7 +391,7 @@ sudo zypper --gpg-auto-import-keys refresh
 # Update the list of products
 sudo zypper update
 
-# Install PowerShell
+# Install mssql-cli
 sudo zypper install mssql-cli
 
 # Start mssql-cli
