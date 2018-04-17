@@ -13,11 +13,7 @@ Supports:
 - [Fedora 25][fed25]
 - [Fedora 26][fed26]
 
-Daily preview dev packages can be found at:
-
-[Latest preview mssql-cli] [downloads]
-
-[downloads]:(https://github.com/dbcli/mssql-cli/tree/master#get-mssql-cli)
+[downloads]:https://github.com/dbcli/mssql-cli/tree/master#get-mssql-cli
 
 Once the package is installed, run `mssql-cli` from a terminal.
 
@@ -63,7 +59,7 @@ from then on, you just need to use `sudo apt-get upgrade mssql-cli` to update it
 
 Download the Debian package
 `mssql-cli-dev-latest.deb`
-from the [Latest preview mssql-cli] page onto the Ubuntu machine.
+from the [downloads] page onto the Ubuntu machine.
 
 Then execute the following in the terminal:
 
@@ -113,7 +109,7 @@ from then on, you just need to use `sudo apt-get upgrade mssql-cli` to update it
 
 Download the Debian package
 `mssql-cli-dev-latest.deb`
-from the [Latest preview mssql-cli] page onto the Ubuntu machine.
+from the [downloads] page onto the Ubuntu machine.
 
 Then execute the following in the terminal:
 
@@ -162,7 +158,7 @@ from then on, you just need to use `sudo apt-get upgrade mssql-cli` to update it
 
 Download the Debian package
 `mssql-cli-dev-latest.deb`
-from the [Latest preview mssql-cli] page onto the Ubuntu machine.
+from the [downloads] page onto the Ubuntu machine.
 
 Then execute the following in the terminal:
 
@@ -216,7 +212,7 @@ from then on, you just need to use `sudo apt-get upgrade mssql-cli` to update it
 
 Download the Debian package
 `mssql-cli-dev-latest.deb`
-from the [Latest preview mssql-cli] page onto the Debian machine.
+from the [downloads] page onto the Debian machine.
 
 Then execute the following in the terminal:
 
@@ -266,7 +262,7 @@ from then on, you just need to use `sudo apt-get upgrade mssql-cli` to update it
 
 Download the Debian package
 `mssql-cli-dev-latest.deb`
-from the [Latest preview mssql-cli] page onto the Debian machine.
+from the [downloads] page onto the Debian machine.
 
 Then execute the following in the terminal:
 
@@ -311,7 +307,7 @@ you just need to use `sudo yum update mssql-cli` to update mssql-cli.
 
 Using [CentOS 7][], download the RPM package
 `mssql-cli-dev-latest.rpm`
-from the [Latest preview mssql-cli] page onto the CentOS machine.
+from the [downloads] page onto the CentOS machine.
 
 Then execute the following in the terminal:
 
@@ -357,7 +353,7 @@ you just need to use `sudo yum update mssql-cli` to update mssql-cli.
 
 Download the RPM package
 `mssql-cli-dev-latest.rpm`
-from the [Latest preview mssql-cli] page onto the Red Hat Enterprise Linux machine.
+from the [downloads] page onto the Red Hat Enterprise Linux machine.
 
 Then execute the following in the terminal:
 
@@ -403,7 +399,7 @@ mssql-cli
 ### Installation for latest preview version via Direct Download - OpenSUSE 42.2
 
 Download the RPM package `mssql-cli-dev-latest.rpm`
-from the [Latest preview mssql-cli] page onto the OpenSUSE machine.
+from the [downloads] page onto the OpenSUSE machine.
 
 ```sh
 sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
@@ -447,7 +443,7 @@ mssql-cli
 
 Download the RPM package
 `mssql-cli-dev-latest.rpm`
-from the [Latest preview mssql-cli] page onto the Fedora machine.
+from the [downloads] page onto the Fedora machine.
 
 Then execute the following in the terminal:
 
@@ -491,7 +487,7 @@ mssql-cli
 
 Download the RPM package
 `mssql-cli-dev-latest.rpm`
-from the [Latest preview mssql-cli] page onto the Fedora machine.
+from the [downloads] page onto the Fedora machine.
 
 Then execute the following in the terminal:
 
