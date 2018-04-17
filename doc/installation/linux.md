@@ -46,7 +46,7 @@ sudo curl -o /etc/apt/sources.list.d/microsoft.list https://packages.microsoft.c
 sudo apt-get update
 
 # Install mssql-cli
-sudo apt-get install -y mssql-cli
+sudo apt-get install mssql-cli
 
 # Start mssql-cli
 mssql-cli
@@ -96,7 +96,7 @@ sudo curl -o /etc/apt/sources.list.d/microsoft.list https://packages.microsoft.c
 sudo apt-get update
 
 # Install mssql-cli
-sudo apt-get install -y mssql-cli
+sudo apt-get install mssql-cli
 
 # Start mssql-cli
 mssql-cli
@@ -145,7 +145,7 @@ sudo curl -o /etc/apt/sources.list.d/microsoft.list https://packages.microsoft.c
 sudo apt-get update
 
 # Install mssql-cli
-sudo apt-get install -y mssql-cli
+sudo apt-get install mssql-cli
 
 # Start mssql-cli
 mssql-cli
@@ -199,7 +199,7 @@ sudo add-apt-repository "$(wget -qO- https://packages.microsoft.com/config/debia
 sudo apt-get update
 
 # Install mssql-cli
-sudo apt-get install -y mssql-cli
+sudo apt-get install mssql-cli
 
 # Start mssql-cli
 mssql-cli
@@ -249,7 +249,7 @@ sudo add-apt-repository "$(wget -qO- https://packages.microsoft.com/config/debia
 sudo apt-get update
 
 # Install mssql-cli
-sudo apt-get install -y mssql-cli
+sudo apt-get install mssql-cli
 
 # Start mssql-cli
 mssql-cli
@@ -294,7 +294,7 @@ mssql-cli for Linux is published to official Microsoft repositories for easy ins
 sudo curl -o /etc/yum.repos.d/mssql-cli.repo https://packages.microsoft.com/config/rhel/7/prod.repo
 
 # Install mssql-cli
-sudo yum install -y mssql-cli
+sudo yum install mssql-cli
 
 # Start mssql-cli
 mssql-cli
@@ -340,7 +340,7 @@ mssql-cli for Linux is published to official Microsoft repositories for easy ins
 curl https://packages.microsoft.com/config/rhel/7/prod.repo | sudo tee /etc/yum.repos.d/microsoft.repo
 
 # Install mssql-cli
-sudo yum install -y mssql-cli
+sudo yum install mssql-cli
 
 # Start mssql-cli
 mssql-cli
@@ -433,7 +433,7 @@ sudo curl -o /etc/yum.repos.d/mssql-cli.repo https://packages.microsoft.com/conf
 sudo dnf update
 
 # Install mssql-cli
-sudo dnf install -y mssql-cli
+sudo dnf install mssql-cli
 
 # Start mssql-cli
 mssql-cli
@@ -477,7 +477,7 @@ sudo curl -o /etc/yum.repos.d/mssql-cli.repo https://packages.microsoft.com/conf
 sudo dnf update
 
 # Install mssql-cli
-sudo dnf install -y mssql-cli
+sudo dnf install mssql-cli
 
 # Start mssql-cli
 mssql-cli
