@@ -105,7 +105,8 @@ def validate_package():
     current_platform = utility.get_current_platform()
 
     mssqlcli_wheel_name = [
-        pkge for pkge in mssqlcli_wheel_dir if current_platform in pkge]
+        pkge for pkge in mssqlcli_wheel_dir if current_platform in pkge and
+        'dev-latest' not in pkge]
     utility.exec_command(
         '{0} install --no-cache-dir --no-index ./dist/{1}'.format(
             PIP,
