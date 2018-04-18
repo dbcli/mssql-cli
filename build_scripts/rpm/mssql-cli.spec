@@ -30,7 +30,7 @@ License:        BSD-3
 Name:           %{name}
 Version:        %{version}
 Release:        %{release}
-Url:            https://github.com/dbcli/mssql-cli/blob/master/doc/installation_guide.md
+Url:            https://github.com/dbcli/mssql-cli
 BuildArch:      x86_64
 
 BuildRequires:  gcc
