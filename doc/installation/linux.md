@@ -193,7 +193,7 @@ sudo apt-get install curl apt-transport-https
 wget -qO- https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
 
 # Register the Microsoft Product feed
-sudo add-apt-repository "$(wget -qO- https://packages.microsoft.com/config/debian/8/prod.list)"
+echo "deb [arch=amd64] https://packages.microsoft.com/debian/8/prod jessie main" | sudo tee /etc/apt/sources.list.d/mssql-cli.list
 
 # Update the list of products
 sudo apt-get update
@@ -243,7 +243,7 @@ This is the preferred method.
 wget -qO- https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
 
 # Register the Microsoft Product feed
-sudo add-apt-repository "$(wget -qO- https://packages.microsoft.com/config/debian/8/prod.list)"
+echo "deb [arch=amd64] https://packages.microsoft.com/debian/9/prod stretch main" | sudo tee /etc/apt/sources.list.d/mssql-cli.list
 
 # Update the list of products
 sudo apt-get update
