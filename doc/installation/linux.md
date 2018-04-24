@@ -177,9 +177,9 @@ sudo apt-get install -f
 sudo apt-get remove mssql-cli
 ```
 
-## Debian 8.7
+## Debian 8
 
-### Installation for latest stable version via Package Repository - Debian 8.7
+### Installation for latest stable version via Package Repository - Debian 8
 
 mssql-cli, for Linux, is published to package repositories for easy installation (and updates).
 This is the preferred method.
