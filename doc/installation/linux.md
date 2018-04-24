@@ -290,6 +290,9 @@ sudo apt-get remove mssql-cli
 mssql-cli for Linux is published to official Microsoft repositories for easy installation (and updates).
 
 ```sh
+# Import Microsoft repository key
+sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
+
 # Register the Microsoft RedHat repository
 sudo curl -o /etc/yum.repos.d/mssql-cli.repo https://packages.microsoft.com/config/rhel/7/prod.repo
 
@@ -336,6 +339,9 @@ sudo yum remove mssql-cli
 mssql-cli for Linux is published to official Microsoft repositories for easy installation (and updates).
 
 ```sh
+# Import Microsoft repository key
+sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
+
 # Register the Microsoft RedHat repository
 curl https://packages.microsoft.com/config/rhel/7/prod.repo | sudo tee /etc/yum.repos.d/microsoft.repo
 
