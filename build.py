@@ -64,6 +64,9 @@ def build():
     else:
         platforms_to_build = [utility.get_current_platform()]
 
+    # Temporary environment variable to change the target platform we are building for.
+    # Ex. Building for a ARM target on a x64 host.
+    platforms_to_build = os.getenv('PLATFORM_OVERRIDE', platforms_to_build)
     for platform in platforms_to_build:
         # For the current platform, populate the appropriate binaries and
         # generate the wheel.
