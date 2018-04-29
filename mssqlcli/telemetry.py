@@ -196,8 +196,10 @@ def _user_id_file_is_old(id_file_path):
 @decorators.suppress_all_exceptions(fallback_return='')
 @decorators.hash256_result
 def _generate_user_id():
-    random_id = os.urandom(16)
-    salt = os.urandom(16)
+    random_id = binascii.hexlify(os.urandom(16)).decode() \
+        if sys.version_info >= (3,0) else binascii.hexlify(os.urandom(16))
+    salt = binascii.hexlify(os.urandom(16)).decode() \
+        if sys.version_info >= (3,0) else binascii.hexlify(os.urandom(16))
 
     return random_id + salt
 
