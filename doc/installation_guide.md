@@ -32,7 +32,11 @@ Follow the instructions link for your platform for the official instructions.
 [in-fedora26]: https://github.com/dbcli/mssql-cli/blob/master/doc/installation/linux.md#fedora-26
 
 
-## Alternative Installation via direct downloads
+## Direct Downloads
+
+The instructions above are the preferred installation method. Direct downloads are provided as a alternative in the 
+scenario that your machine may not have access to the Microsoft repositories. Instructions for direct downloads can be
+also be found in the links above.
 
 | Supported Platform                         |Latest Stable                 |Latest dev               |
 |--------------------------------------------|------------------------------|-------------------------|
