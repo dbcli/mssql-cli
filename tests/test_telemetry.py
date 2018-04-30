@@ -1,10 +1,12 @@
 # coding=utf-8
+import tempfile
 import json
 import os
 import unittest
 
 import mssqlcli.telemetry_upload as telemetry_upload
 
+from stat import ST_MTIME
 try:
     # Python 2.x
     import urllib2 as HTTPClient
@@ -95,6 +97,22 @@ class TelemetryTests(unittest.TestCase):
         payload = test_telemetry_client.conclude()
         self.assertIsNone(payload, 'Payload was uploaded when client opted out.')
 
+    def test_file_time_check_rotation(self):
+        test_telemetry_client = self.build_telemetry_client()
+        expired_id_file = tempfile.NamedTemporaryFile()
+        valid_id_file = tempfile.NamedTemporaryFile()
+        try:
+            st = os.stat(expired_id_file.name)
+            modified_time = st[ST_MTIME]
+            older_modified_time = modified_time - (25 * 3600)
+            # Update modified time.
+            os.utime(expired_id_file.name, (modified_time, older_modified_time))
+
+            # Verify both scenarios of a valid and expired id file.
+            self.assertTrue(test_telemetry_client._user_id_file_is_old(expired_id_file.name))
+            self.assertFalse(test_telemetry_client._user_id_file_is_old(valid_id_file.name))
+        finally:
+            expired_id_file.close()
 
 if __name__ == u'__main__':
     # Enabling this env var would output what telemetry payload is sent.

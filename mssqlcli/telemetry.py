@@ -9,7 +9,7 @@ import sys
 import traceback
 import uuid
 from functools import wraps
-from datetime import datetime as temp
+from datetime import datetime as datetime_2
 from datetime import timedelta
 import datetime
 import mssqlcli.config as config
@@ -186,22 +186,20 @@ def _get_user_id():
 
 def _user_id_file_is_old(id_file_path):
     if os.path.exists(id_file_path):
-        last_24_hours = temp.now() - timedelta(hours=24)
-        id_file_creation_time = temp.fromtimestamp(os.path.getctime(id_file_path))
+        last_24_hours = datetime_2.now() - timedelta(hours=24)
+        id_file_modified_time = datetime_2.fromtimestamp(os.path.getmtime(id_file_path))
 
-        return id_file_creation_time < last_24_hours
+        return id_file_modified_time < last_24_hours
     return False
 
 
 @decorators.suppress_all_exceptions(fallback_return='')
 @decorators.hash256_result
 def _generate_user_id():
-    random_id = binascii.hexlify(os.urandom(16)).decode() \
-        if sys.version_info >= (3,0) else binascii.hexlify(os.urandom(16))
-    salt = binascii.hexlify(os.urandom(16)).decode() \
-        if sys.version_info >= (3,0) else binascii.hexlify(os.urandom(16))
+    random_id = binascii.hexlify(os.urandom(32)).decode() \
+        if sys.version_info >= (3,0) else binascii.hexlify(os.urandom(32))
 
-    return random_id + salt
+    return random_id
 
 
 def _get_env_string():
