@@ -121,10 +121,6 @@ def build_vortex_telemetry_client(service_endpoint_uri):
 
     client = TelemetryClient(INSTRUMENTATION_KEY, channel)
 
-    # Prevent appinsights from reporting these data points.
-    client.context.device.ip = ""
-    client.context.device.role_instance = ""
-
     enable(INSTRUMENTATION_KEY)
     return client
 
