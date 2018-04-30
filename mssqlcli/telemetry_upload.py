@@ -1,9 +1,10 @@
+import datetime
 import json
 import os
 import sys
 
 from applicationinsights import TelemetryClient
-from applicationinsights.channel import TelemetryChannel, SynchronousQueue, SynchronousSender
+from applicationinsights.channel import TelemetryChannel, SynchronousQueue, SynchronousSender, contracts
 from applicationinsights.exceptions import enable
 
 import mssqlcli.decorators as decorators
@@ -39,7 +40,7 @@ class VortexSynchronousSender(SynchronousSender):
 
     def send(self, data_to_send):
         """
-            Override the send method to strip the request_payload's brackets since Vortex does not
+            Override the send method to strip the request_payload's brackets since Vortex does not.
         """
         request_payload = json.dumps([a.write() for a in data_to_send]).strip('[').strip(']')
 
@@ -67,15 +68,59 @@ class VortexSynchronousSender(SynchronousSender):
             self._queue.put(data)
 
 
+class VortexTelemetryChannel(TelemetryChannel):
+    """
+        A Vortext telemetry channel that suppresses the ingest header.
+    """
+    def __init__(self, context=None, queue=None):
+        TelemetryChannel.__init__(self, context, queue)
+
+    def write(self, data, context=None):
+        """
+            Enqueues the passed in data to the queue.
+        """
+        local_context = context or self._context
+        if not local_context:
+            raise Exception('Context was required but not provided')
+
+        if not data:
+            raise Exception('Data was required but not provided')
+
+        envelope = contracts.Envelope()
+        # The only difference in behavior from it's parent class is setting the flag below.
+        # Suppress Vortex ingest header.
+        envelope.flags = 0x200000
+        envelope.name = data.ENVELOPE_TYPE_NAME
+        envelope.time = datetime.datetime.utcnow().isoformat() + 'Z'
+        envelope.ikey = local_context.instrumentation_key
+        tags = envelope.tags
+        for key, value in self._write_tags(local_context):
+            tags[key] = value
+        envelope.data = contracts.Data()
+        envelope.data.base_type = data.DATA_TYPE_NAME
+        if hasattr(data, 'properties') and local_context.properties:
+            properties = data.properties
+            if not properties:
+                properties = {}
+                data.properties = properties
+            for key in local_context.properties:
+                if key not in properties:
+                    properties[key] = local_context.properties[key]
+        envelope.data.base_data = data
+
+        self._queue.put(envelope)
+
+
 def build_vortex_telemetry_client(service_endpoint_uri):
     """
         Build vortex telemetry client.
     """
     vortex_sender = VortexSynchronousSender(service_endpoint_uri)
     sync_queue = SynchronousQueue(vortex_sender)
-    channel = TelemetryChannel(None, queue=sync_queue)
+    channel = VortexTelemetryChannel(None, queue=sync_queue)
 
     client = TelemetryClient(INSTRUMENTATION_KEY, channel)
+
     enable(INSTRUMENTATION_KEY)
     return client
 

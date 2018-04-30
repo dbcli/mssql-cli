@@ -1,3 +1,4 @@
+import binascii
 import datetime
 import json
 import locale
@@ -8,7 +9,9 @@ import sys
 import traceback
 import uuid
 from functools import wraps
-
+from datetime import datetime as datetime_2
+from datetime import timedelta
+import datetime
 import mssqlcli.config as config
 import mssqlcli.telemetry_upload as telemetry_core
 
@@ -170,25 +173,33 @@ def _get_mssql_cli_version():
 def _get_user_id():
     config_dir = config.config_location()
     full_path = os.path.join(config_dir, MSSQL_CLI_TELEMETRY_ID_FILE)
-
-    if os.path.exists(full_path):
-        with open(full_path, 'r') as file:
-            user_id = file.read()
-            return user_id
-    else:
+    if _user_id_file_is_old(full_path) or not os.path.exists(full_path):
         with open(full_path, 'w') as file:
             user_id = _generate_user_id()
             file.write(user_id)
             return user_id
+    else:
+        with open(full_path, 'r') as file:
+            user_id = file.read()
+            return user_id
+
+
+def _user_id_file_is_old(id_file_path):
+    if os.path.exists(id_file_path):
+        last_24_hours = datetime_2.now() - timedelta(hours=24)
+        id_file_modified_time = datetime_2.fromtimestamp(os.path.getmtime(id_file_path))
+
+        return id_file_modified_time < last_24_hours
+    return False
 
 
 @decorators.suppress_all_exceptions(fallback_return='')
 @decorators.hash256_result
 def _generate_user_id():
-    random_id = uuid.uuid4().hex
-    salt = uuid.uuid4().hex
+    random_id = binascii.hexlify(os.urandom(32)).decode() \
+        if sys.version_info >= (3,0) else binascii.hexlify(os.urandom(32))
 
-    return random_id + salt
+    return random_id
 
 
 def _get_env_string():
