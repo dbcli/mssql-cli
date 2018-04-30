@@ -58,7 +58,7 @@ Get mssql-cli
 
 Direct downloads
 ----------------
-Direct downloads for both latest stable and preview bits can be found `Direct download`_.
+Direct downloads for both latest stable and preview bits can be found at `Direct download`_.
 
 Installation via apt, yum
 -------------------------
