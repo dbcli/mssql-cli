@@ -113,6 +113,8 @@ class TelemetryTests(unittest.TestCase):
             self.assertFalse(test_telemetry_client._user_id_file_is_old(valid_id_file.name))
         finally:
             expired_id_file.close()
+            valid_id_file.close()
+
 
 if __name__ == u'__main__':
     # Enabling this env var would output what telemetry payload is sent.
