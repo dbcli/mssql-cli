@@ -3,10 +3,11 @@ import tempfile
 import json
 import os
 import unittest
+from stat import ST_MTIME
 
 import mssqlcli.telemetry_upload as telemetry_upload
 
-from stat import ST_MTIME
+
 try:
     # Python 2.x
     import urllib2 as HTTPClient
