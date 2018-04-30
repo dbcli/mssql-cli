@@ -34,8 +34,8 @@ Follow the instructions link for your platform for the official instructions.
 
 ## Direct Downloads
 
-The instructions above are the preferred installation method. Direct downloads are provided as a alternative in the 
-scenario that your machine may not have access to the Microsoft repositories. Instructions for direct downloads can be
+The instructions above are the preferred installation method. Direct downloads are provided as an alternative in the 
+scenario that your machine may not have access to the Microsoft package repository. Instructions for direct downloads can
 also be found in the links above.
 
 | Supported Platform                         |Latest Stable                 |Latest dev               |
