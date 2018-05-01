@@ -20,7 +20,6 @@ try:
 except ImportError:
     from urllib.parse import urlparse, unquote, parse_qs
 
-from mssqlcli.mssql_cli import MssqlCli
 from mssqlcli.mssqlclioptionsparser import create_parser
 import mssqlcli.telemetry as telemetry_session
 
@@ -46,6 +45,10 @@ def run_cli_with(options):
     display_integrated_auth_message_for_non_windows(options)
 
     configure_and_update_options(options)
+
+    # Importing MssqlCli creates a config dir by default.
+    # Moved import here so we can create the config dir for first use prior.
+    from mssqlcli.mssql_cli import MssqlCli
 
     mssqlcli = MssqlCli(options)
     mssqlcli.connect_to_database()
