@@ -387,7 +387,7 @@ mssql-cli for Linux is published to official Microsoft repositories for easy ins
 
 ```sh
 # Add the Microsoft Product feed
-sudo zypper addrepo -fc https://packages.microsoft.com/config/opensuse/12/prod.repo
+sudo zypper addrepo -fc https://packages.microsoft.com/config/opensuse/42.2/prod.repo
 
 # Refresh the keys
 sudo zypper --gpg-auto-import-keys refresh 
