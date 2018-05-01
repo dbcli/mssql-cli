@@ -398,7 +398,7 @@ sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
 # Update the list of products
 sudo zypper update
 
-# Install system level componenet and mssql-cli
+# Install system level component and mssql-cli
 sudo zypper install libffi-devel
 sudo zypper install mssql-cli
 
