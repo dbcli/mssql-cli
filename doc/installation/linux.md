@@ -386,16 +386,20 @@ sudo yum remove mssql-cli
 mssql-cli for Linux is published to official Microsoft repositories for easy installation (and updates).
 
 ```sh
-# Add the Microsoft Product feed
-sudo zypper addrepo -fc https://packages.microsoft.com/config/opensuse/12/prod.repo
+# Add openSUSE repository feed
+sudo zypper addrepo https://download.opensuse.org/repositories/server:monitoring/openSUSE_Leap_42.2/server:monitoring.repo
 
-# Refresh the keys
-sudo zypper --gpg-auto-import-keys refresh 
+# Add the Microsoft Product feed
+sudo zypper addrepo -fc https://packages.microsoft.com/config/opensuse/42.2/prod.repo
+
+# Add Microsoft repository key
+sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
 
 # Update the list of products
 sudo zypper update
 
-# Install mssql-cli
+# Install system level componenet and mssql-cli
+sudo zypper install libffi-devel
 sudo zypper install mssql-cli
 
 # Start mssql-cli

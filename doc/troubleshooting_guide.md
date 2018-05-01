@@ -53,6 +53,27 @@ If you encounter the display below, it is a Windows 10 issue that can pop up on 
 The current workaround for this issue is to change the font of the prompt to Consolas.
 ![alt text](https://github.com/dbcli/mssql-cli/blob/master/screenshots/mssql-cli-display-issue.png "mssql-cli display issue")
 
+### Default pager outputs results separate from main console:
+If the output of your query looks like the display below, it is due to the default setting on LESS.
+![alt text](https://github.com/dbcli/mssql-cli/blob/master/screenshots/mssql-cli-less-pager.png "mssql-cli pager issue")
+To fix this issue, uncomment 
+the pager option in your config file located here
+* Unix/Linux
+```
+    ~/.config/mssql-cli/config
+    
+    # Default pager.
+    # By default 'PAGER' environment variable is used
+    pager = less -SRXF
+```
+* In Windows: 
+```
+    %USERPROFILE%\AppData\Local\dbcli\mssql-cli\casing`
+    
+    # Default pager.
+    # By default 'PAGER' environment variable is used
+    pager = less -SRXF
+```
 
 ## <a name="Reporting_Issues"></a>Reporting Issues:
 If the issue you are encountering is not listed above nor filed on our github, please file a issue here [issues](#https://github.com/dbcli/mssql-cli/issues) with the following information listed below and any other additional symptoms of your issue.
