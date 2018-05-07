@@ -69,7 +69,7 @@ export CUSTOM_PIP=%{python_dir}/bin/pip3
 %install
 # Install mssql-cli
 dist_dir=%{repo_path}/dist
-all_modules=`find $dist_dir -name "*.whl"`
+all_modules=`find $dist_dir -name "mssql_cli-%{version}-py2.py3-none-manylinux1_x86_64.whl"`
 %{python_dir}/bin/pip3  install $all_modules
 
 # Create executable
