@@ -1,4 +1,4 @@
-from mssqlcli.main import MssqlCli
+from mssqlcli.mssql_cli import MssqlCli
 from mssqltestutils import create_mssql_cli_options
 
 
