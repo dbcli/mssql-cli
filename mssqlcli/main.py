@@ -63,7 +63,7 @@ def configure_and_update_options(options):
 
     if not options.integrated_auth:
         if not options.username:
-            options.username = input(u'Username (press enter for sa)') or u'sa'
+            options.username = input(u'Username (press enter for sa):') or u'sa'
         if not options.password:
             options.password = getpass.getpass()
 

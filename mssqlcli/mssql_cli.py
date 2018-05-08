@@ -367,7 +367,7 @@ class MssqlCli(object):
         self.cli = self._build_cli(history)
 
         if not self.less_chatty:
-            print('Version:', __version__)
+            print('Version: {}'.format(__version__))
             print('Mail: sqlcli@microsoft.com')
             print('Home: http://github.com/dbcli/mssql-cli')
 
