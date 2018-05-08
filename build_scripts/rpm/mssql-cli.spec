@@ -71,7 +71,7 @@ export CUSTOM_PIP=%{python_dir}/bin/pip3
 dist_dir=%{repo_path}/dist
 
 # Ignore the dev latest wheel since build outputs two.
-all_modules=`find $dist_dir -not -name "mssql_cli-dev-latest-py2.py3-none-manylinux1_x86_64.whl"`
+all_modules=`find $dist_dir -not -name "mssql_cli-dev-latest-py2.py3-none-manylinux1_x86_64.whl" -type f`
 %{python_dir}/bin/pip3  install $all_modules
 
 # Create executable

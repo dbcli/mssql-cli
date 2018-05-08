@@ -66,7 +66,7 @@ cd -
 dist_dir=$source_dir/dist
 
 # Ignore the dev latest wheel since build outputs two.
-all_modules=`find $dist_dir -not -name "mssql_cli-dev-latest-py2.py3-none-manylinux1_x86_64.whl"`
+all_modules=`find $dist_dir -not -name "mssql_cli-dev-latest-py2.py3-none-manylinux1_x86_64.whl" -type f`
 $source_dir/python_env/bin/pip3 install $all_modules
 
 # Add the debian files.
