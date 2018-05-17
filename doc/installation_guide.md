@@ -15,6 +15,7 @@ Follow the instructions link for your platform for the official instructions.
 |  CentOS 7                                  |[Instructions][in-centos]     |
 |  Red Hat Enterprise Linux 7                |[Instructions][in-rhel7]      |
 |  OpenSUSE 42.2+                            |[Instructions][in-opensuse42] |
+|  SUSE Enterprise Linux (SLES) 12           |[Instructions][in-sles12]     |
 |  Fedora 25                                 |[Instructions][in-fedora25]   |
 |  Fedora 26                                 |[Instructions][in-fedora26]   |
 
@@ -28,6 +29,7 @@ Follow the instructions link for your platform for the official instructions.
 [in-centos]: https://github.com/dbcli/mssql-cli/blob/master/doc/installation/linux.md#centos-7
 [in-rhel7]: https://github.com/dbcli/mssql-cli/blob/master/doc/installation/linux.md#red-hat-enterprise-linux-rhel-7
 [in-opensuse42]: https://github.com/dbcli/mssql-cli/blob/master/doc/installation/linux.md#opensuse-422
+[in-sles12]: https://github.com/dbcli/mssql-cli/blob/master/doc/installation/linux.md#sles-12
 [in-fedora25]: https://github.com/dbcli/mssql-cli/blob/master/doc/installation/linux.md#fedora-25
 [in-fedora26]: https://github.com/dbcli/mssql-cli/blob/master/doc/installation/linux.md#fedora-26
 
@@ -48,12 +50,12 @@ also be found in the links above.
 |  Ubuntu 14.04                              |[.deb][deb]                   |[.deb][deb-daily]        |
 |  Debian 8.7+                               |[.deb][deb]                   |[.deb][deb-daily]        |
 |  Debian 9                                  |[.deb][deb]                   |[.deb][deb-daily]        |
-|  CentOS 7                                  |[.deb][deb]                   |[.deb][deb-daily]        |
-|  Red Hat Enterprise Linux 7                |[.deb][deb]                   |[.deb][deb-daily]        |
-|  OpenSUSE 42.2+                            |[.deb][deb]                   |[.deb][deb-daily]        | 
-|  Fedora 25                                 |[.deb][deb]                   |[.deb][deb-daily]        |
-|  Fedora 26                                 |[.deb][deb]                   |[.deb][deb-daily]        |
-
+|  CentOS 7                                  |[.rpm][rpm]                   |[.rpm][rpm-daily]        |
+|  Red Hat Enterprise Linux 7                |[.rpm][rpm]                   |[.rpm][rpm-daily]        |
+|  OpenSUSE 42.2+                            |[.rpm][rpm]                   |[.rpm][rpm-daily]        |
+|  SUSE Enterprise Linux (SLES) 12           |[.rpm][rpm]                   |[.rpm][rpm-daily]        |
+|  Fedora 25                                 |[.rpm][rpm]                   |[.rpm][rpm-daily]        |
+|  Fedora 26                                 |[.rpm][rpm]                   |[.rpm][rpm-daily]        |
 
 [whl-win-x64-daily]: https://mssqlcli.blob.core.windows.net/daily/whl/mssql-cli/mssql_cli-dev-latest-py2.py3-none-win_amd64.whl
 [whl-win-x86-daily]: https://mssqlcli.blob.core.windows.net/daily/whl/mssql-cli/mssql_cli-dev-latest-py2.py3-none-win32.whl
