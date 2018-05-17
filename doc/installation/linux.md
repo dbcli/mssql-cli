@@ -10,6 +10,7 @@ Supports:
 - [CentOS 7][cos]
 - [Red Hat Enterprise Linux (RHEL) 7][rhel7]
 - [OpenSUSE 42.2][opensuse]
+- [SUSE Enterprise Linux (SLES) 12][sles12]
 - [Fedora 25][fed25]
 - [Fedora 26][fed26]
 
@@ -25,6 +26,7 @@ Once the package is installed, run `mssql-cli` from a terminal.
 [cos]: #centos-7
 [rhel7]: #red-hat-enterprise-linux-rhel-7
 [opensuse]: #opensuse-422
+[sles12]: #sles-12
 [fed25]: #fedora-25
 [fed26]: #fedora-26
 
