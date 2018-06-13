@@ -366,7 +366,7 @@ from the [downloads] page onto the Red Hat Enterprise Linux machine.
 Then execute the following in the terminal:
 
 ```sh
-sudo yum install mssql-cli-dev-latest.rpm
+sudo yum install mssql-cli-dev-latest.rpm --nogpgcheck
 ```
 
 You can also install the RPM without the intermediate step of downloading it:
