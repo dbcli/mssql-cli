@@ -14,10 +14,10 @@ SQLTOOLSSERVICE_BASE = os.path.join(utility.ROOT_DIR, 'sqltoolsservice/')
 
 # Supported platform key's must match those in mssqlscript's setup.py.
 SUPPORTED_PLATFORMS = {
-    'manylinux1_x86_64': SQLTOOLSSERVICE_BASE + 'manylinux1/' + 'Microsoft.SqlTools.ServiceLayer-linux-x64-netcoreapp2.0.tar.gz',
-    'macosx_10_11_intel': SQLTOOLSSERVICE_BASE + 'macosx_10_11_intel/' + 'Microsoft.SqlTools.ServiceLayer-osx-x64-netcoreapp2.0.tar.gz',
-    'win_amd64': SQLTOOLSSERVICE_BASE + 'win_amd64/' + 'Microsoft.SqlTools.ServiceLayer-win-x64-netcoreapp2.0.zip',
-    'win32': SQLTOOLSSERVICE_BASE + 'win32/' + 'Microsoft.SqlTools.ServiceLayer-win-x86-netcoreapp2.0.zip'
+    'manylinux1_x86_64': SQLTOOLSSERVICE_BASE + 'manylinux1/' + 'Microsoft.SqlTools.ServiceLayer-linux-x64-netcoreapp2.1.tar.gz',
+    'macosx_10_11_intel': SQLTOOLSSERVICE_BASE + 'macosx_10_11_intel/' + 'Microsoft.SqlTools.ServiceLayer-osx-x64-netcoreapp2.1.tar.gz',
+    'win_amd64': SQLTOOLSSERVICE_BASE + 'win_amd64/' + 'Microsoft.SqlTools.ServiceLayer-win-x64-netcoreapp2.1.zip',
+    'win32': SQLTOOLSSERVICE_BASE + 'win32/' + 'Microsoft.SqlTools.ServiceLayer-win-x86-netcoreapp2.1.zip'
 }
 
 TARGET_DIRECTORY = os.path.abspath(os.path.join(os.path.abspath(__file__), '..', 'bin'))
