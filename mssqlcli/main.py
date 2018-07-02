@@ -42,7 +42,6 @@ def run_cli_with(options):
         display_telemetry_message()
 
     display_version_message(options)
-    display_integrated_auth_message_for_non_windows(options)
 
     configure_and_update_options(options)
 
@@ -75,12 +74,6 @@ def create_config_dir_for_first_use():
         return True
 
     return False
-
-
-def display_integrated_auth_message_for_non_windows(options):
-    if platform.system().lower() != 'windows' and options.integrated_auth:
-        options.integrated_auth = False
-        print(u'Integrated authentication not supported on this platform')
 
 
 def display_version_message(options):

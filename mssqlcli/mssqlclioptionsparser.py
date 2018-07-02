@@ -47,7 +47,7 @@ def create_parser():
         help=u'SQL Server instance name or address.')
 
     args_parser.add_argument(
-        u'-I', u'--integrated',
+        u'-E', u'--integrated',
         dest=u'integrated_auth',
         action=u'store_true',
         default=False,
