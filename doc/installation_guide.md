@@ -64,8 +64,8 @@ also be found in the links above.
 [deb-daily]: https://mssqlcli.blob.core.windows.net/daily/deb/mssql-cli-dev-latest.deb
 [rpm-daily]: https://mssqlcli.blob.core.windows.net/daily/rpm/mssql-cli-dev-latest.rpm
 
-[deb]: https://packages.microsoft.com/ubuntu/14.04/prod/pool/main/m/mssql-cli/mssql-cli_0.10.0-1_all.deb
-[rpm]: https://packages.microsoft.com/rhel/7/prod/mssql-cli-0.10.0-1.el7.x86_64.rpm
-[whl-win-x64]: https://files.pythonhosted.org/packages/0d/7c/5e2bcbed3d6215196118337aec9793a7d74ab5cca10b1d834873cb6ac492/mssql_cli-0.10.0-py2.py3-none-win_amd64.whl
-[whl-win-x86]: https://files.pythonhosted.org/packages/4c/84/ba083d0677641f70ed11394fa93414275598161d1e8b6f444b67533079fa/mssql_cli-0.10.0-py2.py3-none-win32.whl
-[whl-macos]: https://files.pythonhosted.org/packages/a6/de/55b73b6aa03e9890585ef5df5dac5717708db1a5018acde2582526b42fc9/mssql_cli-0.10.0-py2.py3-none-macosx_10_11_intel.whl
+[deb]: https://packages.microsoft.com/ubuntu/14.04/prod/pool/main/m/mssql-cli/mssql-cli_0.14.0-1_all.deb
+[rpm]: https://packages.microsoft.com/rhel/7/prod/mssql-cli-0.14.0-1.el7.x86_64.rpm
+[whl-win-x64]: https://files.pythonhosted.org/packages/84/79/0c7344f20188ff1edf7d0124dd5a8e0004c01f7925729f670fa8b35ef761/mssql_cli-0.14.0-py2.py3-none-win_amd64.whl
+[whl-win-x86]: https://files.pythonhosted.org/packages/65/e0/f20822df03394cbd6983e845b04f402569c0001e5082103a2ae1b7838c8d/mssql_cli-0.14.0-py2.py3-none-win32.whl
+[whl-macos]: https://files.pythonhosted.org/packages/1f/d9/b12864cac848f6759d6b6b949535cdd8d8a32bdd5b735373e151bdf679c8/mssql_cli-0.14.0-py2.py3-none-macosx_10_11_intel.whl
