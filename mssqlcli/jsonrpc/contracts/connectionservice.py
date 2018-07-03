@@ -137,6 +137,9 @@ class ConnectionCompleteEvent(object):
             self.server_edition = inner_params[u'serverInfo'][u'serverEdition'] if \
                 u'serverEdition' in inner_params[u'serverInfo'] else None
 
+        if u'connectionSummary' in inner_params and inner_params[u'connectionSummary']:
+            self.connected_database = inner_params[u'connectionSummary'][u'databaseName']
+
 
 class ConnectionResponse(object):
     def __init__(self, params):

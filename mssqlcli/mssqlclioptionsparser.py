@@ -35,7 +35,7 @@ def create_parser():
     args_parser.add_argument(
         u'-d', u'--database',
         dest=u'database',
-        default=os.environ.get(MSSQL_CLI_DATABASE, u'master'),
+        default=os.environ.get(MSSQL_CLI_DATABASE, None),
         metavar=u'',
         help=u'database name to connect to.')
 

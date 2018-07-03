@@ -545,7 +545,7 @@ class MssqlCli(object):
 
             if new_db_name:
                 self.logger.info('Database context changed.')
-                self.mssqlcliclient_main.database = new_db_name
+                self.mssqlcliclient_main.connected_database = new_db_name
 
             if all_success:
                 meta_changed = meta_changed or self.has_meta_cmd(text)
@@ -579,12 +579,12 @@ class MssqlCli(object):
             if not self.mssqlcliclient_main.connect_to_database():
                 click.secho('Unable reconnect to server {0}; database {1}.'.format(
                     self.mssqlcliclient_main.server_name,
-                    self.mssqlcliclient_main.database),
+                    self.mssqlcliclient_main.connected_database),
                     err=True, fg='yellow')
 
                 self.logger.info(u'Unable to reset connection to server {0}; database {1}'.format(
                     self.mssqlcliclient_main.server_name,
-                    self.mssqlcliclient_main.database))
+                    self.mssqlcliclient_main.connected_database))
                 exit(1)
         except Exception as e:
             self.logger.error(u'Error in reset : {0}'.format(e.message))
@@ -658,7 +658,7 @@ class MssqlCli(object):
         string = string.replace('\\t', self.now.strftime('%x %X'))
         string = string.replace('\\u', self.mssqlcliclient_main.user_name or '(none)')
         string = string.replace('\\h', self.mssqlcliclient_main.prompt_host or '(none)')
-        string = string.replace('\\d', self.mssqlcliclient_main.database or '(none)')
+        string = string.replace('\\d', self.mssqlcliclient_main.connected_database or '(none)')
         string = string.replace('\\p', str(self.mssqlcliclient_main.prompt_port) or '(none)')
         string = string.replace('\\n', "\n")
         return string
