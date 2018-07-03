@@ -182,8 +182,8 @@ class MssqlCliClient(object):
             self.connected_database = response.connected_database
 
             logger.info(
-                u'Connection Successful. Connection Id {0}'.format(
-                    response.connection_id))
+                u'Connection Successful. Connection Id: {0} Connected database" {1}'.format(
+                    response.connection_id, response.connected_database))
 
             return self.owner_uri, error_messages
 
