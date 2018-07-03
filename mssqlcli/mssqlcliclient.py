@@ -179,6 +179,7 @@ class MssqlCliClient(object):
             self.server_version = response.server_version
             self.server_edition = response.server_edition
             self.is_cloud = response.is_cloud
+            self.connected_database = response.connected_database
 
             logger.info(
                 u'Connection Successful. Connection Id {0}'.format(
