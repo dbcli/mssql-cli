@@ -206,10 +206,7 @@ class JsonRpcClientTests(unittest.TestCase):
             self.assertEqual(
                 str(exception), u'I/O operation on closed file.')
 
-            self.assertTrue(test_client.request_thread.isAlive())
-            self.assertFalse(test_client.response_thread.isAlive())
             test_client.shutdown()
-            self.assertFalse(test_client.request_thread.isAlive())
 
     @unittest.skip("Disabling until scenario is valid")
     def test_stream_has_no_response(self):
