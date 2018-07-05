@@ -38,16 +38,16 @@ def get_table_columns():
                         column_name,
                         data_type,
                         column_default
-                FROM information_schema.columns
+                FROM INFORMATION_SCHEMA.COLUMNS
             )   AS isc
             INNER JOIN
             (
                 SELECT  table_schema,
                         table_name
-                FROM information_schema.tables
+                FROM INFORMATION_SCHEMA.TABLES
                 WHERE TABLE_TYPE = 'BASE TABLE'
             )   AS ist
-            ON ist.table_name = isc.table_name AND ist.TABLE_SCHEMA = isc.TABLE_SCHEMA
+            ON ist.table_name = isc.table_name AND ist.table_schema = isc.table_schema
             ORDER BY 1, 2'''
 
 
@@ -69,16 +69,16 @@ def get_view_columns():
                         column_name,
                         data_type,
                         column_default
-                FROM information_schema.columns
+                FROM INFORMATION_SCHEMA.COLUMNS
             )   AS isc
             INNER JOIN
             (
                 SELECT  table_schema,
                         table_name
-                FROM information_schema.tables
+                FROM INFORMATION_SCHEMA.TABLES
                 WHERE TABLE_TYPE = 'VIEW'
             )   AS ist
-            ON ist.table_name = isc.table_name AND ist.TABLE_SCHEMA = isc.TABLE_SCHEMA
+            ON ist.table_name = isc.table_name AND ist.table_schema = isc.table_schema
             ORDER BY 1, 2'''
 
 
@@ -90,7 +90,7 @@ def get_views():
     return '''
         SELECT  table_schema,
                 table_name
-        FROM information_schema.tables
+        FROM INFORMATION_SCHEMA.TABLES
         WHERE table_type = 'View'
         ORDER BY 1, 2'''
 
@@ -103,7 +103,7 @@ def get_tables():
     return '''
         SELECT  table_schema,
                 table_name
-        FROM information_schema.tables
+        FROM INFORMATION_SCHEMA.TABLES
         WHERE table_type = 'BASE TABLE'
         ORDER BY 1, 2'''
 
@@ -137,7 +137,7 @@ def get_functions():
     """
     return '''
         SELECT specific_schema, specific_name
-        FROM information_schema.routines
+        FROM INFORMATION_SCHEMA.ROUTINES
         ORDER BY 1, 2'''
 
 
@@ -154,12 +154,12 @@ def get_foreignkeys():
             kcu2.table_schema AS referenced_table_schema,
             kcu2.table_name AS referenced_table_name,
             kcu2.column_name AS referenced_column_name
-        FROM information_schema.referential_constraints AS rc
-        INNER JOIN information_schema.key_column_usage AS kcu1
+        FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS AS rc
+        INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS kcu1
             ON kcu1.constraint_catalog = rc.constraint_catalog
             AND kcu1.constraint_schema = rc.constraint_schema
             AND kcu1.constraint_name = rc.constraint_name
-        INNER JOIN information_schema.key_column_usage AS kcu2
+        INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS kcu2
             ON kcu2.constraint_catalog = rc.unique_constraint_catalog
             AND kcu2.constraint_schema = rc.unique_constraint_schema
             AND kcu2.constraint_name = rc.unique_constraint_name
