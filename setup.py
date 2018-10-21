@@ -56,8 +56,8 @@ setup(
     install_requires=install_requirements,
     include_package_data=True,
     entry_points = {"console_scripts": [
-        "mssql-cli.bat = mssqlcli.main",
-        "mssql-cli = mssqlcli.main"
+        "mssql-cli.bat = mssqlcli.main:main",
+        "mssql-cli = mssqlcli.main:main"
     ]},
     classifiers=[
         'Intended Audience :: Developers',
