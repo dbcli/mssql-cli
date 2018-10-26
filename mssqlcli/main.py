@@ -86,7 +86,7 @@ def display_telemetry_message():
     print(MSSQLCLI_TELEMETRY_PROMPT)
 
 
-if __name__ == "__main__":
+def main():
     try:
         telemetry_session.start()
         mssqlcli_options_parser = create_parser()
@@ -95,3 +95,7 @@ if __name__ == "__main__":
     finally:
         # Upload telemetry async in a separate process.
         telemetry_session.conclude()
+
+
+if __name__ == "__main__":
+    main()
