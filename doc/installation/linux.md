@@ -2,9 +2,7 @@
 
 Supports:
 
-- [Ubuntu 14.04][u14]
-- [Ubuntu 16.04][u16]
-- [Ubuntu 17.04][u17]
+- [Ubuntu][u]
 - [Debian 8][deb8]
 - [Debian 9][deb9]
 - [CentOS 7][cos]
@@ -18,21 +16,19 @@ Supports:
 
 Once the package is installed, run `mssql-cli` from a terminal.
 
-[u14]: #ubuntu-1404
-[u16]: #ubuntu-1604
-[u17]: #ubuntu-1704
-[deb8]: #debian-8
-[deb9]: #debian-9
-[cos]: #centos-7
-[rhel7]: #red-hat-enterprise-linux-rhel-7
+[u]:        #ubuntu
+[deb8]:     #debian-8
+[deb9]:     #debian-9
+[cos]:      #centos-7
+[rhel7]:    #red-hat-enterprise-linux-rhel-7
 [opensuse]: #opensuse-422
-[sles12]: #sles-12
-[fed25]: #fedora-25
-[fed26]: #fedora-26
+[sles12]:   #sles-12
+[fed25]:    #fedora-25
+[fed26]:    #fedora-26
 
-## Ubuntu 14.04
+## Ubuntu
 
-### Installation for latest stable version via Package Repository - Ubuntu 14.04
+### Installation for latest stable version via Package Repository
 
 mssql-cli, for Linux, is published to package repositories for easy installation (and updates).
 This is the preferred method.
@@ -42,7 +38,7 @@ This is the preferred method.
 wget -qO- https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
 
 # Register the Microsoft Ubuntu repository
-sudo curl -o /etc/apt/sources.list.d/microsoft.list https://packages.microsoft.com/config/ubuntu/14.04/prod.list
+sudo curl -o /etc/apt/sources.list.d/microsoft.list "https://packages.microsoft.com/config/ubuntu/$(lsb_release -sr)/prod.list"
 
 # Update the list of products
 sudo apt-get update
@@ -57,10 +53,9 @@ mssql-cli
 After registering the Microsoft repository once as superuser,
 from then on, you just need to use `sudo apt-get upgrade mssql-cli` to update it.
 
-### Installation for latest preview version via Direct Download - Ubuntu 14.04
+### Installation for latest preview version via Direct Download
 
-Download the Debian package
-`mssql-cli-dev-latest.deb`
+Download the Debian package `mssql-cli-dev-latest.deb`
 from the [downloads] page onto the Ubuntu machine.
 
 Then execute the following in the terminal:
@@ -74,106 +69,7 @@ sudo apt-get install -f
 > the next command, `apt-get install -f` resolves these
 > and then finishes configuring the mssql-cli package.
 
-### Uninstallation - Ubuntu 14.04
-
-```sh
-sudo apt-get remove mssql-cli
-```
-
-## Ubuntu 16.04
-
-### Installation for latest stable version via Package Repository - Ubuntu 16.04
-
-mssql-cli, for Linux, is published to package repositories for easy installation (and updates).
-This is the preferred method.
-
-```sh
-# Import the public repository GPG keys
-wget -qO- https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
-
-# Register the Microsoft Ubuntu repository
-sudo curl -o /etc/apt/sources.list.d/microsoft.list https://packages.microsoft.com/config/ubuntu/16.04/prod.list
-
-# Update the list of products
-sudo apt-get update
-
-# Install mssql-cli
-sudo apt-get install mssql-cli
-
-# Start mssql-cli
-mssql-cli
-```
-
-After registering the Microsoft repository once as superuser,
-from then on, you just need to use `sudo apt-get upgrade mssql-cli` to update it.
-
-### Installation for latest preview version  via Direct Download - Ubuntu 16.04
-
-Download the Debian package
-`mssql-cli-dev-latest.deb`
-from the [downloads] page onto the Ubuntu machine.
-
-Then execute the following in the terminal:
-
-```sh
-sudo dpkg -i mssql-cli-dev-latest.deb
-sudo apt-get install -f
-```
-
-> Please note that `dpkg -i` will fail with unmet dependencies;
-> the next command, `apt-get install -f` resolves these
-> and then finishes configuring the mssql-cli package.
-
-### Uninstallation - Ubuntu 16.04
-
-```sh
-sudo apt-get remove mssql-cli
-```
-
-## Ubuntu 17.04
-
-### Installation for latest stable version via Package Repository - Ubuntu 17.04
-mssql-cli, for Linux, is published to package repositories for easy installation (and updates).
-This is the preferred method.
-
-```sh
-# Import the public repository GPG keys
-wget -qO- https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
-
-# Register the Microsoft Ubuntu repository
-sudo curl -o /etc/apt/sources.list.d/microsoft.list https://packages.microsoft.com/config/ubuntu/17.04/prod.list
-
-# Update the list of products
-sudo apt-get update
-
-# Install mssql-cli
-sudo apt-get install mssql-cli
-
-# Start mssql-cli
-mssql-cli
-```
-
-After registering the Microsoft repository once as superuser,
-from then on, you just need to use `sudo apt-get upgrade mssql-cli` to update it.
-
-### Installation for latest preview version via Direct Download - Ubuntu 17.04
-
-Download the Debian package
-`mssql-cli-dev-latest.deb`
-from the [downloads] page onto the Ubuntu machine.
-
-Then execute the following in the terminal:
-
-```sh
-sudo dpkg -i mssql-cli-dev-latest.deb
-sudo apt-get install -f
-```
-
-> Please note that `dpkg -i` will fail with unmet dependencies;
-> the next command, `apt-get install -f` resolves these
-> and then finishes configuring the mssql-cli package.
-
-### Uninstallation - Ubuntu 17.04
+### Uninstallation - Ubuntu
 
 ```sh
 sudo apt-get remove mssql-cli
