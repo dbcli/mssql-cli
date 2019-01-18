@@ -1,69 +1,55 @@
 import logging
 from prompt_toolkit.enums import EditingMode
-from prompt_toolkit.keys import Keys
-from prompt_toolkit.key_binding.manager import KeyBindingManager
-from prompt_toolkit.filters import Condition
-from .filters import HasSelectedCompletion
+from prompt_toolkit.key_binding import KeyBindings
+from .filters import has_selected_completion
 
 _logger = logging.getLogger(__name__)
 
 
-def mssqlcli_bindings(get_vi_mode_enabled, set_vi_mode_enabled):
+def mssqlcli_bindings(mssql_cli):
     """
     Custom key bindings for mssqlcli.
     """
-    assert callable(get_vi_mode_enabled)
-    assert callable(set_vi_mode_enabled)
+    key_bindings = KeyBindings()
 
-    key_binding_manager = KeyBindingManager(
-        enable_open_in_editor=True,
-        enable_system_bindings=True,
-        enable_auto_suggest_bindings=True,
-        enable_search=True,
-        enable_abort_and_exit_bindings=True)
-
-    @key_binding_manager.registry.add_binding(Keys.F2)
+    @key_bindings.add('f2')
     def _(event):
         """
         Enable/Disable SmartCompletion Mode.
         """
         _logger.debug('Detected F2 key.')
-        buf = event.cli.current_buffer
-        buf.completer.smart_completion = not buf.completer.smart_completion
+        mssql_cli.completer.smart_completion = not mssql_cli.completer.smart_completion
 
-    @key_binding_manager.registry.add_binding(Keys.F3)
+    @key_bindings.add('f3')
     def _(event):
         """
         Enable/Disable Multiline Mode.
         """
         _logger.debug('Detected F3 key.')
-        buf = event.cli.current_buffer
-        buf.always_multiline = not buf.always_multiline
+        mssql_cli.multiline = not mssql_cli.multiline
 
-    @key_binding_manager.registry.add_binding(Keys.F4)
+    @key_bindings.add('f4')
     def _(event):
         """
         Toggle between Vi and Emacs mode.
         """
         _logger.debug('Detected F4 key.')
-        vi_mode = not get_vi_mode_enabled()
-        set_vi_mode_enabled(vi_mode)
+        mssql_cli.vi_mode = not mssql_cli.vi_mode
+        event.app.editing_mode = EditingMode.VI if mssql_cli.vi_mode else EditingMode.EMACS
 
-        event.cli.editing_mode = EditingMode.VI if vi_mode else EditingMode.EMACS
-
-    @key_binding_manager.registry.add_binding(Keys.Tab)
+    @key_bindings.add('tab')
     def _(event):
         """
         Force autocompletion at cursor.
         """
         _logger.debug('Detected <Tab> key.')
-        b = event.cli.current_buffer
+        b = event.app.current_buffer
         if b.complete_state:
             b.complete_next()
         else:
-            event.cli.start_completion(select_first=True)
+            b.start_completion(select_first=True)
 
-    @key_binding_manager.registry.add_binding(Keys.ControlSpace)
+    @key_bindings.add('c-space')
     def _(event):
         """
         Initialize autocompletion at cursor.
@@ -75,22 +61,21 @@ def mssqlcli_bindings(get_vi_mode_enabled, set_vi_mode_enabled):
         """
         _logger.debug('Detected <C-Space> key.')
 
-        b = event.cli.current_buffer
+        b = event.app.current_buffer
         if b.complete_state:
             b.complete_next()
         else:
-            event.cli.start_completion(select_first=False)
+            b.start_completion(select_first=False)
 
-    @key_binding_manager.registry.add_binding(
-        Keys.ControlJ, filter=HasSelectedCompletion())
+    @key_bindings.add('enter', filter=has_selected_completion)
     def _(event):
         """
         Makes the enter key work as the tab key only when showing the menu.
         """
-        _logger.debug('Detected <C-J> key.')
+        _logger.debug('Detected enter key.')
 
         event.current_buffer.complete_state = None
-        b = event.cli.current_buffer
+        b = event.app.current_buffer
         b.complete_state = None
 
-    return key_binding_manager
+    return key_bindings
