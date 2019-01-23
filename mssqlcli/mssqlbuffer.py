@@ -11,7 +11,7 @@ def mssql_is_multiline(mssql_cli):
     def cond():
         doc = get_app().layout.get_buffer_by_name(DEFAULT_BUFFER).document
 
-        if not mssql_cli.multi_line:
+        if not mssql_cli.multiline:
             return False
         if mssql_cli.multiline_mode == 'safe':
             return True

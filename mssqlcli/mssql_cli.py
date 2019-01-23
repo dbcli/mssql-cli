@@ -31,7 +31,7 @@ from mssqlcli.encodingutils import text_type
 from mssqlcli.key_bindings import mssqlcli_bindings
 from mssqlcli.mssqlcliclient import MssqlCliClient
 from mssqlcli.mssqlcompleter import MssqlCompleter
-from mssqlcli.mssqlstyle import style_factory
+from mssqlcli.mssqlstyle import style_factory, style_factory_output
 from mssqlcli.mssqltoolbar import create_toolbar_tokens_func
 from mssqlcli.sqltoolsclient import SqlToolsClient
 from mssqlcli.packages import special
@@ -41,13 +41,13 @@ from prompt_toolkit.shortcuts.prompt import PromptSession, CompleteStyle
 from prompt_toolkit.completion import DynamicCompleter, ThreadedCompleter
 from prompt_toolkit.enums import DEFAULT_BUFFER, EditingMode
 
-from prompt_toolkit.styles.pygments import style_from_pygments_cls
 from prompt_toolkit.document import Document
 from prompt_toolkit.filters import HasFocus, IsDone
 
 from prompt_toolkit.lexers import PygmentsLexer
-from prompt_toolkit.layout.processors import (
-    ConditionalProcessor, HighlightMatchingBracketProcessor)
+from prompt_toolkit.layout.processors import (ConditionalProcessor,
+                                              HighlightMatchingBracketProcessor,
+                                              TabsProcessor)
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from pygments.lexers.sql import PostgresLexer
@@ -135,7 +135,7 @@ class MssqlCli(object):
         self.set_default_pager(c)
         self.output_file = None
 
-        self.multi_line = c['main'].as_bool('multi_line')
+        self.multiline = c['main'].as_bool('multi_line')
         self.multiline_mode = c['main'].get('multi_line_mode', 'tsql')
         self.vi_mode = c['main'].as_bool('vi')
         self.auto_expand = options.auto_vertical_output or c['main']['expand'] == 'auto'
@@ -151,7 +151,7 @@ class MssqlCli(object):
         self.table_format = c['main']['table_format']
         self.syntax_style = c['main']['syntax_style']
         self.cli_style = c['colors']
-        self.output_style = style_factory(self.syntax_style, self.cli_style)
+        self.output_style = style_factory_output(self.syntax_style, self.cli_style)
         self.wider_completion_menu = c['main'].as_bool('wider_completion_menu')
         self.less_chatty = bool(
             options.less_chatty) or c['main'].as_bool('less_chatty')
@@ -186,7 +186,6 @@ class MssqlCli(object):
         self._completer_lock = threading.Lock()
 
         self.prompt_session = None
-        self.multiline = False
         self.integrated_auth = options.integrated_auth
 
         self.sqltoolsclient = SqlToolsClient(enable_logging=options.enable_sqltoolsservice_logging)
@@ -409,7 +408,7 @@ class MssqlCli(object):
 
     def _build_cli(self, history):
 
-        def prompt_tokens(_):
+        def get_message():
             prompt = self.get_prompt(self.prompt_format)
             return [('class:prompt', prompt)]
 
@@ -425,20 +424,22 @@ class MssqlCli(object):
             complete_style = CompleteStyle.COLUMN
 
         with self._completer_lock:
-
             self.prompt_session = PromptSession(
-                message=prompt_tokens,
-                style=style_from_pygments_cls(self.output_style),
+                message=get_message,
+                style=style_factory(self.syntax_style, self.cli_style),
 
                 # Layout options.
                 lexer=PygmentsLexer(PostgresLexer),
                 prompt_continuation=get_continuation,
                 bottom_toolbar=get_toolbar_tokens,
                 complete_style=complete_style,
-                input_processors=[ConditionalProcessor(
-                    processor=HighlightMatchingBracketProcessor(chars='[](){}'),
-                    filter=HasFocus(DEFAULT_BUFFER) & ~IsDone
-                )],
+                input_processors=[
+                    ConditionalProcessor(
+                        processor=HighlightMatchingBracketProcessor(
+                            chars='[](){}'),
+                        filter=HasFocus(DEFAULT_BUFFER) & ~IsDone()),
+                    # Render \t as 4 spaces instead of "^I"
+                    TabsProcessor(char1=' ', char2=' ')],
                 reserve_space_for_menu=self.min_num_menu_lines,
 
                 # Buffer options.

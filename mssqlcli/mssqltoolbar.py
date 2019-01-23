@@ -25,17 +25,17 @@ def create_toolbar_tokens_func(mssql_cli):
         result = []
         result.append((token, ' '))
 
-        if mssql_cli.always_multiline.completer.smart_completion:
+        if mssql_cli.completer.smart_completion:
             result.append((token_on, '[F2] Smart Completion: ON  '))
         else:
             result.append((token_off, '[F2] Smart Completion: OFF  '))
 
-        if mssql_cli.always_multiline:
+        if mssql_cli.multiline:
             result.append((token_on, '[F3] Multiline: ON  '))
         else:
             result.append((token_off, '[F3] Multiline: OFF  '))
 
-        if mssql_cli.always_multiline:
+        if mssql_cli.multiline:
             if mssql_cli.multiline_mode == 'safe':
                 result.append((token, ' ([Esc] [Enter] to execute]) '))
             else:
