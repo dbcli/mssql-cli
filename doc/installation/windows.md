@@ -25,7 +25,7 @@ C:\> pip install --pre --no-cache --extra-index-url https://mssqlcli.blob.core.w
 C:\> pip uninstall mssql-cli
 ```
 
-## Instalation behind a proxy
+## Installation behind a proxy
 Set two environment variables:
 ```shell
 C:\>set http_proxy=domain\username:password@proxy_server:port
