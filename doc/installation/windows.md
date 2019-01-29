@@ -24,3 +24,21 @@ C:\> pip install --pre --no-cache --extra-index-url https://mssqlcli.blob.core.w
 ```shell
 C:\> pip uninstall mssql-cli
 ```
+
+## Instalation behind a proxy
+Set two environment variables:
+```shell
+C:\>set http_proxy=domain\username:password@proxy_server:port
+C:\>set https_proxy=domain\username:password@proxy_server:port
+```
+If the Password contains special characters like @,$,! (e.g. Password: P@ssword) then replace the special characters by their hex code equivalents with % prefix like this:
+@==>%40
+$==>%24
+!==>%21
+Example: username:p%40ssword@proxy_server:port
+
+after this steps try install again
+
+```shell
+C:\>pip install mssql-cli
+```
