@@ -40,9 +40,9 @@ For supported operating system specific installations, see one of the following 
     * [Red Hat Enterprise Linux 7](#install-red-hat-enterprise-linux-rhel-7)
     * [CentOS 7](#install-centos-7)
     * [Fedora 25, Fedora 26](#install-fedora-25-fedora-26)
-    * [Debian 8.7 or later versions](#install-debian-87-or-later)
-    * [Ubuntu 17.04, Ubuntu 16.04, Ubuntu 14.04](#install-ubuntu-1704-ubuntu-1604-ubuntu-1404)
-    * [Linux Mint 18, Linux Mint 17](#install-linux-mint-18-linux-mint-17)
+    * [Debian 8.7 or later versions](#install-ubuntu-debian-mint)
+    * [Ubuntu 17.04, Ubuntu 16.04, Ubuntu 14.04](#install-ubuntu-debian-mint)
+    * [Linux Mint 18, Linux Mint 17](#install-ubuntu-debian-mint)
     * [openSUSE 42.2 or later](#install-opensuse-422-or-later)
     * [SUSE Enterprise Linux (SLES) 12 SP2 or later](#install-suse-enterprise-linux-sles-12-sp2-or-later)
 
@@ -93,52 +93,14 @@ $ dnf install libunwind libicu python-pip
 $ sudo pip install mssql-cli
 ```
 
-## Install Debian 8.7 or later
+## Install Ubuntu / Debian / Mint
+
 ```shell
-$ echo deb http://ftp.us.debian.org/debian jessie main | sudo tee -a /etc/apt/sources.list
-$ sudo apt-get update & sudo apt-get install -y libunwind8 python-pip
-$ sudo pip install --upgrade pip
-$ sudo pip install mssql-cli
+$ sudo apt-get update & sudo apt-get install -y libunwind8 python3-pip
+$ sudo apt-get install -y libicu60 2> /dev/null || sudo apt-get install -y libicu57 2> /dev/null || sudo apt-get install -y libicu55 2> /dev/null || sudo apt-get install -y libicu55 2> /dev/null || sudo apt-get install -y libicu52
+$ pip3 install --user mssql-cli
 ```
 
-## Install Ubuntu 17.04, Ubuntu 16.04, Ubuntu 14.04
-
-### Install Ubuntu 17.04
-```shell
-$ sudo apt-get update & sudo apt-get install -y libunwind8 python-pip libicu57
-$ sudo pip install --upgrade pip
-$ sudo pip install mssql-cli
-```
-
-### Install Ubuntu 16.04
-```shell
-$ sudo apt-get update & sudo apt-get install -y libunwind8 python-pip libicu55 
-$ sudo pip install --upgrade pip
-$ sudo pip install mssql-cli
-```
-
-### Install Ubuntu 14.04
-```shell
-$ sudo apt-get update & sudo apt-get install -y libunwind8 python-pip libicu52
-$ sudo pip install --upgrade pip
-$ sudo pip install mssql-cli
-```
-
-## Install Linux Mint 18, Linux Mint 17
-
-### Install Linux Mint 18
-```shell
-$ sudo apt-get update & sudo apt-get install -y libunwind8 python-pip libicu57
-$ sudo pip install --upgrade pip
-$ sudo pip install mssql-cli
-```
-
-### Install Linux Mint 17
-```shell
-$ sudo apt-get update & sudo apt-get install -y libunwind8 python-pip libicu55
-$ sudo pip install --upgrade pip
-$ sudo pip install mssql-cli
-```
 
 ### Install OpenSUSE 42.2 or later
 ```shell
