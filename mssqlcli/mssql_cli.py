@@ -286,7 +286,8 @@ class MssqlCli(object):
         # FIXME: using application.pre_run_callables like this here is not the best solution.
         # It's internal api of prompt_toolkit that may change. This was added to fix #668.
         # We may find a better way to do it in the future.
-        while special.editor_command(text):
+        editor_command = special.editor_command(text)
+        while editor_command:
             filename = special.get_filename(text)
             query = (special.get_editor_query(text) or
                      self.get_last_query())
@@ -294,8 +295,14 @@ class MssqlCli(object):
             if message:
                 # Something went wrong. Raise an exception and bail.
                 raise RuntimeError(message)
-            text = self.prompt_session.prompt(default=sql)
-            continue
+            while True:
+                try:
+                    text = self.prompt_session.prompt(default=sql)
+                    break
+                except KeyboardInterrupt:
+                    sql = ""
+                    
+            editor_command = special.editor_command(text)
         return text
 
     def execute_command(self, text, query):
