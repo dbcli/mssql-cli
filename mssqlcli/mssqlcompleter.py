@@ -4,8 +4,7 @@ import re
 from itertools import count, repeat, chain
 import operator
 from collections import namedtuple, defaultdict, OrderedDict
-from prompt_toolkit.completion import Completer, Completion
-from prompt_toolkit.contrib.completers import PathCompleter
+from prompt_toolkit.completion import Completer, Completion, PathCompleter
 from prompt_toolkit.document import Document
 from .packages import special
 from .packages.special.namedqueries import named_queries

@@ -5,13 +5,14 @@ import click
 import getpass
 import os
 import sys
-import platform
+
 
 from builtins import input
 
 from mssqlcli.config import config_location
 from mssqlcli.__init__ import __version__
-
+from mssqlcli.mssqlclioptionsparser import create_parser
+import mssqlcli.telemetry as telemetry_session
 
 click.disable_unicode_literals_warning = True
 
@@ -20,8 +21,6 @@ try:
 except ImportError:
     from urllib.parse import urlparse, unquote, parse_qs
 
-from mssqlcli.mssqlclioptionsparser import create_parser
-import mssqlcli.telemetry as telemetry_session
 
 MSSQLCLI_TELEMETRY_PROMPT = """
 Telemetry

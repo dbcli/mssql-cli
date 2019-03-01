@@ -1,3 +1,4 @@
+from __future__ import print_function, unicode_literals
 from collections import namedtuple
 
 _ColumnMetadata = namedtuple(

@@ -29,27 +29,28 @@ from mssqlcli.__init__ import __version__
 from mssqlcli.encodingutils import utf8tounicode
 from mssqlcli.encodingutils import text_type
 from mssqlcli.key_bindings import mssqlcli_bindings
-from mssqlcli.mssqlbuffer import MssqlBuffer
 from mssqlcli.mssqlcliclient import MssqlCliClient
 from mssqlcli.mssqlcompleter import MssqlCompleter
-from mssqlcli.mssqlstyle import style_factory
+from mssqlcli.mssqlstyle import style_factory, style_factory_output
 from mssqlcli.mssqltoolbar import create_toolbar_tokens_func
 from mssqlcli.sqltoolsclient import SqlToolsClient
 from mssqlcli.packages import special
+from mssqlcli.mssqlbuffer import mssql_is_multiline
 
-from prompt_toolkit import CommandLineInterface, Application, AbortAction
+from prompt_toolkit.shortcuts.prompt import PromptSession, CompleteStyle
+from prompt_toolkit.completion import DynamicCompleter, ThreadedCompleter
 from prompt_toolkit.enums import DEFAULT_BUFFER, EditingMode
-from prompt_toolkit.shortcuts import create_prompt_layout, create_eventloop
-from prompt_toolkit.buffer import AcceptAction
+
 from prompt_toolkit.document import Document
-from prompt_toolkit.filters import Always, HasFocus, IsDone
-from prompt_toolkit.layout.lexers import PygmentsLexer
-from prompt_toolkit.layout.processors import (
-    ConditionalProcessor, HighlightMatchingBracketProcessor)
+from prompt_toolkit.filters import HasFocus, IsDone
+
+from prompt_toolkit.lexers import PygmentsLexer
+from prompt_toolkit.layout.processors import (ConditionalProcessor,
+                                              HighlightMatchingBracketProcessor,
+                                              TabsProcessor)
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from pygments.lexers.sql import PostgresLexer
-from pygments.token import Token
 
 
 # Query tuples are used for maintaining history
@@ -90,11 +91,11 @@ class MssqlFileHistory(FileHistory):
     def __init__(self, filename):
         super(self.__class__, self).__init__(filename)
 
-    def append(self, string):
+    def append_string(self, string):
         if security_words_found_in(string):
             return
 
-        super(self.__class__, self).append(string)
+        super(self.__class__, self).append_string(string)
 
 
 class MssqlCli(object):
@@ -134,7 +135,7 @@ class MssqlCli(object):
         self.set_default_pager(c)
         self.output_file = None
 
-        self.multi_line = c['main'].as_bool('multi_line')
+        self.multiline = c['main'].as_bool('multi_line')
         self.multiline_mode = c['main'].get('multi_line_mode', 'tsql')
         self.vi_mode = c['main'].as_bool('vi')
         self.auto_expand = options.auto_vertical_output or c['main']['expand'] == 'auto'
@@ -150,6 +151,7 @@ class MssqlCli(object):
         self.table_format = c['main']['table_format']
         self.syntax_style = c['main']['syntax_style']
         self.cli_style = c['colors']
+        self.output_style = style_factory_output(self.syntax_style, self.cli_style)
         self.wider_completion_menu = c['main'].as_bool('wider_completion_menu')
         self.less_chatty = bool(
             options.less_chatty) or c['main'].as_bool('less_chatty')
@@ -183,8 +185,7 @@ class MssqlCli(object):
         self.completer = MssqlCompleter(smart_completion=smart_completion, settings=self.settings)
         self._completer_lock = threading.Lock()
 
-        self.eventloop = create_eventloop()
-        self.cli = None
+        self.prompt_session = None
         self.integrated_auth = options.integrated_auth
 
         self.sqltoolsclient = SqlToolsClient(enable_logging=options.enable_sqltoolsservice_logging)
@@ -226,7 +227,7 @@ class MssqlCli(object):
         if log_level.upper() == 'NONE':
             handler = logging.NullHandler()
         else:
-            handler = logging.FileHandler(os.path.expanduser(log_file))
+            handler = logging.FileHandler(os.path.expanduser(log_file), encoding='utf-8')
 
         level_map = {'CRITICAL': logging.CRITICAL,
                      'ERROR': logging.ERROR,
@@ -270,7 +271,7 @@ class MssqlCli(object):
             click.secho(str(e), err=True, fg='yellow')
             sys.exit(1)
 
-    def handle_editor_command(self, cli, document):
+    def handle_editor_command(self, text):
         r"""
         Editor command is any query that is prefixed or suffixed
         by a '\e'. The reason for a while loop is because a user
@@ -279,28 +280,30 @@ class MssqlCli(object):
         "select * from \e"<enter> to edit it in vim, then come
         back to the prompt with the edited query "select * from
         blah where q = 'abc'\e" to edit it again.
-        :param cli: CommandLineInterface
-        :param document: Document
+        :param text: Document
         :return: Document
         """
         # FIXME: using application.pre_run_callables like this here is not the best solution.
         # It's internal api of prompt_toolkit that may change. This was added to fix #668.
         # We may find a better way to do it in the future.
-        saved_callables = cli.application.pre_run_callables
-        while special.editor_command(document.text):
-            filename = special.get_filename(document.text)
-            query = (special.get_editor_query(document.text) or
+        editor_command = special.editor_command(text)
+        while editor_command:
+            filename = special.get_filename(text)
+            query = (special.get_editor_query(text) or
                      self.get_last_query())
             sql, message = special.open_external_editor(filename, sql=query)
             if message:
                 # Something went wrong. Raise an exception and bail.
                 raise RuntimeError(message)
-            cli.current_buffer.document = Document(sql, cursor_position=len(sql))
-            cli.application.pre_run_callables = []
-            document = cli.run()
-            continue
-        cli.application.pre_run_callables = saved_callables
-        return document
+            while True:
+                try:
+                    text = self.prompt_session.prompt(default=sql)
+                    break
+                except KeyboardInterrupt:
+                    sql = ""
+                    
+            editor_command = special.editor_command(text)
+        return text
 
     def execute_command(self, text, query):
         logger = self.logger
@@ -364,7 +367,7 @@ class MssqlCli(object):
         self.refresh_completions(history=history,
                                  persist_priorities='none')
 
-        self.cli = self._build_cli(history)
+        self.prompt_session = self._build_cli(history)
 
         if not self.less_chatty:
             print('Version: {}'.format(__version__))
@@ -373,32 +376,35 @@ class MssqlCli(object):
 
         try:
             while True:
-                document = self.cli.run()
+                try:
+                    text = self.prompt_session.prompt()
+                except KeyboardInterrupt:
+                    continue
 
                 # The reason we check here instead of inside the mssqlcliclient is
                 # because we want to raise the Exit exception which will be
                 # caught by the try/except block that wraps the mssqlcliclient execute
                 # statement.
-                if self.quit_command(document.text):
+                if self.quit_command(text):
                     raise EOFError
 
                 try:
-                    document = self.handle_editor_command(self.cli, document)
+                    text = self.handle_editor_command(text)
                 except RuntimeError as e:
-                    self.logger.error("sql: %r, error: %r", document.text, e)
+                    self.logger.error("sql: %r, error: %r", text, e)
                     self.logger.error("traceback: %r", traceback.format_exc())
                     click.secho(str(e), err=True, fg='red')
                     continue
 
                 # Initialize default metaquery in case execution fails
-                query = MetaQuery(query=document.text, successful=False)
-                query = self.execute_command(document.text, query)
+                query = MetaQuery(query=text, successful=False)
+                query = self.execute_command(text, query)
                 self.now = dt.datetime.today()
 
                 if not query.contains_secure_statement:
                     # Allow MssqlCompleter to learn user's preferred keywords, etc.
                     with self._completer_lock:
-                        self.completer.extend_query_history(document.text)
+                        self.completer.extend_query_history(text)
 
                     self.query_history.append(query)
 
@@ -409,68 +415,57 @@ class MssqlCli(object):
 
     def _build_cli(self, history):
 
-        def set_vi_mode(value):
-            self.vi_mode = value
-
-        key_binding_manager = mssqlcli_bindings(
-            get_vi_mode_enabled=lambda: self.vi_mode,
-            set_vi_mode_enabled=set_vi_mode)
-
-        def prompt_tokens(_):
+        def get_message():
             prompt = self.get_prompt(self.prompt_format)
-            return [(Token.Prompt, prompt)]
+            return [('class:prompt', prompt)]
 
-        def get_continuation_tokens(cli, width):
+        def get_continuation(width, line_number, is_soft_wrap):
             continuation = self.multiline_continuation_char * (width - 1) + ' '
-            return [(Token.Continuation, continuation)]
+            return [('class:continuation', continuation)]
 
-        get_toolbar_tokens = create_toolbar_tokens_func(
-            lambda: self.vi_mode, None,
-            None,
-            None)
+        get_toolbar_tokens = create_toolbar_tokens_func(self)
 
-        layout = create_prompt_layout(
-            lexer=PygmentsLexer(PostgresLexer),
-            reserve_space_for_menu=self.min_num_menu_lines,
-            get_prompt_tokens=prompt_tokens,
-            get_continuation_tokens=get_continuation_tokens,
-            get_bottom_toolbar_tokens=get_toolbar_tokens,
-            display_completions_in_columns=self.wider_completion_menu,
-            multiline=True,
-            extra_input_processors=[
-                # Highlight matching brackets while editing.
-                ConditionalProcessor(
-                    processor=HighlightMatchingBracketProcessor(
-                        chars='[](){}'),
-                    filter=HasFocus(DEFAULT_BUFFER) & ~IsDone()),
-            ])
+        if self.wider_completion_menu:
+            complete_style = CompleteStyle.MULTI_COLUMN
+        else:
+            complete_style = CompleteStyle.COLUMN
 
         with self._completer_lock:
-            buf = MssqlBuffer(
-                auto_suggest=AutoSuggestFromHistory(),
-                always_multiline=self.multi_line,
-                multiline_mode=self.multiline_mode,
-                completer=self.completer,
-                history=history,
-                complete_while_typing=Always(),
-                accept_action=AcceptAction.RETURN_DOCUMENT)
-
-            editing_mode = EditingMode.VI if self.vi_mode else EditingMode.EMACS
-
-            application = Application(
+            self.prompt_session = PromptSession(
+                message=get_message,
                 style=style_factory(self.syntax_style, self.cli_style),
-                layout=layout,
-                buffer=buf,
-                key_bindings_registry=key_binding_manager.registry,
-                on_exit=AbortAction.RAISE_EXCEPTION,
-                on_abort=AbortAction.RETRY,
-                ignore_case=True,
-                editing_mode=editing_mode)
 
-            cli = CommandLineInterface(application=application,
-                                       eventloop=self.eventloop)
+                # Layout options.
+                lexer=PygmentsLexer(PostgresLexer),
+                prompt_continuation=get_continuation,
+                bottom_toolbar=get_toolbar_tokens,
+                complete_style=complete_style,
+                input_processors=[
+                    ConditionalProcessor(
+                        processor=HighlightMatchingBracketProcessor(
+                            chars='[](){}'),
+                        filter=HasFocus(DEFAULT_BUFFER) & ~IsDone()),
+                    # Render \t as 4 spaces instead of "^I"
+                    TabsProcessor(char1=' ', char2=' ')],
+                reserve_space_for_menu=self.min_num_menu_lines,
 
-            return cli
+                # Buffer options.
+                multiline=mssql_is_multiline(self),
+                completer=ThreadedCompleter(
+                    DynamicCompleter(lambda: self.completer)),
+                history=history, auto_suggest=AutoSuggestFromHistory(),
+                complete_while_typing=True,
+
+                # Key bindings.
+                enable_system_prompt=True,
+                enable_open_in_editor=True,
+
+                # Other options.
+                key_bindings=mssqlcli_bindings(self),
+                editing_mode=EditingMode.VI if self.vi_mode else EditingMode.EMACS,
+                search_ignore_case=True)
+
+            return self.prompt_session
 
     def _should_show_limit_prompt(self, status, rows):
         """returns True if limit prompt should be shown, False otherwise."""
@@ -520,7 +515,7 @@ class MssqlCli(object):
                 continue
 
             if self.auto_expand:
-                max_width = self.cli.output.get_size().columns
+                max_width = self.prompt_session.output.get_size().columns
             else:
                 max_width = None
 
@@ -608,13 +603,13 @@ class MssqlCli(object):
     def _on_completions_refreshed(self, new_completer, persist_priorities):
         self._swap_completer_objects(new_completer, persist_priorities)
 
-        if self.cli:
+        if self.prompt_session:
             # After refreshing, redraw the CLI to clear the statusbar
             # "Refreshing completions..." indicator
-            self.cli.request_redraw()
+            self.prompt_session.app.invalidate()
 
     def _swap_completer_objects(self, new_completer, persist_priorities):
-        """Swap the completer object in cli with the newly created completer.
+        """Swap the completer object with the newly created completer.
 
             persist_priorities is a string specifying how the old completer's
             learned prioritizer should be transferred to the new completer.
@@ -646,13 +641,13 @@ class MssqlCli(object):
             # When mssql-cli is first launched we call refresh_completions before
             # instantiating the cli object. So it is necessary to check if cli
             # exists before trying the replace the completer object in cli.
-            if self.cli:
-                self.cli.current_buffer.completer = new_completer
 
-    def get_completions(self, text, cursor_positition):
+            self.completer = new_completer
+
+    def get_completions(self, text, cursor_position):
         with self._completer_lock:
             return self.completer.get_completions(
-                Document(text=text, cursor_position=cursor_positition), None)
+                Document(text=text, cursor_position=cursor_position), None)
 
     def get_prompt(self, string):
         string = string.replace('\\t', self.now.strftime('%x %X'))
