@@ -11,6 +11,7 @@ Supports:
 - [SUSE Enterprise Linux (SLES) 12][sles12]
 - [Fedora 25][fed25]
 - [Fedora 26][fed26]
+- [ArchLinux][arch]
 
 [downloads]:https://github.com/dbcli/mssql-cli/tree/master#get-mssql-cli
 
@@ -25,6 +26,7 @@ Once the package is installed, run `mssql-cli` from a terminal.
 [sles12]:   #sles-12
 [fed25]:    #fedora-25
 [fed26]:    #fedora-26
+[arch]:     #archlinux
 
 ## Ubuntu
 
@@ -417,4 +419,26 @@ sudo dnf install https://mssqlcli.blob.core.windows.net/daily/rpm/mssql-cli-dev-
 sudo dnf remove mssql-cli
 ```
 
+## ArchLinux
 
+mssql-cli is provided on ArchLinux in the Arch User Repository ([AUR](https://wiki.archlinux.org/index.php/Arch_User_Repository)).
+
+**Warning**: AUR packages are user produced content with no official support. Any use of the provided files is at your own risk.
+
+### [Installation][archinstall]
+
+[archinstall]:https://wiki.archlinux.org/index.php/Arch_User_Repository#Installing_packages
+
+```sh
+git clone https://aur.archlinux.org/mssql-cli.git
+cd mssql-cli
+makepkg -si
+```
+
+### [Uninstallation][archuninstall]
+
+[archuninstall]:https://wiki.archlinux.org/index.php/pacman#Removing_packages
+
+```sh
+sudo pacman -Rs mssql-cli
+```
