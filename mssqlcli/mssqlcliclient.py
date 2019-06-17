@@ -35,6 +35,7 @@ class MssqlCliClient(object):
         self.password = mssqlcli_options.password
         self.authentication_type = u'Integrated' if mssqlcli_options.integrated_auth else u'SqlLogin'
         self.database = mssqlcli_options.database
+        self.connected_database = None
         self.encrypt = mssqlcli_options.encrypt
         self.trust_server_certificate = mssqlcli_options.trust_server_certificate
         self.connection_timeout = mssqlcli_options.connection_timeout
@@ -55,7 +56,7 @@ class MssqlCliClient(object):
 
     def get_base_connection_params(self):
         return {u'ServerName': self.server_name,
-                u'DatabaseName': self.database,
+                u'DatabaseName': self.connected_database if self.connected_database else self.database,
                 u'UserName': self.user_name,
                 u'Password': self.password,
                 u'AuthenticationType': self.authentication_type,
