@@ -90,8 +90,7 @@ def get_views():
     return '''
         SELECT  table_schema,
                 table_name
-        FROM INFORMATION_SCHEMA.TABLES
-        WHERE table_type = 'View'
+        FROM INFORMATION_SCHEMA.VIEWS
         ORDER BY 1, 2'''
 
 
