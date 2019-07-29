@@ -14,7 +14,7 @@ class CompletionRefresherTests(unittest.TestCase):
         refresher = CompletionRefresher()
         assert len(refresher.refreshers) > 0
         actual_handlers = set(refresher.refreshers.keys())
-        expected_handlers = set(['databases', 'schemata', 'tables', 'types', 'views'])
+        expected_handlers = set(['databases', 'schemas', 'tables', 'types', 'views'])
         assert expected_handlers == actual_handlers
 
     def test_refresh_called_once(self):
@@ -74,7 +74,7 @@ class CompletionRefresherTests(unittest.TestCase):
         mssqlcliclient = MssqlCliClientMock()
         callbacks = [Mock()]
         refresher = CompletionRefresher()
-        
+
         # Set refreshers to 0: we're not testing refresh logic here
         refresher.refreshers = {}
         refresher.refresh(mssqlcliclient, callbacks)
