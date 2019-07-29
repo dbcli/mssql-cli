@@ -97,10 +97,10 @@ def refresher(name, refreshers=CompletionRefresher.refreshers):
     return wrapper
 
 
-@refresher('schemata')
+@refresher('schemas')
 @decorators.suppress_all_exceptions()
-def refresh_schemata(completer, mssqlcliclient):
-    completer.extend_schemata(mssqlcliclient.get_schemas())
+def refresh_schemas(completer, mssqlcliclient):
+    completer.extend_schemas(mssqlcliclient.get_schemas())
 
 
 @refresher('tables')
