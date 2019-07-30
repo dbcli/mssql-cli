@@ -1,3 +1,4 @@
+import os
 import mssqlcli.sqltoolsclient as sqltoolsclient
 import mssqlcli.mssqlcliclient as mssqlcliclient
 
@@ -61,3 +62,11 @@ def create_mssql_cli_options(**nondefault_options):
 
 def shutdown(connection):
     connection.shutdown()
+
+def getTempDir(*args):
+    tempDir = os.path.join(os.path.abspath(__file__), '..')
+    for arg in args:
+        tempDir = os.path.join(tempDir, arg)
+    return  os.path.abspath(tempDir)
+
+
