@@ -1,34 +1,31 @@
-import os
-import stat
-
-import pytest
-
-from mssqlcli.config import ensure_dir_exists
-
-
-def test_ensure_file_parent(tmpdir):
-    subdir = tmpdir.join("subdir")
-    rcfile = subdir.join("rcfile")
-    ensure_dir_exists(str(rcfile))
+import unittest
+import shutil
+from mssqlcli.config import (
+    ensure_dir_exists,
+    get_config,
+)
+from mssqltestutils import getTempPath
 
 
-def test_ensure_existing_dir(tmpdir):
-    rcfile = str(tmpdir.mkdir("subdir").join("rcfile"))
+class ConfigTests(unittest.TestCase):
 
-    # should just not raise
-    ensure_dir_exists(rcfile)
+    def test_ensure_existing_dir(self):
+        rcfilePath = getTempPath('subdir', 'rcfile')
+        get_config(rcfilePath)
+        # should just not raise
+        ensure_dir_exists(rcfilePath)
+        shutil.rmtree(getTempPath())
 
-# Below test does not seem to work on windows.
-# Commenting this out so that it doesn't fail our test runs.
-# Tracked by Github Issue
-"""
-def test_ensure_other_create_error(tmpdir):
-    subdir = tmpdir.join("subdir")
-    rcfile = subdir.join("rcfile")
 
-    # trigger an oserror that isn't "directory already exists"
-    os.chmod(str(tmpdir), stat.S_IREAD)
+    # Below test does not seem to work on windows.
+    # Commenting this out so that it doesn't fail our test runs.
+    # Tracked by Github Issue
+    # def test_ensure_other_create_error(self):
+    #     rcfilePath = getTempPath('subdir', 'rcfile')
+    #     get_config(rcfilePath)
 
-    with pytest.raises(OSError):
-        ensure_dir_exists(str(rcfile))
-"""
+    #     # trigger an oserror that isn't "directory already exists"
+    #     os.chmod(rcfilePath, stat.S_IREAD)
+
+    #     with pytest.raises(OSError):
+    #         ensure_dir_exists(rcfilePath)

@@ -63,10 +63,9 @@ def create_mssql_cli_options(**nondefault_options):
 def shutdown(connection):
     connection.shutdown()
 
-def getTempDir(*args):
-    tempDir = os.path.join(os.path.abspath(__file__), '..')
+def getTempPath(*args):
+    testRoot = os.path.join(os.path.abspath(__file__), '..')
+    tempPath = os.path.join(testRoot, 'temp')
     for arg in args:
-        tempDir = os.path.join(tempDir, arg)
-    return  os.path.abspath(tempDir)
-
-
+        tempPath = os.path.join(tempPath, arg)
+    return  os.path.abspath(tempPath)

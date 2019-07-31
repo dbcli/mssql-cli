@@ -10,7 +10,7 @@ from mssqltestutils import (
     create_mssql_cli_options,
     create_mssql_cli_client,
     shutdown,
-    getTempDir
+    getTempPath
 )
 from mssqlcli.mssql_cli import OutputSettings, MssqlFileHistory
 
@@ -142,7 +142,7 @@ class MainTests(unittest.TestCase):
 
     def test_missing_rc_dir(self):
         try:
-            rcfilePath = getTempDir('subdir', 'rcfile')
+            rcfilePath = getTempPath('subdir', 'rcfile')
             mssqlcli = create_mssql_cli(mssqlclirc_file=rcfilePath)
             assert os.path.exists(rcfilePath)
         finally:
