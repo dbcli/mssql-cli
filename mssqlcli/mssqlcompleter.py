@@ -1,6 +1,7 @@
 from __future__ import print_function, unicode_literals
 import logging
 import re
+import sys
 from itertools import count, repeat, chain
 import operator
 from collections import namedtuple, defaultdict, OrderedDict
@@ -405,6 +406,11 @@ class MssqlCompleter(Completer):
                     sort_key, type_priority, prio, priority_func(item),
                     prio2, lexical_priority
                 )
+                
+                item = self.ensure_unicode(item)
+                display_meta = self.ensure_unicode(display_meta)
+                display = self.ensure_unicode(display)
+
                 matches.append(
                     Match(
                         completion=Completion(
@@ -417,6 +423,14 @@ class MssqlCompleter(Completer):
                     )
                 )
         return matches
+    
+    # In Python 3, all strings are sequences of Unicode characters.
+    # There is a bytes type that holds raw bytes.
+    # In Python 2, a string may be of type str or of type unicode.
+    def ensure_unicode(self, word):
+        if (sys.version_info.major < 3 and isinstance(word, str)):
+            return word.decode('utf-8')
+        return word
 
     def case(self, word):
         return self.casing.get(word, word)

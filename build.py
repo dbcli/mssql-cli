@@ -122,7 +122,9 @@ def unit_test():
     utility.exec_command(
         'pytest --cov mssqlcli '
         'tests/test_mssqlcliclient.py '
-        'tests/test_completion_refresher.py ',
+        'tests/test_completion_refresher.py '
+        'tests/test_config.py '
+        'tests/test_naive_completion.py '
         'tests/test_main.py '
         'tests/test_fuzzy_completion.py '
         'tests/test_rowlimit.py '
