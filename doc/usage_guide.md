@@ -29,7 +29,7 @@ Usage: main.py [OPTIONS]
 Options:
     -S, --server TEXT       SQL Server instance name or address.
     -U, --username TEXT     Username to connect to the database.
-    -W, --password          Force password prompt.
+    -P, --password          Force password prompt.
     -E, --integrated        Use integrated authentication on windows.
     -v, --version           Version of mssql-cli.
     -d, --database TEXT     database name to connect to.
