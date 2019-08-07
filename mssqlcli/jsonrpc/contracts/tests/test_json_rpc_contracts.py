@@ -18,7 +18,7 @@ class JSONRPCContractsTests(unittest.TestCase):
             Verify a successful connection response
         """
 
-        with open(self.get_test_baseline(
+        with open(self.get_baseline(\
                   u'test_simple_query.txt'),
                   u'r+b',
                   buffering=0) as response_file:
@@ -50,7 +50,7 @@ class JSONRPCContractsTests(unittest.TestCase):
         """
            Verify a successful query execute response for "select * from HumanResources.Department"
         """
-        with open(self.get_test_baseline(
+        with open(self.get_baseline(\
                   u'test_simple_query.txt'),
                   u'r+b',
                   buffering=0) as response_file:
@@ -78,7 +78,7 @@ class JSONRPCContractsTests(unittest.TestCase):
         """
             Test the retrieval of the actual rows for "select * from HumanResources.Department"
         """
-        with open(self.get_test_baseline(
+        with open(self.get_baseline(\
                   u'test_simple_query.txt'),
                   u'r+b',
                   buffering=0) as response_file:
@@ -106,7 +106,7 @@ class JSONRPCContractsTests(unittest.TestCase):
         """
             Verify a query execute request never retrieves query request responses for a different query.
         """
-        with open(self.get_test_baseline(
+        with open(self.get_baseline(\
                   u'test_query_retrieve_correct_response.txt'),
                   u'r+b',
                   buffering=0) as response_file:
@@ -135,7 +135,7 @@ class JSONRPCContractsTests(unittest.TestCase):
         """
             Verify a failed query execute response for "select * from [HumanResources.Department"
         """
-        with open(self.get_test_baseline(
+        with open(self.get_baseline(\
                   u'test_malformed_query.txt'),
                   u'r+b',
                   buffering=0) as response_file:
@@ -231,7 +231,7 @@ class JSONRPCContractsTests(unittest.TestCase):
         self.assertEqual(query_row_count, expected_row_count)
         self.assertEqual(query_error_events, expected_error_count)
 
-    def get_test_baseline(self, file_name):
+    def get_baseline(self, file_name):
         """
         Helper method to get baseline file.
         """
