@@ -43,12 +43,6 @@ def extract_from_part(parsed, stop_at_punctuation=True):
                 # Also 'SELECT * FROM abc JOIN def' will trigger this elif
                 # condition. So we need to ignore the keyword JOIN and its variants
                 # INNER JOIN, FULL OUTER JOIN, etc.
-                
-                # Unlikely in Python 2, StopIteration is converted into a RuntimeError
-                # when code runs 'raise StopIteration' in Python 3.
-                # Generators which explicitly raise StopIteration can generally be
-                # changed to simply return instead.
-                # (https://www.python.org/dev/peps/pep-0479/)
                 return
             elif item.ttype is Keyword and (
                     not item.value.upper() == 'FROM') and (
