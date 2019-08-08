@@ -417,11 +417,11 @@ class MssqlCli(object):
 
         def get_message():
             prompt = self.get_prompt(self.prompt_format)
-            return [('class:prompt', prompt)]
+            return [(u'class:prompt', prompt)]
 
         def get_continuation(width, line_number, is_soft_wrap):
             continuation = self.multiline_continuation_char * (width - 1) + ' '
-            return [('class:continuation', continuation)]
+            return [(u'class:continuation', continuation)]
 
         get_toolbar_tokens = create_toolbar_tokens_func(self)
 
@@ -446,7 +446,7 @@ class MssqlCli(object):
                             chars='[](){}'),
                         filter=HasFocus(DEFAULT_BUFFER) & ~IsDone()),
                     # Render \t as 4 spaces instead of "^I"
-                    TabsProcessor(char1=' ', char2=' ')],
+                    TabsProcessor(char1=u' ', char2=u' ')],
                 reserve_space_for_menu=self.min_num_menu_lines,
 
                 # Buffer options.

@@ -12,7 +12,7 @@ def mssqlcli_bindings(mssql_cli):
     """
     key_bindings = KeyBindings()
 
-    @key_bindings.add('f2')
+    @key_bindings.add(u'f2')
     def _(event):
         """
         Enable/Disable SmartCompletion Mode.
@@ -20,7 +20,7 @@ def mssqlcli_bindings(mssql_cli):
         _logger.debug('Detected F2 key.')
         mssql_cli.completer.smart_completion = not mssql_cli.completer.smart_completion
 
-    @key_bindings.add('f3')
+    @key_bindings.add(u'f3')
     def _(event):
         """
         Enable/Disable Multiline Mode.
@@ -28,7 +28,7 @@ def mssqlcli_bindings(mssql_cli):
         _logger.debug('Detected F3 key.')
         mssql_cli.multiline = not mssql_cli.multiline
 
-    @key_bindings.add('f4')
+    @key_bindings.add(u'f4')
     def _(event):
         """
         Toggle between Vi and Emacs mode.
@@ -37,7 +37,7 @@ def mssqlcli_bindings(mssql_cli):
         mssql_cli.vi_mode = not mssql_cli.vi_mode
         event.app.editing_mode = EditingMode.VI if mssql_cli.vi_mode else EditingMode.EMACS
 
-    @key_bindings.add('tab')
+    @key_bindings.add(u'tab')
     def _(event):
         """
         Force autocompletion at cursor.
@@ -49,7 +49,7 @@ def mssqlcli_bindings(mssql_cli):
         else:
             b.start_completion(select_first=True)
 
-    @key_bindings.add('c-space')
+    @key_bindings.add(u'c-space')
     def _(event):
         """
         Initialize autocompletion at cursor.
@@ -67,7 +67,7 @@ def mssqlcli_bindings(mssql_cli):
         else:
             b.start_completion(select_first=False)
 
-    @key_bindings.add('enter', filter=has_selected_completion)
+    @key_bindings.add(u'enter', filter=has_selected_completion)
     def _(event):
         """
         Makes the enter key work as the tab key only when showing the menu.

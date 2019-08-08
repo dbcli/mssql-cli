@@ -1,12 +1,16 @@
+import sys
+import re
+
 def get_schemas():
     """
     Query string to retrieve schema names.
     :return: string
     """
-    return '''
+    sql = '''
         SELECT name
         FROM sys.schemas
         ORDER BY 1'''
+    return normalize(sql)
 
 
 def get_databases():
@@ -14,10 +18,11 @@ def get_databases():
     Query string to retrieve all database names.
     :return: string
     """
-    return '''
+    sql = '''
         Select name
         FROM sys.databases
         ORDER BY 1'''
+    return normalize(sql)
 
 
 def get_table_columns():
@@ -25,7 +30,7 @@ def get_table_columns():
     Query string to retrieve all table columns.
     :return: string
     """
-    return '''
+    sql = '''
         SELECT  isc.table_schema,
                 isc.table_name,
                 isc.column_name,
@@ -49,6 +54,7 @@ def get_table_columns():
             )   AS ist
             ON ist.table_name = isc.table_name AND ist.table_schema = isc.table_schema
             ORDER BY 1, 2'''
+    return normalize(sql)
 
 
 def get_view_columns():
@@ -56,7 +62,7 @@ def get_view_columns():
     Query string to retrieve all view columns.
     :return: string
     """
-    return '''
+    sql = '''
         SELECT  isc.table_schema,
                 isc.table_name,
                 isc.column_name,
@@ -80,6 +86,7 @@ def get_view_columns():
             )   AS ist
             ON ist.table_name = isc.table_name AND ist.table_schema = isc.table_schema
             ORDER BY 1, 2'''
+    return normalize(sql)
 
 
 def get_views():
@@ -87,11 +94,12 @@ def get_views():
     Query string to retrieve all views.
     :return: string
     """
-    return '''
+    sql = '''
         SELECT  table_schema,
                 table_name
         FROM INFORMATION_SCHEMA.VIEWS
         ORDER BY 1, 2'''
+    return normalize(sql)
 
 
 def get_tables():
@@ -99,12 +107,13 @@ def get_tables():
     Query string to retrive all tables.
     :return: string
     """
-    return '''
+    sql = '''
         SELECT  table_schema,
                 table_name
         FROM INFORMATION_SCHEMA.TABLES
         WHERE table_type = 'BASE TABLE'
         ORDER BY 1, 2'''
+    return normalize(sql)
 
 
 def get_user_defined_types():
@@ -112,21 +121,22 @@ def get_user_defined_types():
     Query string to retrieve all user defined types.
     :return: string
     """
-    return '''
+    sql = '''
         SELECT  schemas.name,
                 types.name
         FROM
         (
             SELECT name,
-                   schema_id
+                    schema_id
             FROM sys.types
             WHERE is_user_defined = 1) AS types
         INNER JOIN
         (
             SELECT name,
-                   schema_id
+                    schema_id
             FROM   sys.schemas) AS schemas
         ON types.schema_id = schemas.schema_id'''
+    return normalize(sql)
 
 
 def get_functions():
@@ -134,10 +144,11 @@ def get_functions():
     Query string to retrieve stored procedures and functions.
     :return: string
     """
-    return '''
+    sql = '''
         SELECT specific_schema, specific_name
         FROM INFORMATION_SCHEMA.ROUTINES
         ORDER BY 1, 2'''
+    return normalize(sql)
 
 
 def get_foreignkeys():
@@ -145,7 +156,7 @@ def get_foreignkeys():
     Query string for returning foreign keys.
     :return: string
     """
-    return '''
+    sql = '''
         SELECT
             kcu1.table_schema AS fk_table_schema,
             kcu1.table_name AS fk_table_name,
@@ -164,3 +175,13 @@ def get_foreignkeys():
             AND kcu2.constraint_name = rc.unique_constraint_name
             AND kcu2.ordinal_position = kcu1.ordinal_position
             ORDER BY 3, 4'''
+    return normalize(sql)
+
+
+def normalize(sql):
+    if (sql == '' or sql is None):
+        return sql
+    else:
+        sql = sql.replace('\r', ' ').replace('\n', ' ').strip()
+        sql = re.sub(r' +', ' ', sql)
+        return sql.decode('utf-8') if sys.version_info[0] < 3 else sql

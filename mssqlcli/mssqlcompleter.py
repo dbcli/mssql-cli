@@ -142,20 +142,20 @@ class MssqlCompleter(Completer):
         self.keywords.extend(additional_keywords)
         self.all_completions.update(additional_keywords)
 
-    def extend_schemata(self, schemata):
+    def extend_schemas(self, schemas):
 
-        # schemata is a list of schema names
-        schemata = self.escaped_names(schemata)
+        # schemas is a list of schema names
+        schemas = self.escaped_names(schemas)
         metadata = self.dbmetadata['tables']
-        for schema in schemata:
+        for schema in schemas:
             metadata[schema] = {}
 
         # dbmetadata.values() are the 'tables' and 'functions' dicts
         for metadata in self.dbmetadata.values():
-            for schema in schemata:
+            for schema in schemas:
                 metadata[schema] = {}
 
-        self.all_completions.update(schemata)
+        self.all_completions.update(schemas)
 
     def extend_casing(self, words):
         """ extend casing data

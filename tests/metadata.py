@@ -200,10 +200,10 @@ class MetaData(object):
         from mssqlcli.mssqlcompleter import MssqlCompleter
         comp = MssqlCompleter(smart_completion=True, settings=settings)
 
-        schemata, tables, tbl_cols, views, view_cols = [], [], [], [], []
+        schemas, tables, tbl_cols, views, view_cols = [], [], [], [], []
 
         for sch, tbls in metadata['tables'].items():
-            schemata.append(sch)
+            schemas.append(sch)
 
             for tbl, cols in tbls.items():
                 tables.append((sch, tbl))
@@ -232,7 +232,7 @@ class MetaData(object):
             ForeignKey(*fk) for fks in metadata['foreignkeys'].values()
             for fk in fks]
 
-        comp.extend_schemata(schemata)
+        comp.extend_schemas(schemas)
         comp.extend_relations(tables, kind='tables')
         comp.extend_relations(views, kind='views')
         comp.extend_columns(tbl_cols, kind='tables')
