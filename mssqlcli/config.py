@@ -26,12 +26,8 @@ def load_config(usr_cfg, def_cfg=None):
 
 def ensure_dir_exists(path):
     parent_dir = expanduser(dirname(path))
-    try:
+    if not os.path.exists(parent_dir):
         os.makedirs(parent_dir)
-    except OSError as exc:
-        # ignore existing destination (py2 has no exist_ok arg to makedirs)
-        if exc.errno != errno.EEXIST:
-            raise
 
 
 def write_default_config(source, destination, overwrite=False):

@@ -63,7 +63,10 @@ def configure_and_update_options(options):
         if not options.username:
             options.username = input(u'Username (press enter for sa):') or u'sa'
         if not options.password:
-            options.password = getpass.getpass()
+            pw = getpass.getpass()
+            if (pw is not None):
+                pw = pw.replace('\r', '').replace('\n', '')
+            options.password = pw
 
 
 def create_config_dir_for_first_use():
