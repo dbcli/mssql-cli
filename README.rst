@@ -1,5 +1,5 @@
-.. image:: https://badge.fury.io/py/mssql_cli.svg
-    :target: https://pypi.python.org/pypi/mssql_cli
+.. image:: https://badge.fury.io/py/mssql-cli.svg
+    :target: https://pypi.python.org/pypi/mssql-cli
 
 .. image:: https://img.shields.io/pypi/pyversions/mssql-cli.svg
     :target: https://github.com/dbcli/mssql-cli
