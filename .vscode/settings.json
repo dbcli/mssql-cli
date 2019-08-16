@@ -1,0 +1,13 @@
+{
+    "python.pythonPath": "${workspaceRoot}/env/Scripts/python.exe",
+    "python.linting.pylintEnabled": true,
+    "python.envFile": "${workspaceRoot}/environments.env",
+    "python.testing.nosetestsEnabled": true,
+    "python.testing.nosetestArgs": [
+        "tests",
+        "mssqlcli/jsonrpc/tests",
+        "mssqlcli/jsonrpc/contracts/tests"
+    ],
+    "python.testing.pytestEnabled": false,
+    "python.testing.unittestEnabled": false
+}

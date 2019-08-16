@@ -1,0 +1,15 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Launch mssql-cli",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceRoot}/mssqlcli/main.py",
+            "env": {
+                "PYTHONPATH":"${workspaceRoot};${env:PYTHONPATH}"
+            },
+            "console": "integratedTerminal",
+        }
+    ]
+}
