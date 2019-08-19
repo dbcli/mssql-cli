@@ -62,9 +62,9 @@ The steps below outline how to build mssql-cli locally on your dev environment.
 ## 2. Install
 1. Test install locally:
 
-	To install the local mssql-scripter wheel package, from `<clone_root>` execute:
+	To install the local mssql-cli wheel package, from `<clone_root>` execute:
     ```
-    sudo pip install --no-index -i ./dist/mssql_scripter-1.0.0a1-py2.py3-none-win32.whl
+    sudo pip install --no-index -i ./dist/mssql_cli-0.16.0.dev1908130743-py2.py3-none-win_amd64.whl
     ```
     
 # <a name="Daily"></a>Daily builds
@@ -82,7 +82,7 @@ The steps below outline how daily builds of mssql-cli are generated. These steps
 ## 2. Install
 3. Test install from daily storage account:
     ```
-        pip install --pre --no-cache --extra-index-url https://mssqlcli.blob.core.windows.net/daily mssql-cli
+        pip install --pre --no-cache --extra-index-url https://mssqlcli.blob.core.windows.net/daily/whl mssql-cli
     ```
     
 # <a name="Official"></a>Official builds
@@ -124,7 +124,7 @@ The steps below outline how to build official builds and publish to PYPI.
 
 4. Publish to daily storage account:
     ```
-        python build.py publish_daily
+        python release.py publish_daily
     ```
     
 5. Download official wheels from storage account:
