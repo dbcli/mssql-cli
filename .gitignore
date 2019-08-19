@@ -46,6 +46,11 @@ coverage.xml
 *.cover
 .hypothesis/
 .pytest_cache/
+.noseids
+
+# macOS
+.swp
+.DS_Store
 
 # Translations
 *.mo
@@ -89,7 +94,7 @@ celerybeat-schedule
 # virtualenv
 .venv
 venv/
-ENV/
+env*/
 
 # Spyder project settings
 .spyderproject
