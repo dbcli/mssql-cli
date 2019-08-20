@@ -120,7 +120,7 @@ def unit_test():
     Run all unit tests.
     """
     utility.exec_command(
-        'pytest --cov mssqlcli '
+        'pytest --cov mssqlcli --doctest-modules --junitxml=junit/test-results.xml --cov-report=xml --cov-report=html '
         'tests/test_mssqlcliclient.py '
         'tests/test_completion_refresher.py '
         'tests/test_config.py '
