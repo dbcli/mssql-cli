@@ -221,8 +221,6 @@ MSSQL_CLI_USER=<username>
 MSSQL_CLI_PASSWORD=<password>
 ```
 
-![image](https://user-images.githubusercontent.com/19577035/63066435-e82f7a00-bebe-11e9-9ef0-4b1f78a8e38b.png)
-
 
 ## <a name="How_To_Run_mssql_cli_With_Debugger"></a> 3. How To Run mssql_cli With Debugger
 
