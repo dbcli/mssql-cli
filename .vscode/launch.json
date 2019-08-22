@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Launch mssql-cli",
+            "name": "Python: Launch mssql-cli (integrated)",
             "type": "python",
             "request": "launch",
             "program": "${workspaceRoot}/mssqlcli/main.py",
@@ -10,6 +10,16 @@
                 "PYTHONPATH":"${workspaceRoot};${env:PYTHONPATH}"
             },
             "console": "integratedTerminal",
+        },
+        {
+            "name": "Python: Launch mssql-cli (external)",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceRoot}/mssqlcli/main.py",
+            "env": {
+                "PYTHONPATH":"${workspaceRoot};${env:PYTHONPATH}"
+            },
+            "console": "externalTerminal",
         }
     ]
 }

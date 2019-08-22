@@ -1,7 +1,6 @@
 {
     "python.pythonPath": "${workspaceRoot}/env/Scripts/python.exe",
     "python.linting.pylintEnabled": true,
-    "python.envFile": "${workspaceRoot}/environments.env",
     "python.testing.nosetestsEnabled": true,
     "python.testing.nosetestArgs": [
         "tests",

@@ -1,4 +1,4 @@
-
+  
 Development Guide
 =================
 
@@ -114,9 +114,6 @@ General development steps that apply to both a virtual environment or a global e
 cd <workspaceRoot>
 python -m pip install --upgrade pip
 python build.py build
-
-set PYTHONPATH=<workspaceRoot>;%PYTHONPATH%
-python dev_setup.py
 ```
 ##### MacOS/Linux (Python3.x)
 ```
@@ -125,9 +122,6 @@ python dev_setup.py
 cd <workspaceRoot>
 python3 -m pip install --upgrade pip
 python3 build.py build
-
-export PYTHONPATH=<workspaceRoot>:${PYTHONPATH}
-python3 dev_setup.py
 ```
 ##### MacOS/Linux (Python2.x)
 ```
@@ -136,9 +130,6 @@ python3 dev_setup.py
 cd <workspaceRoot>
 python -m pip install --upgrade pip
 python build.py build
-
-export PYTHONPATH=<workspaceRoot>:${PYTHONPATH}
-python dev_setup.py
 ```
 
 ## <a name="Run_mssql-cli_From_Source_Code"></a>4. Run mssql-cli From Source Code
@@ -219,57 +210,10 @@ You will see the extension becomes active and showes current version of python h
 
 ![image](https://user-images.githubusercontent.com/19577035/63064822-1eb5c680-beb8-11e9-8f22-0d3ddad25a95.png)
 
-### 2. Configure settings.json
-If `<workspaceRoot>/.vscode` does not exists, change one of the user settings to create it. One of the easiest way is simply changing the current version of python to any version.
-
-![image](https://user-images.githubusercontent.com/19577035/63064397-b9f96c80-beb5-11e9-8514-b0e58e83f3a5.png)
-
-And you will see `<workspaceRoot>/.vscode` and `<workspaceRoot>/.vscode/settings.json` file are created.
-
-![image](https://user-images.githubusercontent.com/19577035/63064590-bca89180-beb6-11e9-8800-1bcde427cef0.png)
-
-Update the `<workspaceRoot>/.vscode/settings.json` as shown below:
-##### Windows
-```
-{
-    "python.pythonPath": "${workspaceRoot}/env/Scripts/python.exe",
-    "python.linting.pylintEnabled": true,
-    "python.envFile": "${workspaceRoot}/environments.env",
-    "python.testing.nosetestsEnabled": true,
-    "python.testing.nosetestArgs": [
-        "tests",
-        "mssqlcli/jsonrpc/tests",
-        "mssqlcli/jsonrpc/contracts/tests"
-    ],
-    "python.testing.pytestEnabled": false,
-    "python.testing.unittestEnabled": false
-}
-```
-##### MacOS / Linux
-```
-{
-    "python.pythonPath": "${workspaceRoot}/env/bin/python",
-    "python.linting.pylintEnabled": true,
-    "python.envFile": "${workspaceRoot}/environments.env",
-    "python.testing.nosetestsEnabled": true,
-    "python.testing.nosetestArgs": [
-        "tests",
-        "mssqlcli/jsonrpc/tests",
-        "mssqlcli/jsonrpc/contracts/tests"
-    ],
-    "python.testing.pytestEnabled": false,
-    "python.testing.unittestEnabled": false
-}
-```
-
-Press `Yes` if any notification comes up for missing dependencies. Please make sure to complete [Build mssql-cli](#Build_mssql_cli) step before moving forward.
-
-![image](https://user-images.githubusercontent.com/19577035/63066150-9b976f00-bebd-11e9-8e31-a786e2eb61f5.png)
 
 
-
-### 3. Create environments.env file
-Create a file named `<workspaceRoot>/environments.env` with contents:
+### 2. Create .env file
+Create a file named `<workspaceRoot>/.env` with contents:
 ```
 MSSQL_CLI_SERVER=<hostname>
 MSSQL_CLI_DATABASE=<database>
@@ -281,49 +225,7 @@ MSSQL_CLI_PASSWORD=<password>
 
 
 ## <a name="How_To_Run_mssql_cli_With_Debugger"></a> 3. How To Run mssql_cli With Debugger
-### 1. Configure launch.json
-Go to debug window by clicking debug icon on the left.
-If you have no configuration, click the gear icon with red circle badge to create `<workspaceRoot>/.vscode/launch.json` file.
 
-![image](https://user-images.githubusercontent.com/19577035/63065387-b61c1900-beba-11e9-8cb4-2994602ce8ea.png)
-
-Select `Python` for environment.
-
-![image](https://user-images.githubusercontent.com/19577035/63065581-70138500-bebb-11e9-9422-2f24f2bca467.png)
-
-Select `Python File` for debug configuration.
-
-![image](https://user-images.githubusercontent.com/19577035/63065617-99ccac00-bebb-11e9-8f2a-ba1f745551d3.png)
-
-Update the `<workspaceRoot>/.vscode/launch.json` as shown below:
-```
-{
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Python: Launch mssql-cli",
-            "type": "python",
-            "request": "launch",
-            "program": "${workspaceRoot}/mssqlcli/main.py",
-            "args": [
-                "-S", "<hostname>",
-                "-d", "<database>",
-                "-U", "<username>"
-            ],
-            "env": {
-                "PYTHONPATH":"${workspaceRoot};${env:PYTHONPATH}"
-            },
-            "console": "integratedTerminal",
-        }
-    ]
-}
-```
-
-Here is how it should look like.
-![image](https://user-images.githubusercontent.com/19577035/63065683-e1533800-bebb-11e9-9cb6-5513a3ec8650.png)
-
-
-### 2. Launch mssql-cli debugger
 Select `Python: Launch mssql-cli` and click the green arrow in order to launch mssql-cli debugger.
 ![image](https://user-images.githubusercontent.com/19577035/63066602-c97db300-bebf-11e9-83ce-f2bfe30c49c1.png)
 Debugger will run successfully as shown below.
