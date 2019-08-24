@@ -4,6 +4,7 @@ from shutil import copyfile
 import os
 import sys
 import uuid
+import platform
 import utility
 
 # Environment variables below allow the build process to use a python interpreter and pip version different
@@ -121,8 +122,10 @@ def unit_test():
     Run all unit tests.
     """
     runid = str(uuid.uuid1())
+    python_version = platform.python_version()
     utility.exec_command(
         'pytest --cov mssqlcli --doctest-modules --junitxml=junit/test-{}-results.xml --cov-report=xml --cov-report=html --cov-append '
+        '-o junit_suite_name=pytest-{} '
         'tests/test_mssqlcliclient.py '
         'tests/test_completion_refresher.py '
         'tests/test_config.py '
@@ -135,7 +138,7 @@ def unit_test():
         'mssqlcli/jsonrpc/tests '
         'mssqlcli/jsonrpc/contracts/tests '
         'tests/test_telemetry.py '
-        'tests/test_special.py'.format(runid),
+        'tests/test_special.py'.format(runid, python_version),
         utility.ROOT_DIR,
         continue_on_error=False)
 
