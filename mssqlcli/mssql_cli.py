@@ -52,6 +52,8 @@ from prompt_toolkit.history import FileHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from pygments.lexers.sql import PostgresLexer
 
+from mssqlcli.i18n import translate
+_ = translate()
 
 # Query tuples are used for maintaining history
 MetaQuery = namedtuple(
@@ -411,7 +413,7 @@ class MssqlCli(object):
         except EOFError:
             self.mssqlcliclient_main.shutdown()
             if not self.less_chatty:
-                print('Goodbye!')
+                print(_('Goodbye!'))
 
     def _build_cli(self, history):
 
