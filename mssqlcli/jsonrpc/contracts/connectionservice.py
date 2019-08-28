@@ -4,8 +4,9 @@ import logging
 
 logger = logging.getLogger(u'mssqlcli.connectionservice')
 
-from mssqlcli.i18n import translate
-_ = translate()
+from mssqlcli.i18n import translation
+translation().install()
+
 
 class ConnectionRequest(Request):
     """

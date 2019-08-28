@@ -11,8 +11,8 @@ MSSQL_CLI_SERVER = u'MSSQL_CLI_SERVER'
 MSSQL_CLI_ROW_LIMIT = u'MSSQL_CLI_ROW_LIMIT'
 MSSQL_CLI_RC = u'MSSQL_CLI_RC'
 
-from mssqlcli.i18n import translate
-_ = translate()
+from mssqlcli.i18n import translation
+translation().install()
 
 def create_parser():
     args_parser = argparse.ArgumentParser(

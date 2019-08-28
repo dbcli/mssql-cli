@@ -2,9 +2,11 @@ import gettext
 import os
 from importlib import import_module
 
-BASE_DIR = os.path.dirname(import_module('mssqlcli').__file__)
-LOCALE_DIR = os.path.join(BASE_DIR, 'locale')
+MODULE_ROOT_DIR = os.path.dirname(import_module('mssqlcli').__file__)
 DOMAIN = 'mssql-cli'
+LOCALE_DIR = os.path.join(MODULE_ROOT_DIR, 'locale')
+LANGUAGES = None
 
-def translate(domain=DOMAIN, localedir=LOCALE_DIR, languages=None):
-    return gettext.translation(domain, localedir, languages=languages, fallback=True).gettext
+def translation(domain=DOMAIN, localedir=LOCALE_DIR, languages=None):
+    languages = languages if (not languages is None) else LANGUAGES
+    return gettext.translation(domain, localedir, languages, fallback=True)
