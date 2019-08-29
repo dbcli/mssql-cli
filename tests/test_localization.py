@@ -10,21 +10,10 @@ import mssqlcli.localized_strings as localized
 class LocalizationTests(unittest.TestCase):
 
     def test_product(self):
-        mo_config = {
-            'extraction_target': localized.PATH,
-            'lang_name': 'ko_KR',
-            'domain': localized.DOMAIN,
-            'trans_mappings': {
-                u'Goodbye!': u'안녕히가세요!',
-            }
-        }
-        build.generate_mo(mo_config)
-
+        original = self.unicode(localized.goodbye())
         localized.translation(languages=['ko']).install()
-        actual = self.unicode(localized.goodbye())
-        expected = u'안녕히가세요!'
-        assert actual == expected
-
+        translated = self.unicode(localized.goodbye())
+        assert original != translated
 
     def test_ko_KR(self):
         domain, ext = os.path.splitext(os.path.basename(__file__))
@@ -33,7 +22,7 @@ class LocalizationTests(unittest.TestCase):
             'lang_name': 'ko_KR',
             'domain': domain,
             'trans_mappings': {
-                u'Goodbye!': u'안녕히가세요!',
+                u'Goodbye!': u'안녕히 가세요!',
                 u'Hello~': u'안녕하세요~',
                 u'I am very hungry.': u'나 많이 배고파.'
             }
@@ -43,7 +32,7 @@ class LocalizationTests(unittest.TestCase):
         _ = localized.translation(domain, localedir, ['ko']).gettext
         
         actual = self.unicode(_(u'Goodbye!'))
-        expected = u'안녕히가세요!'
+        expected = u'안녕히 가세요!'
         assert actual == expected
 
         actual = self.unicode(_(u'Hello~'))

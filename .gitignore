@@ -54,7 +54,6 @@ junit/
 .DS_Store
 
 # Translations
-*.mo
 *.pot
 
 # Django stuff:
