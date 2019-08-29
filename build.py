@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from __future__ import print_function
 from shutil import copyfile
 
@@ -6,6 +8,7 @@ import sys
 import uuid
 import platform
 import utility
+import mssqlcli.i18n as i18n
 
 # Environment variables below allow the build process to use a python interpreter and pip version different
 # from the user's PATH. When building our linux packages on various distros, we want to be build machine agnostic, so we
@@ -161,6 +164,18 @@ def test():
     integration_test()
 
 
+def i18n_task():
+    mo_config = {
+        'extraction_target': i18n.MODULE_ROOT_DIR,
+        'lang_name': 'ko_KR',
+        'domain': i18n.DOMAIN,
+        'trans_mappings': {
+            u'Goodbye!': u'안녕히가세요!',
+        }
+    }
+    i18n.generate_mo(mo_config)
+
+
 def validate_actions(user_actions, valid_targets):
     for user_action in user_actions:
         if user_action.lower() not in valid_targets.keys():
@@ -177,7 +192,8 @@ if __name__ == '__main__':
         'validate_package': validate_package,
         'unit_test': unit_test,
         'integration_test': integration_test,
-        'test': test
+        'test': test,
+        'i18n': i18n_task
     }
     actions = sys.argv[1:] or default_actions
 
