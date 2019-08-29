@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from __future__ import print_function
 from shutil import copyfile
 
@@ -8,7 +6,8 @@ import sys
 import uuid
 import platform
 import utility
-import mssqlcli.i18n as i18n
+import polib
+
 
 # Environment variables below allow the build process to use a python interpreter and pip version different
 # from the user's PATH. When building our linux packages on various distros, we want to be build machine agnostic, so we
@@ -164,24 +163,58 @@ def test():
     integration_test()
 
 
-def i18n_task():
-    mo_config = {
-        'extraction_target': i18n.MODULE_ROOT_DIR,
-        'lang_name': 'ko_KR',
-        'domain': i18n.DOMAIN,
-        'trans_mappings': {
-            u'Goodbye!': u'안녕히가세요!',
-        }
-    }
-    i18n.generate_mo(mo_config)
-
-
 def validate_actions(user_actions, valid_targets):
     for user_action in user_actions:
         if user_action.lower() not in valid_targets.keys():
             print('{0} is not a supported action'.format(user_action))
             print('Supported actions are {}'.format(list(valid_targets.keys())))
             sys.exit(1)
+
+
+def generate_mo(mo_config):
+    extraction_target = getDictValue(mo_config, 'extraction_target')
+    extraction_dir = extraction_target if os.path.isdir(extraction_target) else os.path.dirname(extraction_target)
+
+    localedir = getDictValue(mo_config, 'localedir')
+    localedir = localedir if (not localedir is None) else os.path.join(extraction_dir, 'locale')
+    lang_name = getDictValue(mo_config, 'lang_name')
+    mo_dir = os.path.join(localedir, lang_name, 'LC_MESSAGES')
+    create_dir([extraction_dir, 'locale', lang_name, 'LC_MESSAGES'])
+
+    domain = getDictValue(mo_config, 'domain')
+    pot_file = '{0}.pot'.format(os.path.join(localedir, domain))
+    po_file = '{0}.po'.format(os.path.join(mo_dir, domain))
+    mo_file = '{0}.mo'.format(os.path.join(mo_dir, domain))
+    
+    extract_command = "pybabel extract {0} -o {1}".format(extraction_target, pot_file)
+    utility.exec_command(extract_command, extraction_dir)
+
+    trans_mappings = getDictValue(mo_config, 'trans_mappings')
+    po = polib.pofile(pot_file)
+    for entry in po:
+        if (entry.msgid in trans_mappings):
+            entry.msgstr = trans_mappings[entry.msgid]
+    po.save(po_file)
+    po.save_as_mofile(mo_file)
+    return domain, localedir
+
+
+def getDictValue(dict, key):
+    try:
+        return dict[key]
+    except:
+        return None
+
+
+def create_dir(path):
+    curr_path = None
+    for p in path:
+        if (curr_path is None):
+            curr_path = os.path.abspath(p)
+        else:
+            curr_path = os.path.join(curr_path, p)
+        if (not os.path.exists(curr_path)):
+            os.mkdir(curr_path)
 
 
 if __name__ == '__main__':
@@ -192,8 +225,7 @@ if __name__ == '__main__':
         'validate_package': validate_package,
         'unit_test': unit_test,
         'integration_test': integration_test,
-        'test': test,
-        'i18n': i18n_task
+        'test': test
     }
     actions = sys.argv[1:] or default_actions
 

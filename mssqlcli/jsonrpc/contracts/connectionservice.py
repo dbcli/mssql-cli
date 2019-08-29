@@ -4,9 +4,6 @@ import logging
 
 logger = logging.getLogger(u'mssqlcli.connectionservice')
 
-from mssqlcli.i18n import translation
-translation().install()
-
 
 class ConnectionRequest(Request):
     """
@@ -53,7 +50,7 @@ class ConnectionRequest(Request):
                     u'ownerUri': self.owner_uri,
                     u'connectionId': None,
                     u'messages': str(error),
-                    u'errorMessage': _(u'Connection request encountered an exception'),
+                    u'errorMessage': u'Connection request encountered an exception',
                     u'errorNumber': None
                 }
             })

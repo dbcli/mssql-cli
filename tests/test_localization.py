@@ -2,26 +2,26 @@
 import unittest
 import sys
 import os
-import mssqlcli.i18n as i18n
 import shutil
+import build
+import mssqlcli.localized_strings as localized
 
 
 class LocalizationTests(unittest.TestCase):
 
     def test_product(self):
         mo_config = {
-            'extraction_target': i18n.MODULE_ROOT_DIR,
+            'extraction_target': localized.PATH,
             'lang_name': 'ko_KR',
-            'domain': i18n.DOMAIN,
+            'domain': localized.DOMAIN,
             'trans_mappings': {
                 u'Goodbye!': u'안녕히가세요!',
             }
         }
-        i18n.generate_mo(mo_config)
+        build.generate_mo(mo_config)
 
-        i18n.LANGUAGES = ['ko']
-        from mssqlcli.mssql_cli import goodbyeStr
-        actual = self.unicode(goodbyeStr())
+        localized.translation(languages=['ko']).install()
+        actual = self.unicode(localized.goodbye())
         expected = u'안녕히가세요!'
         assert actual == expected
 
@@ -39,8 +39,8 @@ class LocalizationTests(unittest.TestCase):
             }
         }
 
-        domain, localedir = i18n.generate_mo(mo_config)
-        _ = i18n.translation(domain, localedir, ['ko']).gettext
+        domain, localedir = build.generate_mo(mo_config)
+        _ = localized.translation(domain, localedir, ['ko']).gettext
         
         actual = self.unicode(_(u'Goodbye!'))
         expected = u'안녕히가세요!'

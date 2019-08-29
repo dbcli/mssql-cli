@@ -16,7 +16,6 @@ from codecs import open
 from collections import namedtuple
 from time import time
 
-
 from mssqlcli.config import (
     get_casing_file,
     config_location,
@@ -40,10 +39,8 @@ from mssqlcli.mssqlbuffer import mssql_is_multiline
 from prompt_toolkit.shortcuts.prompt import PromptSession, CompleteStyle
 from prompt_toolkit.completion import DynamicCompleter, ThreadedCompleter
 from prompt_toolkit.enums import DEFAULT_BUFFER, EditingMode
-
 from prompt_toolkit.document import Document
 from prompt_toolkit.filters import HasFocus, IsDone
-
 from prompt_toolkit.lexers import PygmentsLexer
 from prompt_toolkit.layout.processors import (ConditionalProcessor,
                                               HighlightMatchingBracketProcessor,
@@ -51,9 +48,8 @@ from prompt_toolkit.layout.processors import (ConditionalProcessor,
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from pygments.lexers.sql import PostgresLexer
+import mssqlcli.localized_strings as localized
 
-from mssqlcli.i18n import translation
-translation().install()
 
 # Query tuples are used for maintaining history
 MetaQuery = namedtuple(
@@ -89,6 +85,7 @@ def security_words_found_in(query):
         return False
 
 
+# pylint: disable=bad-super-call
 class MssqlFileHistory(FileHistory):
     def __init__(self, filename):
         super(self.__class__, self).__init__(filename)
@@ -273,6 +270,7 @@ class MssqlCli(object):
             click.secho(str(e), err=True, fg='yellow')
             sys.exit(1)
 
+    # pylint: disable=no-member
     def handle_editor_command(self, text):
         r"""
         Editor command is any query that is prefixed or suffixed
@@ -413,10 +411,10 @@ class MssqlCli(object):
         except EOFError:
             self.mssqlcliclient_main.shutdown()
             if not self.less_chatty:
-                print(goodbyeStr())
+                print(localized.goodbye())
     
 
-
+    # pylint: disable=invalid-unary-operand-type
     def _build_cli(self, history):
 
         def get_message():
@@ -763,6 +761,3 @@ class MssqlCli(object):
             output = itertools.chain(output, [status])
 
         return output
-
-def goodbyeStr():
-    return _('Goodbye!')
