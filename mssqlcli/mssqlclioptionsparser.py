@@ -15,7 +15,8 @@ MSSQL_CLI_RC = u'MSSQL_CLI_RC'
 def create_parser():
     args_parser = argparse.ArgumentParser(
         prog=u'mssql-cli',
-        description=u'Microsoft SQL Server CLI. Version {}'.format(mssqlcli.__version__))
+        description=u'Microsoft SQL Server CLI. ' +
+        u'Version {}'.format(mssqlcli.__version__))
 
     args_parser.add_argument(
         u'-U', u'--username',

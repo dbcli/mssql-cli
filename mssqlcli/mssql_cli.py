@@ -85,7 +85,6 @@ def security_words_found_in(query):
         return False
 
 
-# pylint: disable=bad-super-call
 class MssqlFileHistory(FileHistory):
     def __init__(self, filename):
         super(self.__class__, self).__init__(filename)
@@ -270,7 +269,6 @@ class MssqlCli(object):
             click.secho(str(e), err=True, fg='yellow')
             sys.exit(1)
 
-    # pylint: disable=no-member
     def handle_editor_command(self, text):
         r"""
         Editor command is any query that is prefixed or suffixed
@@ -414,7 +412,6 @@ class MssqlCli(object):
                 print(localized.goodbye())
     
 
-    # pylint: disable=invalid-unary-operand-type
     def _build_cli(self, history):
 
         def get_message():

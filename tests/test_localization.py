@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 import unittest
 import sys
-import os
-import shutil
-import build
 import mssqlcli.localized_strings as localized
 
 
@@ -14,38 +11,7 @@ class LocalizationTests(unittest.TestCase):
         localized.translation(languages=['ko']).install()
         translated = self.unicode(localized.goodbye())
         assert original != translated
-
-    def test_ko_KR(self):
-        domain, ext = os.path.splitext(os.path.basename(__file__))
-        mo_config = {
-            'extraction_target': '{0}.py'.format(os.path.splitext(__file__)[0]),
-            'lang_name': 'ko_KR',
-            'domain': domain,
-            'trans_mappings': {
-                u'Goodbye!': u'안녕히 가세요!',
-                u'Hello~': u'안녕하세요~',
-                u'I am very hungry.': u'나 많이 배고파.'
-            }
-        }
-
-        domain, localedir = build.generate_mo(mo_config)
-        _ = localized.translation(domain, localedir, ['ko']).gettext
         
-        actual = self.unicode(_(u'Goodbye!'))
-        expected = u'안녕히 가세요!'
-        assert actual == expected
-
-        actual = self.unicode(_(u'Hello~'))
-        expected = u'안녕하세요~'
-        assert actual == expected
-
-        actual = self.unicode(_(u'I am very hungry.'))
-        expected = u'나 많이 배고파.'
-        assert actual == expected
-
-        shutil.rmtree(localedir)
-
-
     def unicode(self, s):
         if (sys.version_info.major < 3 and isinstance(s, str)):
             return s.decode('utf-8')

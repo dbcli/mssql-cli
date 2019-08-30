@@ -1,4 +1,3 @@
-# pylint: skip-file
 import gettext
 import os
 from importlib import import_module
@@ -17,4 +16,4 @@ translation().install()
 
 ## Localized Strings
 def goodbye():
-    return _('Goodbye!')
+    return _(u'Goodbye!')
