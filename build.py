@@ -6,6 +6,8 @@ import sys
 import uuid
 import platform
 import utility
+import polib
+
 
 # Environment variables below allow the build process to use a python interpreter and pip version different
 # from the user's PATH. When building our linux packages on various distros, we want to be build machine agnostic, so we
@@ -167,6 +169,44 @@ def validate_actions(user_actions, valid_targets):
             print('{0} is not a supported action'.format(user_action))
             print('Supported actions are {}'.format(list(valid_targets.keys())))
             sys.exit(1)
+
+
+def generate_mo(extraction_target_path, lang_name, trans_mappings, domain, localedir=None):
+    """
+    Extracts strings from 'extraction_target_path', and creates pot, po, mo file with 'trans_mappings' information.\
+    'extraction_target_path' can be file or directory.
+    """
+    extraction_target_dir = extraction_target_path\
+        if os.path.isdir(extraction_target_path) else os.path.dirname(extraction_target_path)
+    localedir = localedir if (not localedir is None) else os.path.join(extraction_target_dir, 'locale')
+    mo_dir = os.path.join(localedir, lang_name, 'LC_MESSAGES')
+    create_dir([extraction_target_dir, 'locale', lang_name, 'LC_MESSAGES'])
+
+    pot_file = '{0}.pot'.format(os.path.join(localedir, domain))
+    po_file = '{0}.po'.format(os.path.join(mo_dir, domain))
+    mo_file = '{0}.mo'.format(os.path.join(mo_dir, domain))
+    
+    extract_command = "pybabel extract {0} -o {1}".format(extraction_target_path, pot_file)
+    utility.exec_command(extract_command, extraction_target_dir)
+
+    po = polib.pofile(pot_file)
+    for entry in po:
+        if (entry.msgid in trans_mappings):
+            entry.msgstr = trans_mappings[entry.msgid]
+    po.save(po_file)
+    po.save_as_mofile(mo_file)
+    return domain, localedir
+
+
+def create_dir(path):
+    curr_path = None
+    for p in path:
+        if (curr_path is None):
+            curr_path = os.path.abspath(p)
+        else:
+            curr_path = os.path.join(curr_path, p)
+        if (not os.path.exists(curr_path)):
+            os.mkdir(curr_path)
 
 
 if __name__ == '__main__':

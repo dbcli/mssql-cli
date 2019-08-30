@@ -16,7 +16,6 @@ from codecs import open
 from collections import namedtuple
 from time import time
 
-
 from mssqlcli.config import (
     get_casing_file,
     config_location,
@@ -40,10 +39,8 @@ from mssqlcli.mssqlbuffer import mssql_is_multiline
 from prompt_toolkit.shortcuts.prompt import PromptSession, CompleteStyle
 from prompt_toolkit.completion import DynamicCompleter, ThreadedCompleter
 from prompt_toolkit.enums import DEFAULT_BUFFER, EditingMode
-
 from prompt_toolkit.document import Document
 from prompt_toolkit.filters import HasFocus, IsDone
-
 from prompt_toolkit.lexers import PygmentsLexer
 from prompt_toolkit.layout.processors import (ConditionalProcessor,
                                               HighlightMatchingBracketProcessor,
@@ -51,6 +48,7 @@ from prompt_toolkit.layout.processors import (ConditionalProcessor,
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from pygments.lexers.sql import PostgresLexer
+import mssqlcli.localized_strings as localized
 
 
 # Query tuples are used for maintaining history
@@ -411,7 +409,8 @@ class MssqlCli(object):
         except EOFError:
             self.mssqlcliclient_main.shutdown()
             if not self.less_chatty:
-                print('Goodbye!')
+                print(localized.goodbye())
+    
 
     def _build_cli(self, history):
 
