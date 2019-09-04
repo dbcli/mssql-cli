@@ -6,7 +6,6 @@ import sys
 import uuid
 import platform
 import utility
-import polib
 
 
 # Environment variables below allow the build process to use a python interpreter and pip version different
@@ -140,6 +139,7 @@ def unit_test():
         'mssqlcli/jsonrpc/tests '
         'mssqlcli/jsonrpc/contracts/tests '
         'tests/test_telemetry.py '
+        'tests/test_localization.py '
         'tests/test_special.py'.format(runid, python_version),
         utility.ROOT_DIR,
         continue_on_error=False)
@@ -176,6 +176,7 @@ def generate_mo(extraction_target_path, lang_name, trans_mappings, domain, local
     Extracts strings from 'extraction_target_path', and creates pot, po, mo file with 'trans_mappings' information.\
     'extraction_target_path' can be file or directory.
     """
+    import polib
     extraction_target_dir = extraction_target_path\
         if os.path.isdir(extraction_target_path) else os.path.dirname(extraction_target_path)
     localedir = localedir if (not localedir is None) else os.path.join(extraction_target_dir, 'locale')

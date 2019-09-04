@@ -120,7 +120,8 @@ def create_parser():
         dest=u'multi_subnet_failover',
         action=u'store_true',
         default=False,
-        help=u'If application is connecting to AlwaysOn AG on different subnets, setting this provides faster detection and connection to currently active server.')
+        help=u'If application is connecting to AlwaysOn AG on different subnets, setting this provides faster '
+             u'detection and connection to currently active server.')
 
     args_parser.add_argument(
         u'-a', u'--packet-size',
