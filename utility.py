@@ -4,6 +4,8 @@ import os
 import platform
 import shutil
 import sys
+import string
+import random
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.abspath(__file__), '..'))
 
@@ -93,3 +95,7 @@ def decode(s):
     if (sys.version_info.major < 3):
         return s.decode('utf-8')
     return s
+
+
+def random_str(size=12, chars=string.ascii_uppercase + string.digits):
+    return ''.join(random.choice(chars) for x in range(size))
