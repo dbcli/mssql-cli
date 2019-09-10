@@ -4,6 +4,7 @@ import io
 import unittest
 import mssqlcli.sqltoolsclient as sqltoolsclient
 from utility import random_str
+import socket
 
 from mssqlcli.jsonrpc.jsonrpcclient import JsonRpcWriter
 from mssqltestutils import (
@@ -208,16 +209,14 @@ class MssqlCliClientTests(unittest.TestCase):
         """
             Verify the column names and string values in rows returned by select statement are properly encoded as unicode.
         """
-        db_name = 'db_' + random_str()
-        table_name = 'table_' + random_str()
+        local_machine_name = socket.gethostname().replace('-','_').replace('.','_')
+        table_name = 'mssqlcli_test_{0}_{1}'.format(local_machine_name, random_str())
         try:
             client = create_mssql_cli_client()
-            setup_query = u"CREATE DATABASE {0};"\
-                u"USE {0};"\
-                u"CREATE TABLE {1} (컬럼1 nvarchar(MAX), 컬럼2 int);"\
-                u"INSERT INTO {1} VALUES (N'테스트1', 1);"\
-                u"INSERT INTO {1} VALUES (N'테스트2', 2);"\
-                .format(db_name, table_name)
+            setup_query = u"CREATE TABLE {0} (컬럼1 nvarchar(MAX), 컬럼2 int);"\
+                u"INSERT INTO {0} VALUES (N'테스트1', 1);"\
+                u"INSERT INTO {0} VALUES (N'테스트2', 2);"\
+                .format(table_name)
             for rows, columns, status, statement, is_error in client.execute_query(setup_query):
                 assert is_error == False
 
@@ -229,7 +228,7 @@ class MssqlCliClientTests(unittest.TestCase):
                 assert rows[0][0] == '\xed\x85\x8c\xec\x8a\xa4\xed\x8a\xb81'
                 assert rows[1][0] == '\xed\x85\x8c\xec\x8a\xa4\xed\x8a\xb82'
         finally:
-            clean_up_query = u"USE master; DROP DATABASE {0};".format(db_name)
+            clean_up_query = u"DROP TABLE {0};".format(table_name)
             for rows, columns, status, statement, is_error in client.execute_query(clean_up_query):
                 assert is_error == False
             shutdown(client)
