@@ -17,6 +17,7 @@ from .packages.parseutils.utils import last_word
 from .packages.parseutils.tables import TableReference
 from .packages.mssqlliterals.main import get_literals
 from .packages.prioritization import PrevalenceCounter
+from utility import decode
 
 _logger = logging.getLogger('mssqlcli.mssqlcompleter')
 
@@ -407,9 +408,9 @@ class MssqlCompleter(Completer):
                     prio2, lexical_priority
                 )
                 
-                item = self.ensure_unicode(item)
-                display_meta = self.ensure_unicode(display_meta)
-                display = self.ensure_unicode(display)
+                item = decode(item)
+                display_meta = decode(display_meta)
+                display = decode(display)
 
                 matches.append(
                     Match(
@@ -423,14 +424,6 @@ class MssqlCompleter(Completer):
                     )
                 )
         return matches
-    
-    # In Python 3, all strings are sequences of Unicode characters.
-    # There is a bytes type that holds raw bytes.
-    # In Python 2, a string may be of type str or of type unicode.
-    def ensure_unicode(self, word):
-        if (sys.version_info.major < 3 and isinstance(word, str)):
-            return word.decode('utf-8')
-        return word
 
     def case(self, word):
         return self.casing.get(word, word)
