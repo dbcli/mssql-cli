@@ -210,7 +210,7 @@ class MssqlCliClientTests(unittest.TestCase):
             Verify the column names and string values in rows returned by select statement are properly encoded as unicode.
         """
         local_machine_name = socket.gethostname().replace('-','_').replace('.','_')
-        table_name = 'mssqlcli_test_{0}_{1}'.format(local_machine_name, random_str())
+        table_name = 'mssqlcli_{0}_{1}'.format(local_machine_name, random_str())
         try:
             client = create_mssql_cli_client()
             setup_query = u"CREATE TABLE {0} (컬럼1 nvarchar(MAX), 컬럼2 int);"\
