@@ -92,7 +92,7 @@ The mssql-cli tool includes a telemetry feature.  Please refer to the `telemetry
 Configuration
 -------------
 
-Customization and persistence of settings can be achieved with a config file, whose path can be passed as the ``--mssqlclirc <file>`` command line argument. Otherwise it is read from the default path `~/.config/mssqlcli/config` on macOS and Linux, and %LOCALAPPDATA%\dbcli\mssqlcli\config' on Windows. See the file itself for a description of all available options.
+Customization and persistence of settings can be achieved with a config file, whose path can be passed as the ``--mssqlclirc <file>`` command line argument. Otherwise it is read from the default path `~/.config/mssqlcli/config` on macOS and Linux, and %LOCALAPPDATA%\\dbcli\\mssqlcli\\config' on Windows. See the file itself for a description of all available options.
 
 
 Contributing
