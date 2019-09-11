@@ -3,7 +3,7 @@ import os
 import io
 import unittest
 import mssqlcli.sqltoolsclient as sqltoolsclient
-from utility import random_str
+from utility import random_str, decode
 import socket
 
 from mssqlcli.jsonrpc.jsonrpcclient import JsonRpcWriter
@@ -223,10 +223,10 @@ class MssqlCliClientTests(unittest.TestCase):
             select_query = u"SELECT * FROM {0};".format(table_name)
             for rows, columns, status, statement, is_error in client.execute_query(select_query):
                 assert is_error == False
-                assert columns[0] == '\xec\xbb\xac\xeb\x9f\xbc1'
-                assert columns[1] == '\xec\xbb\xac\xeb\x9f\xbc2'
-                assert rows[0][0] == '\xed\x85\x8c\xec\x8a\xa4\xed\x8a\xb81'
-                assert rows[1][0] == '\xed\x85\x8c\xec\x8a\xa4\xed\x8a\xb82'
+                assert decode(columns[0]) == u'컬럼1'
+                assert decode(columns[1]) == u'컬럼2'
+                assert decode(rows[0][0]) == u'테스트1'
+                assert decode(rows[1][0]) == u'테스트2'
         finally:
             shutdown(client)
 
