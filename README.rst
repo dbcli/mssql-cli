@@ -92,7 +92,7 @@ The mssql-cli tool includes a telemetry feature.  Please refer to the `telemetry
 Configuration
 -------------
 
-Customization and persistence of settings can be achieved with a config file, whose path can be passed as the ``--mssqlclirc <file>`` command line argument. Otherwise it is read from the default path `~/.config/mssqlcli/config` on macOS and Linux, and %LOCALAPPDATA%\\dbcli\\mssqlcli\\config' on Windows. See the file itself for a description of all available options.
+Customization and persistence of settings can be achieved with a config file, whose path can be passed as the ``--mssqlclirc <file>`` command line argument. Otherwise it is read from the default path `~/.config/mssqlcli/config` on macOS and Linux, and %LOCALAPPDATA%\\dbcli\\mssqlcli\\config' on Windows. See the `config file`_ itself for a description of all available options.
 
 
 Contributing
@@ -126,6 +126,7 @@ mssql-cli is licensed under the `BSD-3 license`_.
 .. _Microsoft Open Source Code of Conduct: https://opensource.microsoft.com/codeofconduct/
 .. _Code of Conduct FAQ: https://opensource.microsoft.com/codeofconduct/faq/
 .. _BSD-3 license: https://github.com/dbcli/mssql-cli/blob/master/LICENSE.txt
+.. _config file: https://github.com/dbcli/mssql-cli/blob/master/mssqlcli/mssqlclirc
 
 .. _Direct Download: https://github.com/dbcli/mssql-cli/blob/master/doc/installation_guide.md#Alternative-Installation-via-direct-downloads
 .. _Install via pip: https://github.com/dbcli/mssql-cli/blob/master/doc/installation/pip.md
