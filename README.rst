@@ -88,6 +88,13 @@ For general help content, pass in the ``-h`` parameter:
 
 The mssql-cli tool includes a telemetry feature.  Please refer to the `telemetry guide`_ for more information.
 
+
+Customization
+-------------
+
+Customization and persistence of settings can be achieved with a config 'rc' file, whose path can be passed as command line argument. Otherwise it is read from the default path `~/.config/mssqlcli/config`, if present.
+
+
 Contributing
 -----------------------------
 If you would like to contribute to the project, please refer to the `development guide`_.
