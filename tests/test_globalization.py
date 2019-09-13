@@ -5,10 +5,10 @@ from utility import random_str, decode
 from mssqltestutils import create_mssql_cli_client, shutdown
 
 
-# All tests require a live connection to an AdventureWorks2014 database with a hardcoded test server.
+# All tests require a live connection to test server.
 # Make modifications to mssqlutils.create_mssql_cli_client() to use a different server and database.
 # Please Note: These tests cannot be run offline.
-class GlobalizationTests(unittest.TestCase):
+class GlobalizationResultSetTests(unittest.TestCase):
     
     def test_charset_double(self):
         charset_list = self.get_charset_double() 
@@ -40,7 +40,7 @@ class GlobalizationTests(unittest.TestCase):
         self.run_charset_validation(charset_list)
 
 
-    def test_chars_zang(self):
+    def test_charset_zang(self):
         charset_list = self.get_charset_zang() 
         self.run_charset_validation(charset_list)
 
@@ -52,14 +52,17 @@ class GlobalizationTests(unittest.TestCase):
         local_machine_name = socket.gethostname().replace('-','_').replace('.','_')
         try:
             client = create_mssql_cli_client()
+            max_string_length = 50
             for chars in chars_list:
-                unit_strs = self.get_unit_str(chars)
-                for unit_str in unit_strs:
-                    table_name = u'#mssqlcli_{0}_{1}_{2}'.format(local_machine_name, random_str(), unit_str)
+                while len(chars) > 0:
+                    next_index = min(len(chars), max_string_length)
+                    test_str = chars[0:next_index]
+                    chars = chars[next_index:]
+                    table_name = u'#mssqlcli_{0}_{1}_{2}'.format(local_machine_name, random_str(), test_str)
                     setup_query = u"CREATE TABLE {0} (col_{1}1 nvarchar(MAX), col_{1}2 int);"\
                         u"INSERT INTO {0} VALUES (N'value_{1}1', 1);"\
                         u"INSERT INTO {0} VALUES (N'value_{1}2', 2);"\
-                        .format(table_name, unit_str)
+                        .format(table_name, test_str)
                     
                     for rows, columns, status, statement, is_error in client.execute_query(setup_query):
                         assert is_error == False
@@ -67,21 +70,9 @@ class GlobalizationTests(unittest.TestCase):
                     select_query = u"SELECT * FROM {0};".format(table_name)
                     for rows, columns, status, statement, is_error in client.execute_query(select_query):
                         assert is_error == False
-                        assert decode(columns[0]) == u'col_{0}1'.format(unit_str)
-                        assert decode(columns[1]) == u'col_{0}2'.format(unit_str)
-                        assert decode(rows[0][0]) == u'value_{0}1'.format(unit_str)
-                        assert decode(rows[1][0]) == u'value_{0}2'.format(unit_str)
+                        assert len(rows) == 2
         finally:
             shutdown(client)
-
-
-    def get_unit_str(self, chars, unit_len = 50):
-        curr_index = 0
-        while curr_index < len(chars):
-            next_index = min(curr_index + unit_len, len(chars))
-            curr_str = chars[curr_index:next_index]
-            curr_index = next_index
-            yield curr_str
 
 
     def get_charset_double(self):

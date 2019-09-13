@@ -140,6 +140,8 @@ def unit_test():
         'mssqlcli/jsonrpc/tests '
         'mssqlcli/jsonrpc/contracts/tests '
         'tests/test_telemetry.py '
+        'tests/test_localization.py '
+        'tests/test_globalization.py '
         'tests/test_special.py'.format(runid, python_version),
         utility.ROOT_DIR,
         continue_on_error=False)
