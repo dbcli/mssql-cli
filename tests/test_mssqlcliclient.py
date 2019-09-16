@@ -204,32 +204,6 @@ class MssqlCliClientTests(unittest.TestCase):
         finally:
             shutdown(client)
 
-    
-    def test_select_result_unicode_encoded(self):
-        """
-            Verify the column names and string values in rows returned by select statement are properly encoded as unicode.
-        """
-        local_machine_name = socket.gethostname().replace('-','_').replace('.','_')
-        table_name = '#mssqlcli_{0}_{1}'.format(local_machine_name, random_str())
-        try:
-            client = create_mssql_cli_client()
-            setup_query = u"CREATE TABLE {0} (컬럼1 nvarchar(MAX), 컬럼2 int);"\
-                u"INSERT INTO {0} VALUES (N'테스트1', 1);"\
-                u"INSERT INTO {0} VALUES (N'테스트2', 2);"\
-                .format(table_name)
-            for rows, columns, status, statement, is_error in client.execute_query(setup_query):
-                assert is_error == False
-
-            select_query = u"SELECT * FROM {0};".format(table_name)
-            for rows, columns, status, statement, is_error in client.execute_query(select_query):
-                assert is_error == False
-                assert decode(columns[0]) == u'컬럼1'
-                assert decode(columns[1]) == u'컬럼2'
-                assert decode(rows[0][0]) == u'테스트1'
-                assert decode(rows[1][0]) == u'테스트2'
-        finally:
-            shutdown(client)
-
 
 if __name__ == u'__main__':
     unittest.main()
