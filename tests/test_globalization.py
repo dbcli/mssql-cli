@@ -55,22 +55,26 @@ class GlobalizationResultSetTests(unittest.TestCase):
             max_string_length = 50
             for chars in chars_list:
                 while len(chars) > 0:
-                    next_index = min(len(chars), max_string_length)
-                    test_str = chars[0:next_index]
-                    chars = chars[next_index:]
+                    test_string_length = min(len(chars), max_string_length)
+                    test_str = chars[0:test_string_length]
+                    chars = chars[test_string_length:]
+                    col1_name = u'col_{0}1'.format(test_str)
+                    col2_name = u'col_{0}2'.format(test_str)
                     table_name = u'#mssqlcli_{0}_{1}_{2}'.format(local_machine_name, random_str(), test_str)
-                    setup_query = u"CREATE TABLE {0} (col_{1}1 nvarchar(MAX), col_{1}2 int);"\
-                        u"INSERT INTO {0} VALUES (N'value_{1}1', 1);"\
-                        u"INSERT INTO {0} VALUES (N'value_{1}2', 2);"\
-                        .format(table_name, test_str)
+                    setup_query = u"CREATE TABLE {0} ({1} nvarchar(MAX), {2} int);"\
+                        u"INSERT INTO {0} VALUES (N'value_{3}1', 1);"\
+                        u"INSERT INTO {0} VALUES (N'value_{3}2', 2);"\
+                        .format(table_name, col1_name, col2_name, test_str)
                     
                     for rows, columns, status, statement, is_error in client.execute_query(setup_query):
                         assert is_error == False
 
-                    select_query = u"SELECT * FROM {0};".format(table_name)
+                    select_query = u"SELECT {0}, {1} FROM {2};".format(col1_name, col2_name, table_name)
                     for rows, columns, status, statement, is_error in client.execute_query(select_query):
                         assert is_error == False
                         assert len(rows) == 2
+                        assert decode(rows[0][0]) == u'value_{0}1'.format(test_str)
+                        assert decode(rows[1][0]) == u'value_{0}2'.format(test_str)
         finally:
             shutdown(client)
 
