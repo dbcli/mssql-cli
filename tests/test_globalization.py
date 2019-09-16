@@ -45,19 +45,26 @@ class GlobalizationResultSetTests(unittest.TestCase):
         self.run_charset_validation(charset_list)
 
     
-    def run_charset_validation(self, chars_list):
+    def run_charset_validation(self, charset_list):
         """
-            Verify the column names and string values in rows returned by select statement are properly encoded as unicode.
+            Verify the column names and string values in rows returned by
+            select statement are properly encoded as unicode.
         """
         local_machine_name = socket.gethostname().replace('-','_').replace('.','_')
         try:
             client = create_mssql_cli_client()
             max_string_length = 50
-            for chars in chars_list:
-                while len(chars) > 0:
-                    test_string_length = min(len(chars), max_string_length)
-                    test_str = chars[0:test_string_length]
-                    chars = chars[test_string_length:]
+
+            # Takes 50 characters at a time from charset until charset becomes empty.
+            # Each time, the characters are used for 'create table' and 'insert into' statement
+            # that are executed by client.execute_query().
+            # We validates the query results are the same value we inserted and
+            # they are properly unicode encoded.
+            for charset in charset_list:
+                while len(charset) > 0:
+                    test_string_length = min(len(charset), max_string_length)
+                    test_str = charset[0:test_string_length]
+                    charset = charset[test_string_length:]
                     col1_name = u'col_{0}1'.format(test_str)
                     col2_name = u'col_{0}2'.format(test_str)
                     table_name = u'#mssqlcli_{0}_{1}_{2}'.format(local_machine_name, random_str(), test_str)
