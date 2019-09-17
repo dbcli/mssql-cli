@@ -94,7 +94,7 @@ python -m virtualenv <workspaceRoot>/env
 ```
 ##### MacOS/Linux
 ```
-. <workspaceRoot>/env/bin/activate
+source <workspaceRoot>/env/bin/activate
 ```
 
 ### (To deactivate the Virtual Environment)
