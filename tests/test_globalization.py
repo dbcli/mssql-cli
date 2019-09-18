@@ -20,50 +20,50 @@ class GlobalizationResultSetTests(unittest.TestCase):
     
     def test_charset_double(self):
         charset = GB18030()
-        characters_list = (charset.
-            get_next_characters(charset.get_double_characters()))
+        characters_list = charset.get_next_characters(
+            charset.get_double_characters())
         self.run_charset_validation(characters_list)
     
 
     def test_charset_four(self):
         charset = GB18030()
-        characters_list = (charset.
-            get_next_characters(charset.get_four_characters()))
+        characters_list = charset.get_next_characters(
+            charset.get_four_characters())
         self.run_charset_validation(characters_list)
 
 
     def test_charset_mongolian(self):
         charset = GB18030()
-        characters_list = (charset.
-            get_next_characters(charset.get_mongolian_characters()))
+        characters_list = charset.get_next_characters(
+            charset.get_mongolian_characters())
         self.run_charset_validation(characters_list)
 
 
     def test_charset_uyghur(self):
         charset = GB18030()
-        characters_list = (charset.
-            get_next_characters(charset.get_uyghur_characters()))
+        characters_list = charset.get_next_characters(
+            charset.get_uyghur_characters())
         self.run_charset_validation(characters_list)
 
 
     def test_charset_tibetian(self):
         charset = GB18030()
-        characters_list = (charset.
-            get_next_characters(charset.get_tibetian_characters()))
+        characters_list = charset.get_next_characters(
+            charset.get_tibetian_characters())
         self.run_charset_validation(characters_list)
 
 
     def test_charset_yi(self):
         charset = GB18030()
-        characters_list = (charset.
-            get_next_characters(charset.get_yi_characters()))
+        characters_list = charset.get_next_characters(
+            charset.get_yi_characters())
         self.run_charset_validation(characters_list)
 
 
     def test_charset_zang(self):
         charset = GB18030()
-        characters_list = (charset.
-            get_next_characters(charset.get_zang_characters()))
+        characters_list = charset.get_next_characters(
+            charset.get_zang_characters())
         self.run_charset_validation(characters_list)
 
     
@@ -108,8 +108,8 @@ class GlobalizationMetadataTests(unittest.TestCase):
 
     def test_schema_metadata_double(self):
         charset = GB18030()
-        characters_list = (charset.
-            get_next_characters(charset.get_double_characters()))
+        characters_list = charset.get_next_characters(
+            charset.get_double_characters())
         self.run_schema_metadata_validation(characters_list)
 
 
@@ -119,16 +119,16 @@ class GlobalizationMetadataTests(unittest.TestCase):
         new_schemas = []
         try:
             for characters in characters_list:
-                schema_name = (u'mssqlcli_{0}_{1}_{2}'.
-                    format(get_local_machine_name(), random_str(), characters))
+                schema_name = u'mssqlcli_{0}_{1}_{2}'.format(
+                    get_local_machine_name(), random_str(), characters)
                 query = u'CREATE SCHEMA {0}'.format(schema_name)
                 for _, _, _, _, is_error in client.execute_query(query):
                     assert is_error is False
                     new_schemas.append(schema_name)
             completion_refresher.refresh_schemas(completer, client)
-            completions = (completer.
-                get_completions(document=Document(u'select * from ', 14, None),
-                complete_event=None, smart_completion=True))
+            completions = completer.get_completions(
+                document=Document(u'select * from ', 14, None),
+                complete_event=None, smart_completion=True)
             db_schemas = set(map(lambda e: e.text, completions))
             for new_schema in new_schemas:
                 assert u'"{}"'.format(new_schema) in db_schemas
