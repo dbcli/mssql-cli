@@ -11,7 +11,6 @@ from mssqlcli.jsonrpc.contracts import connectionservice, queryexecutestringserv
 from mssqlcli.packages import special
 from mssqlcli.packages.parseutils.meta import ForeignKey
 from time import sleep
-from utility import encode, decode
 
 logger = logging.getLogger(u'mssqlcli.mssqlcliclient')
 time_wait_if_no_response = 0.05
@@ -265,9 +264,9 @@ class MssqlCliClient(object):
         if is_error:
             return (), None, message, query, is_error
 
-        columns = [encode(col.column_name) for col in column_info] if column_info else None
+        columns = [col.column_name for col in column_info] if column_info else None
 
-        rows = ([[encode(cell.display_value) for cell in result_row.result_cells]
+        rows = ([[cell.display_value for cell in result_row.result_cells]
                  for result_row in result_rows]) if result_rows else ()
 
         return rows, columns, message, query, is_error
@@ -277,14 +276,14 @@ class MssqlCliClient(object):
         query = mssqlqueries.get_schemas()
         logger.info(u'Schemas query: {0}'.format(query))
         for tabular_result in self.execute_query(query):
-            return [decode(x[0]) for x in tabular_result[0]]
+            return [x[0] for x in tabular_result[0]]
 
     def get_databases(self):
         """ Returns a list of database names"""
         query = mssqlqueries.get_databases()
         logger.info(u'Databases query: {0}'.format(query))
         for tabular_result in self.execute_query(query):
-            return [decode(x[0]) for x in tabular_result[0]]
+            return [x[0] for x in tabular_result[0]]
 
     def get_tables(self):
         """ Yields (schema_name, table_name) tuples"""
@@ -292,7 +291,7 @@ class MssqlCliClient(object):
         logger.info(u'Tables query: {0}'.format(query))
         for tabular_result in self.execute_query(query):
             for row in tabular_result[0]:
-                yield (decode(row[0]), decode(row[1]))
+                yield (row[0], row[1])
 
     def get_table_columns(self):
         """ Yields (schema_name, table_name, column_name, data_type, column_default) tuples"""
@@ -300,7 +299,7 @@ class MssqlCliClient(object):
         logger.info(u'Table columns query: {0}'.format(query))
         for tabular_result in self.execute_query(query):
             for row in tabular_result[0]:
-                yield (decode(row[0]), decode(row[1]), decode(row[2]), row[3], row[4])
+                yield (row[0], row[1], row[2], row[3], row[4])
 
     def get_views(self):
         """ Yields (schema_name, table_name) tuples"""
@@ -308,7 +307,7 @@ class MssqlCliClient(object):
         logger.info(u'Views query: {0}'.format(query))
         for tabular_result in self.execute_query(query):
             for row in tabular_result[0]:
-                yield (decode(row[0]), decode(row[1]))
+                yield (row[0], row[1])
 
     def get_view_columns(self):
         """ Yields (schema_name, table_name, column_name, data_type, column_default) tuples"""
@@ -316,7 +315,7 @@ class MssqlCliClient(object):
         logger.info(u'View columns query: {0}'.format(query))
         for tabular_result in self.execute_query(query):
             for row in tabular_result[0]:
-                yield (decode(row[0]), decode(row[1]), decode(row[2]), row[3], row[4])
+                yield (row[0], row[1], row[2], row[3], row[4])
 
     def get_user_defined_types(self):
         """ Yields (schema_name, type_name) tuples"""
@@ -324,7 +323,7 @@ class MssqlCliClient(object):
         logger.info(u'UDTs query: {0}'.format(query))
         for tabular_result in self.execute_query(query):
             for row in tabular_result[0]:
-                yield (decode(row[0]), row[1])
+                yield (row[0], row[1])
 
     def get_foreign_keys(self):
         """ Yields (parent_schema, parent_table, parent_column, child_schema, child_table, child_column) typles"""
