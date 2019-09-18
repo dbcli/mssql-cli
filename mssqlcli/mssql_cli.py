@@ -25,7 +25,6 @@ from mssqlcli.config import (
 
 from mssqlcli.completion_refresher import CompletionRefresher
 from mssqlcli.__init__ import __version__
-from mssqlcli.encodingutils import utf8tounicode
 from mssqlcli.encodingutils import text_type
 from mssqlcli.key_bindings import mssqlcli_bindings
 from mssqlcli.mssqlcliclient import MssqlCliClient
@@ -736,7 +735,7 @@ class MssqlCli(object):
             output.append(title)
 
         if cur:
-            headers = [case_function(utf8tounicode(x)) for x in headers]
+            headers = [case_function(x) for x in headers]
             if max_width is not None:
                 cur = list(cur)
             formatted = formatter.format_output(cur, headers, **output_kwargs)

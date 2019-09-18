@@ -11,7 +11,6 @@ from mssqlcli.jsonrpc.contracts import connectionservice, queryexecutestringserv
 from mssqlcli.packages import special
 from mssqlcli.packages.parseutils.meta import ForeignKey
 from time import sleep
-from utility import encode
 
 logger = logging.getLogger(u'mssqlcli.mssqlcliclient')
 time_wait_if_no_response = 0.05
@@ -265,9 +264,9 @@ class MssqlCliClient(object):
         if is_error:
             return (), None, message, query, is_error
 
-        columns = [encode(col.column_name) for col in column_info] if column_info else None
+        columns = [col.column_name for col in column_info] if column_info else None
 
-        rows = ([[encode(cell.display_value) for cell in result_row.result_cells]
+        rows = ([[cell.display_value for cell in result_row.result_cells]
                  for result_row in result_rows]) if result_rows else ()
 
         return rows, columns, message, query, is_error

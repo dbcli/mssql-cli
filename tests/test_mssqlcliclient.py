@@ -3,8 +3,6 @@ import os
 import io
 import unittest
 import mssqlcli.sqltoolsclient as sqltoolsclient
-from utility import random_str, decode
-import socket
 
 from mssqlcli.jsonrpc.jsonrpcclient import JsonRpcWriter
 from mssqltestutils import (
