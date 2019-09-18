@@ -112,6 +112,9 @@ env*/
 # Pycharm
 .idea/
 
+# vscode
+.vscode/
+
 # Allow
 !build_scripts/rpm/mssql-cli.spec
 
