@@ -83,8 +83,10 @@ def copy_current_platform_mssqltoolsservice():
 
 
 def encode(s):
-    if (s is not None and sys.version_info.major < 3):
+    try:
         return s.encode('utf-8')
+    except:
+        pass
     return s
 
 
@@ -92,8 +94,10 @@ def encode(s):
 # There is a bytes type that holds raw bytes.
 # In Python 2, a string may be of type str or of type unicode.
 def decode(s):
-    if (s is not None and sys.version_info.major < 3):
+    try:
         return s.decode('utf-8')
+    except:
+        pass    
     return s
 
 

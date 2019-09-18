@@ -118,12 +118,12 @@ class MssqlCompleter(Completer):
 
     def escape_name(self, name):
         if name:
-            name = '"%s"' % name
+            name = u'"%s"' % name
 
         return name
 
     def escape_schema(self, name):
-        return "'{}'".format(self.unescape_name(name))
+        return u"'{}'".format(self.unescape_name(name))
 
     def unescape_name(self, name):
         """ Unquote a string."""
