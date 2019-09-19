@@ -163,6 +163,7 @@ set MSSQL_CLI_SERVER=<hostname>
 set MSSQL_CLI_DATABASE=<database>
 set MSSQL_CLI_USER=<username>
 set MSSQL_CLI_PASSWORD=<password>
+set PYTHONIOENCODING=UTF-8
 
 cd <workspaceRoot>
 python build.py unit_test
@@ -176,6 +177,7 @@ export MSSQL_CLI_SERVER=<hostname>
 export MSSQL_CLI_DATABASE=<database>
 export MSSQL_CLI_USER=<username>
 export MSSQL_CLI_PASSWORD=<password>
+export PYTHONIOENCODING=UTF-8
 
 cd <workspaceRoot>
 python3 build.py unit_test
@@ -189,6 +191,7 @@ export MSSQL_CLI_SERVER=<hostname>
 export MSSQL_CLI_DATABASE=<database>
 export MSSQL_CLI_USER=<username>
 export MSSQL_CLI_PASSWORD=<password>
+export PYTHONIOENCODING=UTF-8
 
 cd <workspaceRoot>
 python build.py unit_test
@@ -215,13 +218,14 @@ You will see the extension becomes active and showes current version of python h
 
 
 
-### 2. Create .env file
+### 2. Edit .env file
 Create a file named `<workspaceRoot>/.env` with contents:
 ```
 MSSQL_CLI_SERVER=<hostname>
 MSSQL_CLI_DATABASE=<database>
 MSSQL_CLI_USER=<username>
 MSSQL_CLI_PASSWORD=<password>
+PYTHONIOENCODING=UTF-8
 ```
 
 
