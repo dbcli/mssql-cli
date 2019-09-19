@@ -113,7 +113,7 @@ General development steps that apply to both a virtual environment or a global e
 
 cd <workspaceRoot>
 python -m pip install --upgrade pip
-python -m pip install -r requirements-dev.txt
+python dev_setup.py
 python build.py build
 ```
 ##### MacOS/Linux (Python3.x)
@@ -122,7 +122,7 @@ python build.py build
 
 cd <workspaceRoot>
 python3 -m pip install --upgrade pip
-python3 -m pip install -r requirements-dev.txt
+python3 dev_setup.py
 python3 build.py build
 ```
 ##### MacOS/Linux (Python2.x)
@@ -131,7 +131,7 @@ python3 build.py build
 
 cd <workspaceRoot>
 python -m pip install --upgrade pip
-python -m pip install -r requirements-dev.txt
+python dev_setup.py
 python build.py build
 ```
 
