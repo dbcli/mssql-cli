@@ -55,10 +55,10 @@ setup(
     long_description=open('README.rst', encoding='utf-8').read(),
     install_requires=install_requirements,
     include_package_data=True,
-    entry_points = {"console_scripts": [
-        "mssql-cli.bat = mssqlcli.main:main",
-        "mssql-cli = mssqlcli.main:main"
-    ]},
+    scripts=[	   
+        'mssql-cli.bat',
+        'mssql-cli'
+    ],
     classifiers=[
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
