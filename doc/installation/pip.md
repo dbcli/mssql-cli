@@ -96,9 +96,9 @@ $ sudo pip install mssql-cli
 ## Install Ubuntu / Debian / Mint
 
 ```shell
-$ sudo apt-get update & sudo apt-get install -y libunwind8 python3-pip
+$ sudo apt-get update & sudo apt-get install -y libunwind8 python-pip
 $ sudo apt-get install -y libicu60 2> /dev/null || sudo apt-get install -y libicu57 2> /dev/null || sudo apt-get install -y libicu55 2> /dev/null || sudo apt-get install -y libicu55 2> /dev/null || sudo apt-get install -y libicu52
-$ pip3 install --user mssql-cli
+$ pip install --user mssql-cli
 ```
 
 
