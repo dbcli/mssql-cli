@@ -117,3 +117,6 @@ env*/
 
 # Allow
 !build_scripts/rpm/mssql-cli.spec
+
+# .env file
+.env
