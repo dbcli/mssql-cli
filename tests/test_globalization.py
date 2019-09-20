@@ -1,8 +1,10 @@
 # coding=utf-8
 import unittest
 import socket
+import os
 from utility import random_str
-from mssqltestutils import create_mssql_cli_client, shutdown
+from mssqltestutils import (create_mssql_cli_client,
+    create_mssql_cli_options, shutdown)
 from mssqlcli.mssqlcompleter import MssqlCompleter
 import mssqlcli.completion_refresher as completion_refresher
 from prompt_toolkit.document import Document
@@ -83,20 +85,23 @@ class GlobalizationResultSetTests(unittest.TestCase):
             # they are properly unicode encoded.
             for characters in characters_list:
                 test_str = characters
-                col1_name = u'col_{0}1'.format(test_str)
-                col2_name = u'col_{0}2'.format(test_str)
+                col1_name = u'col1_{0}'.format(test_str)
+                col2_name = u'col2_{0}'.format(test_str)
                 table_name = u'#mssqlcli_{0}_{1}_{2}'.format(local_machine_name, random_str(), test_str)
                 setup_query = u"CREATE TABLE {0} ({1} nvarchar(MAX), {2} int);"\
                     u"INSERT INTO {0} VALUES (N'value_{3}1', 1);"\
                     u"INSERT INTO {0} VALUES (N'value_{3}2', 2);"\
                     .format(table_name, col1_name, col2_name, test_str)
                 
-                for rows, columns, status, statement, is_error in client.execute_query(setup_query):
-                    assert is_error == False
+                if (not run_query(client, setup_query)):
+                    assert False #should not fail
 
                 select_query = u"SELECT {0}, {1} FROM {2};".format(col1_name, col2_name, table_name)
-                for rows, columns, status, statement, is_error in client.execute_query(select_query):
+                for rows, columns, _, _, is_error in client.execute_query(select_query):
                     assert is_error == False
+                    assert len(columns) == 2
+                    assert columns[0] == col1_name
+                    assert columns[1] == col2_name
                     assert len(rows) == 2
                     assert rows[0][0] == u'value_{0}1'.format(test_str)
                     assert rows[1][0] == u'value_{0}2'.format(test_str)
@@ -106,26 +111,29 @@ class GlobalizationResultSetTests(unittest.TestCase):
 
 class GlobalizationMetadataTests(unittest.TestCase):
 
-    def test_schema_metadata_double(self):
-        charset = GB18030()
-        characters_list = charset.get_next_characters(
-            charset.get_double_characters())
-        self.run_schema_metadata_validation(characters_list)
-
-
-    def run_schema_metadata_validation(self, characters_list):
-        client = create_mssql_cli_client()
-        completer = MssqlCompleter(smart_completion=True)
-        new_schemas = []
+    def test_schema_metadata(self):
+        characters_list = get_GB18030_characters_list()
         try:
+            client1 = create_mssql_cli_client()
+            test_db_name = get_random_db_name()
+            query = u"CREATE DATABASE {0};".format(test_db_name)
+            run_query(client1, query)
+
+            options = create_mssql_cli_options()
+            options.database = test_db_name
+            client2 = create_mssql_cli_client(options=options)
+            new_schemas = []
             for characters in characters_list:
                 schema_name = u'mssqlcli_{0}_{1}_{2}'.format(
                     get_local_machine_name(), random_str(), characters)
                 query = u'CREATE SCHEMA {0}'.format(schema_name)
-                for _, _, _, _, is_error in client.execute_query(query):
-                    assert is_error is False
+                if run_query(client2, query):
                     new_schemas.append(schema_name)
-            completion_refresher.refresh_schemas(completer, client)
+                else:
+                    assert False # should not fail
+
+            completer = MssqlCompleter(smart_completion=True)
+            completion_refresher.refresh_schemas(completer, client2)
             completions = completer.get_completions(
                 document=Document(u'select * from ', 14, None),
                 complete_event=None, smart_completion=True)
@@ -133,18 +141,75 @@ class GlobalizationMetadataTests(unittest.TestCase):
             for new_schema in new_schemas:
                 assert u'"{}"'.format(new_schema) in db_schemas
         finally:
-            for new_schema in new_schemas:
-                try:
-                    query = u'DROP SCHEMA IF EXISTS {0}'.format(new_schema)
-                    for _, _, _, _, _ in client.execute_query(query):
-                        pass
-                except:
-                    pass
-            shutdown(client)
+            shutdown(client2)
+            run_query(client1, u'DROP DATABASE {0}'.format(test_db_name))
+            shutdown(client1)
+
+
+    def test_table_metadata(self):
+        characters_list = get_GB18030_characters_list()
+        try:
+            client1 = create_mssql_cli_client()
+            test_db_name = get_random_db_name()
+            query = u"CREATE DATABASE {0};".format(test_db_name)
+            run_query(client1, query)
+
+            options = create_mssql_cli_options()
+            options.database = test_db_name
+            client2 = create_mssql_cli_client(options=options)
+            new_tables = []
+            for characters in characters_list:
+                col1_name = u'col_{0}1'.format(characters)
+                col2_name = u'col_{0}2'.format(characters)
+                table_name = u'mssqlcli_{0}_{1}_{2}'.format(
+                    get_local_machine_name(), random_str(), characters)
+                query = u"CREATE TABLE {0} ({1} nvarchar(MAX), {2} int);".format(
+                    table_name, col1_name, col2_name)
+                if (run_query(client2, query)):
+                    new_tables.append(table_name)
+
+            completer = MssqlCompleter(smart_completion=True)
+            completion_refresher.refresh_schemas(completer, client2)
+            completion_refresher.refresh_tables(completer, client2)
+            test_query = u'select * from "dbo".'
+            completions = completer.get_completions(
+                document=Document(test_query, len(test_query), None),
+                complete_event=None, smart_completion=True)
+            
+            db_tables = set(map(lambda e: e.text, completions))
+            assert len(db_tables) > 0
+            for new_table in new_tables:
+                assert u'"{}"'.format(new_table) in db_tables
+        finally:
+            shutdown(client2)
+            run_query(client1, u'DROP DATABASE {0}'.format(test_db_name))
+            shutdown(client1)
 
 
 def get_local_machine_name():
     return socket.gethostname().replace('-','_').replace('.','_')
+
+
+def get_random_db_name():
+    return u'mssqlcli_testdb_{0}_{1}'.format(
+        get_local_machine_name(), random_str())
+
+
+def get_GB18030_characters_list():
+    charset = GB18030()
+    return charset.get_next_characters(charset.get_all_characters())
+
+
+def run_query(mssqlcliclient, query):
+    success = True
+    try:
+        for _, _, _, _, is_error in mssqlcliclient.execute_query(query):
+            if is_error is True:
+                success = False
+                break
+    except:
+        success = False
+    return success
 
 
 class GB18030(object):
@@ -233,3 +298,15 @@ class GB18030(object):
             next_characters = all_characters[0:next_characters_length]
             all_characters = all_characters[next_characters_length:]
             yield next_characters
+    
+    def get_all_characters(self):
+        return u''.join([
+            self.get_double_characters(),
+            self.get_four_characters(),
+            self.get_mongolian_characters(),
+            self.get_uyghur_characters(),
+            self.get_tibetian_characters(),
+            self.get_yi_characters(),
+            self.get_zang_characters()
+        ])
+        
