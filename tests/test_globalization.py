@@ -1,10 +1,14 @@
 # coding=utf-8
 import unittest
 import socket
-import os
 from utility import random_str
-from mssqltestutils import (create_mssql_cli_client,
-    create_mssql_cli_options, shutdown)
+from mssqltestutils import (
+    create_mssql_cli_client,
+    create_mssql_cli_options,
+    create_test_db,
+    clean_up_test_db,
+    shutdown
+)
 from mssqlcli.mssqlcompleter import MssqlCompleter
 import mssqlcli.completion_refresher as completion_refresher
 from prompt_toolkit.document import Document
@@ -111,29 +115,120 @@ class GlobalizationResultSetTests(unittest.TestCase):
 
 class GlobalizationMetadataTests(unittest.TestCase):
 
-    def test_schema_metadata(self):
-        characters_list = get_GB18030_characters_list()
-        try:
-            client1 = create_mssql_cli_client()
-            test_db_name = get_random_db_name()
-            query = u"CREATE DATABASE {0};".format(test_db_name)
-            run_query(client1, query)
+    def test_schema_metadata_double(self):
+        charset = GB18030()
+        characters_list = charset.get_next_characters(
+            charset.get_double_characters())
+        self.run_schema_metadata_validation(characters_list)
+    
 
-            options = create_mssql_cli_options()
-            options.database = test_db_name
-            client2 = create_mssql_cli_client(options=options)
+    def test_schema_metadata_four(self):
+        charset = GB18030()
+        characters_list = charset.get_next_characters(
+            charset.get_four_characters())
+        self.run_schema_metadata_validation(characters_list)
+
+
+    def test_schema_metadata_mongolian(self):
+        charset = GB18030()
+        characters_list = charset.get_next_characters(
+            charset.get_mongolian_characters())
+        self.run_schema_metadata_validation(characters_list)
+
+
+    def test_schema_metadata_uyghur(self):
+        charset = GB18030()
+        characters_list = charset.get_next_characters(
+            charset.get_uyghur_characters())
+        self.run_schema_metadata_validation(characters_list)
+
+
+    def test_schema_metadata_tibetian(self):
+        charset = GB18030()
+        characters_list = charset.get_next_characters(
+            charset.get_tibetian_characters())
+        self.run_schema_metadata_validation(characters_list)
+
+
+    def test_schema_metadata_yi(self):
+        charset = GB18030()
+        characters_list = charset.get_next_characters(
+            charset.get_yi_characters())
+        self.run_schema_metadata_validation(characters_list)
+
+
+    def test_schema_metadata_zang(self):
+        charset = GB18030()
+        characters_list = charset.get_next_characters(
+            charset.get_zang_characters())
+        self.run_schema_metadata_validation(characters_list)
+
+
+    def test_table_metadata_double(self):
+        charset = GB18030()
+        characters_list = charset.get_next_characters(
+            charset.get_double_characters())
+        self.run_schema_metadata_validation(characters_list)
+    
+
+    def test_table_metadata_four(self):
+        charset = GB18030()
+        characters_list = charset.get_next_characters(
+            charset.get_four_characters())
+        self.run_schema_metadata_validation(characters_list)
+
+
+    def test_table_metadata_mongolian(self):
+        charset = GB18030()
+        characters_list = charset.get_next_characters(
+            charset.get_mongolian_characters())
+        self.run_schema_metadata_validation(characters_list)
+
+
+    def test_table_metadata_uyghur(self):
+        charset = GB18030()
+        characters_list = charset.get_next_characters(
+            charset.get_uyghur_characters())
+        self.run_schema_metadata_validation(characters_list)
+
+
+    def test_table_metadata_tibetian(self):
+        charset = GB18030()
+        characters_list = charset.get_next_characters(
+            charset.get_tibetian_characters())
+        self.run_schema_metadata_validation(characters_list)
+
+
+    def test_table_metadata_yi(self):
+        charset = GB18030()
+        characters_list = charset.get_next_characters(
+            charset.get_yi_characters())
+        self.run_schema_metadata_validation(characters_list)
+
+
+    def test_table_metadata_zang(self):
+        charset = GB18030()
+        characters_list = charset.get_next_characters(
+            charset.get_zang_characters())
+        self.run_schema_metadata_validation(characters_list)
+
+
+    def run_schema_metadata_validation(self, characters_list):
+        try:
+            test_db_name = create_test_db()
+            client = create_mssqlcliclient(test_db_name)
             new_schemas = []
             for characters in characters_list:
                 schema_name = u'mssqlcli_{0}_{1}_{2}'.format(
                     get_local_machine_name(), random_str(), characters)
                 query = u'CREATE SCHEMA {0}'.format(schema_name)
-                if run_query(client2, query):
+                if run_query(client, query):
                     new_schemas.append(schema_name)
                 else:
                     assert False # should not fail
 
             completer = MssqlCompleter(smart_completion=True)
-            completion_refresher.refresh_schemas(completer, client2)
+            completion_refresher.refresh_schemas(completer, client)
             completions = completer.get_completions(
                 document=Document(u'select * from ', 14, None),
                 complete_event=None, smart_completion=True)
@@ -141,22 +236,14 @@ class GlobalizationMetadataTests(unittest.TestCase):
             for new_schema in new_schemas:
                 assert u'"{}"'.format(new_schema) in db_schemas
         finally:
-            shutdown(client2)
-            run_query(client1, u'DROP DATABASE {0}'.format(test_db_name))
-            shutdown(client1)
+            shutdown(client)
+            clean_up_test_db(test_db_name)
 
 
-    def test_table_metadata(self):
-        characters_list = get_GB18030_characters_list()
+    def run_table_metadata_validation(self, characters_list):
         try:
-            client1 = create_mssql_cli_client()
-            test_db_name = get_random_db_name()
-            query = u"CREATE DATABASE {0};".format(test_db_name)
-            run_query(client1, query)
-
-            options = create_mssql_cli_options()
-            options.database = test_db_name
-            client2 = create_mssql_cli_client(options=options)
+            test_db_name = create_test_db()
+            client = create_mssqlcliclient(test_db_name)
             new_tables = []
             for characters in characters_list:
                 col1_name = u'col_{0}1'.format(characters)
@@ -165,12 +252,12 @@ class GlobalizationMetadataTests(unittest.TestCase):
                     get_local_machine_name(), random_str(), characters)
                 query = u"CREATE TABLE {0} ({1} nvarchar(MAX), {2} int);".format(
                     table_name, col1_name, col2_name)
-                if (run_query(client2, query)):
+                if (run_query(client, query)):
                     new_tables.append(table_name)
 
             completer = MssqlCompleter(smart_completion=True)
-            completion_refresher.refresh_schemas(completer, client2)
-            completion_refresher.refresh_tables(completer, client2)
+            completion_refresher.refresh_schemas(completer, client)
+            completion_refresher.refresh_tables(completer, client)
             test_query = u'select * from "dbo".'
             completions = completer.get_completions(
                 document=Document(test_query, len(test_query), None),
@@ -181,23 +268,19 @@ class GlobalizationMetadataTests(unittest.TestCase):
             for new_table in new_tables:
                 assert u'"{}"'.format(new_table) in db_tables
         finally:
-            shutdown(client2)
-            run_query(client1, u'DROP DATABASE {0}'.format(test_db_name))
-            shutdown(client1)
+            shutdown(client)
+            clean_up_test_db(test_db_name)
+
+
+def create_mssqlcliclient(database_name=None):
+    options = create_mssql_cli_options()
+    if (database_name is not None):
+        options.database = database_name
+    return create_mssql_cli_client(options=options)
 
 
 def get_local_machine_name():
     return socket.gethostname().replace('-','_').replace('.','_')
-
-
-def get_random_db_name():
-    return u'mssqlcli_testdb_{0}_{1}'.format(
-        get_local_machine_name(), random_str())
-
-
-def get_GB18030_characters_list():
-    charset = GB18030()
-    return charset.get_next_characters(charset.get_all_characters())
 
 
 def run_query(mssqlcliclient, query):
@@ -298,15 +381,3 @@ class GB18030(object):
             next_characters = all_characters[0:next_characters_length]
             all_characters = all_characters[next_characters_length:]
             yield next_characters
-    
-    def get_all_characters(self):
-        return u''.join([
-            self.get_double_characters(),
-            self.get_four_characters(),
-            self.get_mongolian_characters(),
-            self.get_uyghur_characters(),
-            self.get_tibetian_characters(),
-            self.get_yi_characters(),
-            self.get_zang_characters()
-        ])
-        
