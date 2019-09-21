@@ -1,10 +1,12 @@
 import os
+import socket
 import mssqlcli.sqltoolsclient as sqltoolsclient
 import mssqlcli.mssqlcliclient as mssqlcliclient
 
 from argparse import Namespace
 from mssqlcli.mssql_cli import MssqlCli
 from mssqlcli.mssqlclioptionsparser import create_parser
+from utility import random_str
 
 
 def create_mssql_cli(**non_default_options):
@@ -69,3 +71,26 @@ def getTempPath(*args):
     for arg in args:
         tempPath = os.path.join(tempPath, arg)
     return  os.path.abspath(tempPath)
+
+def create_test_db():
+    client = create_mssql_cli_client()
+    local_machine_name = socket.gethostname().replace(
+        '-','_').replace('.','_')
+    test_db_name = u'mssqlcli_testdb_{0}_{1}'.format(
+        local_machine_name, random_str())
+    query = u"CREATE DATABASE {0};".format(test_db_name)
+    for _, _, _, _, is_error in client.execute_query(query):
+        if is_error is True:
+            test_db_name = None
+    shutdown(client)
+    return test_db_name
+
+def clean_up_test_db(test_db_name):
+    client = create_mssql_cli_client()
+    query = u"DROP DATABASE {0};".format(test_db_name)
+    success = True
+    for _, _, _, _, is_error in client.execute_query(query):
+        if is_error is True:
+            success = False
+    shutdown(client)
+    return success
