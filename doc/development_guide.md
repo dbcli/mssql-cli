@@ -149,7 +149,7 @@ mssql-cli -S <hostname> -d <database> -U <username>
 . <workspaceRoot>/env/bin/activate
 
 cd <workspaceRoot>
-. mssql-cli -S <hostname> -d <database> -U <username>
+./mssql-cli -S <hostname> -d <database> -U <username>
 ```
 
 
