@@ -53,26 +53,31 @@ Create a virtual environment in a subdirectory of your `<workspaceRoot>` (`<work
 ```
 set PYLOC=<python3_location>
 set PATH=%PYLOC%\Scripts;%PYLOC%;%PATH%
+set PYTHONPATH=<workspaceRoot>
 python -m venv <workspaceRoot>\env
 ```
 ##### Windows (Python2.x)
 ```
 set PYLOC=<python2_location>
 set PATH=%PYLOC%\Scripts;%PYLOC%;%PATH%
+set PYTHONPATH=<workspaceRoot>
 python -m pip install --upgrade pip
 python -m pip install --upgrade virtualenv
 python -m virtualenv <workspaceRoot>\env
 ```
 ##### MacOS (Python3.x)
 ```
+export PYTHONPATH=<workspaceRoot>
 python3 -m venv <workspaceRoot>/env
 ```
 ##### MacOS (Python2.x)
 ```
+export PYTHONPATH=<workspaceRoot>
 python -m venv <workspaceRoot>/env
 ```
 ##### Linux (Python3.x) -- Ubuntu for example
 ```
+export PYTHONPATH=<workspaceRoot>
 sudo apt-get update
 sudo apt-get install python3-pip
 sudo apt-get install python3-venv
@@ -80,6 +85,7 @@ python3 -m venv <workspaceRoot>/env
 ```
 ##### Linux (Python2.x) -- Ubuntu for example
 ```
+export PYTHONPATH=<workspaceRoot>
 sudo apt-get update
 sudo apt-get install python-pip
 python -m pip install --upgrade pip
@@ -111,6 +117,8 @@ General development steps that apply to both a virtual environment or a global e
 ```
 <workspaceRoot>\env\scripts\activate.bat
 
+set PYTHONPATH=<workspaceRoot>
+
 cd <workspaceRoot>
 python -m pip install --upgrade pip
 python dev_setup.py
@@ -120,6 +128,8 @@ python build.py build
 ```
 . <workspaceRoot>/env/bin/activate
 
+export PYTHONPATH=<workspaceRoot>
+
 cd <workspaceRoot>
 python3 -m pip install --upgrade pip
 python3 dev_setup.py
@@ -128,6 +138,8 @@ python3 build.py build
 ##### MacOS/Linux (Python2.x)
 ```
 . <workspaceRoot>/env/bin/activate
+
+export PYTHONPATH=<workspaceRoot>
 
 cd <workspaceRoot>
 python -m pip install --upgrade pip
@@ -141,12 +153,16 @@ python build.py build
 ```
 <workspaceRoot>\env\scripts\activate.bat
 
+set PYTHONPATH=<workspaceRoot>
+
 cd <workspaceRoot>
 mssql-cli -S <hostname> -d <database> -U <username>
 ```
 ##### MacOS/Linux
 ```
 . <workspaceRoot>/env/bin/activate
+
+export PYTHONPATH=<workspaceRoot>
 
 cd <workspaceRoot>
 ./mssql-cli -S <hostname> -d <database> -U <username>
@@ -159,6 +175,7 @@ cd <workspaceRoot>
 ```
 <workspaceRoot>\env\scripts\activate.bat
 
+set PYTHONPATH=<workspaceRoot>
 set MSSQL_CLI_SERVER=<hostname>
 set MSSQL_CLI_DATABASE=<database>
 set MSSQL_CLI_USER=<username>
@@ -173,6 +190,7 @@ python build.py integration_test
 ```
 . <workspaceRoot>/env/bin/activate
 
+export PYTHONPATH=<workspaceRoot>
 export MSSQL_CLI_SERVER=<hostname>
 export MSSQL_CLI_DATABASE=<database>
 export MSSQL_CLI_USER=<username>
@@ -187,6 +205,7 @@ python3 build.py integration_test
 ```
 . <workspaceRoot>/env/bin/activate
 
+export PYTHONPATH=<workspaceRoot>
 export MSSQL_CLI_SERVER=<hostname>
 export MSSQL_CLI_DATABASE=<database>
 export MSSQL_CLI_USER=<username>
