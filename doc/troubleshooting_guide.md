@@ -60,7 +60,7 @@ To fix this issue, uncomment
 the pager option in your config file located here
 * Unix/Linux
 ```
-    ~/.config/mssql-cli/config
+    ~/.config/mssqlcli/config
     
     # Default pager.
     # By default 'PAGER' environment variable is used
@@ -68,7 +68,7 @@ the pager option in your config file located here
 ```
 * In Windows: 
 ```
-    %USERPROFILE%\AppData\Local\dbcli\mssql-cli\config
+    %USERPROFILE%\AppData\Local\dbcli\mssqlcli\config
     
     # Default pager.
     # By default 'PAGER' environment variable is used
