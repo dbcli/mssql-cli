@@ -6,9 +6,7 @@
             "type": "python",
             "request": "launch",
             "program": "${workspaceRoot}/mssqlcli/main.py",
-            "env": {
-                "PYTHONPATH":"${workspaceRoot};${env:PYTHONPATH}"
-            },
+            "pythonPath": "${config:python.pythonPath}",
             "console": "integratedTerminal",
         },
         {
@@ -16,9 +14,7 @@
             "type": "python",
             "request": "launch",
             "program": "${workspaceRoot}/mssqlcli/main.py",
-            "env": {
-                "PYTHONPATH":"${workspaceRoot};${env:PYTHONPATH}"
-            },
+            "pythonPath": "${config:python.pythonPath}",
             "console": "externalTerminal",
         }
     ]
