@@ -6,9 +6,7 @@
             "type": "python",
             "request": "launch",
             "program": "${workspaceRoot}/mssqlcli/main.py",
-            "env": {
-                "PYTHONPATH":"${workspaceRoot};${env:PYTHONPATH}"
-            },
+            "envFile": "${workspaceRoot}/.env",
             "console": "integratedTerminal",
         },
         {
@@ -16,9 +14,15 @@
             "type": "python",
             "request": "launch",
             "program": "${workspaceRoot}/mssqlcli/main.py",
-            "env": {
-                "PYTHONPATH":"${workspaceRoot};${env:PYTHONPATH}"
-            },
+            "envFile": "${workspaceRoot}/.env",
+            "console": "externalTerminal",
+        },
+        {
+            "name": "Python: Current File (external)",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "envFile": "${workspaceRoot}/.env",
             "console": "externalTerminal",
         }
     ]
