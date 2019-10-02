@@ -50,6 +50,9 @@ class MssqlCliClient(object):
         self.server_edition = None
         self.is_cloud = False
 
+        # non-interactive mode options
+        self.query = mssqlcli_options.query
+
         self.extra_params = {k: v for k, v in kwargs.items()}
 
         logger.info(u'Initialized MssqlCliClient with owner Uri {}'.format(self.owner_uri))

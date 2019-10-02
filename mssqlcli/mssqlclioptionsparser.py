@@ -1,6 +1,6 @@
 import argparse
-import mssqlcli
 import os
+import mssqlcli
 
 from .config import config_location
 
@@ -148,5 +148,13 @@ def create_parser():
         dest=u'prompt',
         metavar=u'',
         help=u'Prompt format (Default: \\d> ')
+
+    args_parser.add_argument(
+        u'-Q', u'--query',
+        dest=u'query',
+        metavar=u'',
+        default=False,
+        help=u'Executes a query when mssql-cli starts and immediately exits. Use quotation marks around query.'
+    )
 
     return args_parser

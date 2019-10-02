@@ -185,6 +185,10 @@ class MssqlCli(object):
         self.prompt_session = None
         self.integrated_auth = options.integrated_auth
 
+        # check for interactive mode
+        self.interactive_mode = not options.query
+        self.query_text = str(options.query)
+
         self.sqltoolsclient = SqlToolsClient(enable_logging=options.enable_sqltoolsservice_logging)
         self.mssqlcliclient_main = MssqlCliClient(options, self.sqltoolsclient)
 
@@ -371,6 +375,11 @@ class MssqlCli(object):
             print('Mail: sqlcli@microsoft.com')
             print('Home: http://github.com/dbcli/mssql-cli')
 
+        # if not in interactive mode, don't build CLI
+        if not self.interactive_mode:
+            metaquery = MetaQuery(query=self.query_text, successful=False)
+            self.execute_command(self.query_text, metaquery)
+            return
         try:
             while True:
                 try:
