@@ -154,7 +154,7 @@ def create_parser():
         dest=u'query',
         metavar=u'',
         default=False,
-        help=u'Executes a query when mssql-cli starts and immediately exits. Use quotation marks around query.'
+        help=u'Executes a query outputting the results to stdout and exits.'
     )
 
     return args_parser
