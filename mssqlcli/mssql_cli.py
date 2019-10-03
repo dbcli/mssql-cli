@@ -379,6 +379,7 @@ class MssqlCli(object):
         if not self.interactive_mode:
             metaquery = MetaQuery(query=self.query_text, successful=False)
             self.execute_command(self.query_text, metaquery)
+            self.mssqlcliclient_main.shutdown()
             return
         try:
             while True:
