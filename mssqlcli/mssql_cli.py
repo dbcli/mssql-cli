@@ -342,11 +342,13 @@ class MssqlCli(object):
             except KeyboardInterrupt:
                 pass
 
-            if query.total_time > 1:
-                print('Time: %0.03fs (%s)' % (query.total_time,
-                                              humanize.time.naturaldelta(query.total_time)))
-            else:
-                print('Time: %0.03fs' % query.total_time)
+            # only print elapsed time in interactive mode to mimic sqlcmd behavior
+            if self.interactive_mode:
+                if query.total_time > 1:
+                    print('Time: %0.03fs (%s)' % (query.total_time,
+                                                humanize.time.naturaldelta(query.total_time)))
+                else:
+                    print('Time: %0.03fs' % query.total_time)
 
             # Check if we need to update completions, in order of most
             # to least drastic changes
@@ -370,7 +372,8 @@ class MssqlCli(object):
 
         self.prompt_session = self._build_cli(history)
 
-        if not self.less_chatty:
+        # don't print headers in non-interactive mode to mimic sqlcmd behavior
+        if not self.less_chatty and self.interactive_mode:
             print('Version: {}'.format(__version__))
             print('Mail: sqlcli@microsoft.com')
             print('Home: http://github.com/dbcli/mssql-cli')
