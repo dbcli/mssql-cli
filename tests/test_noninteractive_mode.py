@@ -22,9 +22,14 @@ def test_query_output():
         query_str, shell=True).decode("utf-8").rstrip('\n')
 
     # compare with this result
-    mssqlcli = create_mssql_cli(query=query_str)
-    mssqlcli.connect_to_database()
-    output_compare = mssqlcli.run(test_format=True)
+    output_compare = (
+        "+--------------------+\n" +
+        "| (No column name)   |\n" +
+        "|--------------------|\n" +
+        "| 1                  |\n" +
+        "+--------------------+\n" +
+        "(1 row affected)"
+    )
     assert output_compare == output_dashq
 
 def is_processed_closed(query_str):
