@@ -1,4 +1,5 @@
 """ Non-interactive tests. """
+import subprocess
 from mssqltestutils import create_mssql_cli
 
 def test_session_closure_query_valid():
@@ -8,6 +9,23 @@ def test_session_closure_query_valid():
 def test_session_closure_query_invalid():
     """ Test session closure for invalid query. """
     assert is_processed_closed("asdfasoifjas")
+
+# def test_query_large():
+#     query = "SELECT * FROM STRING_SPLIT(REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024), ',')"
+#     # assert 
+
+def test_query_output():
+    """ Tests if -Q has equal output to execute_query. """
+    # -Q test
+    query_str = "select 1"
+    output_dashq = subprocess.check_output("./mssql-cli -Q '%s'" % \
+        query_str, shell=True).decode("utf-8").rstrip('\n')
+
+    # compare with this result
+    mssqlcli = create_mssql_cli(query=query_str)
+    mssqlcli.connect_to_database()
+    output_compare = mssqlcli.run(test_format=True)
+    assert output_compare == output_dashq
 
 def is_processed_closed(query_str):
     """ Runs unit tests on process closure given a query string """

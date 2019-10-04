@@ -306,7 +306,7 @@ class MssqlCli(object):
             editor_command = special.editor_command(text)
         return text
 
-    def execute_command(self, text, query):
+    def execute_command(self, text, query, test_format=False):
         logger = self.logger
 
         try:
@@ -338,6 +338,9 @@ class MssqlCli(object):
                     except IOError as e:
                         click.secho(str(e), err=True, fg='red')
                 else:
+                    # used for testing purposes
+                    if test_format:
+                        return '\n'.join(output)
                     click.echo_via_pager('\n'.join(output))
             except KeyboardInterrupt:
                 pass
@@ -361,7 +364,7 @@ class MssqlCli(object):
 
         return query
 
-    def run(self):
+    def run(self, test_format=False):
         history_file = self.config['main']['history_file']
         if history_file == 'default':
             history_file = config_location() + 'history'
@@ -381,8 +384,10 @@ class MssqlCli(object):
         # if not in interactive mode, don't build CLI
         if not self.interactive_mode:
             metaquery = MetaQuery(query=self.query_text, successful=False)
-            self.execute_command(self.query_text, metaquery)
+            output = self.execute_command(self.query_text, metaquery, test_format=test_format)
             self.mssqlcliclient_main.shutdown()
+            if test_format:
+                return output
             return
         try:
             while True:
