@@ -378,16 +378,14 @@ class MssqlCli(object):
             print('Mail: sqlcli@microsoft.com')
             print('Home: http://github.com/dbcli/mssql-cli')
 
-        # if not in interactive mode, don't build CLI
-        if not self.interactive_mode:
-            metaquery = MetaQuery(query=self.query_text, successful=False)
-            self.execute_command(self.query_text, metaquery)
-            self.mssqlcliclient_main.shutdown()
-            return
         try:
             while True:
                 try:
-                    text = self.prompt_session.prompt()
+                    # set query text either from prompt or cli depending on interactive mode
+                    if self.interactive_mode:
+                        text = self.prompt_session.prompt()
+                    else:
+                        text = self.query_text
                 except KeyboardInterrupt:
                     continue
 
@@ -417,6 +415,10 @@ class MssqlCli(object):
                         self.completer.extend_query_history(text)
 
                     self.query_history.append(query)
+
+                # exit if not in interactive mode
+                if not self.interactive_mode:
+                    break
 
         except EOFError:
             self.mssqlcliclient_main.shutdown()
