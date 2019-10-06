@@ -416,8 +416,9 @@ class MssqlCli(object):
 
                     self.query_history.append(query)
 
-                # exit if not in interactive mode
+                # shutdown and exit if not in interactive mode
                 if not self.interactive_mode:
+                    self.mssqlcliclient_main.shutdown()
                     break
 
         except EOFError:
