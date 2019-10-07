@@ -1,5 +1,6 @@
 """ Non-interactive tests. """
 import subprocess
+import csv
 from mssqltestutils import create_mssql_cli
 
 def test_session_closure_query_valid():
@@ -10,9 +11,35 @@ def test_session_closure_query_invalid():
     """ Test session closure for invalid query. """
     assert is_processed_closed("asdfasoifjas")
 
-# def test_query_large():
-#     query = "SELECT * FROM STRING_SPLIT(REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024), ',')"
-#     # assert 
+def test_query_large():
+    query_str = "SELECT * FROM STRING_SPLIT(REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024), ',')"
+    p = subprocess.Popen("./mssql-cli -Q \"%s\"" % query_str, shell=True, stdin=subprocess.PIPE,
+                         stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    output = p.communicate(b'y\n')[0].decode("utf-8")
+
+    # start to build the output string to compare
+    warning = ("The result set has more than 1000 rows.\n" +
+               "Do you want to continue? [y/N]: Warning: Output is not to a terminal (fd=1).\n" +
+               "Warning: Input is not to a terminal (fd=0).\n")
+    boundary = "+---------+\n"
+    header_underscore = "|---------|\n"
+    output_compare = "%s%s" % (warning, boundary)
+
+    # get expected result from csv
+    with open('tests/results_big_query.csv', 'r') as csvfile:
+        reader = csv.reader(csvfile)
+        headers = next(reader)
+        output_compare += "| %s   |\n%s" % (headers[0], header_underscore)
+
+        for row in reader:
+            for col in row:
+                output_compare += "| %s       |\n" % col
+
+        output_compare += "|         |\n"
+        output_compare += boundary
+        output_compare += "(1025 rows affected)\n"
+
+    assert output == output_compare
 
 def test_query_output():
     """ Tests if -Q has equal output to execute_query. """
