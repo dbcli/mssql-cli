@@ -514,7 +514,7 @@ class MssqlCli(object):
                 self.mssqlcliclient_main.execute_query(text):
 
             total = time() - start
-            if self._should_show_limit_prompt(status, rows):
+            if self.interactive_mode and self._should_show_limit_prompt(status, rows):
                 click.secho('The result set has more than %s rows.'
                             % self.row_limit, fg='red')
                 if not click.confirm('Do you want to continue?'):

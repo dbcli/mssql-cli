@@ -15,15 +15,14 @@ def test_query_large():
     query_str = "SELECT * FROM STRING_SPLIT(REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024), ',')"
     p = subprocess.Popen("./mssql-cli -Q \"%s\"" % query_str, shell=True, stdin=subprocess.PIPE,
                          stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    output = p.communicate(b'y\n')[0].decode("utf-8")
+    output = p.communicate()[0].decode("utf-8")
 
     # start to build the output string to compare
-    warning = ("The result set has more than 1000 rows.\n" +
-               "Do you want to continue? [y/N]: Warning: Output is not to a terminal (fd=1).\n" +
-               "Warning: Input is not to a terminal (fd=0).\n")
     boundary = "+---------+\n"
     header_underscore = "|---------|\n"
-    output_compare = "%s%s" % (warning, boundary)
+    warnings = ("Warning: Output is not to a terminal (fd=1).\n" +
+                "Warning: Input is not to a terminal (fd=0).\n")
+    output_compare = "%s%s" % (warnings, boundary)
 
     # get expected result from csv
     with open('tests/results_big_query.csv', 'r') as csvfile:
