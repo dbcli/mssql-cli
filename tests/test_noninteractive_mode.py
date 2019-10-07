@@ -45,11 +45,14 @@ def test_query_output():
     """ Tests if -Q has equal output to execute_query. """
     # -Q test
     query_str = "select 1"
-    output_dashq = subprocess.check_output("./mssql-cli -Q '%s'" % \
-        query_str, shell=True).decode("utf-8").rstrip('\n')
+    p = subprocess.Popen("./mssql-cli -Q '%s'" % query_str, shell=True, stdin=subprocess.PIPE,
+                         stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    output_dashq = p.communicate()[0].decode("utf-8").rstrip('\n')
 
     # compare with this result
     output_compare = (
+        "Warning: Output is not to a terminal (fd=1).\n" +
+        "Warning: Input is not to a terminal (fd=0).\n" +
         "+--------------------+\n" +
         "| (No column name)   |\n" +
         "|--------------------|\n" +
