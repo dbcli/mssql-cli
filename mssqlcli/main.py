@@ -52,7 +52,12 @@ def run_cli_with(options):
     mssqlcli.connect_to_database()
 
     telemetry_session.set_server_information(mssqlcli.mssqlcliclient_main)
-    mssqlcli.run()
+
+    # don't run cli if query is specified
+    if not options.query:
+        mssqlcli.run()
+    else:
+        mssqlcli.execute_query(str(options.query))
 
 
 def configure_and_update_options(options):

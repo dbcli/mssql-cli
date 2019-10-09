@@ -185,10 +185,6 @@ class MssqlCli(object):
         self.prompt_session = None
         self.integrated_auth = options.integrated_auth
 
-        # check for interactive mode
-        self.interactive_mode = not options.query
-        self.query_text = str(options.query)
-
         self.sqltoolsclient = SqlToolsClient(enable_logging=options.enable_sqltoolsservice_logging)
         self.mssqlcliclient_main = MssqlCliClient(options, self.sqltoolsclient)
 
@@ -306,11 +302,12 @@ class MssqlCli(object):
             editor_command = special.editor_command(text)
         return text
 
-    def execute_command(self, text, query):
+    def execute_interactive_command(self, text, query):
+        """ Runs commands in the interactive CLI mode """
         logger = self.logger
 
         try:
-            output, query = self._evaluate_command(text)
+            query = self.execute_query(text, is_interactive=True)
         except KeyboardInterrupt:
             # Issue where Ctrl+C propagates to sql tools service process and kills it,
             # so that query/cancel request can't be sent.
@@ -328,20 +325,6 @@ class MssqlCli(object):
             logger.error("traceback: %r", traceback.format_exc())
             click.secho(str(e), err=True, fg='red')
         else:
-            try:
-                if self.output_file and not text.startswith(('\\o ', '\\? ')):
-                    try:
-                        with open(self.output_file, 'a', encoding='utf-8') as f:
-                            click.echo(text, file=f)
-                            click.echo('\n'.join(output), file=f)
-                            click.echo('', file=f)  # extra newline
-                    except IOError as e:
-                        click.secho(str(e), err=True, fg='red')
-                else:
-                    click.echo_via_pager('\n'.join(output))
-            except KeyboardInterrupt:
-                pass
-
             if query.total_time > 1:
                 print('Time: %0.03fs (%s)' % (query.total_time,
                                             humanize.time.naturaldelta(query.total_time)))
@@ -357,6 +340,32 @@ class MssqlCli(object):
             elif query.meta_changed:
                 self.refresh_completions(persist_priorities='all')
 
+        if not query.contains_secure_statement:
+            # Allow MssqlCompleter to learn user's preferred keywords, etc.
+            with self._completer_lock:
+                self.completer.extend_query_history(text)
+
+            self.query_history.append(query)
+
+    def execute_query(self, text, is_interactive=False):
+        """ Processes a query string and outputs to file or terminal """
+        output, query = self._evaluate_command(text, is_interactive=is_interactive)
+
+        if self.output_file and not text.startswith(('\\o ', '\\? ')):
+            try:
+                with open(self.output_file, 'a', encoding='utf-8') as f:
+                    click.echo(text, file=f)
+                    click.echo('\n'.join(output), file=f)
+                    click.echo('', file=f)  # extra newline
+            except IOError as e:
+                click.secho(str(e), err=True, fg='red')
+        else:
+            click.echo_via_pager('\n'.join(output))
+
+        # shutdown client if in non-interactive mode
+        if not is_interactive:
+            self.mssqlcliclient_main.shutdown()
+
         return query
 
     def run(self):
@@ -370,8 +379,7 @@ class MssqlCli(object):
 
         self.prompt_session = self._build_cli(history)
 
-        # don't print headers in non-interactive mode to mimic sqlcmd behavior
-        if not self.less_chatty and self.interactive_mode:
+        if not self.less_chatty:
             print('Version: {}'.format(__version__))
             print('Mail: sqlcli@microsoft.com')
             print('Home: http://github.com/dbcli/mssql-cli')
@@ -379,11 +387,7 @@ class MssqlCli(object):
         try:
             while True:
                 try:
-                    # set query text either from prompt or cli depending on interactive mode
-                    if self.interactive_mode:
-                        text = self.prompt_session.prompt()
-                    else:
-                        text = self.query_text
+                    text = self.prompt_session.prompt()
                 except KeyboardInterrupt:
                     continue
 
@@ -404,20 +408,8 @@ class MssqlCli(object):
 
                 # Initialize default metaquery in case execution fails
                 query = MetaQuery(query=text, successful=False)
-                query = self.execute_command(text, query)
+                self.execute_interactive_command(text, query)
                 self.now = dt.datetime.today()
-
-                if not query.contains_secure_statement:
-                    # Allow MssqlCompleter to learn user's preferred keywords, etc.
-                    with self._completer_lock:
-                        self.completer.extend_query_history(text)
-
-                    self.query_history.append(query)
-
-                # shutdown and exit if not in interactive mode
-                if not self.interactive_mode:
-                    self.mssqlcliclient_main.shutdown()
-                    break
 
         except EOFError:
             self.mssqlcliclient_main.shutdown()
@@ -485,7 +477,7 @@ class MssqlCli(object):
             return False
         return self.row_limit > 0 and len(rows) > self.row_limit
 
-    def _evaluate_command(self, text):
+    def _evaluate_command(self, text, is_interactive):
         """Used to run a command entered by the user during CLI operation
         (Puts the E in REPL)
 
@@ -512,7 +504,7 @@ class MssqlCli(object):
                 self.mssqlcliclient_main.execute_query(text):
 
             total = time() - start
-            if self.interactive_mode and self._should_show_limit_prompt(status, rows):
+            if self._should_show_limit_prompt(status, rows) and is_interactive:
                 click.secho('The result set has more than %s rows.'
                             % self.row_limit, fg='red')
                 if not click.confirm('Do you want to continue?'):
@@ -526,7 +518,7 @@ class MssqlCli(object):
                 all_success = False
                 continue
 
-            if self.auto_expand:
+            if self.auto_expand and self.prompt_session:
                 max_width = self.prompt_session.output.get_size().columns
             else:
                 max_width = None
