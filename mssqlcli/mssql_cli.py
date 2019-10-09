@@ -342,13 +342,11 @@ class MssqlCli(object):
             except KeyboardInterrupt:
                 pass
 
-            # only print elapsed time in interactive mode to mimic sqlcmd behavior
-            if self.interactive_mode:
-                if query.total_time > 1:
-                    print('Time: %0.03fs (%s)' % (query.total_time,
-                                                humanize.time.naturaldelta(query.total_time)))
-                else:
-                    print('Time: %0.03fs' % query.total_time)
+            if query.total_time > 1:
+                print('Time: %0.03fs (%s)' % (query.total_time,
+                                            humanize.time.naturaldelta(query.total_time)))
+            else:
+                print('Time: %0.03fs' % query.total_time)
 
             # Check if we need to update completions, in order of most
             # to least drastic changes
