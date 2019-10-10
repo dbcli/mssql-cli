@@ -11,25 +11,29 @@ def test_session_closure_query_invalid():
     assert is_processed_closed("asdfasoifjas")
 
 def test_query_large():
-    """ Test against query with over 1000 lines """
+    """ Test against query with over 1000 lines. """
     query_str = "SELECT * FROM STRING_SPLIT(REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024), ',')"
+    file_baseline = './tests/query_tests/big_query.txt'
+    output, output_baseline = is_query_valid(query_str, file_baseline)
+    assert output == output_baseline
+
+def test_query_small():
+    """ Tests if -Q has equal output to execute_query. """
+    query_str = "select 1"
+    file_baseline = './tests/query_tests/small_query.txt'
+    output, output_baseline = is_query_valid(query_str, file_baseline)
+    assert output == output_baseline
+
+def is_query_valid(query_str, file_baseline):
+    """ Helper method for running a query with -Q. """
     p = subprocess.Popen("./mssql-cli -Q \"%s\"" % query_str, shell=True, stdin=subprocess.PIPE,
                          stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     output = p.communicate()[0].decode("utf-8")
-    output_baseline = get_file_contents('./tests/query_tests/big_query.txt')
-    assert output == output_baseline
-
-def test_query_output():
-    """ Tests if -Q has equal output to execute_query. """
-    query_str = "select 1"
-    p = subprocess.Popen("./mssql-cli -Q '%s'" % query_str, shell=True, stdin=subprocess.PIPE,
-                         stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    output = p.communicate()[0].decode("utf-8").rstrip('\n')
-    output_baseline = get_file_contents('./tests/query_tests/small_query.txt')
-    assert output == output_baseline
+    output_baseline = get_file_contents(file_baseline)
+    return output, output_baseline
 
 def is_processed_closed(query_str):
-    """ Runs unit tests on process closure given a query string """
+    """ Runs unit tests on process closure given a query string. """
     mssql_cli = create_mssql_cli()
     mssql_cli.execute_query(query_str)
     mssql_cli.shutdown()
@@ -41,7 +45,7 @@ def is_process_terminated(mssql_cli):
         is not None
 
 def get_file_contents(file_path):
-    """ Get expected result from file """
+    """ Get expected result from file. """
     try:
         with open(file_path, 'r') as f:
             return f.read()
