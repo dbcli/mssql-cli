@@ -350,23 +350,30 @@ class MssqlCli(object):
     def execute_query(self, text, is_interactive=False):
         """ Processes a query string and outputs to file or terminal """
         output, query = self._evaluate_command(text, is_interactive=is_interactive)
-
-        if self.output_file and not text.startswith(('\\o ', '\\? ')):
-            try:
-                with open(self.output_file, 'a', encoding='utf-8') as f:
-                    click.echo(text, file=f)
-                    click.echo('\n'.join(output), file=f)
-                    click.echo('', file=f)  # extra newline
-            except IOError as e:
-                click.secho(str(e), err=True, fg='red')
-        else:
-            click.echo_via_pager('\n'.join(output))
+        self.output_query(output, is_interactive=is_interactive)
 
         # shutdown client if in non-interactive mode
         if not is_interactive:
             self.mssqlcliclient_main.shutdown()
 
         return query
+
+    @staticmethod
+    def output_query(output, is_interactive):
+        """ Specifies how query output is handled """
+        if is_interactive:
+            click.echo_via_pager('\n'.join(output))
+        else:
+            # FIXME: this will be changed
+            # if self.output_file and not text.startswith(('\\o ', '\\? ')):
+            #     try:
+            #         with open(self.output_file, 'a', encoding='utf-8') as f:
+            #             click.echo(text, file=f)
+            #             click.echo('\n'.join(output), file=f)
+            #             click.echo('', file=f)  # extra newline
+            #     except IOError as e:
+            #         click.secho(str(e), err=True, fg='red')
+            click.echo('\n'.join(output))
 
     def run(self):
         history_file = self.config['main']['history_file']
