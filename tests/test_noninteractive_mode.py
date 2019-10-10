@@ -11,36 +11,22 @@ def test_session_closure_query_invalid():
     assert is_processed_closed("asdfasoifjas")
 
 def test_query_large():
+    """ Test against query with over 1000 lines """
     query_str = "SELECT * FROM STRING_SPLIT(REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024), ',')"
     p = subprocess.Popen("./mssql-cli -Q \"%s\"" % query_str, shell=True, stdin=subprocess.PIPE,
                          stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     output = p.communicate()[0].decode("utf-8")
-    
-    # get expected result from txt
-    output_compare = ""
-    with open('tests/results_big_query.txt', 'r') as f:
-        output_compare = f.read()
-
-    assert output == output_compare
+    output_baseline = get_file_contents('./tests/query_tests/big_query.txt')
+    assert output == output_baseline
 
 def test_query_output():
     """ Tests if -Q has equal output to execute_query. """
-    # -Q test
     query_str = "select 1"
     p = subprocess.Popen("./mssql-cli -Q '%s'" % query_str, shell=True, stdin=subprocess.PIPE,
                          stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    output_test = p.communicate()[0].decode("utf-8").rstrip('\n')
-
-    # compare with this result
-    output_baseline = (
-        "+--------------------+\n" +
-        "| (No column name)   |\n" +
-        "|--------------------|\n" +
-        "| 1                  |\n" +
-        "+--------------------+\n" +
-        "(1 row affected)"
-    )
-    assert output_baseline == output_test
+    output = p.communicate()[0].decode("utf-8").rstrip('\n')
+    output_baseline = get_file_contents('./tests/query_tests/small_query.txt')
+    assert output == output_baseline
 
 def is_processed_closed(query_str):
     """ Runs unit tests on process closure given a query string """
@@ -53,3 +39,11 @@ def is_process_terminated(mssql_cli):
     """ Checks if mssql_cli instance has terminated. """
     return mssql_cli.mssqlcliclient_main.sql_tools_client.tools_service_process.poll() \
         is not None
+
+def get_file_contents(file_path):
+    """ Get expected result from file """
+    try:
+        with open(file_path, 'r') as f:
+            return f.read()
+    except OSError as e:
+        raise e
