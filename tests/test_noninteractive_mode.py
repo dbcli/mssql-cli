@@ -2,6 +2,10 @@
 import subprocess
 from mssqltestutils import create_mssql_cli
 
+# TESTS
+
+file_root = './tests/test_query_results/'
+
 def test_session_closure_query_valid():
     """ Test session closure for valid query. """
     assert is_processed_closed("select 1")
@@ -13,16 +17,26 @@ def test_session_closure_query_invalid():
 def test_query_large():
     """ Test against query with over 1000 lines. """
     query_str = "SELECT * FROM STRING_SPLIT(REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024), ',')"
-    file_baseline = './tests/query_tests/big_query.txt'
-    output, output_baseline = is_query_valid(query_str, file_baseline)
-    assert output == output_baseline
+    file_baseline = file_root + 'big.txt'
+    output_query, output_file = is_query_valid(query_str, file_baseline)
+    assert output_query == output_file
 
 def test_query_small():
     """ Tests if -Q has equal output to execute_query. """
     query_str = "select 1"
-    file_baseline = './tests/query_tests/small_query.txt'
-    output, output_baseline = is_query_valid(query_str, file_baseline)
-    assert output == output_baseline
+    file_baseline = file_root + 'small.txt'
+    output_query, output_file = is_query_valid(query_str, file_baseline)
+    assert output_query == output_file
+
+def test_query_multiple():
+    """ Tests two simple queries in one string. """
+    query_str = "select 1; select 2;"
+    file_baseline = file_root + 'multiple.txt'
+    output_query, output_file = is_query_valid(query_str, file_baseline)
+    assert output_query == output_file
+
+
+# HELPER FUNCTIONS
 
 def is_query_valid(query_str, file_baseline):
     """ Helper method for running a query with -Q. """
