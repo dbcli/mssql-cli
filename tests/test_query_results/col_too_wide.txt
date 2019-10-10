@@ -1,0 +1,2 @@
+Msg 103, Level 15, State 4, Line 1
+The identifier that starts with 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' is too long. Maximum length is 128.

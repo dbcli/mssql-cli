@@ -1,20 +1,32 @@
-import click
 import datetime as dt
 import functools
-import humanize
 import itertools
 import logging
 import os
 import sys
 import threading
 import traceback
-
-from cli_helpers.tabular_output import TabularOutputFormatter
-from cli_helpers.tabular_output.preprocessors import (align_decimals,
-                                                      format_numbers)
+# pylint: disable=redefined-builtin
 from codecs import open
 from collections import namedtuple
 from time import time
+from cli_helpers.tabular_output import TabularOutputFormatter
+from cli_helpers.tabular_output.preprocessors import (align_decimals,
+                                                      format_numbers)
+import humanize
+import click
+from prompt_toolkit.shortcuts.prompt import PromptSession, CompleteStyle
+from prompt_toolkit.completion import DynamicCompleter, ThreadedCompleter
+from prompt_toolkit.enums import DEFAULT_BUFFER, EditingMode
+from prompt_toolkit.document import Document
+from prompt_toolkit.filters import HasFocus, IsDone
+from prompt_toolkit.lexers import PygmentsLexer
+from prompt_toolkit.layout.processors import (ConditionalProcessor,
+                                              HighlightMatchingBracketProcessor,
+                                              TabsProcessor)
+from prompt_toolkit.history import FileHistory
+from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+from pygments.lexers.sql import PostgresLexer
 
 from mssqlcli.config import (
     get_casing_file,
@@ -35,18 +47,6 @@ from mssqlcli.sqltoolsclient import SqlToolsClient
 from mssqlcli.packages import special
 from mssqlcli.mssqlbuffer import mssql_is_multiline
 
-from prompt_toolkit.shortcuts.prompt import PromptSession, CompleteStyle
-from prompt_toolkit.completion import DynamicCompleter, ThreadedCompleter
-from prompt_toolkit.enums import DEFAULT_BUFFER, EditingMode
-from prompt_toolkit.document import Document
-from prompt_toolkit.filters import HasFocus, IsDone
-from prompt_toolkit.lexers import PygmentsLexer
-from prompt_toolkit.layout.processors import (ConditionalProcessor,
-                                              HighlightMatchingBracketProcessor,
-                                              TabsProcessor)
-from prompt_toolkit.history import FileHistory
-from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
-from pygments.lexers.sql import PostgresLexer
 import mssqlcli.localized_strings as localized
 
 
@@ -417,7 +417,7 @@ class MssqlCli(object):
             self.mssqlcliclient_main.shutdown()
             if not self.less_chatty:
                 print(localized.goodbye())
-    
+
 
     def _build_cli(self, history):
 
