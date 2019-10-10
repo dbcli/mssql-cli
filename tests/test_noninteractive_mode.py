@@ -1,6 +1,5 @@
 """ Non-interactive tests. """
 import subprocess
-import csv
 from mssqltestutils import create_mssql_cli
 
 def test_session_closure_query_valid():
@@ -16,25 +15,11 @@ def test_query_large():
     p = subprocess.Popen("./mssql-cli -Q \"%s\"" % query_str, shell=True, stdin=subprocess.PIPE,
                          stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     output = p.communicate()[0].decode("utf-8")
-
-    # start to build the output string to compare
-    boundary = "+---------+\n"
-    header_underscore = "|---------|\n"
-    output_compare = "%s" % boundary
-
-    # get expected result from csv
-    with open('tests/results_big_query.csv', 'r') as csvfile:
-        reader = csv.reader(csvfile)
-        headers = next(reader)
-        output_compare += "| %s   |\n%s" % (headers[0], header_underscore)
-
-        for row in reader:
-            for col in row:
-                output_compare += "| %s       |\n" % col
-
-        output_compare += "|         |\n"
-        output_compare += boundary
-        output_compare += "(1025 rows affected)\n"
+    
+    # get expected result from txt
+    output_compare = ""
+    with open('tests/results_big_query.txt', 'r') as f:
+        output_compare = f.read()
 
     assert output == output_compare
 
