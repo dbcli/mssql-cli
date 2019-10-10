@@ -351,11 +351,6 @@ class MssqlCli(object):
         """ Processes a query string and outputs to file or terminal """
         output, query = self._evaluate_command(text, is_interactive=is_interactive)
         self.output_query(output, is_interactive=is_interactive)
-
-        # shutdown client if in non-interactive mode
-        if not is_interactive:
-            self.mssqlcliclient_main.shutdown()
-
         return query
 
     @staticmethod
@@ -571,6 +566,10 @@ class MssqlCli(object):
                 click.secho('Reconnected!\nTry the command again.', fg='green')
             except Exception as e:
                 click.secho(str(e), err=True, fg='red')
+
+    def shutdown(self):
+        """ API for shutting down client """
+        self.mssqlcliclient_main.shutdown()
 
     def reset(self):
         """

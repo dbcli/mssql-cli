@@ -61,6 +61,7 @@ def is_processed_closed(query_str):
     """ Runs unit tests on process closure given a query string """
     mssql_cli = create_mssql_cli()
     mssql_cli.execute_query(query_str)
+    mssql_cli.shutdown()
     return is_process_terminated(mssql_cli)
 
 def is_process_terminated(mssql_cli):
