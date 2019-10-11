@@ -1,14 +1,21 @@
-""" Non-interactive tests. """
+"""
+Non-interactive tests.
+"""
 import subprocess
+import pytest
 from mssqltestutils import (
     create_mssql_cli,
     # create_test_db,
     # clean_up_test_db,
 )
 
-# TODO: split up into multiple classes and create automated way to generate query files
-class TestNonInteractive:
-    """ Tests non-interactive features. """
+# TODO: add -s with pytest_adotpion
+
+
+class TestNonInteractiveResults:
+    """
+    Tests non-interactive features.
+    """
 
     file_root = './tests/test_query_results/'
 
@@ -20,48 +27,22 @@ class TestNonInteractive:
     # def teardown_class(cls):
     #     clean_up_test_db(cls.test_db)
 
+    testdata = [
+        ("SELECT * FROM STRING_SPLIT(REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024), ',')",
+         file_root + 'big.txt'),
+        ("select 1", file_root + 'small.txt'),
+        ("select 1; select 2;", file_root + 'multiple.txt'),
+        ("select %s" % ('x' * 250), file_root + 'col_too_wide.txt')
+    ]
 
-    # TESTS
-    def test_session_closure_query_valid(self):
-        """ Test session closure for valid query. """
-        assert self.is_processed_closed("select 1")
-
-    def test_session_closure_query_invalid(self):
-        """ Test session closure for invalid query. """
-        assert self.is_processed_closed("asdfasoifjas")
-
-    def test_query_large(self):
-        """ Test against query with over 1000 lines. """
-        query_str = "SELECT * FROM STRING_SPLIT(REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024), ',')"
-        file_baseline = self.file_root + 'big.txt'
-        output_query, output_file = self.get_query_results(query_str, file_baseline)
-        assert output_query == output_file
-
-    def test_query_small(self):
-        """ Tests if -Q has equal output to execute_query. """
-        query_str = "select 1"
-        file_baseline = self.file_root + 'small.txt'
-        output_query, output_file = self.get_query_results(query_str, file_baseline)
-        assert output_query == output_file
-
-    def test_query_multiple(self):
-        """ Tests two simple queries in one string. """
-        query_str = "select 1; select 2;"
-        file_baseline = self.file_root + 'multiple.txt'
-        output_query, output_file = self.get_query_results(query_str, file_baseline)
-        assert output_query == output_file
-
-    def test_col_too_wide(self):
-        """ Tests query where column is too wide. """
-        s = 'x' * 250
-        query_str = "select %s" % s
-        file_baseline = self.file_root + 'col_too_wide.txt'
+    @pytest.mark.parametrize("query_str, file_baseline", testdata)
+    def test_query(self, query_str, file_baseline):
         output_query, output_file = self.get_query_results(query_str, file_baseline)
         assert output_query == output_file
 
     # TODO: test that calling run with interactive_mode off returns error
-    def test_invalid_run(self):
-        pass
+    # def test_invalid_run(self):
+    #     pass
 
     # HELPER FUNCTIONS
 
@@ -73,24 +54,42 @@ class TestNonInteractive:
         output_baseline = self.get_file_contents(file_baseline)
         return output, output_baseline
 
-    # TODO: rename--split funcitonality in setup and teardown
-    def is_processed_closed(self, query_str):
-        """ Runs unit tests on process closure given a query string. """
-        print("\n")
-        mssql_cli = create_mssql_cli()
-        mssql_cli.execute_query(query_str)
-        mssql_cli.shutdown()
-        return self.is_process_terminated(mssql_cli)
-
-    def is_process_terminated(self, mssql_cli):
-        """ Checks if mssql_cli instance has terminated. """
-        return mssql_cli.mssqlcliclient_main.sql_tools_client.tools_service_process.poll() \
-            is not None
-
-    def get_file_contents(self, file_path):
+    @staticmethod
+    def get_file_contents(file_path):
         """ Get expected result from file. """
         try:
             with open(file_path, 'r') as f:
                 return f.read()
         except OSError as e:
             raise e
+
+
+class TestNonInteractiveClosure:
+    """
+    Ensures that client session has shut down after mssql-cli runs in non-interactive mode.
+    """
+    testdata = [
+        "select 1",
+        "gibberish"
+    ]
+
+    @classmethod
+    def setup_class(cls):
+        """
+        Instantiate empty mssql_cli
+        """
+        cls.mssql_cli = None
+
+    def setup_method(self):
+        """ Create new mssql-cli instance for each test """
+        self.mssql_cli = create_mssql_cli()
+
+    @pytest.mark.parametrize("query_str", testdata)
+    def test_session_closure(self, query_str):
+        """ Runs unit tests on process closure given a query string. """
+        print("\n")
+        self.mssql_cli = create_mssql_cli()
+        self.mssql_cli.execute_query(query_str)
+        self.mssql_cli.shutdown()
+        assert self.mssql_cli.mssqlcliclient_main.sql_tools_client.tools_service_process.poll() \
+            is not None
