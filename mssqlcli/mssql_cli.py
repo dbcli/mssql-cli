@@ -152,7 +152,7 @@ class MssqlCli(object):
         self.wider_completion_menu = c['main'].as_bool('wider_completion_menu')
 
         # override interactive mode to false if query is set
-        self.interactive_mode = options.interactive_mode and not options.query
+        self.interactive_mode = options.interactive_mode
 
         self.less_chatty = bool(
             options.less_chatty) or c['main'].as_bool('less_chatty') or self.interactive_mode

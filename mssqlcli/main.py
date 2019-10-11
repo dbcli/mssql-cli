@@ -42,15 +42,21 @@ def run_cli_with(options):
     from mssqlcli.mssql_cli import MssqlCli
 
     mssqlcli = MssqlCli(options)
-    mssqlcli.connect_to_database()
+    try:
+        # set interactive mode to false if -Q is specified
+        if options.query:
+            mssqlcli.interactive_mode = False
 
-    telemetry_session.set_server_information(mssqlcli.mssqlcliclient_main)
+        mssqlcli.connect_to_database()
+        telemetry_session.set_server_information(mssqlcli.mssqlcliclient_main)
 
-    # don't run cli if query is specified
-    if not options.query:
-        mssqlcli.run()
-    else:
-        mssqlcli.execute_query(str(options.query))
+        if mssqlcli.interactive_mode:
+            # run cli if in interactive mode
+            mssqlcli.run()
+        else:
+            # just execute query otherwise
+            mssqlcli.execute_query(str(options.query))
+    finally:
         mssqlcli.shutdown()
 
 
