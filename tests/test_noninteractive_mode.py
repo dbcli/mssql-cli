@@ -2,6 +2,7 @@
 Non-interactive tests.
 """
 import subprocess
+import os
 import pytest
 from mssqltestutils import (
     create_mssql_cli,
@@ -17,16 +18,7 @@ class TestNonInteractiveResults:
     Tests non-interactive features.
     """
 
-    file_root = './tests/test_query_results/'
-
-    # @classmethod
-    # def setup_class(cls):
-    #     cls.test_db = create_test_db()
-
-    # @classmethod
-    # def teardown_class(cls):
-    #     clean_up_test_db(cls.test_db)
-
+    file_root = '%s/test_query_results/' % os.path.dirname(os.path.abspath(__file__))
     testdata = [
         ("SELECT * FROM STRING_SPLIT(REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024), ',')",
          file_root + 'big.txt'),
@@ -34,6 +26,14 @@ class TestNonInteractiveResults:
         ("select 1; select 2;", file_root + 'multiple.txt'),
         ("select %s" % ('x' * 250), file_root + 'col_too_wide.txt')
     ]
+
+    # @classmethod
+    # def setup_class(cls):
+        # cls.test_db = create_test_db()
+
+    # @classmethod
+    # def teardown_class(cls):
+        # clean_up_test_db(cls.test_db)
 
     @pytest.mark.parametrize("query_str, file_baseline", testdata)
     def test_query(self, query_str, file_baseline):
