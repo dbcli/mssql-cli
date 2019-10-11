@@ -37,7 +37,7 @@ class TestNonInteractiveResults:
 
     @pytest.mark.parametrize("query_str, file_baseline", testdata)
     def test_query(self, query_str, file_baseline):
-        output_query, output_file = self.get_query_results(query_str, file_baseline)
+        output_query, output_file = self.execute_query_via_subprocess(query_str, file_baseline)
         assert output_query == output_file
 
     # TODO: test that calling run with interactive_mode off returns error
@@ -46,7 +46,7 @@ class TestNonInteractiveResults:
 
     # HELPER FUNCTIONS
 
-    def get_query_results(self, query_str, file_baseline):
+    def execute_query_via_subprocess(self, query_str, file_baseline):
         """ Helper method for running a query with -Q. """
         p = subprocess.Popen("./mssql-cli -Q \"%s\"" % query_str, shell=True, stdin=subprocess.PIPE,
                              stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
