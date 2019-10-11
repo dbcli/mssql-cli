@@ -306,9 +306,13 @@ class MssqlCli(object):
             editor_command = special.editor_command(text)
         return text
 
-    def _execute_interactive_command(self, text, query):
+    def _execute_interactive_command(self, text):
         """ Runs commands in the interactive CLI mode. """
+
         logger = self.logger
+
+        # Initialize default metaquery in case execution fails
+        query = MetaQuery(query=text, successful=False)
 
         try:
             output, query = self._evaluate_command(text)
@@ -351,19 +355,16 @@ class MssqlCli(object):
 
             self.query_history.append(query)
 
-        return output, query
+        return output
 
     def execute_query(self, text):
         """ Processes a query string and outputs to file or terminal """
 
-        # Initialize default metaquery in case execution fails
-        query = MetaQuery(query=text, successful=False)
-
         if self.interactive_mode:
-            output, query = self._execute_interactive_command(text, query)
+            output = self._execute_interactive_command(text)
         else:
             # non-interactive mode
-            output, query = self._evaluate_command(text)
+            output, _ = self._evaluate_command(text)
 
         self._output_query(output)
         return output
