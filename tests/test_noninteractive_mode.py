@@ -88,8 +88,10 @@ class TestNonInteractiveClosure:
     def test_session_closure(self, query_str):
         """ Runs unit tests on process closure given a query string. """
         print("\n")
-        self.mssql_cli = create_mssql_cli()
-        self.mssql_cli.execute_query(query_str)
-        self.mssql_cli.shutdown()
-        assert self.mssql_cli.mssqlcliclient_main.sql_tools_client.tools_service_process.poll() \
-            is not None
+        try:
+            self.mssql_cli = create_mssql_cli()
+            self.mssql_cli.execute_query(query_str)
+        finally:
+            self.mssql_cli.shutdown()
+            assert self.mssql_cli.mssqlcliclient_main.sql_tools_client.\
+                tools_service_process.poll() is not None
