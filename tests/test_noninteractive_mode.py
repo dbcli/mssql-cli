@@ -34,21 +34,21 @@ class TestNonInteractive:
         """ Test against query with over 1000 lines. """
         query_str = "SELECT * FROM STRING_SPLIT(REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024), ',')"
         file_baseline = self.file_root + 'big.txt'
-        output_query, output_file = self.is_query_valid(query_str, file_baseline)
+        output_query, output_file = self.get_query_results(query_str, file_baseline)
         assert output_query == output_file
 
     def test_query_small(self):
         """ Tests if -Q has equal output to execute_query. """
         query_str = "select 1"
         file_baseline = self.file_root + 'small.txt'
-        output_query, output_file = self.is_query_valid(query_str, file_baseline)
+        output_query, output_file = self.get_query_results(query_str, file_baseline)
         assert output_query == output_file
 
     def test_query_multiple(self):
         """ Tests two simple queries in one string. """
         query_str = "select 1; select 2;"
         file_baseline = self.file_root + 'multiple.txt'
-        output_query, output_file = self.is_query_valid(query_str, file_baseline)
+        output_query, output_file = self.get_query_results(query_str, file_baseline)
         assert output_query == output_file
 
     def test_col_too_wide(self):
@@ -56,7 +56,7 @@ class TestNonInteractive:
         s = 'x' * 250
         query_str = "select %s" % s
         file_baseline = self.file_root + 'col_too_wide.txt'
-        output_query, output_file = self.is_query_valid(query_str, file_baseline)
+        output_query, output_file = self.get_query_results(query_str, file_baseline)
         assert output_query == output_file
 
     # TODO: test that calling run with interactive_mode off returns error
@@ -65,8 +65,7 @@ class TestNonInteractive:
 
     # HELPER FUNCTIONS
 
-    # TODO: RENAME
-    def is_query_valid(self, query_str, file_baseline):
+    def get_query_results(self, query_str, file_baseline):
         """ Helper method for running a query with -Q. """
         p = subprocess.Popen("./mssql-cli -Q \"%s\"" % query_str, shell=True, stdin=subprocess.PIPE,
                              stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
