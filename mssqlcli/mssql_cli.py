@@ -151,8 +151,8 @@ class MssqlCli(object):
         self.output_style = style_factory_output(self.syntax_style, self.cli_style)
         self.wider_completion_menu = c['main'].as_bool('wider_completion_menu')
 
-        # override interactive mode to false if query is set
-        self.interactive_mode = options.interactive_mode
+        # default value to true--main.py may modify this value
+        self.interactive_mode = True
 
         self.less_chatty = bool(
             options.less_chatty) or c['main'].as_bool('less_chatty') or self.interactive_mode
