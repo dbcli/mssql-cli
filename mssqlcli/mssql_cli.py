@@ -495,7 +495,7 @@ class MssqlCli(object):
         """returns True if limit prompt should be shown, False otherwise."""
         if not rows:
             return False
-        return self.row_limit > 0 and len(rows) > self.row_limit
+        return self.row_limit > 0 and len(rows) > self.row_limit and self.interactive_mode
 
     def _evaluate_command(self, text):
         """Used to run a command entered by the user during CLI operation
@@ -524,7 +524,7 @@ class MssqlCli(object):
                 self.mssqlcliclient_main.execute_query(text):
 
             total = time() - start
-            if self._should_show_limit_prompt(status, rows) and self.interactive_mode:
+            if self._should_show_limit_prompt(status, rows):
                 click.secho('The result set has more than %s rows.'
                             % self.row_limit, fg='red')
                 if not click.confirm('Do you want to continue?'):
