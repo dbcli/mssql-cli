@@ -157,4 +157,11 @@ def create_parser():
         metavar=u'',
         help=u'Prompt format (Default: \\d> ')
 
+    args_parser.add_argument(
+        u'--interactive_mode',
+        dest=u'interactive_mode',
+        metavar=u'',
+        default=True
+    )
+
     return args_parser

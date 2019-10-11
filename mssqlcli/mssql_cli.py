@@ -150,8 +150,12 @@ class MssqlCli(object):
         self.cli_style = c['colors']
         self.output_style = style_factory_output(self.syntax_style, self.cli_style)
         self.wider_completion_menu = c['main'].as_bool('wider_completion_menu')
+
+        # override interactive mode to false if query is set
+        self.interactive_mode = options.interactive_mode and not options.query
+
         self.less_chatty = bool(
-            options.less_chatty) or c['main'].as_bool('less_chatty')
+            options.less_chatty) or c['main'].as_bool('less_chatty') or self.interactive_mode
         self.null_string = c['main'].get('null_string', '<null>')
         self.on_error = c['main']['on_error'].upper()
         self.decimal_format = c['data_formats']['decimal']
@@ -298,16 +302,16 @@ class MssqlCli(object):
                     break
                 except KeyboardInterrupt:
                     sql = ""
-                    
+
             editor_command = special.editor_command(text)
         return text
 
-    def execute_interactive_command(self, text, query):
-        """ Runs commands in the interactive CLI mode """
+    def _execute_interactive_command(self, text, query):
+        """ Runs commands in the interactive CLI mode. """
         logger = self.logger
 
         try:
-            query = self.execute_query(text, is_interactive=True)
+            output, query = self._evaluate_command(text)
         except KeyboardInterrupt:
             # Issue where Ctrl+C propagates to sql tools service process and kills it,
             # so that query/cancel request can't be sent.
@@ -347,16 +351,26 @@ class MssqlCli(object):
 
             self.query_history.append(query)
 
-    def execute_query(self, text, is_interactive=False):
-        """ Processes a query string and outputs to file or terminal """
-        output, query = self._evaluate_command(text, is_interactive=is_interactive)
-        self.output_query(output, is_interactive=is_interactive)
-        return query
+        return output, query
 
-    @staticmethod
-    def output_query(output, is_interactive):
+    def execute_query(self, text):
+        """ Processes a query string and outputs to file or terminal """
+
+        # Initialize default metaquery in case execution fails
+        query = MetaQuery(query=text, successful=False)
+
+        if self.interactive_mode:
+            output, query = self._execute_interactive_command(text, query)
+        else:
+            # non-interactive mode
+            output, query = self._evaluate_command(text)
+
+        self._output_query(output)
+        return output
+
+    def _output_query(self, output):
         """ Specifies how query output is handled """
-        if is_interactive:
+        if self.interactive_mode:
             click.echo_via_pager('\n'.join(output))
         else:
             # FIXME: this will be changed
@@ -371,6 +385,13 @@ class MssqlCli(object):
             click.echo('\n'.join(output))
 
     def run(self):
+        """ Spins up CLI. """
+
+        # raise error if interactive mode is set to false here
+        if not self.interactive_mode:
+            raise ValueError("'run' must be used in interactive mode! Please set \
+                             interactive_mode to True.")
+
         history_file = self.config['main']['history_file']
         if history_file == 'default':
             history_file = config_location() + 'history'
@@ -408,16 +429,13 @@ class MssqlCli(object):
                     click.secho(str(e), err=True, fg='red')
                     continue
 
-                # Initialize default metaquery in case execution fails
-                query = MetaQuery(query=text, successful=False)
-                self.execute_interactive_command(text, query)
+                self.execute_query(text)
                 self.now = dt.datetime.today()
 
         except EOFError:
             self.mssqlcliclient_main.shutdown()
             if not self.less_chatty:
                 print(localized.goodbye())
-
 
     def _build_cli(self, history):
 
@@ -479,7 +497,7 @@ class MssqlCli(object):
             return False
         return self.row_limit > 0 and len(rows) > self.row_limit
 
-    def _evaluate_command(self, text, is_interactive):
+    def _evaluate_command(self, text):
         """Used to run a command entered by the user during CLI operation
         (Puts the E in REPL)
 
@@ -506,7 +524,7 @@ class MssqlCli(object):
                 self.mssqlcliclient_main.execute_query(text):
 
             total = time() - start
-            if self._should_show_limit_prompt(status, rows) and is_interactive:
+            if self._should_show_limit_prompt(status, rows) and self.interactive_mode:
                 click.secho('The result set has more than %s rows.'
                             % self.row_limit, fg='red')
                 if not click.confirm('Do you want to continue?'):
@@ -552,7 +570,8 @@ class MssqlCli(object):
                 meta_changed = meta_changed or self.has_meta_cmd(text)
 
         return output, MetaQuery(
-            text, all_success, total, meta_changed, db_changed, path_changed, mutated, contains_secure_statement)
+            text, all_success, total, meta_changed, db_changed, path_changed, mutated,
+            contains_secure_statement)
 
     def _handle_server_closed_connection(self):
         """Used during CLI execution"""
