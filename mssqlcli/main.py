@@ -41,12 +41,12 @@ def run_cli_with(options):
     # Moved import here so we can create the config dir for first use prior.
     from mssqlcli.mssql_cli import MssqlCli
 
+    # set interactive mode to false if -Q is specified
+    if options.query:
+        options.interactive_mode = False
+
     mssqlcli = MssqlCli(options)
     try:
-        # set interactive mode to false if -Q is specified
-        if options.query:
-            mssqlcli.interactive_mode = False
-
         mssqlcli.connect_to_database()
         telemetry_session.set_server_information(mssqlcli.mssqlcliclient_main)
 
