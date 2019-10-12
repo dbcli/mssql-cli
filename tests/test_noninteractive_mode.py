@@ -23,16 +23,8 @@ class TestNonInteractiveResults:
         ("SELECT 1", file_root + 'small.txt'),
         ("SELECT 1; SELECT 2;", file_root + 'multiple.txt'),
         ("SELECT %s" % ('x' * 250), file_root + 'col_too_wide.txt'),
-        ("SELECT REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024)")
+        # ("SELECT REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024)")
     ]
-
-    # @classmethod
-    # def setup_class(cls):
-        # cls.test_db = create_test_db()
-
-    # @classmethod
-    # def teardown_class(cls):
-        # clean_up_test_db(cls.test_db)
 
     @pytest.mark.parametrize("query_str, file_baseline", testdata)
     def test_query(self, query_str, file_baseline):
@@ -64,7 +56,7 @@ class TestNonInteractiveResults:
             raise e
 
 
-class TestNonInteractiveClosure:
+class TestNonInteractiveShutdown:
     """
     Ensures that client session has shut down after mssql-cli runs in non-interactive mode.
     """
@@ -73,23 +65,16 @@ class TestNonInteractiveClosure:
         "gibberish"
     ]
 
-    @classmethod
-    def setup_class(cls):
-        """
-        Instantiate empty mssql_cli
-        """
-        cls.mssql_cli = None
-
     def setup_method(self):
         """ Create new mssql-cli instance for each test """
+        # pylint: disable=attribute-defined-outside-init
         self.mssql_cli = create_mssql_cli()
 
     @pytest.mark.parametrize("query_str", testdata)
-    def test_session_closure(self, query_str):
+    def test_shutdown_after_query(self, query_str):
         """ Runs unit tests on process closure given a query string. """
         print("\n")
         try:
-            self.mssql_cli = create_mssql_cli()
             self.mssql_cli.execute_query(query_str)
         finally:
             self.mssql_cli.shutdown()
