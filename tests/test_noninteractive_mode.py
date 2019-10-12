@@ -10,8 +10,6 @@ from mssqltestutils import (
     # clean_up_test_db,
 )
 
-# TODO: add -s with pytest_adotpion
-
 
 class TestNonInteractiveResults:
     """
@@ -22,9 +20,10 @@ class TestNonInteractiveResults:
     testdata = [
         ("SELECT * FROM STRING_SPLIT(REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024), ',')",
          file_root + 'big.txt'),
-        ("select 1", file_root + 'small.txt'),
-        ("select 1; select 2;", file_root + 'multiple.txt'),
-        ("select %s" % ('x' * 250), file_root + 'col_too_wide.txt')
+        ("SELECT 1", file_root + 'small.txt'),
+        ("SELECT 1; SELECT 2;", file_root + 'multiple.txt'),
+        ("SELECT %s" % ('x' * 250), file_root + 'col_too_wide.txt'),
+        ("SELECT REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024)")
     ]
 
     # @classmethod
@@ -44,6 +43,8 @@ class TestNonInteractiveResults:
     # TODO: test that calling run with interactive_mode off returns error
     # def test_invalid_run(self):
     #     pass
+
+    # TODO: test wide col
 
     @staticmethod
     def execute_query_via_subprocess(query_str):
