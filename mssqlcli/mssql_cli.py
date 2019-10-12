@@ -131,43 +131,19 @@ class MssqlCli(object):
 
         self.set_default_pager(c)
         self.output_file = None
-
-        self.multiline = c['main'].as_bool('multi_line')
-        self.multiline_mode = c['main'].get('multi_line_mode', 'tsql')
-        self.vi_mode = c['main'].as_bool('vi')
-        self.auto_expand = options.auto_vertical_output or c['main']['expand'] == 'auto'
-        self.expanded_output = c['main']['expand'] == 'always'
-        self.prompt_format = options.prompt or c['main'].get('prompt', self.default_prompt)
-        if options.row_limit is not None:
-            self.row_limit = options.row_limit
-        else:
-            self.row_limit = c['main'].as_int('row_limit')
-
-        self.min_num_menu_lines = c['main'].as_int('min_num_menu_lines')
-        self.multiline_continuation_char = c['main']['multiline_continuation_char']
-        self.table_format = c['main']['table_format']
-        self.syntax_style = c['main']['syntax_style']
-        self.cli_style = c['colors']
-        self.output_style = style_factory_output(self.syntax_style, self.cli_style)
-        self.wider_completion_menu = c['main'].as_bool('wider_completion_menu')
-
         self.interactive_mode = options.interactive_mode
 
-        self.less_chatty = bool(
-            options.less_chatty) or c['main'].as_bool('less_chatty') or self.interactive_mode
-        self.null_string = c['main'].get('null_string', '<null>')
-        self.on_error = c['main']['on_error'].upper()
+        self.table_format = c['main']['table_format']
         self.decimal_format = c['data_formats']['decimal']
         self.float_format = c['data_formats']['float']
+        self.null_string = c['main'].get('null_string', '<null>')
+        self.expanded_output = c['main']['expand'] == 'always'
+        self.auto_expand = options.auto_vertical_output or c['main']['expand'] == 'auto'
+        self.prompt_session = None
+        self.integrated_auth = options.integrated_auth
+        self.less_chatty = bool(
+            options.less_chatty) or c['main'].as_bool('less_chatty') or self.interactive_mode
 
-        self.now = dt.datetime.today()
-
-        self.completion_refresher = CompletionRefresher()
-
-        self.query_history = []
-
-        # Initialize completer
-        smart_completion = True if c['main'].get('smart_completion', 'True') == 'True' else False
         keyword_casing = c['main']['keyword_casing']
         self.settings = {
             'casing_file': get_casing_file(c),
@@ -178,15 +154,38 @@ class MssqlCli(object):
             'case_column_headers': c['main'].as_bool('case_column_headers'),
             'search_path_filter': c['main'].as_bool('search_path_filter'),
             'single_connection': False,
-            'less_chatty': options.less_chatty,
+            'less_chatty': self.less_chatty,
             'keyword_casing': keyword_casing,
         }
 
-        self.completer = MssqlCompleter(smart_completion=smart_completion, settings=self.settings)
-        self._completer_lock = threading.Lock()
+        if self.interactive_mode:
+            self.multiline = c['main'].as_bool('multi_line')
+            self.multiline_mode = c['main'].get('multi_line_mode', 'tsql')
+            self.vi_mode = c['main'].as_bool('vi')
+            self.prompt_format = options.prompt or c['main'].get('prompt', self.default_prompt)
+            if options.row_limit is not None:
+                self.row_limit = options.row_limit
+            else:
+                self.row_limit = c['main'].as_int('row_limit')
 
-        self.prompt_session = None
-        self.integrated_auth = options.integrated_auth
+            self.min_num_menu_lines = c['main'].as_int('min_num_menu_lines')
+            self.multiline_continuation_char = c['main']['multiline_continuation_char']
+            self.syntax_style = c['main']['syntax_style']
+            self.cli_style = c['colors']
+            self.output_style = style_factory_output(self.syntax_style, self.cli_style)
+            self.wider_completion_menu = c['main'].as_bool('wider_completion_menu')
+            self.on_error = c['main']['on_error'].upper()
+
+            self.now = dt.datetime.today()
+
+            self.completion_refresher = CompletionRefresher()
+
+            self.query_history = []
+
+            # Initialize completer
+            smart_completion = True if c['main'].get('smart_completion', 'True') == 'True' else False
+            self.completer = MssqlCompleter(smart_completion=smart_completion, settings=self.settings)
+            self._completer_lock = threading.Lock()
 
         self.sqltoolsclient = SqlToolsClient(enable_logging=options.enable_sqltoolsservice_logging)
         self.mssqlcliclient_main = MssqlCliClient(options, self.sqltoolsclient)
@@ -495,7 +494,7 @@ class MssqlCli(object):
         """returns True if limit prompt should be shown, False otherwise."""
         if not rows:
             return False
-        return self.row_limit > 0 and len(rows) > self.row_limit and self.interactive_mode
+        return self.interactive_mode and self.row_limit > 0 and len(rows) > self.row_limit
 
     def _evaluate_command(self, text):
         """Used to run a command entered by the user during CLI operation
@@ -551,7 +550,8 @@ class MssqlCli(object):
                 expanded=self.expanded_output,
                 max_width=max_width,
                 case_function=(
-                    self.completer.case if self.settings['case_column_headers']
+                    self.completer.case if self.interactive_mode and
+                    self.settings['case_column_headers']
                     else
                     lambda x: x
                 )
