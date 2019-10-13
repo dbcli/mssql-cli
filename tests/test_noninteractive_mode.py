@@ -33,6 +33,19 @@ class TestNonInteractiveResults:
         assert output_query == output_baseline
 
     @staticmethod
+    def test_noninteractive_run():
+        """ Test that calling run throws an exception only when interactive_mode is false """
+        mssqlcli = create_mssql_cli(interactive_mode=False)
+        try:
+            mssqlcli.run()
+            mssqlcli.shutdown()
+            assert False
+        except ValueError:
+            assert True
+        finally:
+            mssqlcli.shutdown()
+
+    @staticmethod
     def execute_query_via_subprocess(query_str):
         """ Helper method for running a query with -Q. """
         p = subprocess.Popen("./mssql-cli -Q \"%s\"" % query_str, shell=True, stdin=subprocess.PIPE,
@@ -74,15 +87,6 @@ class TestNonInteractiveShutdown:
             self.mssql_cli.shutdown()
             assert self.mssql_cli.mssqlcliclient_main.sql_tools_client.\
                 tools_service_process.poll() is not None
-
-
-# TODO
-class TestNonInteractiveApi:
-    """
-    Test API for non-CLI use cases.
-    """
-    # TODO: test that calling run() on interactive mode raises exception
-
 
 # TODO
 class TestNonInteractiveDbModification:
