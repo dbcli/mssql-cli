@@ -19,11 +19,11 @@ class TestNonInteractiveResults:
     file_root = '%s/test_query_results/' % os.path.dirname(os.path.abspath(__file__))
     testdata = [
         ("SELECT * FROM STRING_SPLIT(REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024), ',')",
-         file_root + 'big.txt'),
-        ("SELECT 1", file_root + 'small.txt'),
-        ("SELECT 1; SELECT 2;", file_root + 'multiple.txt'),
-        ("SELECT %s" % ('x' * 250), file_root + 'col_too_wide.txt'),
-        # ("SELECT REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024)")
+         '%sbig.txt' % file_root),
+        ("SELECT 1", '%ssmall.txt' % file_root),
+        ("SELECT 1; SELECT 2;", '%smultiple.txt' % file_root),
+        ("SELECT %s" % ('x' * 250), '%scol_too_wide.txt' % file_root),
+        ("SELECT REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024)", '%scol_wide.txt' % file_root)
     ]
 
     @pytest.mark.parametrize("query_str, file_baseline", testdata)
@@ -31,12 +31,6 @@ class TestNonInteractiveResults:
         output_query = self.execute_query_via_subprocess(query_str)
         output_baseline = self.get_file_contents(file_baseline)
         assert output_query == output_baseline
-
-    # TODO: test that calling run with interactive_mode off returns error
-    # def test_invalid_run(self):
-    #     pass
-
-    # TODO: test wide col
 
     @staticmethod
     def execute_query_via_subprocess(query_str):
@@ -80,3 +74,18 @@ class TestNonInteractiveShutdown:
             self.mssql_cli.shutdown()
             assert self.mssql_cli.mssqlcliclient_main.sql_tools_client.\
                 tools_service_process.poll() is not None
+
+
+# TODO
+class TestNonInteractiveApi:
+    """
+    Test API for non-CLI use cases.
+    """
+    # TODO: test that calling run() on interactive mode raises exception
+
+
+# TODO
+class TestNonInteractiveDbModification:
+    """
+    Test DB modification in non-interactive mode.
+    """
