@@ -38,7 +38,6 @@ class TestNonInteractiveResults:
         mssqlcli = create_mssql_cli(interactive_mode=False)
         try:
             mssqlcli.run()
-            mssqlcli.shutdown()
             assert False
         except ValueError:
             assert True
@@ -80,16 +79,6 @@ class TestNonInteractiveDbModification:
     @pytest.fixture(scope="function")
     def mssqlcli(test_db):
         return create_mssql_cli(interactive_mode=False, database=test_db)
-
-    """
-    TODO: TESTS TO CONSIDER:
-    create table
-    modify table name
-    modify column
-    add column
-    delete column
-    delete table
-"""
 
     @staticmethod
     def test_create_table(test_db, mssqlcli):
