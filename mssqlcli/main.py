@@ -51,10 +51,8 @@ def run_cli_with(options):
         telemetry_session.set_server_information(mssqlcli.mssqlcliclient_main)
 
         if mssqlcli.interactive_mode:
-            # run cli if in interactive mode
             mssqlcli.run()
         else:
-            # just execute query otherwise
             mssqlcli.execute_query(str(options.query))
     finally:
         mssqlcli.shutdown()

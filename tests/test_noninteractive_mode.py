@@ -4,11 +4,7 @@ Non-interactive tests.
 import subprocess
 import os
 import pytest
-from mssqltestutils import (
-    create_mssql_cli,
-    create_test_db,
-    clean_up_test_db,
-)
+from mssqltestutils import create_mssql_cli
 
 _FILE_ROOT = '%s/test_query_results/' % os.path.dirname(os.path.abspath(__file__))
 
@@ -60,37 +56,6 @@ class TestNonInteractiveResults:
                 return f.read()
         except OSError as e:
             raise e
-
-
-class TestNonInteractiveDbModification:
-    """
-    Test DB modification in non-interactive mode.
-    """
-
-    @staticmethod
-    @pytest.fixture(scope="class")
-    def test_db():
-        """ pytest fixture that creates test db """
-        test_db = create_test_db()
-        yield test_db
-        clean_up_test_db(test_db)
-
-    @staticmethod
-    @pytest.fixture(scope="function")
-    def mssqlcli(test_db):
-        return create_mssql_cli(interactive_mode=False, database=test_db)
-
-    @staticmethod
-    def test_create_table(test_db, mssqlcli):
-        """ Tests expected result for query. """
-        output = str(mssqlcli.execute_query("CREATE TABLE %s (test_col_int int)" % test_db))
-        assert output == "['Commands completed successfully.']"
-
-    @staticmethod
-    def test_drop_table(test_db, mssqlcli):
-        """ Tests expected result for query. """
-        output = str(mssqlcli.execute_query("DROP TABLE %s" % test_db))
-        assert output == "['Commands completed successfully.']"
 
 
 class TestNonInteractiveShutdown:
