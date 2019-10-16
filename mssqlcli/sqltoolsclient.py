@@ -87,18 +87,33 @@ class SqlToolsClient(object):
             return request
 
     def shutdown(self):
-        self.json_rpc_client.shutdown()
+        try:
+            self.json_rpc_client.shutdown()
+        except NameError:
+            # json rpc client already shut down
+            pass
 
         if self.tools_service_process:
-            logger.info(u'Shutting down Sql Tools Client Process Id: {0}'.format(self.tools_service_process.pid))
-            self.tools_service_process.kill()
-            # Give the tools service process time to die
-            time.sleep(0.1)
-            # Close the stdout file handle or else we would get a resource warning (found via pytest).
-            # This must be closed after the process is killed, otherwise we would block because the process is using
-            # it's stdout.
-            self.tools_service_process.stdout.close()
-            # None value indicates process has not terminated.
-            if not self.tools_service_process.poll():
-                sys.stderr.write(
-                    u'\nSql Tools Service process was not shut down properly.')
+            try:
+                logger.info(u'Shutting down Sql Tools Client Process Id: {0}'\
+                            .format(self.tools_service_process.pid))
+            except NameError:
+                # logger already shut down
+                pass
+
+            try:
+                # kill process and give it time to die
+                self.tools_service_process.kill()
+                self.tools_service_process.wait()
+            except OSError:
+                # catches 'No such process' error from Python 2
+                pass
+            finally:
+                # Close the stdout file handle or else we would get a resource warning (found via
+                # pytest). This must be closed after the process is killed, otherwise we would block
+                # because the process is using it's stdout.
+                self.tools_service_process.stdout.close()
+                # None value indicates process has not terminated.
+                if not self.tools_service_process.poll():
+                    sys.stderr.write(
+                        u'\nSql Tools Service process was not shut down properly.')
