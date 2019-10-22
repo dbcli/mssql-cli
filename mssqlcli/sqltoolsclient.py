@@ -96,7 +96,7 @@ class SqlToolsClient(object):
             try:
                 # kill process and give it time to die
                 self.tools_service_process.kill()
-                self.tools_service_process.wait()
+                time.sleep(0.1)
             except OSError:
                 # catches 'No such process' error from Python 2
                 pass
@@ -107,5 +107,5 @@ class SqlToolsClient(object):
                 self.tools_service_process.stdout.close()
                 # None value indicates process has not terminated.
                 if not self.tools_service_process.poll():
-                    sys.stderr.write(
+                    logger.warning(
                         u'\nSql Tools Service process was not shut down properly.')
