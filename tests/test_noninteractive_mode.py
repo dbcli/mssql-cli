@@ -21,15 +21,6 @@ class TestNonInteractiveResults:
         yield fp
         os.remove(fp)
 
-    @staticmethod
-    @pytest.fixture()
-    def tmp_filepath():
-        """ pytest fixture which returns filepath string and removes the file after tests
-        complete. """
-        fp = _FILE_ROOT + "tmp.txt"
-        yield fp
-        os.remove(fp)
-
     testdata = [
         ("SELECT 1", os.path.join(_FILE_ROOT, 'small.txt')),
         ("SELECT 1; SELECT 2;", os.path.join(_FILE_ROOT, 'multiple.txt')),
@@ -103,27 +94,59 @@ class TestNonInteractiveResults:
             raise e
 
 
-class TestNonInteractiveShutdown:
+class TestNonInteractiveShutdownQuery:
     """
     Ensures that client session has shut down after mssql-cli runs in non-interactive mode.
     """
+    @staticmethod
+    @pytest.fixture(scope='function')
+    def mssqlcli():
+        """ Create new mssql-cli instance for each test """
+        return create_mssql_cli()
+
     testdata = [
         "select 1",
         "gibberish"
     ]
 
-    def setup_method(self):
-        """ Create new mssql-cli instance for each test """
-        # pylint: disable=attribute-defined-outside-init
-        self.mssql_cli = create_mssql_cli()
-
+    @staticmethod
     @pytest.mark.parametrize("query_str", testdata)
-    def test_shutdown_after_query(self, query_str):
+    def test_shutdown_after_query(query_str, mssqlcli):
         """ Runs unit tests on process closure given a query string. """
         print()
         try:
-            self.mssql_cli.execute_query(query_str)
+            mssqlcli.execute_query(query_str)
         finally:
-            self.mssql_cli.shutdown()
-            assert self.mssql_cli.mssqlcliclient_main.sql_tools_client.\
+            mssqlcli.shutdown()
+            assert mssqlcli.mssqlcliclient_main.sql_tools_client.\
+                tools_service_process.poll() is not None
+
+class TestNonInteractiveShutdownOutput:
+    """
+    Ensures that client session has shut down after mssql-cli runs in non-interactive mode,
+    with -o enabled.
+    """
+    @staticmethod
+    @pytest.fixture(scope='function')
+    def mssqlcli():
+        """ Create new mssql-cli instance for each test """
+        output_file = os.path.join(_FILE_ROOT, 'tmp.txt')
+        yield create_mssql_cli(interactive_mode=False, output_file=output_file)
+        os.remove(output_file)
+
+    testdata = [
+        "select 1",
+        "gibberish"
+    ]
+
+    @staticmethod
+    @pytest.mark.parametrize("query_str", testdata)
+    def test_shutdown_after_query(query_str, mssqlcli):
+        """ Runs unit tests on process closure given a query string. """
+        print()
+        try:
+            mssqlcli.execute_query(query_str)
+        finally:
+            mssqlcli.shutdown()
+            assert mssqlcli.mssqlcliclient_main.sql_tools_client.\
                 tools_service_process.poll() is not None
