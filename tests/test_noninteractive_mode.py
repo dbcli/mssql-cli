@@ -6,7 +6,9 @@ import os
 import pytest
 from mssqltestutils import create_mssql_cli
 
-_FILE_ROOT = '%s/test_query_results/' % os.path.dirname(os.path.abspath(__file__))
+_SLASH = '\\' if os.name == 'nt' else '/'
+_FILE_ROOT = '%s%stest_query_results%s' % (os.path.dirname(os.path.abspath(__file__)),
+                                           _SLASH, _SLASH)
 
 class TestNonInteractiveResults:
     """
@@ -52,9 +54,10 @@ class TestNonInteractiveResults:
     @staticmethod
     def execute_query_via_subprocess(query_str):
         """ Helper method for running a query with -Q. """
-        p = subprocess.Popen("./mssql-cli -Q \"%s\"" % query_str, shell=True, stdin=subprocess.PIPE,
-                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        output = p.communicate()[0].decode("utf-8")
+        p = subprocess.Popen(".%smssql-cli -Q \"%s\"" % (_SLASH, query_str), shell=True,
+                             stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                             stderr=subprocess.STDOUT)
+        output = p.communicate()[0].decode("utf-8").replace('\r', '')
         return output
 
     @staticmethod
