@@ -1,20 +1,32 @@
-import click
 import datetime as dt
 import functools
-import humanize
 import itertools
 import logging
 import os
 import sys
 import threading
 import traceback
-
-from cli_helpers.tabular_output import TabularOutputFormatter
-from cli_helpers.tabular_output.preprocessors import (align_decimals,
-                                                      format_numbers)
+# pylint: disable=redefined-builtin
 from codecs import open
 from collections import namedtuple
 from time import time
+from cli_helpers.tabular_output import TabularOutputFormatter
+from cli_helpers.tabular_output.preprocessors import (align_decimals,
+                                                      format_numbers)
+import humanize
+import click
+from prompt_toolkit.shortcuts.prompt import PromptSession, CompleteStyle
+from prompt_toolkit.completion import DynamicCompleter, ThreadedCompleter
+from prompt_toolkit.enums import DEFAULT_BUFFER, EditingMode
+from prompt_toolkit.document import Document
+from prompt_toolkit.filters import HasFocus, IsDone
+from prompt_toolkit.lexers import PygmentsLexer
+from prompt_toolkit.layout.processors import (ConditionalProcessor,
+                                              HighlightMatchingBracketProcessor,
+                                              TabsProcessor)
+from prompt_toolkit.history import FileHistory
+from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+from pygments.lexers.sql import PostgresLexer
 
 from mssqlcli.config import (
     get_casing_file,
@@ -35,18 +47,6 @@ from mssqlcli.sqltoolsclient import SqlToolsClient
 from mssqlcli.packages import special
 from mssqlcli.mssqlbuffer import mssql_is_multiline
 
-from prompt_toolkit.shortcuts.prompt import PromptSession, CompleteStyle
-from prompt_toolkit.completion import DynamicCompleter, ThreadedCompleter
-from prompt_toolkit.enums import DEFAULT_BUFFER, EditingMode
-from prompt_toolkit.document import Document
-from prompt_toolkit.filters import HasFocus, IsDone
-from prompt_toolkit.lexers import PygmentsLexer
-from prompt_toolkit.layout.processors import (ConditionalProcessor,
-                                              HighlightMatchingBracketProcessor,
-                                              TabsProcessor)
-from prompt_toolkit.history import FileHistory
-from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
-from pygments.lexers.sql import PostgresLexer
 import mssqlcli.localized_strings as localized
 
 
@@ -131,40 +131,19 @@ class MssqlCli(object):
 
         self.set_default_pager(c)
         self.output_file = None
+        self.interactive_mode = options.interactive_mode
 
-        self.multiline = c['main'].as_bool('multi_line')
-        self.multiline_mode = c['main'].get('multi_line_mode', 'tsql')
-        self.vi_mode = c['main'].as_bool('vi')
-        self.auto_expand = options.auto_vertical_output or c['main']['expand'] == 'auto'
-        self.expanded_output = c['main']['expand'] == 'always'
-        self.prompt_format = options.prompt or c['main'].get('prompt', self.default_prompt)
-        if options.row_limit is not None:
-            self.row_limit = options.row_limit
-        else:
-            self.row_limit = c['main'].as_int('row_limit')
-
-        self.min_num_menu_lines = c['main'].as_int('min_num_menu_lines')
-        self.multiline_continuation_char = c['main']['multiline_continuation_char']
         self.table_format = c['main']['table_format']
-        self.syntax_style = c['main']['syntax_style']
-        self.cli_style = c['colors']
-        self.output_style = style_factory_output(self.syntax_style, self.cli_style)
-        self.wider_completion_menu = c['main'].as_bool('wider_completion_menu')
-        self.less_chatty = bool(
-            options.less_chatty) or c['main'].as_bool('less_chatty')
-        self.null_string = c['main'].get('null_string', '<null>')
-        self.on_error = c['main']['on_error'].upper()
         self.decimal_format = c['data_formats']['decimal']
         self.float_format = c['data_formats']['float']
+        self.null_string = c['main'].get('null_string', '<null>')
+        self.expanded_output = c['main']['expand'] == 'always'
+        self.auto_expand = options.auto_vertical_output or c['main']['expand'] == 'auto'
+        self.prompt_session = None
+        self.integrated_auth = options.integrated_auth
+        self.less_chatty = bool(
+            options.less_chatty) or c['main'].as_bool('less_chatty') or self.interactive_mode
 
-        self.now = dt.datetime.today()
-
-        self.completion_refresher = CompletionRefresher()
-
-        self.query_history = []
-
-        # Initialize completer
-        smart_completion = True if c['main'].get('smart_completion', 'True') == 'True' else False
         keyword_casing = c['main']['keyword_casing']
         self.settings = {
             'casing_file': get_casing_file(c),
@@ -175,15 +154,38 @@ class MssqlCli(object):
             'case_column_headers': c['main'].as_bool('case_column_headers'),
             'search_path_filter': c['main'].as_bool('search_path_filter'),
             'single_connection': False,
-            'less_chatty': options.less_chatty,
+            'less_chatty': self.less_chatty,
             'keyword_casing': keyword_casing,
         }
 
-        self.completer = MssqlCompleter(smart_completion=smart_completion, settings=self.settings)
-        self._completer_lock = threading.Lock()
+        if self.interactive_mode:
+            self.multiline = c['main'].as_bool('multi_line')
+            self.multiline_mode = c['main'].get('multi_line_mode', 'tsql')
+            self.vi_mode = c['main'].as_bool('vi')
+            self.prompt_format = options.prompt or c['main'].get('prompt', self.default_prompt)
+            if options.row_limit is not None:
+                self.row_limit = options.row_limit
+            else:
+                self.row_limit = c['main'].as_int('row_limit')
 
-        self.prompt_session = None
-        self.integrated_auth = options.integrated_auth
+            self.min_num_menu_lines = c['main'].as_int('min_num_menu_lines')
+            self.multiline_continuation_char = c['main']['multiline_continuation_char']
+            self.syntax_style = c['main']['syntax_style']
+            self.cli_style = c['colors']
+            self.output_style = style_factory_output(self.syntax_style, self.cli_style)
+            self.wider_completion_menu = c['main'].as_bool('wider_completion_menu')
+            self.on_error = c['main']['on_error'].upper()
+
+            self.now = dt.datetime.today()
+
+            self.completion_refresher = CompletionRefresher()
+
+            self.query_history = []
+
+            # Initialize completer
+            smart_completion = True if c['main'].get('smart_completion', 'True') == 'True' else False
+            self.completer = MssqlCompleter(smart_completion=smart_completion, settings=self.settings)
+            self._completer_lock = threading.Lock()
 
         self.sqltoolsclient = SqlToolsClient(enable_logging=options.enable_sqltoolsservice_logging)
         self.mssqlcliclient_main = MssqlCliClient(options, self.sqltoolsclient)
@@ -298,12 +300,17 @@ class MssqlCli(object):
                     break
                 except KeyboardInterrupt:
                     sql = ""
-                    
+
             editor_command = special.editor_command(text)
         return text
 
-    def execute_command(self, text, query):
+    def _execute_interactive_command(self, text):
+        """ Runs commands in the interactive CLI mode. """
+
         logger = self.logger
+
+        # Initialize default metaquery in case execution fails
+        query = MetaQuery(query=text, successful=False)
 
         try:
             output, query = self._evaluate_command(text)
@@ -324,23 +331,9 @@ class MssqlCli(object):
             logger.error("traceback: %r", traceback.format_exc())
             click.secho(str(e), err=True, fg='red')
         else:
-            try:
-                if self.output_file and not text.startswith(('\\o ', '\\? ')):
-                    try:
-                        with open(self.output_file, 'a', encoding='utf-8') as f:
-                            click.echo(text, file=f)
-                            click.echo('\n'.join(output), file=f)
-                            click.echo('', file=f)  # extra newline
-                    except IOError as e:
-                        click.secho(str(e), err=True, fg='red')
-                else:
-                    click.echo_via_pager('\n'.join(output))
-            except KeyboardInterrupt:
-                pass
-
             if query.total_time > 1:
                 print('Time: %0.03fs (%s)' % (query.total_time,
-                                              humanize.time.naturaldelta(query.total_time)))
+                                            humanize.time.naturaldelta(query.total_time)))
             else:
                 print('Time: %0.03fs' % query.total_time)
 
@@ -353,9 +346,51 @@ class MssqlCli(object):
             elif query.meta_changed:
                 self.refresh_completions(persist_priorities='all')
 
-        return query
+        if not query.contains_secure_statement:
+            # Allow MssqlCompleter to learn user's preferred keywords, etc.
+            with self._completer_lock:
+                self.completer.extend_query_history(text)
+
+            self.query_history.append(query)
+
+        return output
+
+    def execute_query(self, text):
+        """ Processes a query string and outputs to file or terminal """
+
+        if self.interactive_mode:
+            output = self._execute_interactive_command(text)
+        else:
+            # non-interactive mode
+            output, _ = self._evaluate_command(text)
+
+        self._output_query(output)
+        return output
+
+    def _output_query(self, output):
+        """ Specifies how query output is handled """
+        if self.interactive_mode:
+            click.echo_via_pager('\n'.join(output))
+        else:
+            # FIXME: this will be changed
+            # if self.output_file and not text.startswith(('\\o ', '\\? ')):
+            #     try:
+            #         with open(self.output_file, 'a', encoding='utf-8') as f:
+            #             click.echo(text, file=f)
+            #             click.echo('\n'.join(output), file=f)
+            #             click.echo('', file=f)  # extra newline
+            #     except IOError as e:
+            #         click.secho(str(e), err=True, fg='red')
+            click.echo('\n'.join(output))
 
     def run(self):
+        """ Spins up CLI. """
+
+        # raise error if interactive mode is set to false here
+        if not self.interactive_mode:
+            raise ValueError("'run' must be used in interactive mode! Please set \
+                             interactive_mode to True.")
+
         history_file = self.config['main']['history_file']
         if history_file == 'default':
             history_file = config_location() + 'history'
@@ -393,23 +428,13 @@ class MssqlCli(object):
                     click.secho(str(e), err=True, fg='red')
                     continue
 
-                # Initialize default metaquery in case execution fails
-                query = MetaQuery(query=text, successful=False)
-                query = self.execute_command(text, query)
+                self.execute_query(text)
                 self.now = dt.datetime.today()
-
-                if not query.contains_secure_statement:
-                    # Allow MssqlCompleter to learn user's preferred keywords, etc.
-                    with self._completer_lock:
-                        self.completer.extend_query_history(text)
-
-                    self.query_history.append(query)
 
         except EOFError:
             self.mssqlcliclient_main.shutdown()
             if not self.less_chatty:
                 print(localized.goodbye())
-    
 
     def _build_cli(self, history):
 
@@ -469,7 +494,7 @@ class MssqlCli(object):
         """returns True if limit prompt should be shown, False otherwise."""
         if not rows:
             return False
-        return self.row_limit > 0 and len(rows) > self.row_limit
+        return self.interactive_mode and self.row_limit > 0 and len(rows) > self.row_limit
 
     def _evaluate_command(self, text):
         """Used to run a command entered by the user during CLI operation
@@ -512,7 +537,7 @@ class MssqlCli(object):
                 all_success = False
                 continue
 
-            if self.auto_expand:
+            if self.auto_expand and self.prompt_session:
                 max_width = self.prompt_session.output.get_size().columns
             else:
                 max_width = None
@@ -525,7 +550,8 @@ class MssqlCli(object):
                 expanded=self.expanded_output,
                 max_width=max_width,
                 case_function=(
-                    self.completer.case if self.settings['case_column_headers']
+                    self.completer.case if self.interactive_mode and
+                    self.settings['case_column_headers']
                     else
                     lambda x: x
                 )
@@ -544,7 +570,8 @@ class MssqlCli(object):
                 meta_changed = meta_changed or self.has_meta_cmd(text)
 
         return output, MetaQuery(
-            text, all_success, total, meta_changed, db_changed, path_changed, mutated, contains_secure_statement)
+            text, all_success, total, meta_changed, db_changed, path_changed, mutated,
+            contains_secure_statement)
 
     def _handle_server_closed_connection(self):
         """Used during CLI execution"""
@@ -558,6 +585,10 @@ class MssqlCli(object):
                 click.secho('Reconnected!\nTry the command again.', fg='green')
             except Exception as e:
                 click.secho(str(e), err=True, fg='red')
+
+    def shutdown(self):
+        """ API for shutting down client """
+        self.mssqlcliclient_main.shutdown()
 
     def reset(self):
         """

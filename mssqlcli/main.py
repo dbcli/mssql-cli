@@ -1,13 +1,11 @@
 from __future__ import unicode_literals
 from __future__ import print_function
 
-import click
 import getpass
 import os
 import sys
-
-
 from builtins import input
+import click
 
 from mssqlcli.config import config_location
 from mssqlcli.__init__ import __version__
@@ -15,11 +13,6 @@ from mssqlcli.mssqlclioptionsparser import create_parser
 import mssqlcli.telemetry as telemetry_session
 
 click.disable_unicode_literals_warning = True
-
-try:
-    from urlparse import urlparse, unquote, parse_qs
-except ImportError:
-    from urllib.parse import urlparse, unquote, parse_qs
 
 
 MSSQLCLI_TELEMETRY_PROMPT = """
@@ -48,15 +41,26 @@ def run_cli_with(options):
     # Moved import here so we can create the config dir for first use prior.
     from mssqlcli.mssql_cli import MssqlCli
 
-    mssqlcli = MssqlCli(options)
-    mssqlcli.connect_to_database()
+    # set interactive mode to false if -Q is specified
+    if options.query:
+        options.interactive_mode = False
 
-    telemetry_session.set_server_information(mssqlcli.mssqlcliclient_main)
-    mssqlcli.run()
+    mssqlcli = MssqlCli(options)
+    try:
+        mssqlcli.connect_to_database()
+        telemetry_session.set_server_information(mssqlcli.mssqlcliclient_main)
+
+        if mssqlcli.interactive_mode:
+            mssqlcli.run()
+        else:
+            mssqlcli.execute_query(str(options.query))
+    finally:
+        mssqlcli.shutdown()
 
 
 def configure_and_update_options(options):
-    if options.dac_connection and options.server and not options.server.lower().startswith("admin:"):
+    if options.dac_connection and options.server and not \
+            options.server.lower().startswith("admin:"):
         options.server = "admin:" + options.server
 
     if not options.integrated_auth:
@@ -64,7 +68,7 @@ def configure_and_update_options(options):
             options.username = input(u'Username (press enter for sa):') or u'sa'
         if not options.password:
             pw = getpass.getpass()
-            if (pw is not None):
+            if pw is not None:
                 pw = pw.replace('\r', '').replace('\n', '')
             options.password = pw
 

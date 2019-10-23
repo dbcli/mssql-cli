@@ -24,6 +24,17 @@
             "program": "${file}",
             "envFile": "${workspaceRoot}/.env",
             "console": "externalTerminal",
-        }
+        },
+        {
+            "name": "Test Query (external)",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceRoot}/mssqlcli/main.py",
+            "envFile": "${workspaceRoot}/.env",
+            "console": "externalTerminal",
+            "args": [
+                "--query", "select * from t0"
+            ]
+        },
     ]
 }

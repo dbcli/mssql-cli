@@ -142,6 +142,7 @@ def unit_test():
         'tests/test_telemetry.py '
         'tests/test_localization.py '
         'tests/test_globalization.py '
+        '-s tests/test_noninteractive_mode.py '# -s disables capturing--test doesn't work without it
         'tests/test_special.py'.format(runid, python_version),
         utility.ROOT_DIR,
         continue_on_error=False)

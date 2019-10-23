@@ -1,6 +1,6 @@
 import argparse
-import mssqlcli
 import os
+import mssqlcli
 
 from .config import config_location
 
@@ -137,6 +137,14 @@ def create_parser():
         help=u'Connect to SQL Server using the dedicated administrator connection.')
 
     args_parser.add_argument(
+        u'-Q', u'--query',
+        dest=u'query',
+        metavar=u'',
+        default=False,
+        help=u'Executes a query outputting the results to stdout and exits.'
+    )
+
+    args_parser.add_argument(
         u'--enable-sqltoolsservice-logging',
         dest=u'enable_sqltoolsservice_logging',
         action=u'store_true',
@@ -148,5 +156,13 @@ def create_parser():
         dest=u'prompt',
         metavar=u'',
         help=u'Prompt format (Default: \\d> ')
+
+    args_parser.add_argument(
+        u'--interactive_mode',
+        dest=u'interactive_mode',
+        metavar=u'',
+        default=True,
+        help=argparse.SUPPRESS
+    )
 
     return args_parser
