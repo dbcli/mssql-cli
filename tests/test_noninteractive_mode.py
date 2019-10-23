@@ -6,17 +6,18 @@ import os
 import pytest
 from mssqltestutils import create_mssql_cli
 
-_FILE_ROOT = '%s/test_query_results/' % os.path.dirname(os.path.abspath(__file__))
+_FILE_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'test_query_results')
 
 class TestNonInteractiveResults:
     """
     Tests non-interactive features.
     """
     testdata = [
-        ("SELECT 1", '%ssmall.txt' % _FILE_ROOT),
-        ("SELECT 1; SELECT 2;", '%smultiple.txt' % _FILE_ROOT),
-        ("SELECT %s" % ('x' * 250), '%scol_too_wide.txt' % _FILE_ROOT),
-        ("SELECT REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024)", '%scol_wide.txt' % _FILE_ROOT)
+        ("SELECT 1", os.path.join(_FILE_ROOT, 'small.txt')),
+        ("SELECT 1; SELECT 2;", os.path.join(_FILE_ROOT, 'multiple.txt')),
+        ("SELECT %s" % ('x' * 250), os.path.join(_FILE_ROOT, 'col_too_wide.txt')),
+        ("SELECT REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024)",
+         os.path.join(_FILE_ROOT, 'col_wide.txt'))
     ]
 
     @pytest.mark.parametrize("query_str, file_baseline", testdata)
@@ -32,7 +33,7 @@ class TestNonInteractiveResults:
         try:
             mssqlcli = create_mssql_cli(interactive_mode=False)
             output_query = '\n'.join(mssqlcli.execute_query(query_str))
-            output_baseline = self.get_file_contents('%sbig.txt' % _FILE_ROOT)
+            output_baseline = self.get_file_contents(os.path.join(_FILE_ROOT, 'big.txt'))
             assert output_query == output_baseline
         finally:
             mssqlcli.shutdown()
@@ -52,9 +53,10 @@ class TestNonInteractiveResults:
     @staticmethod
     def execute_query_via_subprocess(query_str):
         """ Helper method for running a query with -Q. """
-        p = subprocess.Popen("./mssql-cli -Q \"%s\"" % query_str, shell=True, stdin=subprocess.PIPE,
-                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        output = p.communicate()[0].decode("utf-8")
+        p = subprocess.Popen(os.path.join(".", "mssql-cli -Q \"%s\"" % query_str), shell=True,
+                             stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                             stderr=subprocess.STDOUT)
+        output = p.communicate()[0].decode("utf-8").replace('\r', '')
         return output
 
     @staticmethod
