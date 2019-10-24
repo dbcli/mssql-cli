@@ -191,7 +191,7 @@ class MssqlCli(object):
 
         # exit and return error if user enters interactive mode with -o argument enabled
         if self.interactive_mode and self.output_file:
-            click.secho("Invalid request: -o must be accompanied with a query.", err=True, fg='red')
+            click.secho("Invalid arguments: -o must be accompanied with a query using -Q.", err=True, fg='red')
             sys.exit(1)
 
     def __del__(self):
@@ -396,7 +396,7 @@ class MssqlCli(object):
 
         # exit and return error if user enters interactive mode with -o argument enabled
         if self.output_file:
-            click.secho("Invalid request: -o must be accompanied with a query with -Q.",
+            click.secho("Invalid arguments: -o must be used with interactive mode set to false.",
                         err=True, fg='red')
             self.shutdown()
             sys.exit(1)
