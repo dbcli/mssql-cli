@@ -9,7 +9,7 @@ from mssqltestutils import (
     random_str
 )
 
-_FILE_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'test_query_results')
+_BASELINE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'test_query_results')
 
 class TestNonInteractiveResults:
     """
@@ -20,16 +20,16 @@ class TestNonInteractiveResults:
     def tmp_filepath():
         """ pytest fixture which returns filepath string and removes the file after tests
         complete. """
-        fp = os.path.join(_FILE_ROOT, "%s.txt" % random_str())
+        fp = os.path.join(_BASELINE_DIR, "%s.txt" % random_str())
         yield fp
         os.remove(fp)
 
     testdata = [
-        ("SELECT 1", os.path.join(_FILE_ROOT, 'small.txt')),
-        ("SELECT 1; SELECT 2;", os.path.join(_FILE_ROOT, 'multiple.txt')),
-        ("SELECT %s" % ('x' * 250), os.path.join(_FILE_ROOT, 'col_too_wide.txt')),
+        ("SELECT 1", os.path.join(_BASELINE_DIR, 'small.txt')),
+        ("SELECT 1; SELECT 2;", os.path.join(_BASELINE_DIR, 'multiple.txt')),
+        ("SELECT %s" % ('x' * 250), os.path.join(_BASELINE_DIR, 'col_too_wide.txt')),
         ("SELECT REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024)",
-         os.path.join(_FILE_ROOT, 'col_wide.txt'))
+         os.path.join(_BASELINE_DIR, 'col_wide.txt'))
     ]
 
     @pytest.mark.parametrize("query_str, file_baseline", testdata)
@@ -54,7 +54,7 @@ class TestNonInteractiveResults:
         try:
             mssqlcli = create_mssql_cli(interactive_mode=False, output_file=tmp_filepath)
             output_query = '\n'.join(mssqlcli.execute_query(query_str))
-            output_baseline = self.get_file_contents(os.path.join(_FILE_ROOT, 'big.txt'))
+            output_baseline = self.get_file_contents(os.path.join(_BASELINE_DIR, 'big.txt'))
             assert output_query == output_baseline
 
             # test output to file
@@ -133,7 +133,7 @@ class TestNonInteractiveShutdownOutput:
     @pytest.fixture(scope='function')
     def mssqlcli():
         """ Create new mssql-cli instance for each test """
-        output_file = os.path.join(_FILE_ROOT, 'tmp.txt')
+        output_file = os.path.join(_BASELINE_DIR, 'tmp.txt')
         yield create_mssql_cli(interactive_mode=False, output_file=output_file)
         os.remove(output_file)
 
