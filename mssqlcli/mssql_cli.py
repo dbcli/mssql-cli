@@ -27,14 +27,12 @@ from prompt_toolkit.layout.processors import (ConditionalProcessor,
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from pygments.lexers.sql import PostgresLexer
-
 from mssqlcli.config import (
     get_casing_file,
     config_location,
     ensure_dir_exists,
     get_config,
 )
-
 from mssqlcli.completion_refresher import CompletionRefresher
 from mssqlcli.__init__ import __version__
 from mssqlcli.encodingutils import text_type
@@ -46,9 +44,7 @@ from mssqlcli.mssqltoolbar import create_toolbar_tokens_func
 from mssqlcli.sqltoolsclient import SqlToolsClient
 from mssqlcli.packages import special
 from mssqlcli.mssqlbuffer import mssql_is_multiline
-
 import mssqlcli.localized_strings as localized
-
 
 # Query tuples are used for maintaining history
 MetaQuery = namedtuple(
@@ -96,6 +92,7 @@ class MssqlFileHistory(FileHistory):
 
 
 class MssqlCli(object):
+    # pylint: disable=too-many-instance-attributes, useless-object-inheritance
 
     max_len_prompt = 30
     default_prompt = '\\d> '
@@ -130,7 +127,6 @@ class MssqlCli(object):
         self.logger = logging.getLogger(u'mssqlcli.main')
 
         self.set_default_pager(c)
-        self.output_file = None
         self.interactive_mode = options.interactive_mode
 
         self.table_format = c['main']['table_format']
@@ -187,8 +183,16 @@ class MssqlCli(object):
             self.completer = MssqlCompleter(smart_completion=smart_completion, settings=self.settings)
             self._completer_lock = threading.Lock()
 
+        # output file is for non-interactive mode
+        self.output_file = options.output_file
+
         self.sqltoolsclient = SqlToolsClient(enable_logging=options.enable_sqltoolsservice_logging)
         self.mssqlcliclient_main = MssqlCliClient(options, self.sqltoolsclient)
+
+        # exit and return error if user enters interactive mode with -o argument enabled
+        if self.interactive_mode and self.output_file:
+            click.secho("Invalid arguments: -o must be accompanied with a query using -Q.", err=True, fg='red')
+            sys.exit(1)
 
     def __del__(self):
         # Shut-down sqltoolsservice
@@ -213,7 +217,7 @@ class MssqlCli(object):
         return [(None, None, None, message, '', True)]
 
     def initialize_logging(self):
-
+    
         log_file = self.config['main']['log_file']
         if log_file == 'default':
             log_file = config_location() + 'mssqlcli.log'
@@ -372,16 +376,15 @@ class MssqlCli(object):
         if self.interactive_mode:
             click.echo_via_pager('\n'.join(output))
         else:
-            # FIXME: this will be changed
-            # if self.output_file and not text.startswith(('\\o ', '\\? ')):
-            #     try:
-            #         with open(self.output_file, 'a', encoding='utf-8') as f:
-            #             click.echo(text, file=f)
-            #             click.echo('\n'.join(output), file=f)
-            #             click.echo('', file=f)  # extra newline
-            #     except IOError as e:
-            #         click.secho(str(e), err=True, fg='red')
-            click.echo('\n'.join(output))
+            if self.output_file:
+                try:
+                    with open(self.output_file, 'w', encoding='utf-8') as f:
+                        click.echo('\n'.join(output), file=f)
+                except IOError as e:
+                    click.secho(str(e), err=True, fg='red')
+                    sys.exit(1)
+            else:
+                click.echo('\n'.join(output))
 
     def run(self):
         """ Spins up CLI. """
@@ -390,6 +393,13 @@ class MssqlCli(object):
         if not self.interactive_mode:
             raise ValueError("'run' must be used in interactive mode! Please set \
                              interactive_mode to True.")
+
+        # exit and return error if user enters interactive mode with -o argument enabled
+        if self.output_file:
+            click.secho("Invalid arguments: -o must be used with interactive mode set to false.",
+                        err=True, fg='red')
+            self.shutdown()
+            sys.exit(1)
 
         history_file = self.config['main']['history_file']
         if history_file == 'default':

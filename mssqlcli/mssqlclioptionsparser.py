@@ -145,6 +145,14 @@ def create_parser():
     )
 
     args_parser.add_argument(
+        u'-o', u'--output_file',
+        dest=u'output_file',
+        metavar=u'',
+        default=False,
+        help=u'Specifies the file that receives output from a query.'
+    )
+
+    args_parser.add_argument(
         u'--enable-sqltoolsservice-logging',
         dest=u'enable_sqltoolsservice_logging',
         action=u'store_true',
