@@ -21,7 +21,7 @@ mssql-cli release guide
     ```
     python <clone_root>/dev_setup.py
     ```
-### Requirements for daily and official builds:
+### Requirements for publishing daily and official builds:
 1. A azure storage account with a container named **daily**.
 
 2. A sub folder named **mssql-cli** under the previous container.
@@ -43,20 +43,21 @@ mssql-cli release guide
     Example: 1.0.0
 To bump a particular segment of the version, from `<clone_root>` execute:
 <pre>
-bumpversion major              ->  <b>2</b>.0
-bumpversion minor              ->  1.<b>1</b>
-bumpversion patch              ->  1.0.<b>1</b>
+> bumpversion major              ->  <b>2</b>.0
+> bumpversion minor              ->  1.<b>1</b>
+> bumpversion patch              ->  1.0.<b>1</b>
 
 </pre>
+Check-in changes after running `bumpversion` and **validating the build output following a version bump**.
 
-**Note**: bumpversion does not allow version bumping if your workspace has pending changes.This is to protect against any manual updates that may have been made which can lead to inconsistent versions across files. If you know what you are doing you can override this by appending `--allow-dirty` to the bumpversion command.
+**Note**: bumpversion does not allow version bumping if your workspace has pending changes. This is to protect against any manual updates that may have been made which can lead to inconsistent versions across files. If you know what you are doing you can override this by appending `--allow-dirty` to the bumpversion command.
 
 # <a name="Local"></a>Local builds
 The steps below outline how to build mssql-cli locally on your dev environment.
 ## 1. Build
 1. Build mssql-cli wheel for the current platform:
     ```
-    Python build.by build
+    python build.py build
     ```
 
 ## 2. Install
@@ -64,7 +65,7 @@ The steps below outline how to build mssql-cli locally on your dev environment.
 
 	To install the local mssql-cli wheel package, from `<clone_root>` execute:
     ```
-    sudo pip install --no-index -i ./dist/mssql_cli-0.16.0.dev1908130743-py2.py3-none-win_amd64.whl
+    sudo pip install --no-index -i ./dist/mssql_cli-0.16.0.dev<timestamp here>-py2.py3-none-win_amd64.whl
     ```
     
 # <a name="Daily"></a>Daily builds
