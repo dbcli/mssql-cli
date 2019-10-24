@@ -4,7 +4,10 @@ Non-interactive tests.
 import subprocess
 import os
 import pytest
-from mssqltestutils import create_mssql_cli
+from mssqltestutils import (
+    create_mssql_cli,
+    random_str
+)
 
 _FILE_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'test_query_results')
 
@@ -17,7 +20,7 @@ class TestNonInteractiveResults:
     def tmp_filepath():
         """ pytest fixture which returns filepath string and removes the file after tests
         complete. """
-        fp = _FILE_ROOT + "tmp.txt"
+        fp = os.path.join(_FILE_ROOT, "%s.txt" % random_str())
         yield fp
         os.remove(fp)
 
