@@ -382,6 +382,7 @@ class MssqlCli(object):
                         click.echo('\n'.join(output), file=f)
                 except IOError as e:
                     click.secho(str(e), err=True, fg='red')
+                    sys.exit(1)
             else:
                 click.echo('\n'.join(output))
 
