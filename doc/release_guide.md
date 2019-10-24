@@ -79,7 +79,7 @@ The steps below outline how daily builds of mssql-cli are generated. These steps
 
 2. Publish build to daily storage account:
     ```
-    python build.py publish_daily
+    python release.py publish_daily
     ```
 ### Installation Instructions
 3. Test install from daily storage account:
