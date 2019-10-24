@@ -89,7 +89,6 @@ The steps below outline how daily builds of mssql-cli are generated. These steps
     
 ## <a name="Official"></a>Official Builds
 The steps below outline how to build official builds and publish to PYPI.
-### 1. Create a .pypirc configuration file
 1. Add a .pypirc configuration file:
 
     - Create a .pypirc file in your user directory:
