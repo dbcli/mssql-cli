@@ -105,7 +105,7 @@ class TestNonInteractiveShutdownQuery:
     @pytest.fixture(scope='function')
     def mssqlcli():
         """ Create new mssql-cli instance for each test """
-        return create_mssql_cli()
+        return create_mssql_cli(interactive_mode=False)
 
     testdata = [
         "select 1",
