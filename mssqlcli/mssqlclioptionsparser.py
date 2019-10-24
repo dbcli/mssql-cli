@@ -149,7 +149,7 @@ def create_parser():
         dest=u'output_file',
         metavar=u'',
         default=False,
-        help=u'Identifies the file that receives output from a query.'
+        help=u'Specifies the file that receives output from a query.'
     )
 
     args_parser.add_argument(
