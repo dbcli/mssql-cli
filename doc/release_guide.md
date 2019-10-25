@@ -90,6 +90,8 @@ Check-in changes after running `bumpversion` and **validating the build output f
 **Note**: bumpversion does not allow version bumping if your workspace has pending changes. This is to protect against any manual updates that may have been made which can lead to inconsistent versions across files. If you know what you are doing you can override this by appending `--allow-dirty` to the bumpversion command.
 
 ### Publish Build
+**Important: ensure that the build is uploaded from macOS.**
+
 1. Add a .pypirc configuration file:
 
     - Create a .pypirc file in your user directory:
