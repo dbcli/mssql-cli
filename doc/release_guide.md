@@ -38,22 +38,6 @@ mssql-cli release guide
     export AZURE_STORAGE_CONNECTION_STRING='<connection_string>'
     ```
 
-# <a name="BumpVersion"></a>Bump Version
-The versioning format for `mssql-cli` uses the following naming scheme:
-
-	Versioning schema: {major}.{minor}.{patch}
-    Example: 1.0.0
-To bump a particular segment of the version, from `<clone_root>` execute:
-<pre>
-> bumpversion major          ->  <b>2</b>.0
-> bumpversion minor          ->  1.<b>1</b>
-> bumpversion patch          ->  1.0.<b>1</b>
-
-</pre>
-Check-in changes after running `bumpversion` and **validating the build output following a version bump**.
-
-**Note**: bumpversion does not allow version bumping if your workspace has pending changes. This is to protect against any manual updates that may have been made which can lead to inconsistent versions across files. If you know what you are doing you can override this by appending `--allow-dirty` to the bumpversion command.
-
 # Create Builds
 ## <a name="Local"></a>Local Builds
 The steps below outline how to build mssql-cli locally on your dev environment.
@@ -89,6 +73,24 @@ The steps below outline how daily builds of mssql-cli are generated. These steps
     
 ## <a name="Official"></a>Official Builds
 The steps below outline how to build official builds and publish to PYPI.
+
+### <a name="BumpVersion"></a>Bump Version
+The versioning format for `mssql-cli` uses the following naming scheme:
+
+	Versioning schema: {major}.{minor}.{patch}
+    Example: 1.0.0
+To bump a particular segment of the version, from `<clone_root>` execute:
+<pre>
+> bumpversion major          ->  <b>2</b>.0
+> bumpversion minor          ->  1.<b>1</b>
+> bumpversion patch          ->  1.0.<b>1</b>
+
+</pre>
+Check-in changes after running `bumpversion` and **validating the build output following a version bump**.
+
+**Note**: bumpversion does not allow version bumping if your workspace has pending changes. This is to protect against any manual updates that may have been made which can lead to inconsistent versions across files. If you know what you are doing you can override this by appending `--allow-dirty` to the bumpversion command.
+
+### Publish Build
 1. Add a .pypirc configuration file:
 
     - Create a .pypirc file in your user directory:
