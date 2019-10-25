@@ -2,7 +2,6 @@ mssql-cli release guide
 ========================================
 # Table of Contents
 1. [Requirements](#Requirements)
-2. [Version bump](#BumpVersion)
 2. [Local builds](#Local)
 3. [Daily builds](#Daily)
 4. [Official builds](#Official)
