@@ -3,8 +3,9 @@ Contents
 * [Description](#description)
 * [Options](#options)
 * [Examples](#examples)
-*  [Environment Variables](#environment-variables)
+* [Environment Variables](#environment-variables)
 * [Special Commands](#special-commands)
+* [Non-Interactive Options](#non-interactive-options)
 
 ## Description
 mssql-cli is a new and interactive command line query tool for SQL Server. This open source tool works cross-platform and is a proud member of the dbcli community.
@@ -26,20 +27,47 @@ Type **mssql-cli --help** to also see these options.
 $ mssql-cli --help
 Usage: main.py [OPTIONS]
 
-Options:
-    -S, --server TEXT       SQL Server instance name or address.
-    -U, --username TEXT     Username to connect to the database.
-    -P, --password          Force password prompt.
-    -E, --integrated        Use integrated authentication on windows.
-    -v, --version           Version of mssql-cli.
-    -d, --database TEXT     database name to connect to.
-    --mssqlclirc TEXT       Location of mssqlclirc config file.
-    --row-limit INTEGER     Set threshold for row limit prompt. Use 0 to disable
-                            prompt.
-    --less-chatty           Skip intro on startup and goodbye on exit.
-    --auto-vertical-output  Automatically switch to vertical output mode if the
-                            result is wider than the terminal width.
-    --help                  Show this message and exit.
+optional arguments:
+  -h, --help            show this help message and exit
+  -U , --username       Username to connect to the database
+  -P , --password       If not supplied, defaults to value in environment
+                        variable MSSQL_CLI_PASSWORD.
+  -d , --database       database name to connect to.
+  -S , --server         SQL Server instance name or address.
+  -E, --integrated      Use integrated authentication on windows.
+  -v, --version         Version of mssql-cli.
+  --mssqlclirc          Location of mssqlclirc config file.
+  --row-limit           Set threshold for row limit prompt. Use 0 to disable
+                        prompt.
+  --less-chatty         Skip intro on startup and goodbye on exit.
+  --auto-vertical-output
+                        Automatically switch to vertical output mode if the
+                        result is wider than the terminal width.
+  -N, --encrypt         SQL Server uses SSL encryption for all data if the
+                        server has a certificate installed.
+  -C, --trust-server-certificate
+                        The channel will be encrypted while bypassing walking
+                        the certificate chain to validate trust.
+  -l , --connect-timeout 
+                        Time in seconds to wait for a connection to the server
+                        before terminating request.
+  -K , --application-intent 
+                        Declares the application workload type when connecting
+                        to a database in a SQL Server Availability Group.
+  -M, --multi-subnet-failover
+                        If application is connecting to AlwaysOn AG on
+                        different subnets, setting this provides faster
+                        detection and connection to currently active server.
+  -a , --packet-size    Size in bytes of the network packets used to
+                        communicate with SQL Server.
+  -A, --dac-connection  Connect to SQL Server using the dedicated
+                        administrator connection.
+  -Q , --query          Executes a query outputting the results to stdout and
+                        exits.
+  -o , --output_file    Specifies the file that receives output from a query.
+  --enable-sqltoolsservice-logging
+                        Enables diagnostic logging for the SqlToolsService.
+  --prompt              Prompt format (Default: \d>
 ```
       
 ## Examples
@@ -226,3 +254,18 @@ Below table summarizes the special commands supported
 |\sn  | \sn name query                   | Save a named query.                              
 |help | \?                               | Show this help.                                  
 
+## Non-Interactive Options
+Non-interactive mode is a great way to query SQL Server using `mssql-cli` without needing to jump into an interactive command-line interface.
+
+### Options
+`mssql-cli` supports the following non-interactive options:
+
+#### -Q, --query
+To make a query in non-interactive mode, use the `-Q` (or `--query`) argument, followed by a T-SQL statment surrounded in double or single quotes. sqlcmd syntax is also supported.
+
+**Note:** Ensure a connection to your server is established using the `-S`, `-U`, `-P`, and `-d` arguments, or by specifying your [enviornment variables](#environment-variables).
+
+#### -o, --output_file
+To print the results of your [non-interactive query](#-Q,--query) to a file, add the `-o` (or `--output_file`) argument followed by a file path surrounded by double or single quotes. `mssql-cli` will create a file if the specified value does not exist. **Using `-o` will overwrite any existing file.**
+
+**Note:** [-Q or --query](#-Q,--query) is a required argument.
