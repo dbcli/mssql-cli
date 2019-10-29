@@ -25,11 +25,11 @@ class TestNonInteractiveResults:
         os.remove(fp)
 
     testdata = [
-        ("SELECT 1", os.path.join(_BASELINE_DIR, 'small.txt')),
-        ("SELECT 1; SELECT 2;", os.path.join(_BASELINE_DIR, 'multiple.txt')),
-        ("SELECT %s" % ('x' * 250), os.path.join(_BASELINE_DIR, 'col_too_wide.txt')),
+        ("SELECT 1", os.path.join(_BASELINE_DIR, 'result_small.txt')),
+        ("SELECT 1; SELECT 2;", os.path.join(_BASELINE_DIR, 'result_multiple.txt')),
+        ("SELECT %s" % ('x' * 250), os.path.join(_BASELINE_DIR, 'result_col_too_wide.txt')),
         ("SELECT REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024)",
-         os.path.join(_BASELINE_DIR, 'col_wide.txt'))
+         os.path.join(_BASELINE_DIR, 'result_col_wide.txt'))
     ]
 
     @pytest.mark.parametrize("query_str, file_baseline", testdata)
@@ -47,6 +47,15 @@ class TestNonInteractiveResults:
         output_baseline = self.get_file_contents(file_baseline)
         assert output_query == output_baseline
 
+
+    def test_i_and_o(self):
+        # TODO
+        pass
+
+    def test_q_and_o(self):
+        # TODO
+        pass
+
     def test_long_query(self, tmp_filepath):
         """ Output large query using Python class instance. """
         query_str = """ALTER DATABASE keep_AdventureWorks2014 SET COMPATIBILITY_LEVEL = 130
@@ -54,7 +63,7 @@ class TestNonInteractiveResults:
         try:
             mssqlcli = create_mssql_cli(interactive_mode=False, output_file=tmp_filepath)
             output_query = '\n'.join(mssqlcli.execute_query(query_str))
-            output_baseline = self.get_file_contents(os.path.join(_BASELINE_DIR, 'big.txt'))
+            output_baseline = self.get_file_contents(os.path.join(_BASELINE_DIR, 'result_big.txt'))
             assert output_query == output_baseline
 
             # test output to file
