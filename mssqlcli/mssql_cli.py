@@ -192,7 +192,8 @@ class MssqlCli(object):
 
         # exit and return error if user enters interactive mode with -i or -o arguments enabled
         if self.interactive_mode and (self.input_file or self.output_file):
-            click.secho("Invalid arguments: -i and -o must be accompanied with a query using -Q.", err=True, fg='red')
+            click.secho("Invalid arguments: -i and -o can only be used in non-interactive mode.",
+                        err=True, fg='red')
             sys.exit(1)
 
     def __del__(self):
@@ -367,6 +368,16 @@ class MssqlCli(object):
             output = self._execute_interactive_command(text)
         else:
             # non-interactive mode
+            if self.input_file:
+                if text:
+                    # return error if both query text and an input file are specified
+                    click.secho("Invalid arguments: either -Q or -i may be specified.",
+                                err=True, fg='red')
+                    sys.exit(1)
+                # get query text from input file
+                with open(self.input_file, 'r') as f:
+                    text = f.read()
+
             output, _ = self._evaluate_command(text)
 
         self._output_query(output)
