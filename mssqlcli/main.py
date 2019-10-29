@@ -53,8 +53,7 @@ def run_cli_with(options):
         if mssqlcli.interactive_mode:
             mssqlcli.run()
         else:
-            # TODO: functionality here for getting -i contents (make function in mssqlcli, leverage that)
-            mssqlcli.execute_query(str(options.query))
+            mssqlcli.execute_query(options.query)
     finally:
         mssqlcli.shutdown()
 
