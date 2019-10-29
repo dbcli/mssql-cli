@@ -90,9 +90,8 @@ def download_official_wheels():
             print('Error: blob: {} does not exist in container: {}'.format(blob, BLOB_MSSQL_CLI_DAILY_CONTAINER_NAME))
             sys.exit(1)
 
-        blob_service.get_blob_to_path(BLOB_MSSQL_CLI_DAILY_CONTAINER_NAME, blob, '{0}\{1}'.format(
-                                                                                        utility.MSSQLCLI_DIST_DIRECTORY,
-                                                                                        blob))
+        blob_service.get_blob_to_path(BLOB_MSSQL_CLI_DAILY_CONTAINER_NAME, blob,
+                                      os.path.join(utility.MSSQLCLI_DIST_DIRECTORY, blob))
 
 
 def publish_official():
