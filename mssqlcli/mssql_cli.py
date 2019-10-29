@@ -375,8 +375,12 @@ class MssqlCli(object):
                                 err=True, fg='red')
                     sys.exit(1)
                 # get query text from input file
-                with open(self.input_file, 'r') as f:
-                    text = f.read()
+                try:
+                    with open(self.input_file, 'r') as f:
+                        text = f.read()
+                except FileNotFoundError as e:
+                    click.secho(str(e), err=True, fg='red')
+                    sys.exit(1)
 
             output, _ = self._evaluate_command(text)
 
