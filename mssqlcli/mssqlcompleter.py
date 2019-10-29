@@ -17,7 +17,7 @@ from .packages.parseutils.utils import last_word
 from .packages.parseutils.tables import TableReference
 from .packages.mssqlliterals.main import get_literals
 from .packages.prioritization import PrevalenceCounter
-from utility import decode
+from mssqlcli.util import decode
 
 _logger = logging.getLogger('mssqlcli.mssqlcompleter')
 
