@@ -183,15 +183,16 @@ class MssqlCli(object):
             self.completer = MssqlCompleter(smart_completion=smart_completion, settings=self.settings)
             self._completer_lock = threading.Lock()
 
-        # output file is for non-interactive mode
+        # input and output file are for non-interactive mode
+        self.input_file = options.input_file
         self.output_file = options.output_file
 
         self.sqltoolsclient = SqlToolsClient(enable_logging=options.enable_sqltoolsservice_logging)
         self.mssqlcliclient_main = MssqlCliClient(options, self.sqltoolsclient)
 
-        # exit and return error if user enters interactive mode with -o argument enabled
-        if self.interactive_mode and self.output_file:
-            click.secho("Invalid arguments: -o must be accompanied with a query using -Q.", err=True, fg='red')
+        # exit and return error if user enters interactive mode with -i or -o arguments enabled
+        if self.interactive_mode and (self.input_file or self.output_file):
+            click.secho("Invalid arguments: -i and -o must be accompanied with a query using -Q.", err=True, fg='red')
             sys.exit(1)
 
     def __del__(self):
