@@ -9,7 +9,7 @@ from mssqltestutils import (
     random_str
 )
 
-_BASELINE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'test_query_results')
+_BASELINE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 class TestNonInteractiveResults:
     """
@@ -20,41 +20,43 @@ class TestNonInteractiveResults:
     def tmp_filepath():
         """ pytest fixture which returns filepath string and removes the file after tests
         complete. """
-        fp = os.path.join(_BASELINE_DIR, "%s.txt" % random_str())
+        fp = os.path.join(_BASELINE_DIR, "test_query_baseline", "%s.txt" % random_str())
         yield fp
         os.remove(fp)
 
     testdata = [
-        ("SELECT 1", os.path.join(_BASELINE_DIR, 'result_small.txt')),
-        ("SELECT 1; SELECT 2;", os.path.join(_BASELINE_DIR, 'result_multiple.txt')),
-        ("SELECT %s" % ('x' * 250), os.path.join(_BASELINE_DIR, 'result_col_too_wide.txt')),
-        ("SELECT REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024)",
-         os.path.join(_BASELINE_DIR, 'result_col_wide.txt'))
+        ("SELECT 1", 'small.txt'),
+        ("SELECT 1; SELECT 2;", 'multiple.txt'),
+        ("SELECT %s" % ('x' * 250), 'col_too_wide.txt'),
+        ("SELECT REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024)", 'col_wide.txt')
     ]
 
-    @pytest.mark.parametrize("query_str, file_baseline", testdata)
-    def test_query(self, query_str, file_baseline):
+    @pytest.mark.parametrize("query_str, test_file", testdata)
+    def test_query(self, query_str, test_file):
         """ Tests -Q """
+        file_input, file_baseline = self.input_output_paths(test_file)
+
         output_query = self.execute_query_via_subprocess(query_str)
         output_baseline = self.get_file_contents(file_baseline)
-        assert output_query == output_baseline
 
-    @pytest.mark.parametrize("query_str, file_baseline", testdata)
-    def test_output_file(self, query_str, file_baseline, tmp_filepath):
+        # test with -Q
+        assert output_query == output_baseline
+        # test with -i
+        # TODO
+
+    @pytest.mark.parametrize("query_str, test_file", testdata)
+    def test_output_file(self, query_str, test_file, tmp_filepath):
         """ Tests -o (and ensures file overwrite works) """
+        file_baseline = self.input_output_paths(test_file)[1]
+
         self.execute_query_via_subprocess(query_str, output_file=tmp_filepath)
         output_query = self.get_file_contents(tmp_filepath)
         output_baseline = self.get_file_contents(file_baseline)
+
+        # test with -Q
         assert output_query == output_baseline
-
-
-    def test_i_and_o(self):
+        # test with -i
         # TODO
-        pass
-
-    def test_q_and_o(self):
-        # TODO
-        pass
 
     def test_long_query(self, tmp_filepath):
         """ Output large query using Python class instance. """
@@ -63,7 +65,8 @@ class TestNonInteractiveResults:
         try:
             mssqlcli = create_mssql_cli(interactive_mode=False, output_file=tmp_filepath)
             output_query = '\n'.join(mssqlcli.execute_query(query_str))
-            output_baseline = self.get_file_contents(os.path.join(_BASELINE_DIR, 'result_big.txt'))
+            file_baseline = self.input_output_paths('big.txt')[1]
+            output_baseline = self.get_file_contents(file_baseline)
             assert output_query == output_baseline
 
             # test output to file
@@ -85,6 +88,13 @@ class TestNonInteractiveResults:
             mssqlcli.shutdown()
 
     @staticmethod
+    def input_output_paths(test_file_suffix):
+        """ Returns tuple of file paths for the input an output of a test. """
+        i = os.path.join(_BASELINE_DIR, 'test_query_inputs', 'input_%s' % test_file_suffix)
+        o = os.path.join(_BASELINE_DIR, 'test_query_baseline', 'baseline_%s' % test_file_suffix)
+        return (i, o)
+
+    @staticmethod
     def execute_query_via_subprocess(query_str, output_file=None):
         """ Helper method for running a query with -Q. """
         cli_call = os.path.join(".", "mssql-cli -Q \"%s\"" % query_str)
@@ -99,7 +109,7 @@ class TestNonInteractiveResults:
     def get_file_contents(file_path):
         """ Get expected result from file. """
         try:
-            with open(file_path, 'r', ) as f:
+            with open(file_path, 'r') as f:
                 # remove string literals (needed in python2) and newlines
                 return f.read().replace('\r', '').strip()
         except OSError as e:
