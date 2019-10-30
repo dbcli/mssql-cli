@@ -90,6 +90,12 @@ class TestNonInteractiveResults:
         finally:
             mssqlcli.shutdown()
 
+    @classmethod
+    def test_Q_with_i_run(cls):
+        """ Tests failure of using -Q with -i """
+        output = cls.execute_query_via_subprocess("-Q 'select 1' -i 'this_breaks.txt'")
+        assert output == "Invalid arguments: either -Q or -i may be specified."
+
     @staticmethod
     def input_output_paths(test_file_suffix):
         """ Returns tuple of file paths for the input an output of a test. """
