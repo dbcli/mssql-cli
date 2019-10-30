@@ -36,11 +36,10 @@ class TestNonInteractiveResults:
         """ Tests query outputs to command-line, ensuring -Q and -i produce
         the same results. """
         file_input, file_baseline = self.input_output_paths(test_file)
-
-        output_query_for_Q = self.execute_query_via_subprocess(query_str)
         output_baseline = self.get_file_contents(file_baseline)
 
         # test with -Q
+        output_query_for_Q = self.execute_query_via_subprocess(query_str)
         assert output_query_for_Q == output_baseline
 
         # test with -i
@@ -50,16 +49,17 @@ class TestNonInteractiveResults:
     @pytest.mark.parametrize("query_str, test_file", testdata)
     def test_output_file(self, query_str, test_file, tmp_filepath):
         """ Tests -o (and ensures file overwrite works) """
-        file_baseline = self.input_output_paths(test_file)[1]
-
-        self.execute_query_via_subprocess(query_str, output_file=tmp_filepath)
-        output_query = self.get_file_contents(tmp_filepath)
+        file_input, file_baseline = self.input_output_paths(test_file)
         output_baseline = self.get_file_contents(file_baseline)
 
         # test with -Q
-        assert output_query == output_baseline
+        output_query_for_Q = self.execute_query_via_subprocess(query_str, output_file=tmp_filepath)
+        assert output_query_for_Q == output_baseline
+
         # test with -i
-        # TODO
+        output_query_for_i = self.execute_query_via_subprocess("-i %s" % file_input,
+                                                               output_file=tmp_filepath)
+        assert output_query_for_i == output_baseline
 
     def test_long_query(self, tmp_filepath):
         """ Output large query using Python class instance. """
@@ -97,16 +97,20 @@ class TestNonInteractiveResults:
         o = os.path.join(_BASELINE_DIR, 'test_query_baseline', 'baseline_%s' % test_file_suffix)
         return (i, o)
 
-    @staticmethod
-    def execute_query_via_subprocess(query_str, output_file=None):
+    @classmethod
+    def execute_query_via_subprocess(cls, query_str, output_file=None):
         """ Helper method for running a query. """
         cli_call = os.path.join(".", "mssql-cli %s" % query_str)
         if output_file is not None:
             cli_call += " -o %s" % output_file
         p = subprocess.Popen(cli_call, shell=True, stdin=subprocess.PIPE,
                              stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        output = p.communicate()[0].decode("utf-8").replace('\r', '')
-        return output.strip()
+        p.wait()    # ensure process ends
+
+        if output_file:
+            # get file contents if we used -o
+            return cls.get_file_contents(output_file)
+        return p.communicate()[0].decode("utf-8").replace('\r', '').strip()
 
     @staticmethod
     def get_file_contents(file_path):
