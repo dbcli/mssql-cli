@@ -156,6 +156,7 @@ class TestNonInteractiveShutdownQuery:
             assert mssqlcli.mssqlcliclient_main.sql_tools_client.\
                 tools_service_process.poll() is not None
 
+
 class TestNonInteractiveShutdownOutput:
     """
     Ensures that client session has shut down after mssql-cli runs in non-interactive mode,
