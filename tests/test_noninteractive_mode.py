@@ -25,24 +25,27 @@ class TestNonInteractiveResults:
         os.remove(fp)
 
     testdata = [
-        ("SELECT 1", 'small.txt'),
-        ("SELECT 1; SELECT 2;", 'multiple.txt'),
-        ("SELECT %s" % ('x' * 250), 'col_too_wide.txt'),
-        ("SELECT REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024)", 'col_wide.txt')
+        ("-Q \"SELECT 1\"", 'small.txt'),
+        ("-Q \"SELECT 1; SELECT 2;\"", 'multiple.txt'),
+        ("-Q \"SELECT %s\"" % ('x' * 250), 'col_too_wide.txt'),
+        ("-Q \"SELECT REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024)\"", 'col_wide.txt')
     ]
 
     @pytest.mark.parametrize("query_str, test_file", testdata)
     def test_query(self, query_str, test_file):
-        """ Tests -Q """
+        """ Tests query outputs to command-line, ensuring -Q and -i produce
+        the same results. """
         file_input, file_baseline = self.input_output_paths(test_file)
 
-        output_query = self.execute_query_via_subprocess(query_str)
+        output_query_for_Q = self.execute_query_via_subprocess(query_str)
         output_baseline = self.get_file_contents(file_baseline)
 
         # test with -Q
-        assert output_query == output_baseline
+        assert output_query_for_Q == output_baseline
+
         # test with -i
-        # TODO
+        output_query_for_i = self.execute_query_via_subprocess("-i %s" % file_input)
+        assert output_query_for_i == output_baseline
 
     @pytest.mark.parametrize("query_str, test_file", testdata)
     def test_output_file(self, query_str, test_file, tmp_filepath):
@@ -96,8 +99,8 @@ class TestNonInteractiveResults:
 
     @staticmethod
     def execute_query_via_subprocess(query_str, output_file=None):
-        """ Helper method for running a query with -Q. """
-        cli_call = os.path.join(".", "mssql-cli -Q \"%s\"" % query_str)
+        """ Helper method for running a query. """
+        cli_call = os.path.join(".", "mssql-cli %s" % query_str)
         if output_file is not None:
             cli_call += " -o %s" % output_file
         p = subprocess.Popen(cli_call, shell=True, stdin=subprocess.PIPE,
