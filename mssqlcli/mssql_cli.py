@@ -330,10 +330,6 @@ class MssqlCli(object):
 
         except NotImplementedError:
             click.secho('Not Yet Implemented.', fg="yellow")
-        except Exception as e:
-            logger.error("sql: %r, error: %r", text, e)
-            logger.error("traceback: %r", traceback.format_exc())
-            click.secho(str(e), err=True, fg='red')
         else:
             if query.total_time > 1:
                 print('Time: %0.03fs (%s)' % (query.total_time,
