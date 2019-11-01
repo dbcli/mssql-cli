@@ -53,7 +53,16 @@ def run_cli_with(options):
         if mssqlcli.interactive_mode:
             mssqlcli.run()
         else:
-            mssqlcli.execute_query(options.query)
+            text = options.query
+            if options.input_file:
+                # get query text from input file
+                try:
+                    with open(options.input_file, 'r') as f:
+                        text = f.read()
+                except FileNotFoundError as e:
+                    click.secho(str(e), err=True, fg='red')
+                    sys.exit(1)
+            mssqlcli.execute_query(text)
     finally:
         mssqlcli.shutdown()
 

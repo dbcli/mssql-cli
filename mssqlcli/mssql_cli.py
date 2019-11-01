@@ -186,6 +186,8 @@ class MssqlCli(object):
         # input and output file are for non-interactive mode
         self.input_file = options.input_file
         self.output_file = options.output_file
+        
+        self.query = options.query
 
         self.sqltoolsclient = SqlToolsClient(enable_logging=options.enable_sqltoolsservice_logging)
         self.mssqlcliclient_main = MssqlCliClient(options, self.sqltoolsclient)
@@ -193,6 +195,12 @@ class MssqlCli(object):
         # exit and return error if user enters interactive mode with -i or -o arguments enabled
         if self.interactive_mode and (self.input_file or self.output_file):
             click.secho("Invalid arguments: -i and -o can only be used in non-interactive mode.",
+                        err=True, fg='red')
+            sys.exit(1)
+
+        # exit and return error if both query text and an input file are specified
+        if self.query and self.input_file:
+            click.secho("Invalid arguments: either query [-Q] or input file [-i] may be specified.",
                         err=True, fg='red')
             sys.exit(1)
 
@@ -364,24 +372,11 @@ class MssqlCli(object):
     def execute_query(self, text):
         """ Processes a query string and outputs to file or terminal """
 
+        text = str(text)
         if self.interactive_mode:
             output = self._execute_interactive_command(text)
         else:
             # non-interactive mode
-            if self.input_file:
-                if text:
-                    # return error if both query text and an input file are specified
-                    click.secho("Invalid arguments: either -Q or -i may be specified.",
-                                err=True, fg='red')
-                    sys.exit(1)
-                # get query text from input file
-                try:
-                    with open(self.input_file, 'r') as f:
-                        text = f.read()
-                except FileNotFoundError as e:
-                    click.secho(str(e), err=True, fg='red')
-                    sys.exit(1)
-
             output, _ = self._evaluate_command(text)
 
         self._output_query(output)
