@@ -121,8 +121,19 @@ class MssqlCliClientTests(unittest.TestCase):
         viewtest = "test_%s" % random_str()
         schematest = "test_%s" % random_str()
 
+        def drop_entities(mssqlcli_client):
+            list(mssqlcli_client.execute_query('DROP TABLE %s;' % tabletest1))
+            list(mssqlcli_client.execute_query('DROP TABLE %s;' % tabletest2))
+            list(mssqlcli_client.execute_query('DROP VIEW %s IF EXISTS;' % viewtest))
+            list(mssqlcli_client.execute_query('DROP TABLE %s;' % "."
+                                               .join([schematest, tabletest1])))
+            list(mssqlcli_client.execute_query('DROP SCHEMA %s;' % schematest))
+
         try:
             client = create_mssql_cli_client()
+
+            drop_entities(client)   # drop entities in beginning (in case tables exist)
+
             list(client.execute_query('CREATE TABLE %s (a int, b varchar(25));' % tabletest1))
             list(client.execute_query('CREATE TABLE %s (x int, y varchar(25), z bit);'
                                       % tabletest2))
@@ -139,11 +150,7 @@ class MssqlCliClientTests(unittest.TestCase):
             assert schematest in client.get_schemas()
 
         finally:
-            list(client.execute_query('DROP TABLE %s;' % tabletest1))
-            list(client.execute_query('DROP TABLE %s;' % tabletest2))
-            list(client.execute_query('DROP VIEW %s IF EXISTS;' % viewtest))
-            list(client.execute_query('DROP TABLE %s;' % ".".join([schematest, tabletest1])))
-            list(client.execute_query('DROP SCHEMA %s;' % schematest))
+            drop_entities(client)
             shutdown(client)
 
     def test_mssqlcliclient_reset_connection(self):
