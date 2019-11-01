@@ -9,7 +9,8 @@ from mssqltestutils import (
     create_mssql_cli,
     create_mssql_cli_options,
     create_mssql_cli_client,
-    shutdown
+    shutdown,
+    random_str
 )
 from time import sleep
 
@@ -107,32 +108,49 @@ class MssqlCliClientTests(unittest.TestCase):
             json_writer.close()
             shutdown(client)
 
-    def test_schema_table_views_and_columns_query(self):
+    @staticmethod
+    def test_schema_table_views_and_columns_query():
         """
             Verify mssqlcliclient's tables, views, columns, and schema are populated.
             Note: This test should run against a database that the credentials
                   MSSQL_CLI_USER and MSSQL_CLI_PASSWORD have write access to.
         """
+        # create random strings for entities
+        tabletest1 = "test_%s" % random_str()
+        tabletest2 = "test_%s" % random_str()
+        viewtest = "test_%s" % random_str()
+        schematest = "test_%s" % random_str()
+
+        def drop_entities(mssqlcli_client):
+            list(mssqlcli_client.execute_query('DROP TABLE %s;' % tabletest1))
+            list(mssqlcli_client.execute_query('DROP TABLE %s;' % tabletest2))
+            list(mssqlcli_client.execute_query('DROP VIEW %s IF EXISTS;' % viewtest))
+            list(mssqlcli_client.execute_query('DROP TABLE %s;' % "."
+                                               .join([schematest, tabletest1])))
+            list(mssqlcli_client.execute_query('DROP SCHEMA %s;' % schematest))
+
         try:
             client = create_mssql_cli_client()
-            list(client.execute_query('CREATE TABLE tabletest1 (a int, b varchar(25));'))
-            list(client.execute_query('CREATE TABLE tabletest2 (x int, y varchar(25), z bit);'))
-            list(client.execute_query('CREATE VIEW viewtest as SELECT a from tabletest1;'))
-            list(client.execute_query('CREATE SCHEMA schematest;'))
-            list(client.execute_query('CREATE TABLE schematest.tabletest1 (a int);'))
 
-            assert ('schematest', 'tabletest1') in set(client.get_tables())
-            assert ('dbo', 'viewtest') in set(client.get_views())
-            assert ('schematest', 'tabletest1', 'a', 'int', 'NULL') in set(client.get_table_columns())
-            assert ('dbo', 'viewtest', 'a', 'int', 'NULL') in set(client.get_view_columns())
-            assert 'schematest' in client.get_schemas()
+            drop_entities(client)   # drop entities in beginning (in case tables exist)
+
+            list(client.execute_query('CREATE TABLE %s (a int, b varchar(25));' % tabletest1))
+            list(client.execute_query('CREATE TABLE %s (x int, y varchar(25), z bit);'
+                                      % tabletest2))
+            list(client.execute_query('CREATE VIEW %s as SELECT a from %s;'
+                                      % (viewtest, tabletest1)))
+            list(client.execute_query('CREATE SCHEMA %s;' % schematest))
+            list(client.execute_query('CREATE TABLE %s (a int);'
+                                      % '.'.join([schematest, tabletest1])))
+
+            assert (schematest, tabletest1) in set(client.get_tables())
+            assert ('dbo', viewtest) in set(client.get_views())
+            assert (schematest, tabletest1, 'a', 'int', 'NULL') in set(client.get_table_columns())
+            assert ('dbo', viewtest, 'a', 'int', 'NULL') in set(client.get_view_columns())
+            assert schematest in client.get_schemas()
 
         finally:
-            list(client.execute_query('DROP TABLE tabletest1;'))
-            list(client.execute_query('DROP TABLE tabletest2;'))
-            list(client.execute_query('DROP VIEW viewtest IF EXISTS;'))
-            list(client.execute_query('DROP TABLE schematest.tabletest1;'))
-            list(client.execute_query('DROP SCHEMA schematest;'))
+            drop_entities(client)
             shutdown(client)
 
     def test_mssqlcliclient_reset_connection(self):
