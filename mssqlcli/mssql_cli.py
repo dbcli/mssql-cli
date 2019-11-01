@@ -266,19 +266,11 @@ class MssqlCli(object):
         self.mssqlcliclient_main = mssqlcli_client
 
     def connect_to_database(self):
-
-        try:
-            owner_uri, error_messages = self.mssqlcliclient_main.connect_to_database()
-            if not owner_uri and error_messages:
-                click.secho('\n'.join(error_messages),
-                            err=True,
-                            fg='yellow')
-                sys.exit(1)
-
-        except Exception as e:
-            self.logger.debug('Database connection failed: %r.', e)
-            self.logger.error("traceback: %r", traceback.format_exc())
-            click.secho(str(e), err=True, fg='yellow')
+        owner_uri, error_messages = self.mssqlcliclient_main.connect_to_database()
+        if not owner_uri and error_messages:
+            click.secho('\n'.join(error_messages),
+                        err=True,
+                        fg='yellow')
             sys.exit(1)
 
     def handle_editor_command(self, text):
