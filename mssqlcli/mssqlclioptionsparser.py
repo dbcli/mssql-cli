@@ -145,6 +145,14 @@ def create_parser():
     )
 
     args_parser.add_argument(
+        u'-i', u'--input_file',
+        dest=u'input_file',
+        metavar=u'',
+        default=False,
+        help=u'Specifies the file that contains a batch of SQL statements for processing.'
+    )
+
+    args_parser.add_argument(
         u'-o', u'--output_file',
         dest=u'output_file',
         metavar=u'',

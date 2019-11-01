@@ -183,15 +183,25 @@ class MssqlCli(object):
             self.completer = MssqlCompleter(smart_completion=smart_completion, settings=self.settings)
             self._completer_lock = threading.Lock()
 
-        # output file is for non-interactive mode
+        # input and output file are for non-interactive mode
+        self.input_file = options.input_file
         self.output_file = options.output_file
+        
+        self.query = options.query
 
         self.sqltoolsclient = SqlToolsClient(enable_logging=options.enable_sqltoolsservice_logging)
         self.mssqlcliclient_main = MssqlCliClient(options, self.sqltoolsclient)
 
-        # exit and return error if user enters interactive mode with -o argument enabled
-        if self.interactive_mode and self.output_file:
-            click.secho("Invalid arguments: -o must be accompanied with a query using -Q.", err=True, fg='red')
+        # exit and return error if user enters interactive mode with -i or -o arguments enabled
+        if self.interactive_mode and (self.input_file or self.output_file):
+            click.secho("Invalid arguments: -i and -o can only be used in non-interactive mode.",
+                        err=True, fg='red')
+            sys.exit(1)
+
+        # exit and return error if both query text and an input file are specified
+        if self.query and self.input_file:
+            click.secho("Invalid arguments: either query [-Q] or input file [-i] may be specified.",
+                        err=True, fg='red')
             sys.exit(1)
 
     def __del__(self):
@@ -362,6 +372,7 @@ class MssqlCli(object):
     def execute_query(self, text):
         """ Processes a query string and outputs to file or terminal """
 
+        text = str(text)
         if self.interactive_mode:
             output = self._execute_interactive_command(text)
         else:

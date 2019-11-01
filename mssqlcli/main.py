@@ -41,8 +41,8 @@ def run_cli_with(options):
     # Moved import here so we can create the config dir for first use prior.
     from mssqlcli.mssql_cli import MssqlCli
 
-    # set interactive mode to false if -Q is specified
-    if options.query:
+    # set interactive mode to false if -Q or -i is specified
+    if options.query or options.input_file:
         options.interactive_mode = False
 
     mssqlcli = MssqlCli(options)
@@ -53,7 +53,16 @@ def run_cli_with(options):
         if mssqlcli.interactive_mode:
             mssqlcli.run()
         else:
-            mssqlcli.execute_query(str(options.query))
+            text = options.query
+            if options.input_file:
+                # get query text from input file
+                try:
+                    with open(options.input_file, 'r') as f:
+                        text = f.read()
+                except FileNotFoundError as e:
+                    click.secho(str(e), err=True, fg='red')
+                    sys.exit(1)
+            mssqlcli.execute_query(text)
     finally:
         mssqlcli.shutdown()
 
