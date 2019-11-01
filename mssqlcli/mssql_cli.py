@@ -76,19 +76,16 @@ def security_words_found_in(query):
     try:
         tokens = query.lower()
         return any([keyword for keyword in security_keywords if keyword in tokens])
-    except Exception:
+    except AttributeError:
         return False
 
 
 class MssqlFileHistory(FileHistory):
-    def __init__(self, filename):
-        super(self.__class__, self).__init__(filename)
-
     def append_string(self, string):
         if security_words_found_in(string):
             return
 
-        super(self.__class__, self).append_string(string)
+        super(MssqlFileHistory, self).append_string(string)
 
 
 class MssqlCli(object):
