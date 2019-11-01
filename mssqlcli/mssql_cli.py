@@ -288,6 +288,7 @@ class MssqlCli(object):
         # FIXME: using application.pre_run_callables like this here is not the best solution.
         # It's internal api of prompt_toolkit that may change. This was added to fix #668.
         # We may find a better way to do it in the future.
+        # pylint: disable=no-member
         editor_command = special.editor_command(text)
         while editor_command:
             filename = special.get_filename(text)

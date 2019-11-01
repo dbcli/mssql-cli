@@ -7,6 +7,5 @@ def export(defn):
     __all__.append(defn.__name__)
     return defn
 
-
-from . import main
-from . import commands
+from mssqlcli.packages.special import main
+from mssqlcli.packages.special import commands

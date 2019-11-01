@@ -1,13 +1,13 @@
 from __future__ import print_function, unicode_literals
+from collections import namedtuple
 import re
 import sqlparse
-from collections import namedtuple
 from sqlparse.sql import Comparison, Identifier, Where
-from .parseutils.utils import (
+from mssqlcli.packages.parseutils.utils import (
     last_word, find_prev_keyword, parse_partial_identifier)
-from .parseutils.tables import extract_tables
-from .parseutils.ctes import isolate_query_ctes
-from .special.main import parse_special_command
+from mssqlcli.packages.parseutils.tables import extract_tables
+from mssqlcli.packages.parseutils.ctes import isolate_query_ctes
+from mssqlcli.packages.special.main import parse_special_command
 
 try:
     string_types = basestring  # Python 2

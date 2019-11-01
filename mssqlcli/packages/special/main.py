@@ -1,7 +1,7 @@
 import logging
 from collections import namedtuple
 
-from . import export
+from mssqlcli.packages.special import export
 
 logger = logging.getLogger('mssqlcli.special')
 
