@@ -451,6 +451,7 @@ class MssqlCli(object):
             prompt = self.get_prompt(self.prompt_format)
             return [(u'class:prompt', prompt)]
 
+        # FIXME: unused arguments
         def get_continuation(width, line_number, is_soft_wrap):
             continuation = self.multiline_continuation_char * (width - 1) + ' '
             return [(u'class:continuation', continuation)]
@@ -476,7 +477,7 @@ class MssqlCli(object):
                     ConditionalProcessor(
                         processor=HighlightMatchingBracketProcessor(
                             chars='[](){}'),
-                        filter=HasFocus(DEFAULT_BUFFER) & ~IsDone()),
+                        filter=HasFocus(DEFAULT_BUFFER) & ~IsDone()),       #FIXME: what is this?
                     # Render \t as 4 spaces instead of "^I"
                     TabsProcessor(char1=u' ', char2=u' ')],
                 reserve_space_for_menu=self.min_num_menu_lines,
@@ -499,6 +500,7 @@ class MssqlCli(object):
 
             return self.prompt_session
 
+    # FIXME: unused argument
     def _should_show_limit_prompt(self, status, rows):
         """returns True if limit prompt should be shown, False otherwise."""
         if not rows:
@@ -588,12 +590,8 @@ class MssqlCli(object):
             'Connection reset. Reconnect (Y/n)',
             show_default=False, type=bool, default=True)
         if reconnect:
-            try:
-                self.reset()
-
-                click.secho('Reconnected!\nTry the command again.', fg='green')
-            except Exception as e:
-                click.secho(str(e), err=True, fg='red')
+            self.reset()
+            click.secho('Reconnected!\nTry the command again.', fg='green')
 
     def shutdown(self):
         """ API for shutting down client """
@@ -603,25 +601,29 @@ class MssqlCli(object):
         """
         Reset mssqlcli client with a new sql tools service and connection.
         """
-        try:
-            self.sqltoolsclient.shutdown()
-            self.sqltoolsclient = SqlToolsClient()
+        self.sqltoolsclient.shutdown()
+        self.sqltoolsclient = SqlToolsClient()
 
-            self.mssqlcliclient_main = self.mssqlcliclient_main.clone(self.sqltoolsclient)
+        self.mssqlcliclient_main = self.mssqlcliclient_main.clone(self.sqltoolsclient)
 
-            if not self.mssqlcliclient_main.connect_to_database():
-                click.secho('Unable reconnect to server {0}; database {1}.'.format(
-                    self.mssqlcliclient_main.server_name,
-                    self.mssqlcliclient_main.connected_database),
-                    err=True, fg='yellow')
+        database_response = self.mssqlcliclient_main.connect_to_database()
+        if not database_response:
+            click.secho('Unable reconnect to server %s; database %s.' % (
+                self.mssqlcliclient_main.server_name,
+                self.mssqlcliclient_main.connected_database),
+                        err=True, fg='yellow')
 
-                self.logger.info(u'Unable to reset connection to server {0}; database {1}'.format(
-                    self.mssqlcliclient_main.server_name,
-                    self.mssqlcliclient_main.connected_database))
-                exit(1)
-        except Exception as e:
-            self.logger.error(u'Error in reset : {0}'.format(e.message))
-            raise e
+            self.logger.info(u'Unable to reset connection to server %s; database %s',
+                             self.mssqlcliclient_main.server_name,
+                             self.mssqlcliclient_main.connected_database)
+
+            sys.exit(1)
+        else:
+            owner_uri, error_messages = database_response
+            if not owner_uri and error_messages:
+                # can occur if database credentials change during reset
+                self.logger.error(u'Error in reset : %s', error_messages)
+                raise ConnectionResetError(error_messages)
 
     def refresh_completions(self, history=None, persist_priorities='all'):
         # Clone mssqlcliclient to create a new connection with a new owner Uri.
