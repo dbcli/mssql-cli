@@ -176,14 +176,15 @@ class MssqlCli(object):
             self.query_history = []
 
             # Initialize completer
-            smart_completion = True if c['main'].get('smart_completion', 'True') == 'True' else False
-            self.completer = MssqlCompleter(smart_completion=smart_completion, settings=self.settings)
+            smart_completion = c['main'].get('smart_completion', 'True') == 'True'
+            self.completer = MssqlCompleter(smart_completion=smart_completion,
+                                            settings=self.settings)
             self._completer_lock = threading.Lock()
 
         # input and output file are for non-interactive mode
         self.input_file = options.input_file
         self.output_file = options.output_file
-        
+
         self.query = options.query
 
         self.sqltoolsclient = SqlToolsClient(enable_logging=options.enable_sqltoolsservice_logging)
@@ -224,7 +225,6 @@ class MssqlCli(object):
         return [(None, None, None, message, '', True)]
 
     def initialize_logging(self):
-    
         log_file = self.config['main']['log_file']
         if log_file == 'default':
             log_file = config_location() + 'mssqlcli.log'
