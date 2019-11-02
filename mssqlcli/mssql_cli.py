@@ -271,6 +271,7 @@ class MssqlCli(object):
             click.secho('\n'.join(error_messages),
                         err=True,
                         fg='yellow')
+            self.logger.debug('Database connection failed: %r.', error_messages)
             sys.exit(1)
 
     def handle_editor_command(self, text):
@@ -332,8 +333,9 @@ class MssqlCli(object):
             click.secho('Not Yet Implemented.', fg="yellow")
         else:
             if query.total_time > 1:
+                # pylint: disable=no-member
                 print('Time: %0.03fs (%s)' % (query.total_time,
-                                            humanize.time.naturaldelta(query.total_time)))
+                                              humanize.time.naturaldelta(query.total_time)))
             else:
                 print('Time: %0.03fs' % query.total_time)
 
