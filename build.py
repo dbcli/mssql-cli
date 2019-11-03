@@ -5,13 +5,15 @@ import os
 import sys
 import uuid
 import platform
-import utility
 import polib
+import utility
+import mssqlcli.mssqltoolsservice.externals as mssqltoolsservice
 
 
-# Environment variables below allow the build process to use a python interpreter and pip version different
-# from the user's PATH. When building our linux packages on various distros, we want to be build machine agnostic, so we
-# redirect python calls to the python we bundle in. Usage of these variables can be seen in our build_scripts folder.
+# Environment variables below allow the build process to use a python interpreter and pip version
+# different from the user's PATH. When building our linux packages on various distros, we want to
+# be build machine agnostic, so we redirect python calls to the python we bundle in. Usage of
+# these variables can be seen in our build_scripts folder.
 PIP = os.getenv('CUSTOM_PIP', 'pip')
 PYTHON = os.getenv('CUSTOM_PYTHON', 'python')
 
@@ -20,21 +22,19 @@ def print_heading(heading, f=None):
     print('{0}\n{1}\n{0}'.format('=' * len(heading), heading), file=f)
 
 
-def clean_and_copy_sqltoolsservice(platform):
+def clean_and_copy_sqltoolsservice(plat):
     """
-        Cleans the SqlToolsService directory and copies over the SqlToolsService binaries for the given platform.
+        Cleans the SqlToolsService directory and copies over the SqlToolsService binaries for the
+        given platform.
         :param platform: string
     """
-
-    import mssqlcli.mssqltoolsservice.externals as mssqltoolsservice
-
     mssqltoolsservice.clean_up_sqltoolsservice()
-    mssqltoolsservice.copy_sqltoolsservice(platform)
+    mssqltoolsservice.copy_sqltoolsservice(plat)
 
 
 def code_analysis():
     utility.exec_command(
-        '{0} -m flake8 mssqlcli setup.py dev_setup.py build.py utility.py dos2unix.py'.format(PYTHON),
+        '%s -m flake8 mssqlcli setup.py dev_setup.py build.py utility.py dos2unix.py' % PYTHON,
         utility.ROOT_DIR)
 
 
@@ -68,15 +68,15 @@ def build():
     else:
         platforms_to_build = [utility.get_current_platform()]
 
-    for platform in platforms_to_build:
+    for plat in platforms_to_build:
         # For the current platform, populate the appropriate binaries and
         # generate the wheel.
-        clean_and_copy_sqltoolsservice(platform)
+        clean_and_copy_sqltoolsservice(plat)
         utility.clean_up(utility.MSSQLCLI_BUILD_DIRECTORY)
 
         print_heading('Building mssql-cli pip package')
-        utility.exec_command('{0} --version'.format(PYTHON), utility.ROOT_DIR)
-        utility.exec_command('{0} setup.py check -r -s bdist_wheel --plat-name {1}'.format(PYTHON, platform),
+        utility.exec_command('%s --version' % PYTHON, utility.ROOT_DIR)
+        utility.exec_command('%s setup.py check -r -s bdist_wheel --plat-name %s' % (PYTHON, plat),
                              utility.ROOT_DIR,
                              continue_on_error=False)
 
@@ -86,7 +86,8 @@ def build():
 
 
 def copy_and_rename_wheels():
-    # Create a additional copy of each build artifact with a ever green name with 'dev-latest' as it's version.
+    # Create a additional copy of each build artifact with a ever green name with 'dev-latest' as
+    # it's version.
     for pkg_name in os.listdir(utility.MSSQLCLI_DIST_DIRECTORY):
         first_dash = pkg_name.find('-')
         second_dash = pkg_name.find('-', first_dash + 1, len(pkg_name))
@@ -126,7 +127,8 @@ def unit_test():
     runid = str(uuid.uuid1())
     python_version = platform.python_version()
     utility.exec_command(
-        'pytest --cov mssqlcli --doctest-modules --junitxml=junit/test-{}-results.xml --cov-report=xml --cov-report=html --cov-append '
+        'pytest --cov mssqlcli --doctest-modules --junitxml=junit/test-{}-results.xml \
+            --cov-report=xml --cov-report=html --cov-append '
         '-o junit_suite_name=pytest-{} '
         'tests/test_mssqlcliclient.py '
         'tests/test_completion_refresher.py '
@@ -150,7 +152,8 @@ def unit_test():
 
 def integration_test():
     """
-    Run full integration test via tox which includes build, unit tests, code coverage, and packaging.
+    Run full integration test via tox which includes build, unit tests, code coverage,
+    and packaging.
     """
     utility.exec_command(
         'tox',
@@ -176,25 +179,27 @@ def validate_actions(user_actions, valid_targets):
 
 def generate_mo(extraction_target_path, lang_name, trans_mappings, domain, localedir=None):
     """
-    Extracts strings from 'extraction_target_path', and creates pot, po, mo file with 'trans_mappings' information.\
+    Extracts strings from 'extraction_target_path', and creates pot, po, mo file with
+    'trans_mappings' information.
     'extraction_target_path' can be file or directory.
     """
     extraction_target_dir = extraction_target_path\
         if os.path.isdir(extraction_target_path) else os.path.dirname(extraction_target_path)
-    localedir = localedir if (not localedir is None) else os.path.join(extraction_target_dir, 'locale')
+    localedir = localedir if (not localedir is None) \
+                          else os.path.join(extraction_target_dir, 'locale')
     mo_dir = os.path.join(localedir, lang_name, 'LC_MESSAGES')
     create_dir([extraction_target_dir, 'locale', lang_name, 'LC_MESSAGES'])
 
     pot_file = '{0}.pot'.format(os.path.join(localedir, domain))
     po_file = '{0}.po'.format(os.path.join(mo_dir, domain))
     mo_file = '{0}.mo'.format(os.path.join(mo_dir, domain))
-    
+
     extract_command = "pybabel extract {0} -o {1}".format(extraction_target_path, pot_file)
     utility.exec_command(extract_command, extraction_target_dir)
 
     po = polib.pofile(pot_file)
     for entry in po:
-        if (entry.msgid in trans_mappings):
+        if entry.msgid in trans_mappings:
             entry.msgstr = trans_mappings[entry.msgid]
     po.save(po_file)
     po.save_as_mofile(mo_file)
@@ -204,11 +209,11 @@ def generate_mo(extraction_target_path, lang_name, trans_mappings, domain, local
 def create_dir(path):
     curr_path = None
     for p in path:
-        if (curr_path is None):
+        if curr_path is None:
             curr_path = os.path.abspath(p)
         else:
             curr_path = os.path.join(curr_path, p)
-        if (not os.path.exists(curr_path)):
+        if not os.path.exists(curr_path):
             os.mkdir(curr_path)
 
 
