@@ -6,7 +6,6 @@ import shutil
 import sys
 import string
 import random
-import mssqlcli.mssqltoolsservice.externals as mssqltoolsservice
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.abspath(__file__), '..'))
 
@@ -74,6 +73,9 @@ def copy_current_platform_mssqltoolsservice():
     """
     Copy the necessary mssqltoolsservice binaries for the current platform if supported.
     """
+    # pylint: disable=import-outside-toplevel
+    import mssqlcli.mssqltoolsservice.externals as mssqltoolsservice
+
     current_platform = get_current_platform()
     if current_platform:
         mssqltoolsservice.copy_sqltoolsservice(current_platform)
