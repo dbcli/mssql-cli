@@ -2,9 +2,8 @@ import ast
 import os
 import re
 import datetime
-
+from codecs import open     #pylint: disable=redefined-builtin
 from setuptools import setup, find_packages
-from codecs import open
 
 _version_re = re.compile(r'__version__\s+=\s+(.*)')
 
@@ -17,13 +16,13 @@ description = 'CLI for SQL Server Database. With auto-completion and syntax high
 MSSQLTOOLSSERVICE_VERSION = '1.0.0a21'
 
 
-def get_timestamped_version(version):
+def get_timestamped_version(ver):
     """
     Appends .dev<DateTimeString> to version.
     :param version: The version number
     :return: <version>.dev<YearMonthDayHourMinute>. Example 0.0.1.dev1711030310
     """
-    return version + '.dev' + datetime.datetime.now().strftime("%y%m%d%H%M")
+    return ver + '.dev' + datetime.datetime.now().strftime("%y%m%d%H%M")
 
 
 install_requirements = [
@@ -45,7 +44,8 @@ setup(
     name='mssql-cli',
     author='Microsoft Corporation',
     author_email='sqlcli@microsoft.com',
-    version=version if os.environ.get('MSSQL_CLI_OFFICIAL_BUILD', '') else get_timestamped_version(version),
+    version=version if os.environ.get('MSSQL_CLI_OFFICIAL_BUILD', '') \
+                    else get_timestamped_version(version),
     license='BSD-3',
     url='https://github.com/dbcli/mssql-cli',
     packages=find_packages(),
@@ -55,7 +55,7 @@ setup(
     long_description=open('README.rst', encoding='utf-8').read(),
     install_requires=install_requirements,
     include_package_data=True,
-    scripts=[	   
+    scripts=[
         'mssql-cli.bat',
         'mssql-cli'
     ],
