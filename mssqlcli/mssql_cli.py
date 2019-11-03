@@ -451,8 +451,7 @@ class MssqlCli(object):
             prompt = self.get_prompt(self.prompt_format)
             return [(u'class:prompt', prompt)]
 
-        # FIXME: unused arguments
-        def get_continuation(width, line_number, is_soft_wrap):
+        def get_continuation(width):
             continuation = self.multiline_continuation_char * (width - 1) + ' '
             return [(u'class:continuation', continuation)]
 
@@ -500,8 +499,7 @@ class MssqlCli(object):
 
             return self.prompt_session
 
-    # FIXME: unused argument
-    def _should_show_limit_prompt(self, status, rows):
+    def _should_show_limit_prompt(self, rows):
         """returns True if limit prompt should be shown, False otherwise."""
         if not rows:
             return False
@@ -534,7 +532,7 @@ class MssqlCli(object):
                 self.mssqlcliclient_main.execute_query(text):
 
             total = time() - start
-            if self._should_show_limit_prompt(status, rows):
+            if self._should_show_limit_prompt(rows):
                 click.secho('The result set has more than %s rows.'
                             % self.row_limit, fg='red')
                 if not click.confirm('Do you want to continue?'):
@@ -702,38 +700,37 @@ class MssqlCli(object):
         """Get the last query executed or None."""
         return self.query_history[-1][0] if self.query_history else None
 
-    def has_meta_cmd(self, query):
+    @staticmethod
+    def has_meta_cmd(query):
         """Determines if the completion needs a refresh by checking if the sql
         statement is an alter, create, drop, commit or rollback."""
-        try:
+        if query and isinstance(query, str):
             first_token = query.split()[0]
             if first_token.lower() in ('alter', 'create', 'drop'):
                 return True
-        except Exception:
-            return False
-
         return False
 
-    def has_change_db_cmd(self, query):
+    @staticmethod
+    def has_change_db_cmd(query):
         """Determines if the statement is a database switch such as 'use' or '\\c'
            Returns (True, DBName) or (False, None)
         """
-        try:
+        if query and isinstance(query, str):
             first_token = query.split()[0]
             if first_token.lower() in ('use', '\\c', '\\connect'):
                 return True, query.split()[1].strip('"')
-        except Exception:
-            return False, None
 
         return False, None
 
-    def quit_command(self, sql):
+    @staticmethod
+    def quit_command(sql):
         return (sql.strip().lower() == 'exit' or
                 sql.strip().lower() == 'quit' or
                 sql.strip() == r'\q' or
                 sql.strip() == ':q')
 
-    def format_output(self, title, cur, headers, status, settings):
+    @staticmethod
+    def format_output(title, cur, headers, status, settings):
         output = []
         expanded = (settings.expanded or settings.table_format == 'vertical')
         table_format = ('vertical' if settings.expanded else
