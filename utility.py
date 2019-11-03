@@ -6,6 +6,7 @@ import shutil
 import sys
 import string
 import random
+import mssqlcli.mssqltoolsservice.externals as mssqltoolsservice
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.abspath(__file__), '..'))
 
@@ -43,7 +44,7 @@ def clean_up(directory):
     """
     try:
         shutil.rmtree(directory)
-    except Exception:
+    except OSError:
         # Ignored, directory may not exist which is fine.
         pass
 
@@ -73,8 +74,6 @@ def copy_current_platform_mssqltoolsservice():
     """
     Copy the necessary mssqltoolsservice binaries for the current platform if supported.
     """
-    import mssqlcli.mssqltoolsservice.externals as mssqltoolsservice
-
     current_platform = get_current_platform()
     if current_platform:
         mssqltoolsservice.copy_sqltoolsservice(current_platform)
@@ -85,7 +84,7 @@ def copy_current_platform_mssqltoolsservice():
 def encode(s):
     try:
         return s.encode('utf-8')
-    except:
+    except:     #pylint: disable=bare-except
         pass
     return s
 
@@ -96,8 +95,8 @@ def encode(s):
 def decode(s):
     try:
         return s.decode('utf-8')
-    except:
-        pass    
+    except:     #pylint: disable=bare-except
+        pass
     return s
 
 
