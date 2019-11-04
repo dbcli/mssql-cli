@@ -1,8 +1,8 @@
 """
 Non-interactive tests.
 """
-import subprocess
 import os
+import subprocess
 import pytest
 from mssqltestutils import (
     create_mssql_cli,
@@ -32,6 +32,7 @@ class TestNonInteractiveResults:
     ]
 
     @pytest.mark.parametrize("query_str, test_file", testdata)
+    @pytest.mark.timeout(60)
     def test_query(self, query_str, test_file):
         """ Tests query outputs to command-line, ensuring -Q and -i produce
         the same results. """
@@ -47,6 +48,7 @@ class TestNonInteractiveResults:
         assert output_query_for_i == output_baseline
 
     @pytest.mark.parametrize("query_str, test_file", testdata)
+    @pytest.mark.timeout(60)
     def test_output_file(self, query_str, test_file, tmp_filepath):
         """ Tests -o (and ensures file overwrite works) """
         file_input, file_baseline = self.input_output_paths(test_file)
@@ -61,10 +63,10 @@ class TestNonInteractiveResults:
                                                                output_file=tmp_filepath)
         assert output_query_for_i == output_baseline
 
+    @pytest.mark.timeout(60)
     def test_long_query(self, tmp_filepath):
         """ Output large query using Python class instance. """
-        query_str = """ALTER DATABASE keep_AdventureWorks2014 SET COMPATIBILITY_LEVEL = 130
-                    SELECT * FROM STRING_SPLIT(REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024), ',')"""
+        query_str = "SELECT * FROM STRING_SPLIT(REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024), ',')"
         try:
             mssqlcli = create_mssql_cli(interactive_mode=False, output_file=tmp_filepath)
             output_query = '\n'.join(mssqlcli.execute_query(query_str))
@@ -79,6 +81,7 @@ class TestNonInteractiveResults:
             mssqlcli.shutdown()
 
     @staticmethod
+    @pytest.mark.timeout(60)
     def test_noninteractive_run():
         """ Test that calling run throws an exception only when interactive_mode is false """
         mssqlcli = create_mssql_cli(interactive_mode=False)
@@ -91,6 +94,7 @@ class TestNonInteractiveResults:
             mssqlcli.shutdown()
 
     @classmethod
+    @pytest.mark.timeout(60)
     def test_Q_with_i_run(cls):
         """ Tests failure of using -Q with -i """
         output = cls.execute_query_via_subprocess("-Q 'select 1' -i 'this_breaks.txt'")
@@ -111,12 +115,15 @@ class TestNonInteractiveResults:
             cli_call += " -o %s" % output_file
         p = subprocess.Popen(cli_call, shell=True, stdin=subprocess.PIPE,
                              stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        p.wait()    # ensure process ends
+
+        output, errs = p.communicate()
+        if errs:
+            print(errs)
 
         if output_file:
             # get file contents if we used -o
             return cls.get_file_contents(output_file)
-        return p.communicate()[0].decode("utf-8").replace('\r', '').strip()
+        return output.decode("utf-8").replace('\r', '').strip()
 
     @staticmethod
     def get_file_contents(file_path):
@@ -146,6 +153,7 @@ class TestNonInteractiveShutdownQuery:
 
     @staticmethod
     @pytest.mark.parametrize("query_str", testdata)
+    @pytest.mark.timeout(60)
     def test_shutdown_after_query(query_str, mssqlcli):
         """ Runs unit tests on process closure given a query string. """
         print()
@@ -177,6 +185,7 @@ class TestNonInteractiveShutdownOutput:
 
     @staticmethod
     @pytest.mark.parametrize("query_str", testdata)
+    @pytest.mark.timeout(60)
     def test_shutdown_after_query(query_str, mssqlcli):
         """ Runs unit tests on process closure given a query string. """
         print()
