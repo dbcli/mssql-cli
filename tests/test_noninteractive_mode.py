@@ -1,8 +1,8 @@
 """
 Non-interactive tests.
 """
-import subprocess
 import os
+import subprocess
 import pytest
 from mssqltestutils import (
     create_mssql_cli,
@@ -116,12 +116,7 @@ class TestNonInteractiveResults:
         p = subprocess.Popen(cli_call, shell=True, stdin=subprocess.PIPE,
                              stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
-        try:
-            output, errs = p.communicate(timeout=15)
-        except subprocess.TimeoutExpired:
-            p.kill()
-            output, errs = p.communicate()
-
+        output, errs = p.communicate()
         if errs:
             print(errs)
 
