@@ -176,7 +176,7 @@ class MssqlCli(object):
             self.query_history = []
 
             # Initialize completer
-            smart_completion = c['main'].get('smart_completion', 'True') == 'True'
+            smart_completion = c['main'].get('smart_completion', 'True').lower() == 'true'
             self.completer = MssqlCompleter(smart_completion=smart_completion,
                                             settings=self.settings)
             self._completer_lock = threading.Lock()
