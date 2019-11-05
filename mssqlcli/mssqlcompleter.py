@@ -1,22 +1,21 @@
 from __future__ import print_function, unicode_literals
 import logging
 import re
-import sys
-from itertools import count, repeat, chain
+from itertools import count, chain
 import operator
 from collections import namedtuple, defaultdict, OrderedDict
 from prompt_toolkit.completion import Completer, Completion, PathCompleter
 from prompt_toolkit.document import Document
-from .packages import special
-from .packages.special.namedqueries import named_queries
-from .packages.sqlcompletion import (FromClauseItem,
-                                     suggest_type, Special, NamedQuery, Database, Schema, Table, Function, Column, View,
-                                     Keyword, Datatype, Alias, Path, JoinCondition, Join)
-from .packages.parseutils.meta import ColumnMetadata, ForeignKey
-from .packages.parseutils.utils import last_word
-from .packages.parseutils.tables import TableReference
-from .packages.mssqlliterals.main import get_literals
-from .packages.prioritization import PrevalenceCounter
+from mssqlcli.packages import special
+from mssqlcli.packages.special.namedqueries import named_queries
+from mssqlcli.packages.sqlcompletion import (FromClauseItem, suggest_type, Special, NamedQuery,
+                                             Database, Schema, Table, Function, Column, View,
+                                             Keyword, Datatype, Alias, Path, JoinCondition, Join)
+from mssqlcli.packages.parseutils.meta import ColumnMetadata, ForeignKey
+from mssqlcli.packages.parseutils.utils import last_word
+from mssqlcli.packages.parseutils.tables import TableReference
+from mssqlcli.packages.mssqlliterals.main import get_literals
+from mssqlcli.packages.prioritization import PrevalenceCounter
 from mssqlcli.util import decode
 
 _logger = logging.getLogger('mssqlcli.mssqlcompleter')
@@ -140,7 +139,7 @@ class MssqlCompleter(Completer):
         self.databases.extend(databases)
 
     def extend_keywords(self, additional_keywords):
-        self.keywords.extend(additional_keywords)
+        self.keywords = self.keywords + additional_keywords
         self.all_completions.update(additional_keywords)
 
     def extend_schemas(self, schemas):
@@ -398,7 +397,8 @@ class MssqlCompleter(Completer):
                 # case-sensitive one as a tie breaker.
                 # We also use the unescape_name to make sure quoted names have
                 # the same priority as unquoted names.
-                lexical_priority = (tuple(0 if c in(' _') else -ord(c) for c in self.unescape_name(item.lower())) +
+                lexical_priority = (tuple(0 if c in(' _') else -ord(c) \
+                                    for c in self.unescape_name(item.lower())) +
                                     (1,) + tuple(c for c in item))
 
                 item = self.case(item)
@@ -407,7 +407,7 @@ class MssqlCompleter(Completer):
                     sort_key, type_priority, prio, priority_func(item),
                     prio2, lexical_priority
                 )
-                
+
                 item = decode(item)
                 display_meta = decode(display_meta)
                 display = decode(display)
@@ -460,11 +460,12 @@ class MssqlCompleter(Completer):
     def get_column_matches(self, suggestion, word_before_cursor):
         tables = suggestion.table_refs
         do_qualify = suggestion.qualifiable and {'always': True, 'never': False,
-                                                 'if_more_than_one_table': len(tables) > 1}[self.qualify_columns]
+                                                 'if_more_than_one_table': \
+                                                     len(tables) > 1}[self.qualify_columns]
 
         def qualify(col, tbl):
-            return (
-                   (tbl + '.' + self.case(col)) if do_qualify else self.case(col))
+            return (tbl + '.' + self.case(col)) if do_qualify else self.case(col)
+
         _logger.debug("Completion column scope: %r", tables)
         scoped_cols = self.populate_scoped_cols(
             tables, suggestion.local_tables)
@@ -503,7 +504,9 @@ class MssqlCompleter(Completer):
             if self.asterisk_column_order == 'alphabetic':
                 for cols in scoped_cols.values():
                     cols.sort(key=operator.attrgetter('name'))
-            if (lastword != word_before_cursor and len(tables) == 1 and word_before_cursor[-len(lastword) - 1] == '.'):
+            if lastword != word_before_cursor \
+                and len(tables) == 1 \
+                and word_before_cursor[-len(lastword) - 1] == '.':
                 # User typed x.*; replicate "x." for all columns except the
                 # first, which gets the original (as we only replace the "*"")
                 sep = ', ' + word_before_cursor[:-1]
