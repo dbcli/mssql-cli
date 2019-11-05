@@ -76,19 +76,16 @@ def security_words_found_in(query):
     try:
         tokens = query.lower()
         return any([keyword for keyword in security_keywords if keyword in tokens])
-    except Exception:
+    except AttributeError:
         return False
 
 
 class MssqlFileHistory(FileHistory):
-    def __init__(self, filename):
-        super(self.__class__, self).__init__(filename)
-
     def append_string(self, string):
         if security_words_found_in(string):
             return
 
-        super(self.__class__, self).append_string(string)
+        super(MssqlFileHistory, self).append_string(string)
 
 
 class MssqlCli(object):
@@ -103,11 +100,11 @@ class MssqlCli(object):
 
         if configured_pager:
             self.logger.info(
-                'Default pager found in config file: "{}"'.format(configured_pager))
+                'Default pager found in config file: "%s"', configured_pager)
             os.environ['PAGER'] = configured_pager
         elif os_environ_pager:
-            self.logger.info('Default pager found in PAGER environment variable: "{}"'.format(
-                os_environ_pager))
+            self.logger.info('Default pager found in PAGER environment variable: "%s"',
+                             os_environ_pager)
             os.environ['PAGER'] = os_environ_pager
         else:
             self.logger.info(
@@ -179,14 +176,15 @@ class MssqlCli(object):
             self.query_history = []
 
             # Initialize completer
-            smart_completion = True if c['main'].get('smart_completion', 'True') == 'True' else False
-            self.completer = MssqlCompleter(smart_completion=smart_completion, settings=self.settings)
+            smart_completion = c['main'].get('smart_completion', 'True').lower() == 'true'
+            self.completer = MssqlCompleter(smart_completion=smart_completion,
+                                            settings=self.settings)
             self._completer_lock = threading.Lock()
 
         # input and output file are for non-interactive mode
         self.input_file = options.input_file
         self.output_file = options.output_file
-        
+
         self.query = options.query
 
         self.sqltoolsclient = SqlToolsClient(enable_logging=options.enable_sqltoolsservice_logging)
@@ -227,7 +225,6 @@ class MssqlCli(object):
         return [(None, None, None, message, '', True)]
 
     def initialize_logging(self):
-    
         log_file = self.config['main']['log_file']
         if log_file == 'default':
             log_file = config_location() + 'mssqlcli.log'
@@ -269,19 +266,12 @@ class MssqlCli(object):
         self.mssqlcliclient_main = mssqlcli_client
 
     def connect_to_database(self):
-
-        try:
-            owner_uri, error_messages = self.mssqlcliclient_main.connect_to_database()
-            if not owner_uri and error_messages:
-                click.secho('\n'.join(error_messages),
-                            err=True,
-                            fg='yellow')
-                sys.exit(1)
-
-        except Exception as e:
-            self.logger.debug('Database connection failed: %r.', e)
-            self.logger.error("traceback: %r", traceback.format_exc())
-            click.secho(str(e), err=True, fg='yellow')
+        owner_uri, error_messages = self.mssqlcliclient_main.connect_to_database()
+        if not owner_uri and error_messages:
+            click.secho('\n'.join(error_messages),
+                        err=True,
+                        fg='yellow')
+            self.logger.debug('Database connection failed: %r.', error_messages)
             sys.exit(1)
 
     def handle_editor_command(self, text):
@@ -299,6 +289,7 @@ class MssqlCli(object):
         # FIXME: using application.pre_run_callables like this here is not the best solution.
         # It's internal api of prompt_toolkit that may change. This was added to fix #668.
         # We may find a better way to do it in the future.
+        # pylint: disable=no-member
         editor_command = special.editor_command(text)
         while editor_command:
             filename = special.get_filename(text)
@@ -340,14 +331,11 @@ class MssqlCli(object):
 
         except NotImplementedError:
             click.secho('Not Yet Implemented.', fg="yellow")
-        except Exception as e:
-            logger.error("sql: %r, error: %r", text, e)
-            logger.error("traceback: %r", traceback.format_exc())
-            click.secho(str(e), err=True, fg='red')
         else:
             if query.total_time > 1:
+                # pylint: disable=no-member
                 print('Time: %0.03fs (%s)' % (query.total_time,
-                                            humanize.time.naturaldelta(query.total_time)))
+                                              humanize.time.naturaldelta(query.total_time)))
             else:
                 print('Time: %0.03fs' % query.total_time)
 
@@ -463,7 +451,7 @@ class MssqlCli(object):
             prompt = self.get_prompt(self.prompt_format)
             return [(u'class:prompt', prompt)]
 
-        def get_continuation(width, line_number, is_soft_wrap):
+        def get_continuation(width):
             continuation = self.multiline_continuation_char * (width - 1) + ' '
             return [(u'class:continuation', continuation)]
 
@@ -488,7 +476,7 @@ class MssqlCli(object):
                     ConditionalProcessor(
                         processor=HighlightMatchingBracketProcessor(
                             chars='[](){}'),
-                        filter=HasFocus(DEFAULT_BUFFER) & ~IsDone()),
+                        filter=HasFocus(DEFAULT_BUFFER) & ~IsDone()),       #FIXME: what is this?
                     # Render \t as 4 spaces instead of "^I"
                     TabsProcessor(char1=u' ', char2=u' ')],
                 reserve_space_for_menu=self.min_num_menu_lines,
@@ -511,7 +499,7 @@ class MssqlCli(object):
 
             return self.prompt_session
 
-    def _should_show_limit_prompt(self, status, rows):
+    def _should_show_limit_prompt(self, rows):
         """returns True if limit prompt should be shown, False otherwise."""
         if not rows:
             return False
@@ -544,7 +532,7 @@ class MssqlCli(object):
                 self.mssqlcliclient_main.execute_query(text):
 
             total = time() - start
-            if self._should_show_limit_prompt(status, rows):
+            if self._should_show_limit_prompt(rows):
                 click.secho('The result set has more than %s rows.'
                             % self.row_limit, fg='red')
                 if not click.confirm('Do you want to continue?'):
@@ -600,12 +588,8 @@ class MssqlCli(object):
             'Connection reset. Reconnect (Y/n)',
             show_default=False, type=bool, default=True)
         if reconnect:
-            try:
-                self.reset()
-
-                click.secho('Reconnected!\nTry the command again.', fg='green')
-            except Exception as e:
-                click.secho(str(e), err=True, fg='red')
+            self.reset()
+            click.secho('Reconnected!\nTry the command again.', fg='green')
 
     def shutdown(self):
         """ API for shutting down client """
@@ -615,25 +599,29 @@ class MssqlCli(object):
         """
         Reset mssqlcli client with a new sql tools service and connection.
         """
-        try:
-            self.sqltoolsclient.shutdown()
-            self.sqltoolsclient = SqlToolsClient()
+        self.sqltoolsclient.shutdown()
+        self.sqltoolsclient = SqlToolsClient()
 
-            self.mssqlcliclient_main = self.mssqlcliclient_main.clone(self.sqltoolsclient)
+        self.mssqlcliclient_main = self.mssqlcliclient_main.clone(self.sqltoolsclient)
 
-            if not self.mssqlcliclient_main.connect_to_database():
-                click.secho('Unable reconnect to server {0}; database {1}.'.format(
-                    self.mssqlcliclient_main.server_name,
-                    self.mssqlcliclient_main.connected_database),
-                    err=True, fg='yellow')
+        database_response = self.mssqlcliclient_main.connect_to_database()
+        if not database_response:
+            click.secho('Unable reconnect to server %s; database %s.' % (
+                self.mssqlcliclient_main.server_name,
+                self.mssqlcliclient_main.connected_database),
+                        err=True, fg='yellow')
 
-                self.logger.info(u'Unable to reset connection to server {0}; database {1}'.format(
-                    self.mssqlcliclient_main.server_name,
-                    self.mssqlcliclient_main.connected_database))
-                exit(1)
-        except Exception as e:
-            self.logger.error(u'Error in reset : {0}'.format(e.message))
-            raise e
+            self.logger.info(u'Unable to reset connection to server %s; database %s',
+                             self.mssqlcliclient_main.server_name,
+                             self.mssqlcliclient_main.connected_database)
+
+            sys.exit(1)
+        else:
+            owner_uri, error_messages = database_response
+            if not owner_uri and error_messages:
+                # can occur if database credentials change during reset
+                self.logger.error(u'Error in reset : %s', error_messages)
+                raise ConnectionResetError(error_messages)
 
     def refresh_completions(self, history=None, persist_priorities='all'):
         # Clone mssqlcliclient to create a new connection with a new owner Uri.
@@ -712,38 +700,37 @@ class MssqlCli(object):
         """Get the last query executed or None."""
         return self.query_history[-1][0] if self.query_history else None
 
-    def has_meta_cmd(self, query):
+    @staticmethod
+    def has_meta_cmd(query):
         """Determines if the completion needs a refresh by checking if the sql
         statement is an alter, create, drop, commit or rollback."""
-        try:
+        if query and isinstance(query, str):
             first_token = query.split()[0]
             if first_token.lower() in ('alter', 'create', 'drop'):
                 return True
-        except Exception:
-            return False
-
         return False
 
-    def has_change_db_cmd(self, query):
+    @staticmethod
+    def has_change_db_cmd(query):
         """Determines if the statement is a database switch such as 'use' or '\\c'
            Returns (True, DBName) or (False, None)
         """
-        try:
+        if query and isinstance(query, str):
             first_token = query.split()[0]
             if first_token.lower() in ('use', '\\c', '\\connect'):
                 return True, query.split()[1].strip('"')
-        except Exception:
-            return False, None
 
         return False, None
 
-    def quit_command(self, sql):
+    @staticmethod
+    def quit_command(sql):
         return (sql.strip().lower() == 'exit' or
                 sql.strip().lower() == 'quit' or
                 sql.strip() == r'\q' or
                 sql.strip() == ':q')
 
-    def format_output(self, title, cur, headers, status, settings):
+    @staticmethod
+    def format_output(title, cur, headers, status, settings):
         output = []
         expanded = (settings.expanded or settings.table_format == 'vertical')
         table_format = ('vertical' if settings.expanded else
