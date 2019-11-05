@@ -86,7 +86,7 @@ def copy_current_platform_mssqltoolsservice():
 def encode(s):
     try:
         return s.encode('utf-8')
-    except:     #pylint: disable=bare-except
+    except (AttributeError, ValueError, UnicodeError):
         pass
     return s
 
@@ -97,7 +97,7 @@ def encode(s):
 def decode(s):
     try:
         return s.decode('utf-8')
-    except:     #pylint: disable=bare-except
+    except (AttributeError, ValueError, UnicodeError):
         pass
     return s
 
