@@ -15,8 +15,7 @@ def mssql_is_multiline(mssql_cli):
             return False
         if mssql_cli.multiline_mode == 'safe':
             return True
-        else:
-            return not _multiline_exception(doc.text)
+        return not _multiline_exception(doc.text)
 
     return cond
 
