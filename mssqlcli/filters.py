@@ -8,4 +8,3 @@ def has_selected_completion():
     complete_state = get_app().current_buffer.complete_state
     return (complete_state is not None and
             complete_state.current_completion is not None)
-
