@@ -60,7 +60,7 @@ def execute(mssqlcliclient, sql):
     command, verbose, pattern = parse_special_command(sql)
 
     if (command not in COMMANDS) and (command.lower() not in COMMANDS):
-        raise CommandNotFound
+        raise CommandNotFound('Command not found: %s' % command)
 
     try:
         special_cmd = COMMANDS[command]
