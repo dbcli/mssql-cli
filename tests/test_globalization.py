@@ -170,7 +170,7 @@ class TestGlobalizationMetadata(GlobalizationTests):
     def test_db():
         db = create_test_db()
         yield db
-        return clean_up_test_db(db)
+        clean_up_test_db(db)
 
     def test_schema_metadata_double(self, test_db):
         self.run_schema_metadata_validation('double', test_db)
