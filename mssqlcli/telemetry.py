@@ -1,20 +1,18 @@
 import binascii
-import datetime
 import json
 import locale
 import os
+import subprocess
 import platform
 import re
 import sys
 import traceback
 import uuid
 from functools import wraps
-from datetime import datetime as datetime_2
-from datetime import timedelta
-import datetime
+from datetime import datetime, timedelta
+from mssqlcli import __version__ as mssql_cli_version
 import mssqlcli.config as config
 import mssqlcli.telemetry_upload as telemetry_core
-
 import mssqlcli.decorators as decorators
 
 PRODUCT_NAME = 'mssqlcli'
@@ -38,7 +36,7 @@ def _user_agrees_to_telemetry(func):
     return _wrapper
 
 
-class TelemetrySession(object):
+class TelemetrySession:
     start_time = None
     end_time = None
     correlation_id = str(uuid.uuid4())
@@ -47,7 +45,7 @@ class TelemetrySession(object):
     server_edition = None
     connection_type = None
 
-    def add_exception(self, fault_type, description=None, message=''):
+    def add_exception(self, fault_type, description=None):
         details = {
             'Reserved.DataModel.EntityType': 'Fault',
             'Reserved.DataModel.Fault.Description': description or fault_type,
@@ -101,7 +99,8 @@ class TelemetrySession(object):
                                                               locale.getdefaultlocale()[1]),
             'Context.Default.SQLTools.StartTime': str(self.start_time),
             'Context.Default.SQLTools.EndTime': str(self.end_time),
-            'Context.Default.SQLTools.SessionDuration': str((self.end_time - self.start_time).total_seconds()),
+            'Context.Default.SQLTools.SessionDuration': str((self.end_time - self.start_time)
+                                                            .total_seconds()),
             'Context.Default.SQLTools.PythonVersion': platform.python_version(),
             'Context.Default.SQLTools.ServerVersion': self.server_version,
             'Context.Default.SQLTools.ServerEdition': self.server_edition,
@@ -116,12 +115,13 @@ _session = TelemetrySession()
 
 @decorators.suppress_all_exceptions(raise_in_diagnostics=True)
 def start():
-    _session.start_time = datetime.datetime.now()
+    _session.start_time = datetime.now()
 
 
 @decorators.suppress_all_exceptions(raise_in_diagnostics=True)
-def conclude(service_endpoint_uri='https://vortex.data.microsoft.com/collect/v1', separate_process=True):
-    _session.end_time = datetime.datetime.now()
+def conclude(service_endpoint_uri='https://vortex.data.microsoft.com/collect/v1',
+             separate_process=True):
+    _session.end_time = datetime.now()
 
     payload = _session.generate_payload()
     output_payload_to_file(payload)
@@ -135,8 +135,8 @@ def upload_payload(payload, service_endpoint_uri, separate_process):
         if not separate_process:
             telemetry_core.upload(payload, service_endpoint_uri)
         else:
-            import subprocess
-            subprocess.Popen([sys.executable, os.path.realpath(telemetry_core.__file__), payload, service_endpoint_uri])
+            subprocess.Popen([sys.executable, os.path.realpath(telemetry_core.__file__),
+                              payload, service_endpoint_uri])
         return payload
 
 
@@ -165,7 +165,6 @@ def set_server_information(connection):
 
 @decorators.suppress_all_exceptions(fallback_return=None)
 def _get_mssql_cli_version():
-    from mssqlcli import __version__ as mssql_cli_version
     return mssql_cli_version
 
 
@@ -186,8 +185,8 @@ def _get_user_id():
 
 def _user_id_file_is_old(id_file_path):
     if os.path.exists(id_file_path):
-        last_24_hours = datetime_2.now() - timedelta(hours=24)
-        id_file_modified_time = datetime_2.fromtimestamp(os.path.getmtime(id_file_path))
+        last_24_hours = datetime.now() - timedelta(hours=24)
+        id_file_modified_time = datetime.fromtimestamp(os.path.getmtime(id_file_path))
 
         return id_file_modified_time < last_24_hours
     return False
@@ -197,7 +196,7 @@ def _user_id_file_is_old(id_file_path):
 @decorators.hash256_result
 def _generate_user_id():
     random_id = binascii.hexlify(os.urandom(32)).decode() \
-        if sys.version_info >= (3,0) else binascii.hexlify(os.urandom(32))
+        if sys.version_info >= (3, 0) else binascii.hexlify(os.urandom(32))
 
     return random_id
 
@@ -210,11 +209,11 @@ def _get_env_string():
 def _get_shell_type():
     if 'ZSH_VERSION' in os.environ:
         return 'zsh'
-    elif 'BASH_VERSION' in os.environ:
+    if 'BASH_VERSION' in os.environ:
         return 'bash'
-    elif 'KSH_VERSION' in os.environ or 'FCEDIT' in os.environ:
+    if 'KSH_VERSION' in os.environ or 'FCEDIT' in os.environ:
         return 'ksh'
-    elif 'WINDIR' in os.environ:
+    if 'WINDIR' in os.environ:
         return 'cmd'
     return _remove_cmd_chars(_remove_symbols(os.environ.get('SHELL')))
 
