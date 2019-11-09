@@ -1,7 +1,7 @@
 def encode(s):
     try:
         return s.encode('utf-8')
-    except:
+    except (AttributeError, SyntaxError):
         pass
     return s
 
@@ -11,6 +11,6 @@ def encode(s):
 def decode(s):
     try:
         return s.decode('utf-8')
-    except:
-        pass    
+    except (AttributeError, SyntaxError):
+        pass
     return s

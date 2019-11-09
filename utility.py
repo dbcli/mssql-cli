@@ -83,24 +83,5 @@ def copy_current_platform_mssqltoolsservice():
         print("This platform: {} does not support mssqltoolsservice.".format(platform.system()))
 
 
-def encode(s):
-    try:
-        return s.encode('utf-8')
-    except:     #pylint: disable=bare-except
-        pass
-    return s
-
-
-# In Python 3, all strings are sequences of Unicode characters.
-# There is a bytes type that holds raw bytes.
-# In Python 2, a string may be of type str or of type unicode.
-def decode(s):
-    try:
-        return s.decode('utf-8')
-    except:     #pylint: disable=bare-except
-        pass
-    return s
-
-
 def random_str(size=12, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for x in range(size))
