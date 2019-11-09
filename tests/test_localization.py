@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import unittest
 import mssqlcli.localized_strings as localized
-from utility import decode
+from mssqlcli.util import decode
 
 
 class LocalizationTests(unittest.TestCase):
