@@ -115,6 +115,10 @@ class MssqlCompleter(Completer):
 
         self.all_completions = set(self.keywords + self.functions)
 
+        # initialize attributes to be set later
+        self._arg_list_cache = None
+        self.special_commands = None
+
     def escape_name(self, name):
         if name:
             name = u'"%s"' % name
@@ -429,6 +433,8 @@ class MssqlCompleter(Completer):
         return self.casing.get(word, word)
 
     def get_completions(self, document, complete_event, smart_completion=None):
+        # pylint: disable=arguments-differ
+
         word_before_cursor = document.get_word_before_cursor(WORD=True)
 
         if smart_completion is None:
@@ -491,7 +497,7 @@ class MssqlCompleter(Completer):
         lastword = last_word(word_before_cursor, include='most_punctuations')
         if lastword == '*':
             if suggestion.context == 'insert':
-                def filter(col):
+                def filter_col(col):
                     if not col.has_default:
                         return True
                     return not any(
@@ -499,7 +505,7 @@ class MssqlCompleter(Completer):
                         for p in self.insert_col_skip_patterns
                     )
                 scoped_cols = {
-                    t: [col for col in cols if filter(col)] for t, cols in scoped_cols.items()
+                    t: [col for col in cols if filter_col(col)] for t, cols in scoped_cols.items()
                 }
             if self.asterisk_column_order == 'alphabetic':
                 for cols in scoped_cols.values():
@@ -652,7 +658,7 @@ class MssqlCompleter(Completer):
         else:
             alias = False
 
-            def filt(f):
+            def filt(_):
                 return True
         arg_mode = {
             'signature': 'signature',
