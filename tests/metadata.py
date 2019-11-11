@@ -1,10 +1,11 @@
 from functools import partial
 from itertools import product
-from mssqlcli.packages.parseutils.meta import FunctionMetadata, ForeignKey
 from prompt_toolkit.completion import Completion
 from prompt_toolkit.document import Document
 from mock import Mock
 import pytest
+from mssqlcli.packages.parseutils.meta import FunctionMetadata, ForeignKey
+from mssqlcli.mssqlcompleter import MssqlCompleter
 
 parametrize = pytest.mark.parametrize
 
@@ -63,7 +64,7 @@ def wildcard_expansion(cols, pos=-1):
         cols, start_position=pos, display_meta='columns', display='*')
 
 
-class MetaData(object):
+class MetaData:
     def __init__(self, metadata):
         self.metadata = metadata
 
@@ -197,7 +198,6 @@ class MetaData(object):
 
     def get_completer(self, settings=None, casing=None):
         metadata = self.metadata
-        from mssqlcli.mssqlcompleter import MssqlCompleter
         comp = MssqlCompleter(smart_completion=True, settings=settings)
 
         schemas, tables, tbl_cols, views, view_cols = [], [], [], [], []
