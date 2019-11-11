@@ -4,19 +4,17 @@ from __future__ import unicode_literals
 import os
 import unittest
 import tempfile
-from time import sleep
 from mssqltestutils import (
     create_mssql_cli,
-    create_mssql_cli_options,
-    create_mssql_cli_client,
     shutdown,
     getTempPath
 )
 from mssqlcli.mssql_cli import OutputSettings, MssqlFileHistory
 
 class MainTests(unittest.TestCase):
-    
-    def test_history_file_not_store_credentials(self):
+
+    @staticmethod
+    def test_history_file_not_store_credentials():
         # Used by prompt tool kit, verify statements that contain password or secret
         # are not stored by the history file.
         statements = [
@@ -100,7 +98,8 @@ class MainTests(unittest.TestCase):
         finally:
             shutdown(mssqlcli.mssqlcliclient_main)
 
-    def test_format_output_auto_expand(self):
+    @staticmethod
+    def test_format_output_auto_expand():
         mssqlcli = create_mssql_cli()
         settings = OutputSettings(
             table_format='psql',
@@ -140,7 +139,8 @@ class MainTests(unittest.TestCase):
         ]
         assert list(expanded_results) == expanded
 
-    def test_missing_rc_dir(self):
+    @staticmethod
+    def test_missing_rc_dir():
         try:
             rcfilePath = getTempPath('subdir', 'rcfile')
             mssqlcli = create_mssql_cli(mssqlclirc_file=rcfilePath)
@@ -148,13 +148,14 @@ class MainTests(unittest.TestCase):
         finally:
             mssqlcli.sqltoolsclient.shutdown()
 
-    def run_and_return_string_from_formatter(self, mssql_cli, sql, join=False, expanded=False):
+    @staticmethod
+    def run_and_return_string_from_formatter(mssql_cli, sql, join=False, expanded=False):
         """
         Return string output for the sql to be run.
         """
         mssql_cli.connect_to_database()
         mssql_cli_client = mssql_cli.mssqlcliclient_main
-        for rows, col, message, query, is_error in mssql_cli_client.execute_query(sql):
+        for rows, col, message, _, _ in mssql_cli_client.execute_query(sql):
             settings = OutputSettings(
                 table_format='psql',
                 dcmlfmt='d',

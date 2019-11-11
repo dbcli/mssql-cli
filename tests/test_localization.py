@@ -6,7 +6,8 @@ from mssqlcli.util import decode
 
 class LocalizationTests(unittest.TestCase):
 
-    def test_product(self):
+    @staticmethod
+    def test_product():
         original = localized.goodbye()
         localized.translation(languages=['ko']).install()
         translated = decode(localized.goodbye())
