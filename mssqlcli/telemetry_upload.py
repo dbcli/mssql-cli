@@ -16,11 +16,11 @@ INSTRUMENTATION_KEY = 'AIF-5574968e-856d-40d2-af67-c89a14e76412'
 try:
     # Python 2.x
     import urllib2 as HTTPClient
-    from urllib2 import HTTPError, URLError, ContentTooShortError
+    from urllib2 import HTTPError, URLError
 except ImportError:
     # Python 3.x
     import urllib.request as HTTPClient
-    from urllib.error import HTTPError, URLError, ContentTooShortError
+    from urllib.error import HTTPError, URLError
 
 
 def in_diagnostic_mode():
@@ -59,7 +59,7 @@ class VortexSynchronousSender(SynchronousSender):
         except HTTPError as e:
             if e.getcode() == 400:
                 raise e
-        except (AttributeError, ValueError, URLError, ContentTooShortError):
+        except (AttributeError, ValueError, URLError):
             if self.retry < 3:
                 self.retry += 1
             else:
