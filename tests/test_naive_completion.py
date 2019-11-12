@@ -1,5 +1,4 @@
 from __future__ import unicode_literals
-import pytest
 import unittest
 from prompt_toolkit.completion import Completion
 from prompt_toolkit.document import Document
@@ -71,7 +70,7 @@ class NaiveCompletionTests(unittest.TestCase):
     def test_paths_completion(self):
         completer = self.get_completer()
         complete_event = self.get_complete_event()
-        text = '\i '
+        text = r'\i '
         position = len(text)
         actual = list(
             completer.get_completions(
@@ -101,36 +100,38 @@ class NaiveCompletionTests(unittest.TestCase):
         not_expected = [Completion(text="CREATE", display_meta="keyword")]
         assert not self.contains(actual, not_expected)
 
-    def get_completer(self):
+    @staticmethod
+    def get_completer():
         return mssqlcompleter.MssqlCompleter(smart_completion=True)
 
-    def get_complete_event(self):
+    @staticmethod
+    def get_complete_event():
         return Mock()
 
-    def equals(self, completion_list1, completion_list2):
+    @staticmethod
+    def equals(completion_list1, completion_list2):
         if len(completion_list1) != len(completion_list2):
             return False
         for e1 in completion_list1:
             theSame = None
             for e2 in completion_list2:
                 if (e1.text == e2.text
-                    and e1.start_position == e2.start_position
-                    and e1.display_meta_text == e2.display_meta_text
-                ):
+                        and e1.start_position == e2.start_position
+                        and e1.display_meta_text == e2.display_meta_text):
                     theSame = e2
                     break
             if theSame is None:
                 return False
         return True
 
-    def contains(self, completion_list1, completion_list2):
+    @staticmethod
+    def contains(completion_list1, completion_list2):
         for e2 in completion_list2:
             theSame = None
             for e1 in completion_list1:
                 if (e2.text == e1.text
-                    and e2.start_position == e1.start_position
-                    and e2.display_meta_text == e1.display_meta_text
-                ):
+                        and e2.start_position == e1.start_position
+                        and e2.display_meta_text == e1.display_meta_text):
                     theSame = e1
                     break
             if theSame is None:
