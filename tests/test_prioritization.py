@@ -1,9 +1,10 @@
-from mssqlcli.packages.prioritization import PrevalenceCounter
 import unittest
+from mssqlcli.packages.prioritization import PrevalenceCounter
 
 class PrioritizationTests(unittest.TestCase):
 
-    def test_prevalence_counter(self):
+    @staticmethod
+    def test_prevalence_counter():
         counter = PrevalenceCounter()
         sql = '''SELECT * FROM foo WHERE bar GROUP BY baz;
                 select * from foo;
