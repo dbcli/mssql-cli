@@ -1,16 +1,19 @@
+#pylint: disable=too-many-lines
+import unittest
 from mssqlcli.packages.sqlcompletion import (
     suggest_type, Special, Database, Schema, Table, Column, View, Keyword,
     FromClauseItem, Function, Datatype, Alias, JoinCondition, Join)
 from mssqlcli.packages.parseutils.tables import TableReference
-import sys
-import unittest
 
 class SqlCompletionTests(unittest.TestCase):
+    #pylint: disable=too-many-public-methods
 
-    def cols_etc(self, table, schema=None, alias=None, is_function=False, parent=None, \
+    @staticmethod
+    def cols_etc(table, schema=None, alias=None, is_function=False, parent=None, \
                 last_keyword=None):
         """Returns the expected select-clause suggestions for a single-table
         select."""
+        #pylint: disable=too-many-arguments
         return set([
             Column(table_refs=(TableReference(schema, table, alias, is_function),), \
                 qualifiable=True),
@@ -29,7 +32,8 @@ class SqlCompletionTests(unittest.TestCase):
         assert set(suggestions) == self.cols_etc('tabl', 'sch', last_keyword='SELECT')
 
 
-    def test_cte_does_not_crash(self):
+    @staticmethod
+    def test_cte_does_not_crash():
         sql = ('WITH CTE AS (SELECT F.* FROM Foo F WHERE F.Bar > 23) ' \
             + 'SELECT C.* FROM CTE C WHERE C.FooID BETWEEN 123 AND 234;')
         for i in range(len(sql)):
@@ -76,7 +80,8 @@ class SqlCompletionTests(unittest.TestCase):
             assert set(suggestions) == self.cols_etc('tabl', last_keyword='WHERE')
 
 
-    def test_after_as(self):
+    @staticmethod
+    def test_after_as():
         expressions = [
             'SELECT 1 AS ',
             'SELECT 1 FROM tabl AS '
@@ -91,14 +96,15 @@ class SqlCompletionTests(unittest.TestCase):
         suggestions = suggest_type(text, text)
         assert set(suggestions) == self.cols_etc('tabl', last_keyword='WHERE')
 
-
-    def test_lparen_suggests_cols(self):
+    @staticmethod
+    def test_lparen_suggests_cols():
         suggestion = suggest_type('SELECT MAX( FROM tbl', 'SELECT MAX(')
         assert set(suggestion) == set([
             Column(table_refs=((None, 'tbl', None, False),), qualifiable=True)])
 
 
-    def test_select_suggests_cols_and_funcs(self):
+    @staticmethod
+    def test_select_suggests_cols_and_funcs():
         suggestions = suggest_type('SELECT ', 'SELECT ')
         assert set(suggestions) == set([
             Column(table_refs=(), qualifiable=True),
@@ -107,7 +113,8 @@ class SqlCompletionTests(unittest.TestCase):
         ])
 
 
-    def test_suggests_tables_views_and_schemas(self):
+    @staticmethod
+    def test_suggests_tables_views_and_schemas():
         expressions = [
             'INSERT INTO ',
             'COPY ',
@@ -123,7 +130,8 @@ class SqlCompletionTests(unittest.TestCase):
             ])
 
 
-    def test_suggest_tables_views_schemas_and_functions(self):
+    @staticmethod
+    def test_suggest_tables_views_schemas_and_functions():
         expressions = [
             'SELECT * FROM '
         ]
@@ -135,7 +143,8 @@ class SqlCompletionTests(unittest.TestCase):
             ])
 
 
-    def test_suggest_after_join_with_two_tables(self):
+    @staticmethod
+    def test_suggest_after_join_with_two_tables():
         expressions = [
             'SELECT * FROM foo JOIN bar on bar.barid = foo.barid JOIN ',
             'SELECT * FROM foo JOIN bar USING (barid) JOIN '
@@ -150,7 +159,8 @@ class SqlCompletionTests(unittest.TestCase):
             ])
 
 
-    def test_suggest_after_join_with_one_table(self):
+    @staticmethod
+    def test_suggest_after_join_with_one_table():
         expressions = [
             'SELECT * FROM foo JOIN ',
             'SELECT * FROM foo JOIN bar'
@@ -165,7 +175,8 @@ class SqlCompletionTests(unittest.TestCase):
             ])
 
 
-    def test_suggest_qualified_tables_and_views(self):
+    @staticmethod
+    def test_suggest_qualified_tables_and_views():
         expressions = [
             'INSERT INTO sch.',
             'COPY sch.',
@@ -178,7 +189,8 @@ class SqlCompletionTests(unittest.TestCase):
                 View(schema='sch'),
             ])
 
-    def test_suggest_qualified_aliasable_tables_and_views(self):
+    @staticmethod
+    def test_suggest_qualified_aliasable_tables_and_views():
         expressions = [
             'UPDATE sch.'
         ]
@@ -190,7 +202,8 @@ class SqlCompletionTests(unittest.TestCase):
             ])
 
 
-    def test_suggest_qualified_tables_views_and_functions(self):
+    @staticmethod
+    def test_suggest_qualified_tables_views_and_functions():
         expressions = [
             'SELECT * FROM sch.',
             'SELECT * FROM sch."',
@@ -203,7 +216,8 @@ class SqlCompletionTests(unittest.TestCase):
             assert set(suggestions) == set([FromClauseItem(schema='sch')])
 
 
-    def test_suggest_qualified_tables_views_functions_and_joins(self):
+    @staticmethod
+    def test_suggest_qualified_tables_views_functions_and_joins():
         expressions = [
             'SELECT * FROM foo JOIN sch.'
         ]
@@ -216,20 +230,23 @@ class SqlCompletionTests(unittest.TestCase):
             ])
 
 
-    def test_truncate_suggests_tables_and_schemas(self):
+    @staticmethod
+    def test_truncate_suggests_tables_and_schemas():
         suggestions = suggest_type('TRUNCATE ', 'TRUNCATE ')
         assert set(suggestions) == set([
             Table(schema=None),
             Schema()])
 
 
-    def test_truncate_suggests_qualified_tables(self):
+    @staticmethod
+    def test_truncate_suggests_qualified_tables():
         suggestions = suggest_type('TRUNCATE sch.', 'TRUNCATE sch.')
         assert set(suggestions) == set([
             Table(schema='sch')])
 
 
-    def test_distinct_suggests_cols(self):
+    @staticmethod
+    def test_distinct_suggests_cols():
         texts = [
             'SELECT DISTINCT ',
             'INSERT INTO foo SELECT DISTINCT '
@@ -243,7 +260,8 @@ class SqlCompletionTests(unittest.TestCase):
             ])
 
 
-    def test_distinct_and_order_by_suggestions_with_aliases(self):
+    @staticmethod
+    def test_distinct_and_order_by_suggestions_with_aliases():
         test_args = [
             (
                 'SELECT DISTINCT FROM tbl x JOIN tbl1 y',
@@ -276,7 +294,8 @@ class SqlCompletionTests(unittest.TestCase):
             ])
 
 
-    def test_distinct_and_order_by_suggestions_with_alias_given(self):
+    @staticmethod
+    def test_distinct_and_order_by_suggestions_with_alias_given():
         test_args = [
             (
                 'SELECT DISTINCT x. FROM tbl x JOIN tbl1 y',
@@ -304,7 +323,8 @@ class SqlCompletionTests(unittest.TestCase):
             ])
 
 
-    def test_col_comma_suggests_cols(self):
+    @staticmethod
+    def test_col_comma_suggests_cols():
         suggestions = suggest_type('SELECT a, b, FROM tbl', 'SELECT a, b,')
         assert set(suggestions) == set([
             Column(table_refs=((None, 'tbl', None, False),), qualifiable=True),
@@ -313,7 +333,8 @@ class SqlCompletionTests(unittest.TestCase):
         ])
 
 
-    def test_table_comma_suggests_tables_and_schemas(self):
+    @staticmethod
+    def test_table_comma_suggests_tables_and_schemas():
         suggestions = suggest_type('SELECT a, b FROM tbl1, ', \
                 'SELECT a, b FROM tbl1, ')
         assert set(suggestions) == set([
@@ -322,7 +343,8 @@ class SqlCompletionTests(unittest.TestCase):
         ])
 
 
-    def test_into_suggests_tables_and_schemas(self):
+    @staticmethod
+    def test_into_suggests_tables_and_schemas():
         suggestion = suggest_type('INSERT INTO ', 'INSERT INTO ')
         assert set(suggestion) == set([
             Table(schema=None),
@@ -331,7 +353,8 @@ class SqlCompletionTests(unittest.TestCase):
         ])
 
 
-    def test_insert_into_lparen_suggests_cols(self):
+    @staticmethod
+    def test_insert_into_lparen_suggests_cols():
         texts = [
             'INSERT INTO abc (',
             'INSERT INTO abc () SELECT * FROM hij;',
@@ -346,7 +369,8 @@ class SqlCompletionTests(unittest.TestCase):
             )
 
 
-    def test_insert_into_lparen_partial_text_suggests_cols(self):
+    @staticmethod
+    def test_insert_into_lparen_partial_text_suggests_cols():
         suggestions = suggest_type('INSERT INTO abc (i', 'INSERT INTO abc (i')
         assert suggestions == (
             Column(
@@ -356,7 +380,8 @@ class SqlCompletionTests(unittest.TestCase):
         )
 
 
-    def test_insert_into_lparen_comma_suggests_cols(self):
+    @staticmethod
+    def test_insert_into_lparen_comma_suggests_cols():
         suggestions = suggest_type('INSERT INTO abc (id,', 'INSERT INTO abc (id,')
         assert suggestions == (
             Column(
@@ -372,7 +397,8 @@ class SqlCompletionTests(unittest.TestCase):
         assert set(suggestions) == self.cols_etc('tabl', last_keyword='WHERE')
 
 
-    def test_dot_suggests_cols_of_a_table_or_schema_qualified_table(self):
+    @staticmethod
+    def test_dot_suggests_cols_of_a_table_or_schema_qualified_table():
         suggestions = suggest_type('SELECT tabl. FROM tabl', 'SELECT tabl.')
         assert set(suggestions) == set([
             Column(table_refs=((None, 'tabl', None, False),)),
@@ -382,7 +408,8 @@ class SqlCompletionTests(unittest.TestCase):
         ])
 
 
-    def test_dot_suggests_cols_of_an_alias(self):
+    @staticmethod
+    def test_dot_suggests_cols_of_an_alias():
         sqls = [
             'SELECT t1. FROM tabl1 t1',
             'SELECT t1. FROM tabl1 t1, tabl2 t2',
@@ -399,7 +426,8 @@ class SqlCompletionTests(unittest.TestCase):
             ])
 
 
-    def test_dot_suggests_cols_of_an_alias_where(self):
+    @staticmethod
+    def test_dot_suggests_cols_of_an_alias_where():
         sqls = [
             'SELECT * FROM tabl1 t1 WHERE t1.',
             'SELECT * FROM tabl1 t1, tabl2 t2 WHERE t1.',
@@ -416,7 +444,8 @@ class SqlCompletionTests(unittest.TestCase):
             ])
 
 
-    def test_dot_col_comma_suggests_cols_or_schema_qualified_table(self):
+    @staticmethod
+    def test_dot_col_comma_suggests_cols_or_schema_qualified_table():
         suggestions = suggest_type('SELECT t1.a, t2. FROM tabl1 t1, tabl2 t2', \
             'SELECT t1.a, t2.')
         assert set(suggestions) == set([
@@ -427,7 +456,8 @@ class SqlCompletionTests(unittest.TestCase):
         ])
 
 
-    def test_sub_select_suggests_keyword(self):
+    @staticmethod
+    def test_sub_select_suggests_keyword():
         expressions = [
             'SELECT * FROM (',
             'SELECT * FROM foo WHERE EXISTS (',
@@ -438,7 +468,8 @@ class SqlCompletionTests(unittest.TestCase):
             assert suggestion == (Keyword(),)
 
 
-    def test_sub_select_partial_text_suggests_keyword(self):
+    @staticmethod
+    def test_sub_select_partial_text_suggests_keyword():
         expressions = [
             'SELECT * FROM (S',
             'SELECT * FROM foo WHERE EXISTS (S',
@@ -446,10 +477,11 @@ class SqlCompletionTests(unittest.TestCase):
         ]
         for expression in expressions:
             suggestion = suggest_type(expression, expression)
-            assert suggestion ==(Keyword(),)
+            assert suggestion == (Keyword(),)
 
 
-    def test_outer_table_reference_in_exists_subquery_suggests_columns(self):
+    @staticmethod
+    def test_outer_table_reference_in_exists_subquery_suggests_columns():
         q = 'SELECT * FROM foo f WHERE EXISTS (SELECT 1 FROM bar WHERE f.'
         suggestions = suggest_type(q, q)
         assert set(suggestions) == set([
@@ -460,7 +492,8 @@ class SqlCompletionTests(unittest.TestCase):
         ])
 
 
-    def test_sub_select_table_name_completion(self):
+    @staticmethod
+    def test_sub_select_table_name_completion():
         expression = 'SELECT * FROM (SELECT * FROM '
         suggestion = suggest_type(expression, expression)
         assert set(suggestion) == set([
@@ -469,7 +502,8 @@ class SqlCompletionTests(unittest.TestCase):
         ])
 
 
-    def test_sub_select_table_name_completion_with_outer_table(self):
+    @staticmethod
+    def test_sub_select_table_name_completion_with_outer_table():
         expressions = [
             'SELECT * FROM foo WHERE EXISTS (SELECT * FROM ',
             'SELECT * FROM foo WHERE bar AND NOT EXISTS (SELECT * FROM ',
@@ -483,7 +517,8 @@ class SqlCompletionTests(unittest.TestCase):
             ])
 
 
-    def test_sub_select_col_name_completion(self):
+    @staticmethod
+    def test_sub_select_col_name_completion():
         suggestions = suggest_type('SELECT * FROM (SELECT  FROM abc', \
             'SELECT * FROM (SELECT ')
         assert set(suggestions) == set([
@@ -493,7 +528,8 @@ class SqlCompletionTests(unittest.TestCase):
         ])
 
 
-    def test_sub_select_multiple_col_name_completion(self):
+    @staticmethod
+    def test_sub_select_multiple_col_name_completion():
         suggestions = suggest_type('SELECT * FROM (SELECT a, FROM abc', \
             'SELECT * FROM (SELECT a, ')
         assert set(suggestions) == set([
@@ -504,7 +540,8 @@ class SqlCompletionTests(unittest.TestCase):
         ])
 
 
-    def test_sub_select_dot_col_name_completion(self):
+    @staticmethod
+    def test_sub_select_dot_col_name_completion():
         suggestions = suggest_type('SELECT * FROM (SELECT t. FROM tabl t', \
             'SELECT * FROM (SELECT t.')
         assert set(suggestions) == set([
@@ -515,7 +552,8 @@ class SqlCompletionTests(unittest.TestCase):
         ])
 
 
-    def test_join_suggests_tables_and_schemas(self):
+    @staticmethod
+    def test_join_suggests_tables_and_schemas():
         join_types = ('', 'INNER', 'LEFT', 'RIGHT OUTER',)
         tbl_aliases = ('', 'foo',)
         for join_type in join_types:
@@ -530,7 +568,8 @@ class SqlCompletionTests(unittest.TestCase):
                 ])
 
 
-    def test_left_join_with_comma(self):
+    @staticmethod
+    def test_left_join_with_comma():
         text = 'select * from foo f left join bar b,'
         suggestions = suggest_type(text, text)
         # tbls should also include (None, 'bar', 'b', False)
@@ -542,7 +581,8 @@ class SqlCompletionTests(unittest.TestCase):
         ])
 
 
-    def test_join_alias_dot_suggests_cols1(self):
+    @staticmethod
+    def test_join_alias_dot_suggests_cols1():
         sqls = [
             'SELECT * FROM abc a JOIN def d ON a.',
             'SELECT * FROM abc a JOIN def d ON a.id = d.id AND a.',
@@ -559,7 +599,8 @@ class SqlCompletionTests(unittest.TestCase):
             ])
 
 
-    def test_join_alias_dot_suggests_cols2(self):
+    @staticmethod
+    def test_join_alias_dot_suggests_cols2():
         sqls = [
             'SELECT * FROM abc a JOIN def d ON a.id = d.',
             'SELECT * FROM abc a JOIN def d ON a.id = d.id AND a.id2 = d.',
@@ -574,7 +615,8 @@ class SqlCompletionTests(unittest.TestCase):
             ])
 
 
-    def test_on_suggests_aliases_and_join_conditions(self):
+    @staticmethod
+    def test_on_suggests_aliases_and_join_conditions():
         sqls = [ \
 'select a.x, b.y from abc a join bcd b on ',
 '''select a.x, b.y
@@ -594,7 +636,8 @@ on ''',
                 Alias(aliases=('a', 'b',)),))
 
 
-    def test_on_suggests_tables_and_join_conditions(self):
+    @staticmethod
+    def test_on_suggests_tables_and_join_conditions():
         sqls = [
             'select abc.x, bcd.y from abc join bcd on abc.id = bcd.id AND ',
             'select abc.x, bcd.y from abc join bcd on ',
@@ -606,7 +649,8 @@ on ''',
                 Alias(aliases=('abc', 'bcd',)),))
 
 
-    def test_on_suggests_aliases_right_side(self):
+    @staticmethod
+    def test_on_suggests_aliases_right_side():
         sqls = [
             'select a.x, b.y from abc a join bcd b on a.id = ',
             'select a.x, b.y from abc a join bcd b on a.id = b.id AND a.id2 = ',
@@ -616,7 +660,8 @@ on ''',
             assert suggestions == (Alias(aliases=('a', 'b',)),)
 
 
-    def test_on_suggests_tables_and_join_conditions_right_side(self):
+    @staticmethod
+    def test_on_suggests_tables_and_join_conditions_right_side():
         sqls = [
             'select abc.x, bcd.y from abc join bcd on abc.id = bcd.id and ',
             'select abc.x, bcd.y from abc join bcd on ',
@@ -628,7 +673,8 @@ on ''',
                 Alias(aliases=('abc', 'bcd',)),))
 
 
-    def test_join_using_suggests_common_columns(self):
+    @staticmethod
+    def test_join_using_suggests_common_columns():
         texts = [
             'select * from abc inner join def using (',
             'select * from abc inner join def using (col1, ',
@@ -644,7 +690,8 @@ on ''',
                 Column(table_refs=tables, require_last_table=True),])
 
 
-    def test_suggest_columns_after_multiple_joins(self):
+    @staticmethod
+    def test_suggest_columns_after_multiple_joins():
         sql = '''select * from t1
                 inner join t2 ON
                 t1.id = t2.t1_id
@@ -654,7 +701,8 @@ on ''',
         assert Column(table_refs=((None, 't3', None, False),)) in set(suggestions)
 
 
-    def test_2_statements_2nd_current(self):
+    @staticmethod
+    def test_2_statements_2nd_current():
         suggestions = suggest_type('select * from a; select * from ', \
             'select * from a; select * from ')
         assert set(suggestions) == set([
@@ -704,7 +752,8 @@ on ''',
         assert set(suggestions) == self.cols_etc('b', last_keyword='SELECT')
 
 
-    def test_statements_in_function_body(self):
+    @staticmethod
+    def test_statements_in_function_body():
         texts = [ \
 '''
 CREATE OR REPLACE FUNCTION func() RETURNS setof int AS $$
@@ -791,38 +840,44 @@ SELECT 1 FROM foo;
             assert set(suggestions) == set([Keyword(), Special()])
 
 
-    def test_create_db_with_template(self):
+    @staticmethod
+    def test_create_db_with_template():
         suggestions = suggest_type('create database foo with template ', \
             'create database foo with template ')
         assert set(suggestions) == set((Database(),))
 
 
-    def test_specials_included_for_initial_completion(self):
+    @staticmethod
+    def test_specials_included_for_initial_completion():
         initial_texts = ('', '    ', '\t \t',)
         for initial_text in initial_texts:
             suggestions = suggest_type(initial_text, initial_text)
             assert set(suggestions) == set([Keyword(), Special()])
 
 
-    def test_drop_schema_qualified_table_suggests_only_tables(self):
+    @staticmethod
+    def test_drop_schema_qualified_table_suggests_only_tables():
         text = 'DROP TABLE schema_name.table_name'
         suggestions = suggest_type(text, text)
         assert suggestions == (Table(schema='schema_name'),)
 
 
-    def test_handle_pre_completion_comma_gracefully(self):
+    @staticmethod
+    def test_handle_pre_completion_comma_gracefully():
         texts = (',', '  ,', 'sel ,',)
         for text in texts:
             suggestions = suggest_type(text, text)
             assert iter(suggestions)
 
 
-    def test_drop_schema_suggests_schemas(self):
+    @staticmethod
+    def test_drop_schema_suggests_schemas():
         sql = 'DROP SCHEMA '
         assert suggest_type(sql, sql) == (Schema(),)
 
 
-    def test_cast_operator_suggests_types(self):
+    @staticmethod
+    def test_cast_operator_suggests_types():
         texts = [
             'SELECT x::',
             'SELECT x::y',
@@ -835,7 +890,8 @@ SELECT 1 FROM foo;
                 Schema()])
 
 
-    def test_cast_operator_suggests_schema_qualified_types(self):
+    @staticmethod
+    def test_cast_operator_suggests_schema_qualified_types():
         texts = [
             'SELECT foo::bar.',
             'SELECT foo::bar.baz',
@@ -847,7 +903,8 @@ SELECT 1 FROM foo;
                 Table(schema='bar')])
 
 
-    def test_alter_column_type_suggests_types(self):
+    @staticmethod
+    def test_alter_column_type_suggests_types():
         q = 'ALTER TABLE foo ALTER COLUMN bar TYPE '
         assert set(suggest_type(q, q)) == set([
             Datatype(schema=None),
@@ -855,7 +912,8 @@ SELECT 1 FROM foo;
             Schema()])
 
 
-    def test_identifier_suggests_types_in_parentheses(self):
+    @staticmethod
+    def test_identifier_suggests_types_in_parentheses():
         texts = [
             'CREATE TABLE foo (bar ',
             'CREATE TABLE foo (bar DOU',
@@ -876,7 +934,8 @@ SELECT 1 FROM foo;
                 Schema()])
 
 
-    def test_alias_suggests_keywords(self):
+    @staticmethod
+    def test_alias_suggests_keywords():
         texts = [
             'SELECT foo ',
             'SELECT foo FROM bar ',
@@ -888,14 +947,15 @@ SELECT 1 FROM foo;
         ]
         for text in texts:
             suggestions = suggest_type(text, text)
-            assert suggestions ==(Keyword(),)
+            assert suggestions == (Keyword(),)
 
 
-    def test_invalid_sql(self):
+    @staticmethod
+    def test_invalid_sql():
         # issue 317
         text = 'selt *'
         suggestions = suggest_type(text, text)
-        assert suggestions ==(Keyword(),)
+        assert suggestions == (Keyword(),)
 
 
     def test_suggest_where_keyword(self):
@@ -909,7 +969,8 @@ SELECT 1 FROM foo;
             assert set(suggestions) == self.cols_etc('foo', last_keyword='WHERE')
 
 
-    def test_named_query_completion(self):
+    @staticmethod
+    def test_named_query_completion():
         test_args = [
             ('\\ns abc SELECT ', 'SELECT ', [
                 Column(table_refs=(), qualifiable=True),
@@ -938,7 +999,8 @@ SELECT 1 FROM foo;
             'func', is_function=True, last_keyword='SELECT')
 
 
-    def test_leading_parenthesis(self):
+    @staticmethod
+    def test_leading_parenthesis():
         sqls = [
             '(',
         ]
@@ -947,7 +1009,8 @@ SELECT 1 FROM foo;
             suggest_type(sql, sql)
 
 
-    def test_ignore_leading_double_quotes(self):
+    @staticmethod
+    def test_ignore_leading_double_quotes():
         sqls = [
             'select * from "',
             'select * from "foo',
@@ -957,7 +1020,8 @@ SELECT 1 FROM foo;
             assert FromClauseItem(schema=None) in set(suggestions)
 
 
-    def test_column_keyword_suggests_columns(self):
+    @staticmethod
+    def test_column_keyword_suggests_columns():
         sqls = [
             'ALTER TABLE foo ALTER COLUMN ',
             'ALTER TABLE foo ALTER COLUMN bar',
@@ -971,7 +1035,8 @@ SELECT 1 FROM foo;
             ])
 
 
-    def test_handle_unrecognized_kw_generously(self):
+    @staticmethod
+    def test_handle_unrecognized_kw_generously():
         sql = 'SELECT * FROM sessions WHERE session = 1 AND '
         suggestions = suggest_type(sql, sql)
         expected = Column(table_refs=((None, 'sessions', None, False),), \
@@ -979,7 +1044,8 @@ SELECT 1 FROM foo;
         assert expected in set(suggestions)
 
 
-    def test_keyword_after_alter(self):
+    @staticmethod
+    def test_keyword_after_alter():
         sqls = [
             'ALTER ',
             'ALTER TABLE foo ALTER ',
