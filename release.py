@@ -1,8 +1,7 @@
 from __future__ import print_function
+from azure.storage.blob import BlockBlobService, ContentSettings
 import os
 import sys
-from azure.storage.blob import BlockBlobService, ContentSettings
-from mssqlcli import __version__ as latest_version
 import utility
 
 AZURE_STORAGE_CONNECTION_STRING = os.environ.get(
@@ -23,7 +22,7 @@ def _upload_index_file(service, blob_name, title, links):
         blob_name=blob_name,
         text="<html><head><title>{0}</title></head><body><h1>{0}</h1>{1}</body></html>"
         .format(title, '\n'.join(
-            ['<a href="{0}">{0}</a><br/>'.format(link) for link in links])),
+                ['<a href="{0}">{0}</a><br/>'.format(link) for link in links])),
         content_settings=ContentSettings(
             content_type='text/html',
             content_disposition=None,
@@ -68,8 +67,8 @@ def download_official_wheels():
     """
         Download the official wheels for each platform
     """
-    assert AZURE_STORAGE_CONNECTION_STRING, \
-           'Set AZURE_STORAGE_CONNECTION_STRING environment variable'
+    assert AZURE_STORAGE_CONNECTION_STRING, 'Set AZURE_STORAGE_CONNECTION_STRING environment variable'
+    from mssqlcli import __version__ as latest_version
 
     # Clear previous downloads
     utility.clean_up(utility.MSSQLCLI_DIST_DIRECTORY)
@@ -88,8 +87,7 @@ def download_official_wheels():
         print('Downloading wheel:{}'.format(blob))
 
         if not blob_service.exists(BLOB_MSSQL_CLI_DAILY_CONTAINER_NAME, blob):
-            print('Error: blob: {} does not exist in container: {}'\
-                  .format(blob, BLOB_MSSQL_CLI_DAILY_CONTAINER_NAME))
+            print('Error: blob: {} does not exist in container: {}'.format(blob, BLOB_MSSQL_CLI_DAILY_CONTAINER_NAME))
             sys.exit(1)
 
         blob_service.get_blob_to_path(BLOB_MSSQL_CLI_DAILY_CONTAINER_NAME, blob,
@@ -115,8 +113,7 @@ def publish_daily():
     Publish mssql-cli package to daily storage account.
     """
     print('Publishing to daily container within storage account.')
-    assert AZURE_STORAGE_CONNECTION_STRING,\
-          'Set AZURE_STORAGE_CONNECTION_STRING environment variable'
+    assert AZURE_STORAGE_CONNECTION_STRING, 'Set AZURE_STORAGE_CONNECTION_STRING environment variable'
 
     blob_service = BlockBlobService(
         connection_string=AZURE_STORAGE_CONNECTION_STRING)

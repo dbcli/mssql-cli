@@ -39,7 +39,6 @@ def run_cli_with(options):
 
     # Importing MssqlCli creates a config dir by default.
     # Moved import here so we can create the config dir for first use prior.
-    # pylint: disable=import-outside-toplevel
     from mssqlcli.mssql_cli import MssqlCli
 
     # set interactive mode to false if -Q or -i is specified
