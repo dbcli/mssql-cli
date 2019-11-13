@@ -43,7 +43,7 @@ def clean_up(directory):
     """
     try:
         shutil.rmtree(directory)
-    except Exception:
+    except OSError:
         # Ignored, directory may not exist which is fine.
         pass
 
@@ -73,6 +73,7 @@ def copy_current_platform_mssqltoolsservice():
     """
     Copy the necessary mssqltoolsservice binaries for the current platform if supported.
     """
+    # pylint: disable=import-outside-toplevel
     import mssqlcli.mssqltoolsservice.externals as mssqltoolsservice
 
     current_platform = get_current_platform()
@@ -85,7 +86,7 @@ def copy_current_platform_mssqltoolsservice():
 def encode(s):
     try:
         return s.encode('utf-8')
-    except:
+    except (AttributeError, ValueError, UnicodeError):
         pass
     return s
 
@@ -96,8 +97,8 @@ def encode(s):
 def decode(s):
     try:
         return s.decode('utf-8')
-    except:
-        pass    
+    except (AttributeError, ValueError, UnicodeError):
+        pass
     return s
 
 
