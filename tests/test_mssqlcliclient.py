@@ -2,6 +2,7 @@
 import os
 import io
 from time import sleep
+import pytest
 import mssqlcli.sqltoolsclient as sqltoolsclient
 from mssqlcli.jsonrpc.jsonrpcclient import JsonRpcWriter
 from mssqltestutils import (
@@ -109,24 +110,27 @@ class TestMssqlCliClientQuery:
     """ Unit tests for executing queries with mssql-cli client. """
 
     @staticmethod
-    def test_get_query_results():
+    @pytest.fixture(scope='function')
+    def client():
+        cl = create_mssql_cli_client()
+        yield cl
+        shutdown(cl)
+
+    @staticmethod
+    def test_get_query_results(client):
         """
             Verify number of rows returned and returned query.
         """
-        try:
-            client = create_mssql_cli_client()
-            test_query = u"""select 1 as [ShiftID], 'Day' as [Name] UNION ALL\
-                             select 2, N'魚' UNION ALL\
-                             select 3, 'Night'"""
+        test_query = u"""select 1 as [ShiftID], 'Day' as [Name] UNION ALL\
+                            select 2, N'魚' UNION ALL\
+                            select 3, 'Night'"""
 
-            for rows, _, _, query, _ in client.execute_query(test_query):
-                assert len(rows) == 3
-                assert query == test_query
-        finally:
-            shutdown(client)
+        for rows, _, _, query, _ in client.execute_query(test_query):
+            assert len(rows) == 3
+            assert query == test_query
 
     @staticmethod
-    def test_schema_table_views_and_columns_query():
+    def test_schema_table_views_and_columns_query(client):
         """
             Verify mssqlcliclient's tables, views, columns, and schema are populated.
             Note: This test should run against a database that the credentials
@@ -147,8 +151,6 @@ class TestMssqlCliClientQuery:
             list(mssqlcli_client.execute_query('DROP SCHEMA %s;' % schematest))
 
         try:
-            client = create_mssql_cli_client()
-
             drop_entities(client)   # drop entities in beginning (in case tables exist)
 
             list(client.execute_query('CREATE TABLE %s (a int, b varchar(25));' % tabletest1))
@@ -168,65 +170,55 @@ class TestMssqlCliClientQuery:
 
         finally:
             drop_entities(client)
-            shutdown(client)
 
     @staticmethod
-    def test_mssqlcliclient_multiple_statement():
+    def test_mssqlcliclient_multiple_statement(client):
         """
             Verify correct execution of queries separated by semi-colon
         """
-        try:
-            client = create_mssql_cli_client()
-            multi_statement_query = (u"select 'Morning' as [Name] UNION ALL select 'Evening'; " +
-                                     u"select 1;")
-            multi_statement_query2 = u"select 1; select 'foo' from teapot;"
-            multi_statement_query3 = u"select 'foo' from teapot; select 2;"
-            for rows, _, _, query, is_error in client.execute_query(multi_statement_query):
-                if query == u"select 'Morning' as [Name] UNION ALL select 'Evening'":
-                    assert len(rows) == 2
-                else:
-                    assert len(rows) == 1
+        multi_statement_query = (u"select 'Morning' as [Name] UNION ALL select 'Evening'; " +
+                                    u"select 1;")
+        multi_statement_query2 = u"select 1; select 'foo' from teapot;"
+        multi_statement_query3 = u"select 'foo' from teapot; select 2;"
+        for rows, _, _, query, is_error in client.execute_query(multi_statement_query):
+            if query == u"select 'Morning' as [Name] UNION ALL select 'Evening'":
+                assert len(rows) == 2
+            else:
+                assert len(rows) == 1
 
-            for rows, _, _, query, is_error in \
-                    client.execute_query(multi_statement_query2):
-                if query == u"select 1":
-                    assert len(rows) == 1
-                else:
-                    assert is_error
+        for rows, _, _, query, is_error in \
+                client.execute_query(multi_statement_query2):
+            if query == u"select 1":
+                assert len(rows) == 1
+            else:
+                assert is_error
 
-            for rows, _, _, query, is_error in \
-                    client.execute_query(multi_statement_query3):
-                if query == u"select 2":
-                    assert len(rows) == 1
-                else:
-                    assert is_error
-
-        finally:
-            shutdown(client)
+        for rows, _, _, query, is_error in \
+                client.execute_query(multi_statement_query3):
+            if query == u"select 2":
+                assert len(rows) == 1
+            else:
+                assert is_error
 
     @staticmethod
-    def test_stored_proc_multiple_result_sets():
+    def test_stored_proc_multiple_result_sets(client):
         """
             Verify the results of running a stored proc with multiple result sets
         """
-        try:
-            client = create_mssql_cli_client()
-            create_stored_proc = u"CREATE PROC sp_mssqlcli_multiple_results " \
-                          u"AS " \
-                          u"BEGIN " \
-                          u"SELECT 'Morning' as [Name] UNION ALL select 'Evening' " \
-                          u"SELECT 'Dawn' as [Name] UNION ALL select 'Dusk' " \
-                          u"UNION ALL select 'Midnight' " \
-                          u"END"
-            exec_stored_proc = u"EXEC sp_mssqlcli_multiple_results"
-            del_stored_proc = u"DROP PROCEDURE sp_mssqlcli_multiple_results"
+        create_stored_proc = u"CREATE PROC sp_mssqlcli_multiple_results " \
+                        u"AS " \
+                        u"BEGIN " \
+                        u"SELECT 'Morning' as [Name] UNION ALL select 'Evening' " \
+                        u"SELECT 'Dawn' as [Name] UNION ALL select 'Dusk' " \
+                        u"UNION ALL select 'Midnight' " \
+                        u"END"
+        exec_stored_proc = u"EXEC sp_mssqlcli_multiple_results"
+        del_stored_proc = u"DROP PROCEDURE sp_mssqlcli_multiple_results"
 
-            list(client.execute_query(create_stored_proc))
-            row_counts = []
-            for rows, _, _, _, _ in client.execute_query(exec_stored_proc):
-                row_counts.append(len(rows))
-            assert row_counts[0] == 2
-            assert row_counts[1] == 3
-            list(client.execute_query(del_stored_proc))
-        finally:
-            shutdown(client)
+        list(client.execute_query(create_stored_proc))
+        row_counts = []
+        for rows, _, _, _, _ in client.execute_query(exec_stored_proc):
+            row_counts.append(len(rows))
+        assert row_counts[0] == 2
+        assert row_counts[1] == 3
+        list(client.execute_query(del_stored_proc))
