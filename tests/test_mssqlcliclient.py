@@ -1,7 +1,6 @@
 # coding=utf-8
 import os
 import io
-import unittest
 from time import sleep
 import mssqlcli.sqltoolsclient as sqltoolsclient
 from mssqlcli.jsonrpc.jsonrpcclient import JsonRpcWriter
@@ -14,11 +13,13 @@ from mssqltestutils import (
 )
 
 
+# TODO: fix comment
+
 # All tests apart from test_mssqlcliclient_request_response require a live connection to an
 # AdventureWorks2014 database with a hardcoded test server.
 # Make modifications to mssqlutils.create_mssql_cli_client() to use a different server and database.
 # Please Note: These tests cannot be run offline.
-class MssqlCliClientTests(unittest.TestCase):
+class TestMssqlCliClientConnection:
     """
         Tests for mssqlcliclient.py and sqltoolsclient.py.
     """
@@ -66,32 +67,15 @@ class MssqlCliClientTests(unittest.TestCase):
         finally:
             mssql_cli_client.shutdown()
 
-    def test_connection(self):
+    @staticmethod
+    def test_connection():
         """
             Verify a successful connection via returned owner uri.
         """
         try:
             client = create_mssql_cli_client(owner_uri=u'connectionservicetest')
 
-            self.assertEqual(client.owner_uri, u'connectionservicetest')
-        finally:
-            shutdown(client)
-
-    def test_get_query_results(self):
-        """
-            Verify number of rows returned and returned query.
-        """
-        try:
-            client = create_mssql_cli_client()
-            test_query = u"""
-                select 1 as [ShiftID], 'Day' as [Name] UNION ALL
-                select 2, N'魚' UNION ALL
-                select 3, 'Night'
-            """
-
-            for rows, _, _, query, _ in client.execute_query(test_query):
-                self.assertTrue(len(rows), 3)
-                self.assertTrue(query, test_query)
+            assert client.owner_uri == u'connectionservicetest'
         finally:
             shutdown(client)
 
@@ -107,6 +91,38 @@ class MssqlCliClientTests(unittest.TestCase):
             json_writer.send_request(u'test/method', extra_params, id=1)
         finally:
             json_writer.close()
+            shutdown(client)
+
+    @staticmethod
+    def test_mssqlcliclient_reset_connection():
+        """
+            Verify if the MssqlCliClient can successfully reset its connection
+        """
+        try:
+            mssqlcli = create_mssql_cli()
+            mssqlcli.reset()
+        finally:
+            shutdown(mssqlcli.mssqlcliclient_main)
+
+
+class TestMssqlCliClientQuery:
+    """ Unit tests for executing queries with mssql-cli client. """
+
+    @staticmethod
+    def test_get_query_results():
+        """
+            Verify number of rows returned and returned query.
+        """
+        try:
+            client = create_mssql_cli_client()
+            test_query = u"""select 1 as [ShiftID], 'Day' as [Name] UNION ALL\
+                             select 2, N'魚' UNION ALL\
+                             select 3, 'Night'"""
+
+            for rows, _, _, query, _ in client.execute_query(test_query):
+                assert len(rows) == 3
+                assert query == test_query
+        finally:
             shutdown(client)
 
     @staticmethod
@@ -155,17 +171,7 @@ class MssqlCliClientTests(unittest.TestCase):
             shutdown(client)
 
     @staticmethod
-    def test_mssqlcliclient_reset_connection():
-        """
-            Verify if the MssqlCliClient can successfully reset its connection
-        """
-        try:
-            mssqlcli = create_mssql_cli()
-            mssqlcli.reset()
-        finally:
-            shutdown(mssqlcli.mssqlcliclient_main)
-
-    def test_mssqlcliclient_multiple_statement(self):
+    def test_mssqlcliclient_multiple_statement():
         """
             Verify correct execution of queries separated by semi-colon
         """
@@ -177,28 +183,29 @@ class MssqlCliClientTests(unittest.TestCase):
             multi_statement_query3 = u"select 'foo' from teapot; select 2;"
             for rows, _, _, query, is_error in client.execute_query(multi_statement_query):
                 if query == u"select 'Morning' as [Name] UNION ALL select 'Evening'":
-                    self.assertTrue(len(rows), 2)
+                    assert len(rows) == 2
                 else:
-                    self.assertTrue(len(rows), 1)
+                    assert len(rows) == 1
 
             for rows, _, _, query, is_error in \
                     client.execute_query(multi_statement_query2):
                 if query == u"select 1":
-                    self.assertTrue(len(rows) == 1)
+                    assert len(rows) == 1
                 else:
-                    self.assertTrue(is_error)
+                    assert is_error
 
             for rows, _, _, query, is_error in \
                     client.execute_query(multi_statement_query3):
                 if query == u"select 2":
-                    self.assertTrue(len(rows) == 1)
+                    assert len(rows) == 1
                 else:
-                    self.assertTrue(is_error)
+                    assert is_error
 
         finally:
             shutdown(client)
 
-    def test_stored_proc_multiple_result_sets(self):
+    @staticmethod
+    def test_stored_proc_multiple_result_sets():
         """
             Verify the results of running a stored proc with multiple result sets
         """
@@ -218,12 +225,8 @@ class MssqlCliClientTests(unittest.TestCase):
             row_counts = []
             for rows, _, _, _, _ in client.execute_query(exec_stored_proc):
                 row_counts.append(len(rows))
-            self.assertTrue(row_counts[0] == 2)
-            self.assertTrue(row_counts[1] == 3)
+            assert row_counts[0] == 2
+            assert row_counts[1] == 3
             list(client.execute_query(del_stored_proc))
         finally:
             shutdown(client)
-
-
-if __name__ == u'__main__':
-    unittest.main()
