@@ -31,7 +31,7 @@ class MssqlCliClient:
         yield cl
         shutdown(cl)
 
-class TestMssqlCliClientConnection:
+class TestMssqlCliClientConnection(MssqlCliClient):
     """
         Tests for mssqlcliclient.py and sqltoolsclient.py.
     """
@@ -92,18 +92,16 @@ class TestMssqlCliClientConnection:
             shutdown(client)
 
     @staticmethod
-    def test_json_writer_extra_params():
+    def test_json_writer_extra_params(client):
         """
             Verify JSON RPC accepts extra paramaters.
         """
         try:
-            client = create_mssql_cli_client()
             extra_params = client.extra_params
             json_writer = JsonRpcWriter(io.BytesIO())
             json_writer.send_request(u'test/method', extra_params, id=1)
         finally:
             json_writer.close()
-            shutdown(client)
 
     @staticmethod
     def test_mssqlcliclient_reset_connection():
