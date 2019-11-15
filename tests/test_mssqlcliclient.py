@@ -169,7 +169,6 @@ class TestMssqlCliClientQuery(MssqlCliClient):
             assert (schematest, tabletest1, 'a', 'int', 'NULL') in set(client.get_table_columns())
             assert ('dbo', viewtest, 'a', 'int', 'NULL') in set(client.get_view_columns())
             assert schematest in client.get_schemas()
-
         finally:
             drop_entities(client)
 
@@ -188,13 +187,15 @@ class TestMssqlCliClientQuery(MssqlCliClient):
         exec_stored_proc = u"EXEC sp_mssqlcli_multiple_results"
         del_stored_proc = u"DROP PROCEDURE sp_mssqlcli_multiple_results"
 
-        list(client.execute_query(create_stored_proc))
-        row_counts = []
-        for rows, _, _, _, _ in client.execute_query(exec_stored_proc):
-            row_counts.append(len(rows))
-        assert row_counts[0] == 2
-        assert row_counts[1] == 3
-        list(client.execute_query(del_stored_proc))
+        try:
+            list(client.execute_query(create_stored_proc))
+            row_counts = []
+            for rows, _, _, _, _ in client.execute_query(exec_stored_proc):
+                row_counts.append(len(rows))
+            assert row_counts[0] == 2
+            assert row_counts[1] == 3
+        finally:
+            list(client.execute_query(del_stored_proc))
 
 
 class TestMssqlCliClientMultipleStatement(MssqlCliClient):
