@@ -62,8 +62,8 @@ class CompletionRefresher:
             callbacks = [callbacks]
 
         while 1:
-            for r in self.refreshers.values():
-                r(completer, executor)
+            for refresh in self.refreshers.values():
+                refresh(completer, executor)
                 if self._restart_refresh.is_set():
                     self._restart_refresh.clear()
                     break
