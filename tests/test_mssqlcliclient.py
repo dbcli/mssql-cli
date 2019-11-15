@@ -14,14 +14,9 @@ from mssqltestutils import (
 )
 
 
-# TODO: fix comment
-
-# All tests apart from test_mssqlcliclient_request_response require a live connection to an
-# AdventureWorks2014 database with a hardcoded test server.
-# Make modifications to mssqlutils.create_mssql_cli_client() to use a different server and database.
 # Please Note: These tests cannot be run offline.
 
-class MssqlCliClient:
+class MssqlCliClient:   # pylint: disable=too-few-public-methods
     """ Creates client fixture to be used for tests. """
 
     @staticmethod
@@ -200,10 +195,11 @@ class TestMssqlCliClientQuery(MssqlCliClient):
 
 class TestMssqlCliClientMultipleStatement(MssqlCliClient):
     test_data = [
+        # random strings used to test for errors with non-existing tables
         (u"select 'Morning' as [Name] UNION ALL select 'Evening'; " +
          u"select 1;", [2, 1]),
-        (u"select 1; select 'foo' from teapot;", [1, 0]),
-        (u"select 'foo' from teapot; select 2;", [0, 1])
+        (u"select 1; select 'foo' from %s;" % random_str(), [1, 0]),
+        (u"select 'foo' from %s; select 2;" % random_str(), [0, 1])
     ]
 
     @staticmethod
