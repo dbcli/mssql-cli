@@ -20,6 +20,17 @@ from mssqltestutils import (
 # AdventureWorks2014 database with a hardcoded test server.
 # Make modifications to mssqlutils.create_mssql_cli_client() to use a different server and database.
 # Please Note: These tests cannot be run offline.
+
+class MssqlCliClient:
+    """ Creates client fixture to be used for tests. """
+
+    @staticmethod
+    @pytest.fixture(scope='function')
+    def client():
+        cl = create_mssql_cli_client()
+        yield cl
+        shutdown(cl)
+
 class TestMssqlCliClientConnection:
     """
         Tests for mssqlcliclient.py and sqltoolsclient.py.
@@ -106,15 +117,8 @@ class TestMssqlCliClientConnection:
             shutdown(mssqlcli.mssqlcliclient_main)
 
 
-class TestMssqlCliClientQuery:
+class TestMssqlCliClientQuery(MssqlCliClient):
     """ Unit tests for executing queries with mssql-cli client. """
-
-    @staticmethod
-    @pytest.fixture(scope='function')
-    def client():
-        cl = create_mssql_cli_client()
-        yield cl
-        shutdown(cl)
 
     @staticmethod
     def test_get_query_results(client):
@@ -172,35 +176,6 @@ class TestMssqlCliClientQuery:
             drop_entities(client)
 
     @staticmethod
-    def test_mssqlcliclient_multiple_statement(client):
-        """
-            Verify correct execution of queries separated by semi-colon
-        """
-        multi_statement_query = (u"select 'Morning' as [Name] UNION ALL select 'Evening'; " +
-                                    u"select 1;")
-        multi_statement_query2 = u"select 1; select 'foo' from teapot;"
-        multi_statement_query3 = u"select 'foo' from teapot; select 2;"
-        for rows, _, _, query, is_error in client.execute_query(multi_statement_query):
-            if query == u"select 'Morning' as [Name] UNION ALL select 'Evening'":
-                assert len(rows) == 2
-            else:
-                assert len(rows) == 1
-
-        for rows, _, _, query, is_error in \
-                client.execute_query(multi_statement_query2):
-            if query == u"select 1":
-                assert len(rows) == 1
-            else:
-                assert is_error
-
-        for rows, _, _, query, is_error in \
-                client.execute_query(multi_statement_query3):
-            if query == u"select 2":
-                assert len(rows) == 1
-            else:
-                assert is_error
-
-    @staticmethod
     def test_stored_proc_multiple_result_sets(client):
         """
             Verify the results of running a stored proc with multiple result sets
@@ -222,3 +197,27 @@ class TestMssqlCliClientQuery:
         assert row_counts[0] == 2
         assert row_counts[1] == 3
         list(client.execute_query(del_stored_proc))
+
+
+class TestMssqlCliClientMultipleStatement(MssqlCliClient):
+    test_data = [
+        (u"select 'Morning' as [Name] UNION ALL select 'Evening'; " +
+         u"select 1;", [2, 1]),
+        (u"select 1; select 'foo' from teapot;", [1, 0]),
+        (u"select 'foo' from teapot; select 2;", [0, 1])
+    ]
+
+    @staticmethod
+    @pytest.mark.parametrize("query_str, rows_outputted", test_data)
+    def test_mssqlcliclient_multiple_statement(client, query_str, rows_outputted):
+        """
+            Verify correct execution of queries separated by semi-colon
+        """
+
+        for (i, (rows, _, _, query_executed, is_error)) in \
+            enumerate(client.execute_query(query_str)):
+
+            queries = query_str.split(';')
+            assert query_executed == queries[i].strip()
+            assert len(rows) == rows_outputted[i]
+            assert (is_error and len(rows) == 0) or (not is_error)
