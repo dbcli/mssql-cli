@@ -64,6 +64,8 @@ optional arguments:
                         administrator connection.
   -Q , --query          Executes a query outputting the results to stdout and
                         exits.
+  -i , --input_file     Specifies the file that contains a batch of SQL
+                        statements for processing.
   -o , --output_file    Specifies the file that receives output from a query.
   --enable-sqltoolsservice-logging
                         Enables diagnostic logging for the SqlToolsService.
@@ -257,15 +259,21 @@ Below table summarizes the special commands supported
 ## Non-Interactive Options
 Non-interactive mode is a great way to query SQL Server using `mssql-cli` without needing to jump into an interactive command-line interface.
 
-### Options
-`mssql-cli` supports the following non-interactive options:
+### Executing a Query in Non-Interactive Mode
+`mssql-cli` supports the following options for query exection in non-interactive mode:
+
+**Note:** Ensure a connection to your server is established using the `-S`, `-U`, `-P`, and `-d` arguments, or by specifying your [enviornment variables](#environment-variables).
 
 #### -Q, --query
 To make a query in non-interactive mode, use the `-Q` (or `--query`) argument, followed by a T-SQL statment surrounded in double or single quotes. sqlcmd syntax is also supported.
 
-**Note:** Ensure a connection to your server is established using the `-S`, `-U`, `-P`, and `-d` arguments, or by specifying your [enviornment variables](#environment-variables).
+#### -i, --input-file
+An input file using T-SQL or sqlcmd syntax may be specified as an alternative to using `-Q`.
+
+### Outputting a Query Execution in Non-Interactive Mode
+If no argument is specified, the output of a query execution in non-interactive mode prints to standard output. Results may also be printed to a file using the [non-interactive output file argument](#-o---output_file).
 
 #### -o, --output_file
-To print the results of your [non-interactive query](#-Q,--query) to a file, add the `-o` (or `--output_file`) argument followed by a file path surrounded by double or single quotes. `mssql-cli` will create a file if the specified value does not exist. **Using `-o` will overwrite any existing file.**
+To print the results of your [non-interactive query](#executing-a-query-in-non-interactive-mode) to a file, add the `-o` (or `--output_file`) argument followed by a file path surrounded by double or single quotes. `mssql-cli` will create a file if the specified value does not exist. **Using `-o` will overwrite any existing file.**
 
-**Note:** [-Q or --query](#-Q,--query) is a required argument.
+**Note:** `-Q`/`--query` or `-i`/`--input-file` is required.
