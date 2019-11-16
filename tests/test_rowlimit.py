@@ -1,3 +1,4 @@
+# pylint: disable=protected-access
 import unittest
 from mssqlcli.mssql_cli import MssqlCli
 from mssqltestutils import create_mssql_cli_options
@@ -14,31 +15,28 @@ class RowLimitTests(unittest.TestCase):
 
     def test_default_row_limit(self):
         cli = MssqlCli(self.DEFAULT_OPTIONS)
-        stmt = "SELECT * FROM students"
         result = cli._should_show_limit_prompt(['row']*self.low_count)
-        assert result is False
+        assert not result
 
         result = cli._should_show_limit_prompt(['row']*self.over_default)
-        assert result is True
+        assert result
 
     def test_no_limit(self):
         cli_options = create_mssql_cli_options(row_limit=0)
         cli = MssqlCli(cli_options)
-        assert cli.row_limit is 0
-        stmt = "SELECT * FROM students"
+        assert cli.row_limit == 0
 
         result = cli._should_show_limit_prompt(['row']*self.over_limit)
-        assert result is False
+        assert not result
 
     def test_row_limit_on_non_select(self):
         cli = MssqlCli(self.DEFAULT_OPTIONS)
-        stmt = "UPDATE students set name='Boby'"
         result = cli._should_show_limit_prompt(None)
-        assert result is False
+        assert not result
 
         cli_options = create_mssql_cli_options(row_limit=0)
-        assert cli_options.row_limit is 0
+        assert cli_options.row_limit == 0
         cli = MssqlCli(cli_options)
         result = cli._should_show_limit_prompt(['row']*self.over_default)
-        assert cli.row_limit is 0
-        assert result is False
+        assert cli.row_limit == 0
+        assert not result

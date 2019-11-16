@@ -1,11 +1,11 @@
 from __future__ import unicode_literals
-import pytest
 import unittest
 import mssqlcli.mssqlcompleter as mssqlcompleter
 
 class FuzzyCompletionTests(unittest.TestCase):
 
-    def getCompleter(self):
+    @staticmethod
+    def getCompleter():
         return mssqlcompleter.MssqlCompleter()
 
     def test_ranking_ignores_identifier_quotes(self):

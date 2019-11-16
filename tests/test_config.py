@@ -9,7 +9,8 @@ from mssqltestutils import getTempPath
 
 class ConfigTests(unittest.TestCase):
 
-    def test_ensure_existing_dir(self):
+    @staticmethod
+    def test_ensure_existing_dir():
         rcfilePath = getTempPath('subdir', 'rcfile')
         get_config(rcfilePath)
         # should just not raise

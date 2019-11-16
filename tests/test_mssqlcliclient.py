@@ -2,8 +2,8 @@
 import os
 import io
 import unittest
+from time import sleep
 import mssqlcli.sqltoolsclient as sqltoolsclient
-
 from mssqlcli.jsonrpc.jsonrpcclient import JsonRpcWriter
 from mssqltestutils import (
     create_mssql_cli,
@@ -12,7 +12,6 @@ from mssqltestutils import (
     shutdown,
     random_str
 )
-from time import sleep
 
 
 # All tests apart from test_mssqlcliclient_request_response require a live connection to an
@@ -23,7 +22,8 @@ class MssqlCliClientTests(unittest.TestCase):
     """
         Tests for mssqlcliclient.py and sqltoolsclient.py.
     """
-    def test_mssqlcliclient_request_response(self):
+    @staticmethod
+    def test_mssqlcliclient_request_response():
         """
         Test mssqlcliclient pipeline for sending request and receiving response works.
         """
@@ -44,25 +44,27 @@ class MssqlCliClientTests(unittest.TestCase):
                     u'baselines',
                     file_name))
 
-        with open(get_test_baseline(u'test_simple_query.txt'), u'r+b', buffering=0) as response_file:
-            request_stream = io.BytesIO()
-            self.sql_tools_client = sqltoolsclient.SqlToolsClient(
-                input_stream=request_stream, output_stream=response_file)
+        try:
+            with open(get_test_baseline(u'test_simple_query.txt'), u'r+b', buffering=0) \
+                    as response_file:
+                request_stream = io.BytesIO()
+                sql_tools_client = sqltoolsclient.SqlToolsClient(
+                    input_stream=request_stream, output_stream=response_file)
 
-            # The sleep is required because py.test and logging have an issue with closing the FileHandle
-            # in a non-thread safe way
-            # issue24262
-            sleep(0.5)
+                # The sleep is required because py.test and logging have an issue with closing
+                # the FileHandle in a non-thread safe way
+                # issue24262
+                sleep(0.5)
 
-        self.mssql_cli_options = create_mssql_cli_options(integrated_auth=True)
-        self.mssql_cli_client = create_mssql_cli_client(self.mssql_cli_options,
-                                                        owner_uri=u'connectionservicetest',
-                                                        sql_tools_client=self.sql_tools_client,
-                                                        extra_bool_param=True,
-                                                        extra_string_param=u'stringparam',
-                                                        extra_int_param=5)
-
-        self.mssql_cli_client.shutdown()
+                mssql_cli_options = create_mssql_cli_options(integrated_auth=True)
+                mssql_cli_client = create_mssql_cli_client(mssql_cli_options,
+                                                           owner_uri=u'connectionservicetest',
+                                                           sql_tools_client=sql_tools_client,
+                                                           extra_bool_param=True,
+                                                           extra_string_param=u'stringparam',
+                                                           extra_int_param=5)
+        finally:
+            mssql_cli_client.shutdown()
 
     def test_connection(self):
         """
@@ -87,13 +89,14 @@ class MssqlCliClientTests(unittest.TestCase):
                 select 3, 'Night'
             """
 
-            for rows, col, message, query, is_error in client.execute_query(test_query):
+            for rows, _, _, query, _ in client.execute_query(test_query):
                 self.assertTrue(len(rows), 3)
                 self.assertTrue(query, test_query)
         finally:
             shutdown(client)
 
-    def test_json_writer_extra_params(self):
+    @staticmethod
+    def test_json_writer_extra_params():
         """
             Verify JSON RPC accepts extra paramaters.
         """
@@ -102,8 +105,6 @@ class MssqlCliClientTests(unittest.TestCase):
             extra_params = client.extra_params
             json_writer = JsonRpcWriter(io.BytesIO())
             json_writer.send_request(u'test/method', extra_params, id=1)
-        except Exception as ex:
-            self.fail(u'Exception from JsonRpcWriter %s' % ex)
         finally:
             json_writer.close()
             shutdown(client)
@@ -153,7 +154,8 @@ class MssqlCliClientTests(unittest.TestCase):
             drop_entities(client)
             shutdown(client)
 
-    def test_mssqlcliclient_reset_connection(self):
+    @staticmethod
+    def test_mssqlcliclient_reset_connection():
         """
             Verify if the MssqlCliClient can successfully reset its connection
         """
@@ -169,23 +171,24 @@ class MssqlCliClientTests(unittest.TestCase):
         """
         try:
             client = create_mssql_cli_client()
-            multi_statement_query = u"select 'Morning' as [Name] UNION ALL select 'Evening'; select 1;"
+            multi_statement_query = (u"select 'Morning' as [Name] UNION ALL select 'Evening'; " +
+                                     u"select 1;")
             multi_statement_query2 = u"select 1; select 'foo' from teapot;"
             multi_statement_query3 = u"select 'foo' from teapot; select 2;"
-            for rows, col, message, query, is_error in client.execute_query(multi_statement_query):
+            for rows, _, _, query, is_error in client.execute_query(multi_statement_query):
                 if query == u"select 'Morning' as [Name] UNION ALL select 'Evening'":
                     self.assertTrue(len(rows), 2)
                 else:
                     self.assertTrue(len(rows), 1)
 
-            for rows, col, message, query, is_error in \
+            for rows, _, _, query, is_error in \
                     client.execute_query(multi_statement_query2):
                 if query == u"select 1":
                     self.assertTrue(len(rows) == 1)
                 else:
                     self.assertTrue(is_error)
 
-            for rows, col, message, query, is_error in \
+            for rows, _, _, query, is_error in \
                     client.execute_query(multi_statement_query3):
                 if query == u"select 2":
                     self.assertTrue(len(rows) == 1)
@@ -205,14 +208,15 @@ class MssqlCliClientTests(unittest.TestCase):
                           u"AS " \
                           u"BEGIN " \
                           u"SELECT 'Morning' as [Name] UNION ALL select 'Evening' " \
-                          u"SELECT 'Dawn' as [Name] UNION ALL select 'Dusk' UNION ALL select 'Midnight' " \
+                          u"SELECT 'Dawn' as [Name] UNION ALL select 'Dusk' " \
+                          u"UNION ALL select 'Midnight' " \
                           u"END"
             exec_stored_proc = u"EXEC sp_mssqlcli_multiple_results"
             del_stored_proc = u"DROP PROCEDURE sp_mssqlcli_multiple_results"
 
             list(client.execute_query(create_stored_proc))
             row_counts = []
-            for rows, columns, message, query, is_error in client.execute_query(exec_stored_proc):
+            for rows, _, _, _, _ in client.execute_query(exec_stored_proc):
                 row_counts.append(len(rows))
             self.assertTrue(row_counts[0] == 2)
             self.assertTrue(row_counts[1] == 3)

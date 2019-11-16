@@ -1,9 +1,8 @@
 import os
 import socket
+from argparse import Namespace
 import mssqlcli.sqltoolsclient as sqltoolsclient
 import mssqlcli.mssqlcliclient as mssqlcliclient
-
-from argparse import Namespace
 from mssqlcli.mssql_cli import MssqlCli
 from mssqlcli.mssqlclioptionsparser import create_parser
 from utility import random_str
@@ -16,7 +15,8 @@ def create_mssql_cli(**non_default_options):
     return mssql_cli
 
 
-def create_mssql_cli_client(options=None, owner_uri=None, connect=True, sql_tools_client=None, **additional_params):
+def create_mssql_cli_client(options=None, owner_uri=None, connect=True, sql_tools_client=None,
+                            **additional_params):
     """
     Retrieve a mssqlcliclient connection.
     :param options: options
@@ -51,11 +51,11 @@ def create_mssql_cli_options(**nondefault_options):
 
     if nondefault_options:
         updateable_mssql_cli_options = vars(default_mssql_cli_options)
-        for option in nondefault_options.keys():
+        for option, value in nondefault_options.items():
             if option not in updateable_mssql_cli_options.keys():
                 raise Exception('Invalid mssql-cli option specified: {}'.format(option))
 
-            updateable_mssql_cli_options[option] = nondefault_options.get(option)
+            updateable_mssql_cli_options[option] = value
 
         return Namespace(**updateable_mssql_cli_options)
 
@@ -75,7 +75,7 @@ def getTempPath(*args):
 def create_test_db():
     client = create_mssql_cli_client()
     local_machine_name = socket.gethostname().replace(
-        '-','_').replace('.','_')
+        '-', '_').replace('.', '_')
     test_db_name = u'mssqlcli_testdb_{0}_{1}'.format(
         local_machine_name, random_str())
     query = u"CREATE DATABASE {0};".format(test_db_name)
