@@ -86,21 +86,24 @@ def create_parser():
         dest=u'auto_vertical_output',
         action=u'store_true',
         default=False,
-        help=u'Automatically switch to vertical output mode if the result is wider than the terminal width.')
+        help=(u'Automatically switch to vertical output mode if the result is wider ' +
+              'than the terminal width.'))
 
     args_parser.add_argument(
         u'-N', u'--encrypt',
         dest=u'encrypt',
         action=u'store_true',
         default=False,
-        help=u'SQL Server uses SSL encryption for all data if the server has a certificate installed.')
+        help=(u'SQL Server uses SSL encryption for all data if the server has a ' +
+              'certificate installed.'))
 
     args_parser.add_argument(
         u'-C', u'--trust-server-certificate',
         dest=u'trust_server_certificate',
         action=u'store_true',
         default=False,
-        help=u'The channel will be encrypted while bypassing walking the certificate chain to validate trust.')
+        help=(u'The channel will be encrypted while bypassing walking the certificate ' +
+              'chain to validate trust.'))
 
     args_parser.add_argument(
         u'-l', u'--connect-timeout',
@@ -113,14 +116,16 @@ def create_parser():
         u'-K', u'--application-intent',
         dest=u'application_intent',
         metavar=u'',
-        help=u'Declares the application workload type when connecting to a database in a SQL Server Availability Group.')
+        help=(u'Declares the application workload type when connecting to a database in a SQL ' +
+              'Server Availability Group.'))
 
     args_parser.add_argument(
         u'-M', u'--multi-subnet-failover',
         dest=u'multi_subnet_failover',
         action=u'store_true',
         default=False,
-        help=u'If application is connecting to AlwaysOn AG on different subnets, setting this provides faster detection and connection to currently active server.')
+        help=(u'If application is connecting to AlwaysOn AG on different subnets, setting this ' +
+              'provides faster detection and connection to currently active server.'))
 
     args_parser.add_argument(
         u'-a', u'--packet-size',

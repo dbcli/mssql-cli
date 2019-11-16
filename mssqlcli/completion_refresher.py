@@ -1,14 +1,13 @@
+from collections import OrderedDict
 import logging
 import threading
 import mssqlcli.decorators as decorators
-
-from collections import OrderedDict
 from .mssqlcompleter import MssqlCompleter
 
 logger = logging.getLogger(u'mssqlcli.completion_refresher')
 
 
-class CompletionRefresher(object):
+class CompletionRefresher:
 
     refreshers = OrderedDict()
 
@@ -32,15 +31,15 @@ class CompletionRefresher(object):
         if self.is_refreshing():
             self._restart_refresh.set()
             return [(None, None, None, 'Auto-completion refresh restarted.')]
-        else:
-            self._completer_thread = threading.Thread(
-                target=self._bg_refresh,
-                args=(mssqcliclient, callbacks, history, settings),
-                name='completion_refresh')
-            self._completer_thread.setDaemon(True)
-            self._completer_thread.start()
-            return [(None, None, None,
-                     'Auto-completion refresh started in the background.')]
+
+        self._completer_thread = threading.Thread(
+            target=self._bg_refresh,
+            args=(mssqcliclient, callbacks, history, settings),
+            name='completion_refresh')
+        self._completer_thread.setDaemon(True)
+        self._completer_thread.start()
+        return [(None, None, None,
+                 'Auto-completion refresh started in the background.')]
 
     def is_refreshing(self):
         return self._completer_thread and self._completer_thread.is_alive()
@@ -63,8 +62,8 @@ class CompletionRefresher(object):
             callbacks = [callbacks]
 
         while 1:
-            for refresher in self.refreshers.values():
-                refresher(completer, executor)
+            for refresh in self.refreshers.values():
+                refresh(completer, executor)
                 if self._restart_refresh.is_set():
                     self._restart_refresh.clear()
                     break

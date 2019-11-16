@@ -17,6 +17,7 @@ def mssqlcli_bindings(mssql_cli):
         """
         Enable/Disable SmartCompletion Mode.
         """
+        del event       # event is unused
         _logger.debug('Detected F2 key.')
         mssql_cli.completer.smart_completion = not mssql_cli.completer.smart_completion
 
@@ -25,6 +26,7 @@ def mssqlcli_bindings(mssql_cli):
         """
         Enable/Disable Multiline Mode.
         """
+        del event       # event is unused
         _logger.debug('Detected F3 key.')
         mssql_cli.multiline = not mssql_cli.multiline
 

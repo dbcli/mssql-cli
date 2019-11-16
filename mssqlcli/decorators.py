@@ -60,7 +60,7 @@ def hash256_result(func):
         val = func(*args, **kwargs)
         if not val:
             raise ValueError('Return value is None')
-        elif not isinstance(val, str):
+        if not isinstance(val, str):
             raise ValueError('Return value is not string')
         hash_object = hashlib.sha256(val.encode('utf-8'))
         return str(hash_object.hexdigest())
@@ -76,10 +76,8 @@ def suppress_all_exceptions(raise_in_diagnostics=False, fallback_return=None):
             except Exception as ex:  # nopa pylint: disable=broad-except
                 if _should_raise(raise_in_diagnostics):
                     raise ex
-                elif fallback_return:
+                if fallback_return:
                     return fallback_return
-                else:
-                    pass
 
         return _wrapped_func
 

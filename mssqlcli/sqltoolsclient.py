@@ -2,7 +2,6 @@ import logging
 import subprocess
 import io
 import time
-import sys
 import uuid
 
 import mssqlcli.mssqltoolsservice as mssqltoolsservice
@@ -14,7 +13,7 @@ from .config import config_location
 logger = logging.getLogger(u'mssqlcli.sqltoolsclient')
 
 
-class SqlToolsClient(object):
+class SqlToolsClient:
     """
         Create sql tools service requests.
     """
@@ -56,7 +55,7 @@ class SqlToolsClient(object):
                     buffering=0,
                     closefd=False))
 
-            logger.info(u'SqlToolsService process id: {0}'.format(self.tools_service_process.pid))
+            logger.info(u'SqlToolsService process id: %s', self.tools_service_process.pid)
 
         self.json_rpc_client.start()
         logger.info(u'Sql Tools Client Initialized')
@@ -69,29 +68,31 @@ class SqlToolsClient(object):
         self.current_id = str(uuid.uuid4().int)
 
         if request_type == u'connection_request':
-            logger.info(u'SqlToolsClient connection request Id {0} and owner Uri {1}'.format(self.current_id,
-                                                                                             owner_uri))
-            request = connection.ConnectionRequest(self.current_id, owner_uri, self.json_rpc_client, parameters)
-            return request
+            logger.info(u'SqlToolsClient connection request Id %s and owner Uri %s',
+                        self.current_id, owner_uri)
+            request = connection.ConnectionRequest(self.current_id, owner_uri, self.json_rpc_client,
+                                                   parameters)
 
         if request_type == u'query_execute_string_request':
-            logger.info(u'SqlToolsClient execute string request Id {0} and owner Uri {1}'.format(self.current_id,
-                                                                                                 owner_uri))
-            request = query.QueryExecuteStringRequest(self.current_id, owner_uri, self.json_rpc_client, parameters)
-            return request
+            logger.info(u'SqlToolsClient execute string request Id %s and owner Uri %s',
+                        self.current_id, owner_uri)
+            request = query.QueryExecuteStringRequest(self.current_id, owner_uri,
+                                                      self.json_rpc_client, parameters)
 
         if request_type == u'query_subset_request':
-            logger.info(u'SqlToolsClient subset request Id {0} and owner Uri {1}'.format(self.current_id,
-                                                                                         owner_uri))
-            request = query.QuerySubsetRequest(self.current_id, owner_uri, self.json_rpc_client, parameters)
-            return request
+            logger.info(u'SqlToolsClient subset request Id %s and owner Uri %s',
+                        self.current_id, owner_uri)
+            request = query.QuerySubsetRequest(self.current_id, owner_uri,
+                                               self.json_rpc_client, parameters)
+
+        return request
 
     def shutdown(self):
         self.json_rpc_client.shutdown()
 
         if self.tools_service_process:
-            logger.info(u'Shutting down Sql Tools Client Process Id: {0}'\
-                        .format(self.tools_service_process.pid))
+            logger.info(u'Shutting down Sql Tools Client Process Id: %s',
+                        self.tools_service_process.pid)
 
             try:
                 # kill process and give it time to die

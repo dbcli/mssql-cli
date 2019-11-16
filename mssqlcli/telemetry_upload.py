@@ -4,7 +4,8 @@ import os
 import sys
 
 from applicationinsights import TelemetryClient
-from applicationinsights.channel import TelemetryChannel, SynchronousQueue, SynchronousSender, contracts
+from applicationinsights.channel import (
+    TelemetryChannel, SynchronousQueue, SynchronousSender, contracts)
 from applicationinsights.exceptions import enable
 
 import mssqlcli.decorators as decorators
@@ -15,11 +16,11 @@ INSTRUMENTATION_KEY = 'AIF-5574968e-856d-40d2-af67-c89a14e76412'
 try:
     # Python 2.x
     import urllib2 as HTTPClient
-    from urllib2 import HTTPError
+    from urllib2 import HTTPError, URLError
 except ImportError:
     # Python 3.x
     import urllib.request as HTTPClient
-    from urllib.error import HTTPError
+    from urllib.error import HTTPError, URLError
 
 
 def in_diagnostic_mode():
@@ -44,7 +45,8 @@ class VortexSynchronousSender(SynchronousSender):
         """
         request_payload = json.dumps([a.write() for a in data_to_send]).strip('[').strip(']')
 
-        request = HTTPClient.Request(self._service_endpoint_uri, bytearray(request_payload, 'utf-8'),
+        request = HTTPClient.Request(self._service_endpoint_uri,
+                                     bytearray(request_payload, 'utf-8'),
                                      {'Accept': 'application/json',
                                       'Content-Type': 'application/json; charset=utf-8'})
         try:
@@ -57,7 +59,7 @@ class VortexSynchronousSender(SynchronousSender):
         except HTTPError as e:
             if e.getcode() == 400:
                 raise e
-        except Exception:
+        except (AttributeError, ValueError, URLError):
             if self.retry < 3:
                 self.retry += 1
             else:
@@ -148,7 +150,8 @@ def upload(data_to_save, service_endpoint_uri):
         measurements = {}
         for k in raw_properties:
             v = raw_properties[k]
-            if isinstance(v, str if sys.version_info[0] >= 3 else basestring):
+            if isinstance(v, str if sys.version_info[0] >= 3 else basestring): # pylint: disable=undefined-variable
+                # suppress warning for undefined variable, since `basestring` was dropped in python 3
                 properties[k] = v
             else:
                 measurements[k] = v
