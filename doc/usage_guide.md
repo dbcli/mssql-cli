@@ -262,10 +262,10 @@ Non-interactive mode is a great way to query SQL Server using `mssql-cli` withou
 ### Executing a Query in Non-Interactive Mode
 `mssql-cli` supports the following options for query exection in non-interactive mode:
 
-**Note:** Ensure a connection to your server is established using the `-S`, `-U`, `-P`, and `-d` arguments, or by specifying your [enviornment variables](#environment-variables).
+**Note:** Ensure a connection to your server is established using the `-S`, `-U`, `-P`, and `-d` arguments, or by specifying your [environment variables](#environment-variables).
 
 #### -Q, --query
-To make a query in non-interactive mode, use the `-Q` (or `--query`) argument, followed by a T-SQL statment surrounded in double or single quotes. sqlcmd syntax is also supported.
+To make a query in non-interactive mode, use the `-Q` (or `--query`) argument, followed by a T-SQL statement surrounded in double or single quotes. sqlcmd syntax is also supported.
 
 #### -i, --input-file
 An input file using T-SQL or sqlcmd syntax may be specified as an alternative to using `-Q`.
