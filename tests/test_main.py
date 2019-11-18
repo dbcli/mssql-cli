@@ -31,7 +31,8 @@ class MainTests(unittest.TestCase):
 
         assert len(file_history.get_strings()) == 0
 
-    def test_format_output(self):
+    @staticmethod
+    def test_format_output():
         mssqlcli = create_mssql_cli()
         settings = OutputSettings(table_format='psql', dcmlfmt='d', floatfmt='g')
         results = mssqlcli.format_output(
