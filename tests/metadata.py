@@ -196,7 +196,7 @@ class MetaData:
         return (sch, tbl, col, 'text', (tbl, col) in defaults, defaults.get((tbl, col)))
 
 
-    def get_completer(self, settings=None, casing=None):
+    def get_completer(self, settings=None, casing=None):    # pylint: disable=too-many-locals
         metadata = self.metadata
         comp = MssqlCompleter(smart_completion=True, settings=settings)
 
