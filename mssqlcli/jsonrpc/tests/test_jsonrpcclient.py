@@ -279,7 +279,7 @@ class JsonRpcClientTests(unittest.TestCase):
                 u'Key': u'Value'},
             u'method': u'testMethod/DoThis',
             u'id': 1}
-        response = test_client.get_response(id=1)
+        response = test_client.get_response(request_id=1)
         self.assertEqual(response, baseline)
         test_client.shutdown()
 
