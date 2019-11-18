@@ -30,7 +30,7 @@ def _user_agrees_to_telemetry(func):
     def _wrapper(*args, **kwargs):
         user_opted_out = os.environ.get(MSSQL_CLI_TELEMETRY_OPT_OUT, False)
         if user_opted_out in ['True', 'true', '1']:
-            return
+            return None
         return func(*args, **kwargs)
 
     return _wrapper
@@ -131,13 +131,15 @@ def conclude(service_endpoint_uri='https://vortex.data.microsoft.com/collect/v1'
 @_user_agrees_to_telemetry
 @decorators.suppress_all_exceptions(raise_in_diagnostics=True)
 def upload_payload(payload, service_endpoint_uri, separate_process):
+    payload_uploaded = None
     if payload:
         if not separate_process:
             telemetry_core.upload(payload, service_endpoint_uri)
         else:
             subprocess.Popen([sys.executable, os.path.realpath(telemetry_core.__file__),
                               payload, service_endpoint_uri])
-        return payload
+        payload_uploaded = payload
+    return payload_uploaded
 
 
 @_user_agrees_to_telemetry
