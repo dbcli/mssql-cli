@@ -109,7 +109,7 @@ def style_factory_output(name, cli_style):
             # TODO: cli helpers will have to switch to ptk.Style
             logger.error('Unhandled style / class name: %s', token)
 
-    class OutputStyle(PygmentsStyle):
+    class OutputStyle(PygmentsStyle):   # pylint: disable=too-few-public-methods
         default_style = ""
         styles = style
 
