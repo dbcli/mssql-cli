@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
 import itertools
 from metadata import (MetaData, alias, name_join, fk_join, join,
-    schema, table, function, wildcard_expansion, column,
-    get_result, result_set, qual, no_qual, parametrize)
+                      schema, table, function, wildcard_expansion, column,
+                      get_result, result_set, qual, no_qual, parametrize)
 
 metadata = {
     'tables': {
@@ -34,20 +34,20 @@ metadata = {
         'custom': [
             ['func3', [], [], [], '', False, False, False],
             ['set_returning_func', ['x'], ['integer'], ['o'],
-                'integer', False, False, True]],
+             'integer', False, False, True]],
         'Custom': [
             ['func4', [], [], [], '', False, False, False]],
         'blog': [
             ['extract_entry_symbols', ['_entryid', 'symbol'],
-                ['integer', 'text'], ['i', 'o'], '', False, False, True],
+             ['integer', 'text'], ['i', 'o'], '', False, False, True],
             ['enter_entry', ['_title', '_text', 'entryid'],
-                ['text', 'text', 'integer'], ['i', 'i', 'o'],
-                '', False, False, False]],
-     },
+             ['text', 'text', 'integer'], ['i', 'i', 'o'],
+             '', False, False, False]],
+    },
     'datatypes': {
         'public': ['typ1', 'typ2'],
         'custom': ['typ3', 'typ4'],
-     },
+    },
     'foreignkeys': {
         'custom': [
             ('public', 'users', 'id', 'custom', 'shipments', 'user_id')
@@ -77,8 +77,8 @@ completers = testdata.get_completers(casing)
 
 @parametrize('completer', completers(filtr=True, casing=False, qualify=no_qual))
 @parametrize('table', ['users', '"users"'])
-def test_suggested_column_names_from_shadowed_visible_table(completer, table) :
-    result = result_set(completer, 'SELECT  FROM ' + table, len('SELECT '))
+def test_suggested_column_names_from_shadowed_visible_table(completer, tbl):
+    result = result_set(completer, 'SELECT  FROM ' + tbl, len('SELECT '))
     assert result == set(testdata.columns_functions_and_keywords('users'))
 
 
@@ -88,7 +88,7 @@ def test_suggested_column_names_from_shadowed_visible_table(completer, table) :
     'WITH users as (SELECT 1 AS foo) SELECT  from custom.users',
 ])
 def test_suggested_column_names_from_qualified_shadowed_table(completer, text):
-    result = result_set(completer, text, position = text.find('  ') + 1)
+    result = result_set(completer, text, position=text.find('  ') + 1)
     assert result == set(testdata.columns_functions_and_keywords(
         'users', 'custom'
     ))
@@ -168,9 +168,7 @@ def test_suggested_column_names_in_function(completer):
     'SELECT * FROM "custom".',
 ])
 @parametrize('use_leading_double_quote', [False, True])
-def test_suggested_table_names_with_schema_dot(
-    completer, text, use_leading_double_quote
-):
+def test_suggested_table_names_with_schema_dot(completer, text, use_leading_double_quote):
     if use_leading_double_quote:
         text += '"'
         start_position = -1
@@ -186,9 +184,7 @@ def test_suggested_table_names_with_schema_dot(
     'SELECT * FROM "Custom".',
 ])
 @parametrize('use_leading_double_quote', [False, True])
-def test_suggested_table_names_with_schema_dot2(
-    completer, text, use_leading_double_quote
-):
+def test_suggested_table_names_with_schema_dot2(completer, text, use_leading_double_quote):
     if use_leading_double_quote:
         text += '"'
         start_position = -1
@@ -230,7 +226,8 @@ def test_suggested_multiple_column_names_with_alias(completer):
 @parametrize('completer', completers(filtr=True, casing=False))
 @parametrize('text', [
     'SELECT x.id, y.product_name FROM custom.products x JOIN custom.products y ON ',
-    'SELECT x.id, y.product_name FROM custom.products x JOIN custom.products y ON JOIN public.orders z ON z.id > y.id'
+    'SELECT x.id, y.product_name FROM custom.products x JOIN custom.products y ON \
+     JOIN public.orders z ON z.id > y.id'
 ])
 def test_suggestions_after_on(completer, text):
     position = len('SELECT x.id, y.product_name FROM custom.products x JOIN custom.products y ON ')
@@ -289,7 +286,7 @@ def test_suggest_columns_from_aliased_set_returning_function(completer):
         testdata.columns('set_returning_func', 'custom', 'functions'))
 
 
-@parametrize('completer',completers(filtr=True, casing=False, qualify=no_qual))
+@parametrize('completer', completers(filtr=True, casing=False, qualify=no_qual))
 @parametrize('text', [
     'SELECT * FROM custom.set_returning_func()',
     'SELECT * FROM Custom.set_returning_func()',
@@ -370,7 +367,7 @@ def test_wildcard_column_expansion_with_table_qualifier(completer):
     assert expected == completions
 
 
-@parametrize('completer',completers(filtr=True, casing=False, qualify=qual))
+@parametrize('completer', completers(filtr=True, casing=False, qualify=qual))
 def test_wildcard_column_expansion_with_two_tables(completer):
     text = 'SELECT * FROM public."select" JOIN custom.users ON true'
     position = len('SELECT *')
@@ -378,7 +375,7 @@ def test_wildcard_column_expansion_with_two_tables(completer):
     completions = get_result(completer, text, position)
 
     cols = ('"select".id, "select"."localtime", "select"."ABC", '
-        'users.id, users.phone_number')
+            'users.id, users.phone_number')
     expected = [wildcard_expansion(cols)]
     assert completions == expected
 
@@ -546,7 +543,7 @@ def test_function_alias_search_with_aliases(completer):
     assert first.display == 'enter_entry(_title, _text)'
 
 
-@parametrize('completer',completers(filtr=True, casing=True, qualify=no_qual))
+@parametrize('completer', completers(filtr=True, casing=True, qualify=no_qual))
 def test_column_alias_search(completer):
     result = get_result(
         completer, 'SELECT et FROM blog.Entries E', len('SELECT et')
