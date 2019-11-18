@@ -150,8 +150,10 @@ def upload(data_to_save, service_endpoint_uri):
         measurements = {}
         for k in raw_properties:
             v = raw_properties[k]
-            if isinstance(v, str if sys.version_info[0] >= 3 else basestring): # pylint: disable=undefined-variable
-                # suppress warning for undefined variable, since `basestring` was dropped in python 3
+
+            # pylint: disable=undefined-variable
+            # suppress warning for undefined variable, since `basestring` was dropped in python 3
+            if isinstance(v, str if sys.version_info[0] >= 3 else basestring):
                 properties[k] = v
             else:
                 measurements[k] = v
@@ -168,6 +170,7 @@ def upload(data_to_save, service_endpoint_uri):
 
 
 if __name__ == '__main__':
-    # If user doesn't agree to upload telemetry, this scripts won't be executed. The caller should control.
+    # If user doesn't agree to upload telemetry, this scripts won't be executed.
+    # The caller should control.
     decorators.is_diagnostics_mode = in_diagnostic_mode
     upload(sys.argv[1], sys.argv[2])
