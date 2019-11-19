@@ -127,7 +127,7 @@ def unit_test():
     runid = str(uuid.uuid1())
     python_version = platform.python_version()
     utility.exec_command(
-        'pytest --cov mssqlcli --doctest-modules --junitxml=junit/test-{}-results.xml \
+        'pytest -l --cov mssqlcli --doctest-modules --junitxml=junit/test-{}-results.xml \
             --cov-report=xml --cov-report=html --cov-append '
         '-o junit_suite_name=pytest-{} '
         'tests/test_mssqlcliclient.py '
