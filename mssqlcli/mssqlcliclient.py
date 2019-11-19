@@ -1,16 +1,15 @@
-
-import click
+import sys
 import copy
 import logging
-import sqlparse
 import time
+from time import sleep
 import uuid
-
+import sqlparse
+import click
 from mssqlcli import mssqlqueries
 from mssqlcli.jsonrpc.contracts import connectionservice, queryexecutestringservice as queryservice
 from mssqlcli.packages import special
 from mssqlcli.packages.parseutils.meta import ForeignKey
-from time import sleep
 
 logger = logging.getLogger(u'mssqlcli.mssqlcliclient')
 time_wait_if_no_response = 0.05
@@ -20,7 +19,8 @@ def generate_owner_uri():
     return u'mssql-cli-' + uuid.uuid4().urn
 
 
-class MssqlCliClient(object):
+class MssqlCliClient:
+    # pylint: disable=too-many-instance-attributes
 
     def __init__(self, mssqlcli_options, sql_tools_client, owner_uri=None, **kwargs):
 
@@ -33,7 +33,8 @@ class MssqlCliClient(object):
 
         self.user_name = mssqlcli_options.username
         self.password = mssqlcli_options.password
-        self.authentication_type = u'Integrated' if mssqlcli_options.integrated_auth else u'SqlLogin'
+        self.authentication_type = u'Integrated' if mssqlcli_options.integrated_auth \
+                                                 else u'SqlLogin'
         self.database = mssqlcli_options.database
         self.connected_database = None
         self.encrypt = mssqlcli_options.encrypt
@@ -50,18 +51,20 @@ class MssqlCliClient(object):
         self.server_edition = None
         self.is_cloud = False
 
-        self.extra_params = {k: v for k, v in kwargs.items()}
+        self.extra_params = kwargs
 
-        logger.info(u'Initialized MssqlCliClient with owner Uri {}'.format(self.owner_uri))
+        logger.info(u'Initialized MssqlCliClient with owner Uri %s', self.owner_uri)
 
     def get_base_connection_params(self):
-        return {u'ServerName': self.server_name,
-                u'DatabaseName': self.connected_database if self.connected_database else self.database,
-                u'UserName': self.user_name,
-                u'Password': self.password,
-                u'AuthenticationType': self.authentication_type,
-                u'OwnerUri': self.owner_uri
-                }
+        return {
+            u'ServerName': self.server_name,
+            u'DatabaseName': self.connected_database if self.connected_database \
+                                                        else self.database,
+            u'UserName': self.user_name,
+            u'Password': self.password,
+            u'AuthenticationType': self.authentication_type,
+            u'OwnerUri': self.owner_uri
+        }
 
     def add_optional_connection_params(self, base_connection_params):
         if self.encrypt:
@@ -105,14 +108,16 @@ class MssqlCliClient(object):
                     # Remove spaces, EOL and semi-colons from end
                     single_query = single_query.strip().rstrip(';')
                     if single_query:
-                        for rows, columns, status, statement, is_error in self._execute_query(single_query):
+                        for rows, columns, status, statement, is_error \
+                            in self._execute_query(single_query):
                             yield rows, columns, status, statement, is_error
                     else:
                         yield None, None, None, None, False
                         continue
 
     def _execute_query(self, query):
-        query_response, query_messages, query_had_error = self._execute_query_execute_request_for(query)
+        query_response, query_messages, query_had_error \
+            = self._execute_query_execute_request_for(query)
 
         if self._exception_found_in(query_response):
             yield self._generate_query_results_to_tuples(query=query,
@@ -126,21 +131,26 @@ class MssqlCliClient(object):
                                                          message=query_message,
                                                          is_error=query_had_error)
         else:
-            query_subset_responses_and_summaries = self._execute_query_subset_request_for(query_response)
+            query_subset_responses_and_summaries \
+                = self._execute_query_subset_request_for(query_response)
 
-            for query_subset_response, result_set_summary, query_subset_error in query_subset_responses_and_summaries:
+            for query_subset_response, result_set_summary, query_subset_error \
+                in query_subset_responses_and_summaries:
                 if self._error_message_found_in(query_subset_response):
                     yield self._generate_query_results_to_tuples(query=query,
-                                                                 message=query_subset_response.error_message,
+                                                                 message=query_subset_response\
+                                                                    .error_message,
                                                                  is_error=query_subset_error)
 
-                query_message_for_current_result_set = query_messages[result_set_summary.id].message \
-                    if query_messages else u''
+                query_message_for_current_result_set \
+                    = query_messages[result_set_summary.id].message if query_messages else u''
 
-                yield self._generate_query_results_to_tuples(column_info=result_set_summary.column_info,
-                                                             result_rows=query_subset_response.rows,
-                                                             query=query,
-                                                             message=query_message_for_current_result_set)
+                yield self._generate_query_results_to_tuples(
+                    column_info=result_set_summary.column_info,
+                    result_rows=query_subset_response.rows,
+                    query=query,
+                    message=query_message_for_current_result_set
+                )
 
     def clone(self, sqltoolsclient=None):
         cloned_mssqlcli_client = copy.copy(self)
@@ -156,9 +166,11 @@ class MssqlCliClient(object):
         if self.is_connected:
             return self.owner_uri, []
 
-        connection_request = self.sql_tools_client.create_request(self.sql_tools_client.CONNECTION_REQUEST,
-                                                                  connection_params,
-                                                                  self.owner_uri)
+        connection_request = self.sql_tools_client.create_request(
+            self.sql_tools_client.CONNECTION_REQUEST,
+            connection_params,
+            self.owner_uri
+        )
         connection_request.execute()
         error_messages = []
         response = None
@@ -182,9 +194,8 @@ class MssqlCliClient(object):
             self.is_cloud = response.is_cloud
             self.connected_database = response.connected_database
 
-            logger.info(
-                u'Connection Successful. Connection Id: {0} Connected database" {1}'.format(
-                    response.connection_id, response.connected_database))
+            logger.info(u'Connection Successful. Connection Id: %s Connected database" %s',
+                        response.connection_id, response.connected_database)
 
             return self.owner_uri, error_messages
 
@@ -195,12 +206,16 @@ class MssqlCliClient(object):
             click.secho(u'No connection established with the server.',
                         err=True,
                         fg='yellow')
-            exit(1)
+            sys.exit(1)
 
-        query_request = self.sql_tools_client.create_request(self.sql_tools_client.QUERY_EXECUTE_STRING_REQUEST,
-                                                             {u'OwnerUri': self.owner_uri,
-                                                              u'Query': query},
-                                                             self.owner_uri)
+        query_request = self.sql_tools_client.create_request(
+            self.sql_tools_client.QUERY_EXECUTE_STRING_REQUEST,
+            {
+                u'OwnerUri': self.owner_uri,
+                u'Query': query
+            },
+            self.owner_uri
+        )
         query_request.execute()
         query_response = None
         query_messages = []
@@ -223,13 +238,16 @@ class MssqlCliClient(object):
     def _execute_query_subset_request_for(self, query_response):
         subset_responses_and_summaries = []
         for result_set_summary in query_response.batch_summaries[0].result_set_summaries:
-            query_subset_request = self.sql_tools_client.create_request(self.sql_tools_client.QUERY_SUBSET_REQUEST,
-                                                                        {u'OwnerUri': query_response.owner_uri,
-                                                                         u'BatchIndex': result_set_summary.batch_id,
-                                                                         u'ResultSetIndex': result_set_summary.id,
-                                                                         u'RowsStartIndex': 0,
-                                                                         u'RowCount': result_set_summary.row_count},
-                                                                        self.owner_uri)
+            query_subset_request = self.sql_tools_client.create_request(
+                self.sql_tools_client.QUERY_SUBSET_REQUEST,
+                {
+                    u'OwnerUri': query_response.owner_uri,
+                    u'BatchIndex': result_set_summary.batch_id,
+                    u'ResultSetIndex': result_set_summary.id,
+                    u'RowsStartIndex': 0,
+                    u'RowCount': result_set_summary.row_count
+                },
+                self.owner_uri)
 
             query_subset_request.execute()
 
@@ -242,23 +260,31 @@ class MssqlCliClient(object):
             query_subset_had_error = query_subset_request.error_message \
                 if hasattr(query_subset_request, 'error_message') else False
 
-            subset_responses_and_summaries.append((query_subset_response, result_set_summary, query_subset_had_error))
+            subset_responses_and_summaries.append(
+                (query_subset_response, result_set_summary, query_subset_had_error)
+            )
 
         return subset_responses_and_summaries
 
-    def _error_message_found_in(self, query_subset_response):
+    @staticmethod
+    def _error_message_found_in(query_subset_response):
         return query_subset_response.error_message
 
-    def _exception_found_in(self, query_response):
+    @staticmethod
+    def _exception_found_in(query_response):
         return query_response.exception_message
 
-    def _no_results_found_in(self, query_response):
+    @staticmethod
+    def _no_results_found_in(query_response):
         return not query_response.batch_summaries[0].result_set_summaries
 
-    def _no_rows_found_in(self, query_response):
+    @staticmethod
+    def _no_rows_found_in(query_response):
         return query_response.batch_summaries[0].result_set_summaries[0].row_count == 0
 
-    def _generate_query_results_to_tuples(self, query, message, column_info=None, result_rows=None, is_error=False):
+    @staticmethod
+    def _generate_query_results_to_tuples(query, message, column_info=None, result_rows=None, \
+        is_error=False):
         # Returns a generator of rows, columns, status(rows affected) or
         # message, sql (the query), is_error
         if is_error:
@@ -274,21 +300,21 @@ class MssqlCliClient(object):
     def get_schemas(self):
         """ Returns a list of schema names"""
         query = mssqlqueries.get_schemas()
-        logger.info(u'Schemas query: {0}'.format(query))
+        logger.info(u'Schemas query: %s', query)
         for tabular_result in self.execute_query(query):
             return [x[0] for x in tabular_result[0]]
 
     def get_databases(self):
         """ Returns a list of database names"""
         query = mssqlqueries.get_databases()
-        logger.info(u'Databases query: {0}'.format(query))
+        logger.info(u'Databases query: %s', query)
         for tabular_result in self.execute_query(query):
             return [x[0] for x in tabular_result[0]]
 
     def get_tables(self):
         """ Yields (schema_name, table_name) tuples"""
         query = mssqlqueries.get_tables()
-        logger.info(u'Tables query: {0}'.format(query))
+        logger.info(u'Tables query: %s', query)
         for tabular_result in self.execute_query(query):
             for row in tabular_result[0]:
                 yield (row[0], row[1])
@@ -296,7 +322,7 @@ class MssqlCliClient(object):
     def get_table_columns(self):
         """ Yields (schema_name, table_name, column_name, data_type, column_default) tuples"""
         query = mssqlqueries.get_table_columns()
-        logger.info(u'Table columns query: {0}'.format(query))
+        logger.info(u'Table columns query: %s', query)
         for tabular_result in self.execute_query(query):
             for row in tabular_result[0]:
                 yield (row[0], row[1], row[2], row[3], row[4])
@@ -304,7 +330,7 @@ class MssqlCliClient(object):
     def get_views(self):
         """ Yields (schema_name, table_name) tuples"""
         query = mssqlqueries.get_views()
-        logger.info(u'Views query: {0}'.format(query))
+        logger.info(u'Views query: %s', query)
         for tabular_result in self.execute_query(query):
             for row in tabular_result[0]:
                 yield (row[0], row[1])
@@ -312,7 +338,7 @@ class MssqlCliClient(object):
     def get_view_columns(self):
         """ Yields (schema_name, table_name, column_name, data_type, column_default) tuples"""
         query = mssqlqueries.get_view_columns()
-        logger.info(u'View columns query: {0}'.format(query))
+        logger.info(u'View columns query: %s', query)
         for tabular_result in self.execute_query(query):
             for row in tabular_result[0]:
                 yield (row[0], row[1], row[2], row[3], row[4])
@@ -320,15 +346,16 @@ class MssqlCliClient(object):
     def get_user_defined_types(self):
         """ Yields (schema_name, type_name) tuples"""
         query = mssqlqueries.get_user_defined_types()
-        logger.info(u'UDTs query: {0}'.format(query))
+        logger.info(u'UDTs query: %s', query)
         for tabular_result in self.execute_query(query):
             for row in tabular_result[0]:
                 yield (row[0], row[1])
 
     def get_foreign_keys(self):
-        """ Yields (parent_schema, parent_table, parent_column, child_schema, child_table, child_column) typles"""
+        """ Yields (parent_schema, parent_table, parent_column, child_schema, child_table,
+            child_column) typles"""
         query = mssqlqueries.get_foreignkeys()
-        logger.info(u'Foreign keys query: {0}'.format(query))
+        logger.info(u'Foreign keys query: %s', query)
         for tabular_result in self.execute_query(query):
             for row in tabular_result[0]:
                 yield ForeignKey(*row)
