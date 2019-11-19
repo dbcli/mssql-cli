@@ -29,13 +29,13 @@ def generate_query_baseline(file_name):
                       }
 
         writer = json_rpc_client.JsonRpcWriter(tools_service_process.stdin)
-        writer.send_request(u'connection/connect', parameters, id=1)
+        writer.send_request(u'connection/connect', parameters, request_id=1)
 
         time.sleep(2)
 
         parameters = {u'OwnerUri': u'connectionservicetest',
                       u'Query': "select * from HumanResources.Department"}
-        writer.send_request(u'query/executeString', parameters, id=2)
+        writer.send_request(u'query/executeString', parameters, request_id=2)
 
         time.sleep(5)
         parameters = {u'OwnerUri': u'connectionservicetest',
@@ -44,7 +44,7 @@ def generate_query_baseline(file_name):
                       u'RowsStartIndex': 0,
                       u'RowsCount': 16}
 
-        writer.send_request(u'query/subset', parameters, id=3)
+        writer.send_request(u'query/subset', parameters, request_id=3)
         # submit raw request.
         time.sleep(5)
         tools_service_process.kill()

@@ -511,6 +511,8 @@ class MssqlCli(object):
 
         returns (results, MetaQuery)
         """
+        # pylint: disable=too-many-locals
+
         all_success = True
         meta_changed = False  # CREATE, ALTER, DROP, etc
         mutated = False  # INSERT, DELETE, etc
@@ -526,7 +528,7 @@ class MssqlCli(object):
         # mssql-cli
         if not self.mssqlcliclient_main.connect_to_database():
             click.secho(u'No connection to server. Exiting.')
-            exit(1)
+            sys.exit(1)
 
         for rows, columns, status, sql, is_error in \
                 self.mssqlcliclient_main.execute_query(text):
@@ -731,6 +733,8 @@ class MssqlCli(object):
 
     @staticmethod
     def format_output(title, cur, headers, status, settings):
+        # pylint: disable=too-many-locals
+
         output = []
         expanded = (settings.expanded or settings.table_format == 'vertical')
         table_format = ('vertical' if settings.expanded else

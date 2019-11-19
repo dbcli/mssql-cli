@@ -94,7 +94,7 @@ class TestMssqlCliClientConnection(MssqlCliClient):
         try:
             extra_params = client.extra_params
             json_writer = JsonRpcWriter(io.BytesIO())
-            json_writer.send_request(u'test/method', extra_params, id=1)
+            json_writer.send_request(u'test/method', extra_params, request_id=1)
         finally:
             json_writer.close()
 

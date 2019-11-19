@@ -36,7 +36,7 @@ class JsonRpcTest(unittest.TestCase):
             method=u'testMethod/DoThis',
             params={
                 u'Key': u'Value'},
-            id=1)
+            request_id=1)
 
         # Use JSON RPC reader to read request.
         test_stream.seek(0)
@@ -66,7 +66,7 @@ class JsonRpcTest(unittest.TestCase):
                 u'key2': {
                     u'key3': u'value3',
                     u'key4': u'value4'}},
-            id=1)
+            request_id=1)
 
         test_stream.seek(0)
         json_rpc_reader = jsonrpc.JsonRpcReader(test_stream)
@@ -156,7 +156,7 @@ class JsonRpcTest(unittest.TestCase):
             method=u'testMethod/DoThis',
             params={
                 u'Key': u'Value'},
-            id=1)
+            request_id=1)
 
         # reset the stream.
         test_stream.seek(0)
@@ -175,7 +175,7 @@ class JsonRpcTest(unittest.TestCase):
                 method=u'testMethod/DoThis',
                 params={
                     u'Key': u'Value'},
-                id=1)
+                request_id=1)
 
     def test_trigger_buffer_resize(self):
         """

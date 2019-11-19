@@ -181,7 +181,6 @@ def get_foreignkeys():
 def normalize(sql):
     if (sql == '' or sql is None):
         return sql
-    else:
-        sql = sql.replace('\r', ' ').replace('\n', ' ').strip()
-        sql = re.sub(r' +', ' ', sql)
-        return sql.decode('utf-8') if sys.version_info[0] < 3 else sql
+    sql = sql.replace('\r', ' ').replace('\n', ' ').strip()
+    sql = re.sub(r' +', ' ', sql)
+    return sql.decode('utf-8') if sys.version_info[0] < 3 else sql
