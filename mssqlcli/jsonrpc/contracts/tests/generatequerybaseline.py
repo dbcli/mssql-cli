@@ -2,9 +2,9 @@
 
 import io
 import subprocess
+import time
 import mssqlcli.mssqltoolsservice as mssqltoolsservice
 import mssqlcli.jsonrpc.jsonrpcclient as json_rpc_client
-import time
 
 
 # Helper to generate a query baseline
