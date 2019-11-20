@@ -1,6 +1,9 @@
-from mssqlcli.jsonrpc.contracts import Request
+# pylint: disable=too-many-instance-attributes
+# pylint: disable=too-few-public-methods
 
 import logging
+from mssqlcli.jsonrpc.contracts import Request
+
 
 logger = logging.getLogger(u'mssqlcli.connectionservice')
 
@@ -11,8 +14,8 @@ class ConnectionRequest(Request):
     """
     METHOD_NAME = u'connection/connect'
 
-    def __init__(self, id, owner_uri, json_rpc_client, parameters):
-        self.id = id
+    def __init__(self, request_id, owner_uri, json_rpc_client, parameters):
+        self.request_id = request_id
         self.owner_uri = owner_uri
         self.finished = False
         self.json_rpc_client = json_rpc_client
@@ -20,14 +23,14 @@ class ConnectionRequest(Request):
 
     def execute(self):
         self.json_rpc_client.submit_request(
-            self.METHOD_NAME, self.params.format(), self.id)
+            self.METHOD_NAME, self.params.format(), self.request_id)
 
     def get_response(self):
         """
             Get latest response, event or exception if it occured.
         """
         try:
-            response = self.json_rpc_client.get_response(self.id, self.owner_uri)
+            response = self.json_rpc_client.get_response(self.request_id, self.owner_uri)
             decoded_response = None
             if response:
                 logger.debug(response)
@@ -35,15 +38,15 @@ class ConnectionRequest(Request):
 
             if isinstance(decoded_response, ConnectionCompleteEvent):
                 self.finished = True
-                self.json_rpc_client.request_finished(self.id)
+                self.json_rpc_client.request_finished(self.request_id)
                 self.json_rpc_client.request_finished(self.owner_uri)
 
             return decoded_response
 
-        except Exception as error:
+        except Exception as error:  # pylint: disable=broad-except
             logger.info(str(error))
             self.finished = True
-            self.json_rpc_client.request_finished(self.id)
+            self.json_rpc_client.request_finished(self.request_id)
             self.json_rpc_client.request_finished(self.owner_uri)
             return ConnectionCompleteEvent({
                 u'params': {
@@ -61,7 +64,8 @@ class ConnectionRequest(Request):
         """
         return self.finished
 
-    def decode_response(self, obj):
+    @staticmethod
+    def decode_response(obj):
         """
             Decode response dictionary into a Connection parameter type.
         """
@@ -69,14 +73,14 @@ class ConnectionRequest(Request):
         if u'result' in obj:
             return ConnectionResponse(obj)
 
-        elif 'method' in obj and obj['method'] == 'connection/complete':
+        if 'method' in obj and obj['method'] == 'connection/complete':
             return ConnectionCompleteEvent(obj)
 
         # Could not decode return st
         return obj
 
 
-class ConnectionDetails(object):
+class ConnectionDetails:
     """
         Connection details params.
     """
@@ -106,7 +110,7 @@ class ConnectionDetails(object):
         return vars(self)
 
 
-class ConnectionParams(object):
+class ConnectionParams:
     def __init__(self, parameters):
         self.owner_uri = parameters[u'OwnerUri']
         self.connection_details = ConnectionDetails(parameters)
@@ -120,7 +124,7 @@ class ConnectionParams(object):
 #   The Connection Events.
 #
 
-class ConnectionCompleteEvent(object):
+class ConnectionCompleteEvent:
     def __init__(self, params):
         inner_params = params[u'params']
         self.owner_uri = inner_params[u'ownerUri']
@@ -141,7 +145,7 @@ class ConnectionCompleteEvent(object):
             self.connected_database = inner_params[u'connectionSummary'][u'databaseName']
 
 
-class ConnectionResponse(object):
+class ConnectionResponse:
     def __init__(self, params):
         self.result = params[u'result']
-        self.id = params[u'id']
+        self.request_id = params[u'id']
