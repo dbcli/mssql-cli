@@ -1,3 +1,6 @@
+# pylint: disable=too-many-arguments
+# pylint: disable=too-many-locals
+
 #!/usr/bin/env python
 import io
 import os
@@ -37,7 +40,7 @@ class JSONRPCContractsTests(unittest.TestCase):
                           u'AuthenticationType': u'Integrated',
                           u'MultipleActiveResultSets': True}
 
-            request = connectionservice.ConnectionRequest(id=u'1',
+            request = connectionservice.ConnectionRequest(request_id=u'1',
                                                           owner_uri=owner_uri,
                                                           json_rpc_client=rpc_client,
                                                           parameters=parameters)
@@ -62,7 +65,7 @@ class JSONRPCContractsTests(unittest.TestCase):
             owner_uri = u'connectionservicetest'
             parameters = {u'OwnerUri': owner_uri,
                           u'Query': "select * from HumanResources.Department"}
-            request = queryservice.QueryExecuteStringRequest(id=2,
+            request = queryservice.QueryExecuteStringRequest(request_id=2,
                                                              owner_uri=owner_uri,
                                                              json_rpc_client=rpc_client,
                                                              parameters=parameters)
@@ -93,7 +96,7 @@ class JSONRPCContractsTests(unittest.TestCase):
                           u'ResultSetIndex': 0,
                           u'RowsStartIndex': 0,
                           u'RowCount': 16}
-            request = queryservice.QuerySubsetRequest(id=u'3',
+            request = queryservice.QuerySubsetRequest(request_id=u'3',
                                                       owner_uri=owner_uri,
                                                       json_rpc_client=rpc_client,
                                                       parameters=parameters)
@@ -104,7 +107,8 @@ class JSONRPCContractsTests(unittest.TestCase):
 
     def test_query_retrieve_correct_response(self):
         """
-            Verify a query execute request never retrieves query request responses for a different query.
+            Verify a query execute request never retrieves query request
+            responses for a different query.
         """
         with open(self.get_baseline(\
                   u'test_query_retrieve_correct_response.txt'),
@@ -118,13 +122,14 @@ class JSONRPCContractsTests(unittest.TestCase):
             owner_uri = u'mismatchquerycompleteresponse_2'
             parameters = {u'OwnerUri': owner_uri,
                           u'Query': "select * from HumanResources.Department"}
-            request = queryservice.QueryExecuteStringRequest(id=u'3',
+            request = queryservice.QueryExecuteStringRequest(request_id=u'3',
                                                              owner_uri=owner_uri,
                                                              json_rpc_client=rpc_client,
                                                              parameters=parameters)
 
-            # The baseline file contains responses for a different owner uri, which this request should not receive.
-            # Receiving a query complete event with a error message indicates we did not retrieve a wrong event.
+            # The baseline file contains responses for a different owner uri, which
+            # this request should not receive. Receiving a query complete event with
+            # a error message indicates we did not retrieve a wrong event.
             self.verify_query_service_response(request=request,
                                                expected_complete_event=1,
                                                expected_error_count=1)
@@ -147,7 +152,7 @@ class JSONRPCContractsTests(unittest.TestCase):
             owner_uri = u'connectionservicetest'
             parameters = {u'OwnerUri': owner_uri,
                           u'Query': "select * from [HumanResources.Department"}
-            request = queryservice.QueryExecuteStringRequest(id=u'2',
+            request = queryservice.QueryExecuteStringRequest(request_id=u'2',
                                                              owner_uri=owner_uri,
                                                              json_rpc_client=rpc_client,
                                                              parameters=parameters)
@@ -214,7 +219,8 @@ class JSONRPCContractsTests(unittest.TestCase):
                         query_batch_summaries = len(response.batch_summaries)
                         query_result_set_summaries = len(
                             response.batch_summaries[0].result_set_summaries)
-                        query_row_count = response.batch_summaries[0].result_set_summaries[0].row_count
+                        query_row_count = response.batch_summaries[0].result_set_summaries[0]\
+                            .row_count
                     if hasattr(response, 'exception_message') and response.exception_message:
                         query_error_events += 1
                 elif isinstance(response, queryservice.ResultSubset):
@@ -231,7 +237,8 @@ class JSONRPCContractsTests(unittest.TestCase):
         self.assertEqual(query_row_count, expected_row_count)
         self.assertEqual(query_error_events, expected_error_count)
 
-    def get_baseline(self, file_name):
+    @staticmethod
+    def get_baseline(file_name):
         """
         Helper method to get baseline file.
         """
