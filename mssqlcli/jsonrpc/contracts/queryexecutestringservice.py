@@ -30,7 +30,7 @@ class QueryExecuteStringRequest(Request):
 
             decoded_response = None
             if response:
-                decoded_response = self.decode_response(response)
+                decoded_response = QueryExecuteStringRequest.decode_response(response)
 
             if isinstance(decoded_response,
                           (QueryCompleteEvent, QueryExecuteErrorResponseEvent)):
@@ -160,7 +160,7 @@ class QuerySubsetRequest(Request):
             response = self.json_rpc_client.get_response(self.request_id, self.owner_uri)
             decoded_response = None
             if response:
-                decoded_response = self.decode_response(response)
+                decoded_response = QuerySubsetRequest.decode_response(response)
 
             if isinstance(decoded_response, ResultSubset):
                 self.finished = True

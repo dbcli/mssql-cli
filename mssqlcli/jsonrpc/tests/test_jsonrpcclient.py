@@ -52,7 +52,7 @@ class JsonRpcClientTests(unittest.TestCase):
         baseline = {u'key': u'value'}
 
         self.assertEqual(response, baseline)
-        self.shutdown_background_threads(test_client)
+        JsonRpcClientTests.shutdown_background_threads(test_client)
         # All background threads should be shut down.
         self.assertFalse(test_client.request_thread.is_alive())
         self.assertFalse(test_client.response_thread.is_alive())
@@ -76,7 +76,7 @@ class JsonRpcClientTests(unittest.TestCase):
         test_client.submit_request(
             u'scriptingService/ScriptDatabase', {u'ScriptDatabaseOptions': u'True'})
 
-        self.shutdown_background_threads(test_client)
+        JsonRpcClientTests.shutdown_background_threads(test_client)
 
         # check stream contents.
         input_stream.seek(0)
@@ -117,7 +117,7 @@ class JsonRpcClientTests(unittest.TestCase):
         time.sleep(1)
 
         # Kill the threads so we can just verify the queues.
-        self.shutdown_background_threads(test_client)
+        JsonRpcClientTests.shutdown_background_threads(test_client)
 
         input_stream.seek(0)
         expected = (
