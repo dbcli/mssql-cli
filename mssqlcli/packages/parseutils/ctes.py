@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
+from collections import namedtuple
 from sqlparse import parse
 from sqlparse.tokens import Keyword, CTE, DML
 from sqlparse.sql import Identifier, IdentifierList, Parenthesis
-from collections import namedtuple
 from .meta import TableMetadata, ColumnMetadata
 
 
@@ -21,7 +21,7 @@ def isolate_query_ctes(full_text, text_before_cursor):
     if not full_text:
         return full_text, text_before_cursor, tuple()
 
-    ctes, remainder = extract_ctes(full_text)
+    ctes, _ = extract_ctes(full_text)
     if not ctes:
         return full_text, text_before_cursor, ()
 
