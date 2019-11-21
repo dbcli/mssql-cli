@@ -1,3 +1,6 @@
+# pylint: disable=too-many-instance-attributes
+# pylint: disable=too-many-arguments
+
 from __future__ import print_function, unicode_literals
 from collections import namedtuple
 
@@ -32,7 +35,7 @@ def parse_defaults(defaults_string):
         if current == '' and char == ' ':
             # Skip space after comma separating default expressions
             continue
-        if char == '"' or char == '\'':
+        if char in ('"', '\''):
             if in_quote and char == in_quote:
                 # End quote
                 in_quote = None
@@ -48,7 +51,7 @@ def parse_defaults(defaults_string):
     yield current
 
 
-class FunctionMetadata(object):
+class FunctionMetadata:
 
     def __init__(
             self, schema_name, func_name, arg_names, arg_types, arg_modes,
@@ -82,7 +85,7 @@ class FunctionMetadata(object):
         self.is_set_returning = is_set_returning
 
     def __eq__(self, other):
-        return (isinstance(other, self.__class__) and self.__dict__ == other.__dict__)
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -103,7 +106,9 @@ class FunctionMetadata(object):
                 '%s(schema_name=%r, func_name=%r, arg_names=%r, '
                 'arg_types=%r, arg_modes=%r, return_type=%r, is_aggregate=%r, '
                 'is_window=%r, is_set_returning=%r, arg_defaults=%r)'
-            ) % (self.__class__.__name__,) + self._signature()
+            ) % (self.__class__.__name__, self.schema_name, self.func_name, self.arg_names,
+                 self.arg_types, self.arg_modes, self.return_type, self.is_aggregate,
+                 self.is_window, self.is_set_returning, self.arg_defaults)
         )
 
     def has_variadic(self):
@@ -138,7 +143,7 @@ class FunctionMetadata(object):
 
         if self.return_type.lower() == 'void':
             return []
-        elif not self.arg_modes:
+        if not self.arg_modes:
             # For functions  without output parameters, the function name
             # is used as the name of the output column.
             # E.g. 'SELECT unnest FROM unnest(...);'
@@ -146,5 +151,5 @@ class FunctionMetadata(object):
 
         return [ColumnMetadata(name, typ, [])
                 for name, typ, mode in zip(
-                self.arg_names, self.arg_types, self.arg_modes)
+                    self.arg_names, self.arg_types, self.arg_modes)
                 if mode in ('o', 'b', 't')]  # OUT, INOUT, TABLE
