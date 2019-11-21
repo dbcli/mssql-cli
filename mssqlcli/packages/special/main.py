@@ -1,3 +1,5 @@
+# pylint: disable=too-many-arguments
+
 import logging
 from collections import namedtuple
 
@@ -11,7 +13,7 @@ RAW_QUERY = 2
 
 SpecialCommand = namedtuple('SpecialCommand',
                             ['handler', 'command', 'shortcut', 'description', 'arg_type', 'hidden',
-                                'case_sensitive'])
+                             'case_sensitive'])
 
 COMMANDS = {}
 
@@ -69,14 +71,16 @@ def execute(mssqlcliclient, sql):
         if special_cmd.case_sensitive:
             raise CommandNotFound('Command not found: %s' % command)
 
-    logger.debug(u'Executing special command {0} with argument {1}.'.format(command, pattern))
+    logger.debug(u'Executing special command %s with argument %s.', command, pattern)
 
     if special_cmd.arg_type == NO_QUERY:
         return special_cmd.handler()
-    elif special_cmd.arg_type == PARSED_QUERY:
+    if special_cmd.arg_type == PARSED_QUERY:
         return special_cmd.handler(mssqlcliclient=mssqlcliclient, pattern=pattern, verbose=verbose)
-    elif special_cmd.arg_type == RAW_QUERY:
+    if special_cmd.arg_type == RAW_QUERY:
         return special_cmd.handler(mssqlcliclient=mssqlcliclient, query=sql)
+
+    return None
 
 
 @special_command('help', '\\?', 'Show this help.', arg_type=NO_QUERY, aliases=('\\?', '?'))
