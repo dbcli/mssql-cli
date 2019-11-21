@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-class NamedQueries(object):
+from ...config import get_config
+
+class NamedQueries:
 
     section_name = 'named queries'
 
@@ -58,5 +60,4 @@ Examples:
         return '%s: Deleted' % name
 
 
-from ...config import get_config
 named_queries = NamedQueries(get_config())
