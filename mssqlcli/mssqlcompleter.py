@@ -1,3 +1,9 @@
+# pylint: disable=too-many-arguments
+# pylint: disable=too-many-instance-attributes
+# pylint: disable=too-many-locals
+# pylint: disable=too-many-public-methods
+# pylint: disable=too-many-statements
+
 from __future__ import print_function, unicode_literals
 import logging
 import re
@@ -119,27 +125,31 @@ class MssqlCompleter(Completer):
         self._arg_list_cache = None
         self.special_commands = None
 
-    def escape_name(self, name):
+    @staticmethod
+    def escape_name(name):
         if name:
             name = u'"%s"' % name
 
         return name
 
-    def escape_schema(self, name):
-        return u"'{}'".format(self.unescape_name(name))
+    @staticmethod
+    def escape_schema(name):
+        return u"'{}'".format(MssqlCompleter.unescape_name(name))
 
-    def unescape_name(self, name):
+    @staticmethod
+    def unescape_name(name):
         """ Unquote a string."""
         if name and name[0] == '"' and name[-1] == '"':
             name = name[1:-1]
 
         return name
 
-    def escaped_names(self, names):
-        return [self.escape_name(name) for name in names]
+    @staticmethod
+    def escaped_names(names):
+        return [MssqlCompleter.escape_name(name) for name in names]
 
     def extend_database_names(self, databases):
-        databases = self.escaped_names(databases)
+        databases = MssqlCompleter.escaped_names(databases)
         self.databases.extend(databases)
 
     def extend_keywords(self, additional_keywords):
@@ -149,7 +159,7 @@ class MssqlCompleter(Completer):
     def extend_schemas(self, schemas):
 
         # schemas is a list of schema names
-        schemas = self.escaped_names(schemas)
+        schemas = MssqlCompleter.escaped_names(schemas)
         metadata = self.dbmetadata['tables']
         for schema in schemas:
             metadata[schema] = {}
@@ -179,7 +189,7 @@ class MssqlCompleter(Completer):
 
         """
 
-        data = [self.escaped_names(d) for d in data]
+        data = [MssqlCompleter.escaped_names(d) for d in data]
 
         # dbmetadata['tables']['schema_name']['table_name'] should be an
         # OrderedDict {column_name:ColumnMetaData}.
@@ -204,7 +214,7 @@ class MssqlCompleter(Completer):
         """
         metadata = self.dbmetadata[kind]
         for schema, relname, colname, datatype, default in column_data:
-            (schema, relname, colname) = self.escaped_names(
+            (schema, relname, colname) = MssqlCompleter.escaped_names(
                 [schema, relname, colname])
             column = ColumnMetadata(
                 name=colname,
@@ -224,7 +234,7 @@ class MssqlCompleter(Completer):
         metadata = self.dbmetadata['functions']
 
         for f in func_data:
-            schema, func = self.escaped_names([f.schema_name, f.func_name])
+            schema, func = MssqlCompleter.escaped_names([f.schema_name, f.func_name])
 
             if func in metadata[schema]:
                 metadata[schema][func].append(f)
@@ -261,7 +271,7 @@ class MssqlCompleter(Completer):
         meta = self.dbmetadata['tables']
 
         for fk in fk_data:
-            e = self.escaped_names
+            e = MssqlCompleter.escaped_names
             parentschema, childschema = e([fk.parentschema, fk.childschema])
             parenttable, childtable = e([fk.parenttable, fk.childtable])
             childcol, parcol = e([fk.childcolumn, fk.parentcolumn])
@@ -280,7 +290,7 @@ class MssqlCompleter(Completer):
         meta = self.dbmetadata['datatypes']
 
         for t in type_data:
-            schema, type_name = self.escaped_names(t)
+            schema, type_name = MssqlCompleter.escaped_names(t)
             meta[schema][type_name] = None
             self.all_completions.add(type_name)
 
@@ -293,7 +303,7 @@ class MssqlCompleter(Completer):
             self.prioritizer.update(text)
 
     def set_search_path(self, search_path):
-        self.search_path = self.escaped_names(search_path)
+        self.search_path = MssqlCompleter.escaped_names(search_path)
 
     def reset_completions(self):
         self.databases = []
@@ -354,24 +364,28 @@ class MssqlCompleter(Completer):
             pat = re.compile('(%s)' % regex)
 
             def _match(item):
+                match_item = None
                 if item.lower()[:len(text) + 1] in (text, text + ' '):
                     # Exact match of first word in suggestion
                     # This is to get exact alias matches to the top
                     # E.g. for input `e`, 'Entries E' should be on top
                     # (before e.g. `EndUsers EU`)
-                    return float('Infinity'), -1
-                r = pat.search(self.unescape_name(item.lower()))
+                    match_item = float('Infinity'), -1
+                r = pat.search(MssqlCompleter.unescape_name(item.lower()))
                 if r:
-                    return -len(r.group()), -r.start()
+                    match_item = -len(r.group()), -r.start()
+                return match_item
         else:
             match_end_limit = len(text)
 
             def _match(item):
+                match_item = None
                 match_point = item.lower().find(text, 0, match_end_limit)
                 if match_point >= 0:
                     # Use negative infinity to force keywords to sort after all
                     # fuzzy matches
-                    return -float('Infinity'), -match_point
+                    match_item = -float('Infinity'), -match_point
+                return match_item
 
         matches = []
         for cand in collection:
@@ -402,7 +416,7 @@ class MssqlCompleter(Completer):
                 # We also use the unescape_name to make sure quoted names have
                 # the same priority as unquoted names.
                 lexical_priority = (tuple(0 if c in(' _') else -ord(c) \
-                                    for c in self.unescape_name(item.lower())) +
+                                    for c in MssqlCompleter.unescape_name(item.lower())) +
                                     (1,) + tuple(c for c in item))
 
                 item = self.case(item)
@@ -543,10 +557,10 @@ class MssqlCompleter(Completer):
         tbl = self.case(tbl)
         tbls = set(normalize_ref(t.ref) for t in tbls)
         if self.generate_aliases:
-            tbl = generate_alias(self.unescape_name(tbl))
+            tbl = generate_alias(MssqlCompleter.unescape_name(tbl))
         if normalize_ref(tbl) not in tbls:
             return tbl
-        elif tbl[0] == '"':
+        if tbl[0] == '"':
             aliases = ('"' + tbl[1:-1] + str(i) + '"' for i in count(2))
         else:
             aliases = (tbl + str(i) for i in count(2))
@@ -685,7 +699,7 @@ class MssqlCompleter(Completer):
     def get_schema_matches(self, suggestion, word_before_cursor):
         schema_names = self.dbmetadata['tables'].keys()
         if suggestion.quoted:
-            schema_names = [self.escape_schema(s) for s in schema_names]
+            schema_names = [MssqlCompleter.escape_schema(s) for s in schema_names]
 
         return self.find_matches(
             word_before_cursor, schema_names, meta='schema')
@@ -717,9 +731,9 @@ class MssqlCompleter(Completer):
         args = func.args()
         if not template:
             return '()'
-        elif usage == 'call' and len(args) < 2:
+        if usage == 'call' and len(args) < 2:
             return '()'
-        elif usage == 'call' and func.has_variadic():
+        if usage == 'call' and func.has_variadic():
             return '()'
         multiline = usage == 'call' and len(args) > self.call_arg_oneliner_max
         max_arg_len = max(len(a.name) for a in args) if multiline else 0
@@ -729,8 +743,7 @@ class MssqlCompleter(Completer):
         )
         if multiline:
             return '(' + ','.join('\n    ' + a for a in args if a) + '\n)'
-        else:
-            return '(' + ', '.join(a for a in args if a) + ')'
+        return '(' + ', '.join(a for a in args if a) + ')'
 
     def _format_arg(self, template, arg, arg_num, max_arg_len):
         if not template:
@@ -819,7 +832,8 @@ class MssqlCompleter(Completer):
         return self.find_matches(word_before_cursor, keywords,
                                  mode='strict', meta='keyword')
 
-    def get_path_matches(self, _, word_before_cursor):
+    @staticmethod
+    def get_path_matches(_, word_before_cursor):
         completer = PathCompleter(expanduser=True)
         document = Document(text=word_before_cursor,
                             cursor_position=len(word_before_cursor))
@@ -893,8 +907,8 @@ class MssqlCompleter(Completer):
                 continue
             schemas = [tbl.schema] if tbl.schema else self.search_path
             for schema in schemas:
-                relname = self.escape_name(tbl.name)
-                schema = self.escape_name(schema)
+                relname = MssqlCompleter.escape_name(tbl.name)
+                schema = MssqlCompleter.escape_name(schema)
                 if tbl.is_function:
                     # Return column names from a set-returning function
                     # Get an array of FunctionMetadata objects
@@ -921,7 +935,7 @@ class MssqlCompleter(Completer):
         """
         metadata = self.dbmetadata[obj_typ]
         if schema:
-            schema = self.escape_name(schema)
+            schema = MssqlCompleter.escape_name(schema)
             return [schema] if schema in metadata else []
         return self.search_path if self.search_path_filter else metadata.keys()
 
