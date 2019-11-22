@@ -4,7 +4,7 @@ import io
 import threading
 import pytest
 import mssqlcli.jsonrpc.jsonrpcclient as json_rpc_client
-
+from mssqlcli.jsonrpc.tests.test_jsonrpc import BASELINE_REQUEST
 
 class JsonRpcClientTests(unittest.TestCase):
     """
@@ -305,12 +305,7 @@ class JsonRpcClientTests(unittest.TestCase):
         # Sleeping to give background threads a chance to process response.
         time.sleep(1)
 
-        baseline = {
-            u'jsonrpc': u'2.0',
-            u'params': {
-                u'Key': u'Value'},
-            u'method': u'testMethod/DoThis',
-            u'id': 1}
+        baseline = BASELINE_REQUEST
         response = test_client.get_response(request_id=1)
         self.assertEqual(response, baseline)
         test_client.shutdown()
