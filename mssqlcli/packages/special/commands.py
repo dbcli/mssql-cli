@@ -272,7 +272,7 @@ def subst_favorite_query_args(query, args):
                                                                         + query]
 
         query = query.replace(subst_var, val)
-    match = re.search(r'\\$\d+', query)
+    match = re.search('\\$\d+', query)
     if match:
         return[None, 'missing substitution for ' + match.group(0) + ' in query:\n  ' + query]
 
