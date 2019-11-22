@@ -17,17 +17,11 @@ class QueryExecuteStringRequest(Request):
                          QueryExecuteStringParams(parameters), u'query/executeString',
                          (QueryCompleteEvent, QueryExecuteErrorResponseEvent))
 
-    def get_response(self):
-        """
-            Get latest response, event or exception if occured.
-        """
-        try:
-            return self.get_decoded_response(self.decode_response)
-
-        except Exception as error:  # pylint: disable=broad-except
-            return QueryCompleteEvent(
-                {u'params': None}, exception_message=str(error)
-            )
+    @classmethod
+    def response_error(cls, error):
+        return QueryCompleteEvent(
+            {u'params': None}, exception_message=str(error)
+        )
 
     @staticmethod
     def decode_response(response):
@@ -115,11 +109,9 @@ class QuerySubsetRequest(Request):
         super().__init__(request_id, owner_uri, json_rpc_client,
                          QuerySubsetParams(parameters), u'query/subset', ResultSubset)
 
-    def get_response(self):
-        try:
-            return self.get_decoded_response(self.decode_response)
-        except Exception as error:      # pylint: disable=broad-except
-            return ResultSubset(None, error_message=str(error))
+    @classmethod
+    def response_error(cls, error):
+        return ResultSubset(None, error_message=str(error))
 
     @staticmethod
     def decode_response(response):
