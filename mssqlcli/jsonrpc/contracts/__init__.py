@@ -13,15 +13,15 @@ class Request(ABC):
         Abstract request class.
     """
 
-    def __init__(self, request_id, owner_uri, finished, json_rpc_client, parameters,
+    def __init__(self, request_id, owner_uri, json_rpc_client, parameters,
                  method_name, connectionCompleteEvent):
         self.request_id = request_id
         self.owner_uri = owner_uri
-        self.finished = finished
         self.json_rpc_client = json_rpc_client
         self.params = parameters
         self.method_name = method_name
         self.connectionCompleteEvent = connectionCompleteEvent
+        self.finished = False
 
     def execute(self):
         """
