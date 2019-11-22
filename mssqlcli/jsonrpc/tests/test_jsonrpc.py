@@ -7,6 +7,14 @@ import io
 import unittest
 import mssqlcli.jsonrpc.jsonrpcclient as jsonrpc
 
+BASELINE_REQUEST = {
+    u'jsonrpc': u'2.0',
+    u'params': {
+        u'Key': u'Value'
+    },
+    u'method': u'testMethod/DoThis',
+    u'id': 1
+}
 
 class JsonRpcTest(unittest.TestCase):
     """
@@ -42,12 +50,7 @@ class JsonRpcTest(unittest.TestCase):
         test_stream.seek(0)
         json_rpc_reader = jsonrpc.JsonRpcReader(test_stream)
         response = json_rpc_reader.read_response()
-        baseline = {
-            u'jsonrpc': u'2.0',
-            u'params': {
-                u'Key': u'Value'},
-            u'method': u'testMethod/DoThis',
-            u'id': 1}
+        baseline = BASELINE_REQUEST
         self.assertEqual(response, baseline)
 
         json_rpc_reader.close()
