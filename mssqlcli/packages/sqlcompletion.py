@@ -1,3 +1,5 @@
+# pylint: disable=too-many-instance-attributes
+
 from __future__ import print_function, unicode_literals
 from collections import namedtuple
 import re
@@ -52,7 +54,7 @@ Alias = namedtuple('Alias', ['aliases'])
 Path = namedtuple('Path', [])
 
 
-class SqlStatement(object):
+class SqlStatement:
     def __init__(self, full_text, text_before_cursor):
         self.identifier = None
         self.word_before_cursor = word_before_cursor = last_word(
@@ -89,8 +91,8 @@ class SqlStatement(object):
         self.text_before_cursor = text_before_cursor
         self.parsed = parsed
 
-        self.last_token = parsed and parsed.token_prev(len(parsed.tokens))[
-            1] or ''
+        self.last_token = parsed.token_prev(len(parsed.tokens))[1] \
+            if parsed and parsed.token_prev(len(parsed.tokens))[1] else ''
 
     def is_insert(self):
         return self.parsed.token_first().value.lower() == 'insert'
@@ -114,7 +116,8 @@ class SqlStatement(object):
         return self.parsed.token_prev(self.parsed.token_index(token))[1]
 
     def get_identifier_schema(self):
-        schema = (self.identifier and self.identifier.get_parent_name()) or None
+        schema = self.identifier.get_parent_name() \
+            if (self.identifier and self.identifier.get_parent_name()) else None
         # If schema name is unquoted, lower-case it
         if schema and self.identifier.value[0] != '"':
             schema = schema.lower()
@@ -269,20 +272,18 @@ def suggest_special(text):
         if schema:
             return (Table(schema=schema),
                     View(schema=schema),)
-        else:
-            return (Schema(),
-                    Table(schema=None),
-                    View(schema=None),)
-    elif cmd[1:] in SPECIALS_SUGGESTION:
+        return (Schema(),
+                Table(schema=None),
+                View(schema=None),)
+    if cmd[1:] in SPECIALS_SUGGESTION:
         rel_type = SPECIALS_SUGGESTION[cmd[1:]]
         if schema:
             if rel_type == Function:
                 return (Function(schema=schema, usage='special'),)
             return (rel_type(schema=schema),)
-        else:
-            if rel_type == Function:
-                return (Schema(), Function(schema=None, usage='special'),)
-            return (Schema(), rel_type(schema=None))
+        if rel_type == Function:
+            return (Schema(), Function(schema=None, usage='special'),)
+        return (Schema(), rel_type(schema=None))
 
     if cmd in ['\\n', '\\sn', '\\dn']:
         return (NamedQuery(),)
@@ -322,8 +323,7 @@ def suggest_based_on_last_token(token, stmt):
         if prev_keyword and prev_keyword.value == '(':
             # Suggest datatypes
             return suggest_based_on_last_token('type', stmt)
-        else:
-            return (Keyword(),)
+        return (Keyword(),)
     else:
         token_v = token.value.lower()
 
@@ -357,8 +357,7 @@ def suggest_based_on_last_token(token, stmt):
             prev_tok = prev_tok.value.lower()
             if prev_tok == 'exists':
                 return (Keyword(),)
-            else:
-                return column_suggestions
+            return column_suggestions
 
         # Get the token before the parens
         prev_tok = p.token_prev(len(p.tokens) - 1)[1]
@@ -372,7 +371,7 @@ def suggest_based_on_last_token(token, stmt):
                            require_last_table=True,
                            local_tables=stmt.local_tables),)
 
-        elif p.token_first().value.lower() == 'select':
+        if p.token_first().value.lower() == 'select':
             # If the lparen is preceeded by a space chances are we're about to
             # do a sub-select.
             if last_word(stmt.text_before_cursor,
@@ -386,12 +385,13 @@ def suggest_based_on_last_token(token, stmt):
         # We're probably in a function argument list
         return (Column(table_refs=extract_tables(stmt.full_text),
                        local_tables=stmt.local_tables, qualifiable=True),)
-    elif token_v == 'set':
+    if token_v == 'set':
         return (Column(table_refs=stmt.get_tables(),
                        local_tables=stmt.local_tables),)
-    elif token_v in ('select', 'where', 'having', 'by', 'distinct'):
+    if token_v in ('select', 'where', 'having', 'by', 'distinct'):
         # Check for a table alias or schema qualification
-        parent = (stmt.identifier and stmt.identifier.get_parent_name()) or []
+        parent = stmt.identifier.get_parent_name() \
+            if (stmt.identifier and stmt.identifier.get_parent_name()) else []
         tables = stmt.get_tables()
         if parent:
             tables = tuple(t for t in tables if identifies(parent, t))
@@ -399,16 +399,15 @@ def suggest_based_on_last_token(token, stmt):
                     Table(schema=parent),
                     View(schema=parent),
                     Function(schema=parent),)
-        else:
-            return (Column(table_refs=tables, local_tables=stmt.local_tables,
-                           qualifiable=True),
-                    Function(schema=None),
-                    Keyword(token_v.upper()),)
-    elif token_v == 'as':
+        return (Column(table_refs=tables, local_tables=stmt.local_tables,
+                       qualifiable=True),
+                Function(schema=None),
+                Keyword(token_v.upper()),)
+    if token_v == 'as':
         # Don't suggest anything for aliases
         return ()
-    elif (token_v.endswith('join') and token.is_keyword) or (token_v in
-                                                             ('copy', 'from', 'update', 'into', 'describe', 'truncate')):
+    if (token_v.endswith('join') and token.is_keyword) or \
+         token_v in ('copy', 'from', 'update', 'into', 'describe', 'truncate'):
 
         schema = stmt.get_identifier_schema()
         tables = extract_tables(stmt.text_before_cursor)
@@ -437,7 +436,7 @@ def suggest_based_on_last_token(token, stmt):
 
         return tuple(suggest)
 
-    elif token_v == 'function':
+    if token_v == 'function':
         schema = stmt.get_identifier_schema()
         # stmt.get_previous_token will fail for e.g. `SELECT 1 FROM functions
         # WHERE function:`
@@ -449,7 +448,7 @@ def suggest_based_on_last_token(token, stmt):
             pass
         return tuple()
 
-    elif token_v in ('table', 'view'):
+    if token_v in ('table', 'view'):
         # E.g. 'ALTER TABLE <tablname>'
         rel_type = {
             'table': Table,
@@ -458,16 +457,16 @@ def suggest_based_on_last_token(token, stmt):
         schema = stmt.get_identifier_schema()
         if schema:
             return (rel_type(schema=schema),)
-        else:
-            return (Schema(), rel_type(schema=schema))
+        return (Schema(), rel_type(schema=schema))
 
-    elif token_v == 'column':
+    if token_v == 'column':
         # E.g. 'ALTER TABLE foo ALTER COLUMN bar
         return (Column(table_refs=stmt.get_tables()),)
 
-    elif token_v == 'on':
+    if token_v == 'on':
         tables = stmt.get_tables('before')
-        parent = (stmt.identifier and stmt.identifier.get_parent_name()) or None
+        parent = stmt.identifier.get_parent_name() \
+            if (stmt.identifier and stmt.identifier.get_parent_name()) else None
         if parent:
             # "ON parent.<suggestion>"
             # parent can be either a schema name or table alias
@@ -481,32 +480,29 @@ def suggest_based_on_last_token(token, stmt):
                 sugs.append(JoinCondition(table_refs=tables,
                                           parent=filteredtables[-1]))
             return tuple(sugs)
-        else:
-            # ON <suggestion>
-            # Use table alias if there is one, otherwise the table name
-            aliases = tuple(t.ref for t in tables)
-            if _allow_join_condition(stmt.parsed):
-                return (Alias(aliases=aliases), JoinCondition(
-                    table_refs=tables, parent=None))
-            else:
-                return (Alias(aliases=aliases),)
+        # ON <suggestion>
+        # Use table alias if there is one, otherwise the table name
+        aliases = tuple(t.ref for t in tables)
+        if _allow_join_condition(stmt.parsed):
+            return (Alias(aliases=aliases), JoinCondition(
+                table_refs=tables, parent=None))
+        return (Alias(aliases=aliases),)
 
-    elif token_v in ('c', 'use', 'database', 'template'):
+    if token_v in ('c', 'use', 'database', 'template'):
         # "\c <db", "use <db>", "DROP DATABASE <db>",
         # "CREATE DATABASE <newdb> WITH TEMPLATE <db>"
         return (Database(),)
-    elif token_v == 'schema':
+    if token_v == 'schema':
         # DROP SCHEMA schema_name, SET SCHEMA schema name
         prev_keyword = stmt.reduce_to_prev_keyword(n_skip=2)
         quoted = prev_keyword and prev_keyword.value.lower() == 'set'
         return (Schema(quoted),)
-    elif token_v.endswith(',') or token_v in ('=', 'and', 'or'):
+    if token_v.endswith(',') or token_v in ('=', 'and', 'or'):
         prev_keyword = stmt.reduce_to_prev_keyword()
         if prev_keyword:
             return suggest_based_on_last_token(prev_keyword, stmt)
-        else:
-            return ()
-    elif token_v in ('type', '::'):
+        return ()
+    if token_v in ('type', '::'):
         #   ALTER TABLE foo SET DATA TYPE bar
         #   SELECT foo::bar
         # Note that tables are a form of composite type in postgresql, so
@@ -517,25 +513,23 @@ def suggest_based_on_last_token(token, stmt):
         if not schema:
             suggestions.append(Schema())
         return tuple(suggestions)
-    elif token_v in {'alter', 'create', 'drop'}:
+    if token_v in {'alter', 'create', 'drop'}:
         return (Keyword(token_v.upper()),)
-    elif token.is_keyword:
+    if token.is_keyword:
         # token is a keyword we haven't implemented any special handling for
         # go backwards in the query until we find one we do recognize
         prev_keyword = stmt.reduce_to_prev_keyword(n_skip=1)
         if prev_keyword:
             return suggest_based_on_last_token(prev_keyword, stmt)
-        else:
-            return (Keyword(token_v.upper()),)
-    else:
-        return (Keyword(),)
+        return (Keyword(token_v.upper()),)
+    return (Keyword(),)
 
 
-def identifies(id, ref):
-    """Returns true if string `id` matches TableReference `ref`"""
+def identifies(string_id, ref):
+    """Returns true if string `string_id` matches TableReference `ref`"""
 
-    return id == ref.alias or id == ref.name or (
-        ref.schema and (id == ref.schema + '.' + ref.name))
+    return string_id == ref.alias or string_id == ref.name or (
+        ref.schema and (string_id == ref.schema + '.' + ref.name))
 
 
 def _allow_join_condition(statement):
