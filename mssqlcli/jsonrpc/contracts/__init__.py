@@ -16,15 +16,18 @@ class Request(ABC):
         """
             Executes the request.
         """
+        pass
 
     @abc.abstractmethod
     def get_response(self):
         """
             Retrieves expected response.
         """
+        pass
 
     @abc.abstractmethod
     def completed(self):
         """
             Return state of request.
         """
+        pass
