@@ -15,30 +15,16 @@ class QueryExecuteStringRequest(Request):
     METHOD_NAME = u'query/executeString'
 
     def __init__(self, request_id, owner_uri, json_rpc_client, parameters):
-        self.request_id = request_id
-        self.owner_uri = owner_uri
-        self.finished = False
-        self.json_rpc_client = json_rpc_client
-        self.params = QueryExecuteStringParams(parameters)
+        super().__init__(request_id, owner_uri, False, json_rpc_client,
+                         QueryExecuteStringParams(parameters),
+                         (QueryCompleteEvent, QueryExecuteErrorResponseEvent))
 
     def get_response(self):
         """
             Get latest response, event or exception if occured.
         """
         try:
-            response = self.json_rpc_client.get_response(self.request_id, self.owner_uri)
-
-            decoded_response = None
-            if response:
-                decoded_response = QueryExecuteStringRequest.decode_response(response)
-
-            if isinstance(decoded_response,
-                          (QueryCompleteEvent, QueryExecuteErrorResponseEvent)):
-                self.finished = True
-                self.json_rpc_client.request_finished(self.request_id)
-                self.json_rpc_client.request_finished(self.owner_uri)
-
-            return decoded_response
+            return self.get_decoded_response(self.decode_response)
 
         except Exception as error:  # pylint: disable=broad-except
             self.finished = True
@@ -143,11 +129,8 @@ class QuerySubsetRequest(Request):
     METHOD_NAME = u'query/subset'
 
     def __init__(self, request_id, owner_uri, json_rpc_client, parameters):
-        self.request_id = request_id
-        self.owner_uri = owner_uri
-        self.finished = False
-        self.json_rpc_client = json_rpc_client
-        self.params = QuerySubsetParams(parameters)
+        super().__init__(request_id, owner_uri, False, json_rpc_client,
+                         QuerySubsetParams(parameters), ResultSubset)
 
     def completed(self):
         """
@@ -157,18 +140,7 @@ class QuerySubsetRequest(Request):
 
     def get_response(self):
         try:
-            response = self.json_rpc_client.get_response(self.request_id, self.owner_uri)
-            decoded_response = None
-            if response:
-                decoded_response = QuerySubsetRequest.decode_response(response)
-
-            if isinstance(decoded_response, ResultSubset):
-                self.finished = True
-                self.json_rpc_client.request_finished(self.request_id)
-                self.json_rpc_client.request_finished(self.owner_uri)
-
-            return decoded_response
-
+            return self.get_decoded_response(self.decode_response)
         except Exception as error:      # pylint: disable=broad-except
             self.finished = True
             self.json_rpc_client.request_finished(self.request_id)
