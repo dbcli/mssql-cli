@@ -1,11 +1,7 @@
 # pylint: disable=too-many-instance-attributes
 # pylint: disable=too-few-public-methods
 
-import logging
 from mssqlcli.jsonrpc.contracts import Request
-
-
-logger = logging.getLogger(u'mssqlcli.connectionservice')
 
 
 class ConnectionRequest(Request):
@@ -18,37 +14,32 @@ class ConnectionRequest(Request):
                          ConnectionParams(parameters), u'connection/connect',
                          ConnectionCompleteEvent)
 
-    def get_response(self):
-        """
-            Get latest response, event or exception if it occured.
-        """
-        try:
-            return self.get_decoded_response(self.decode_response)
-        except Exception as error:  # pylint: disable=broad-except
-            return ConnectionCompleteEvent({
-                u'params': {
-                    u'ownerUri': self.owner_uri,
-                    u'connectionId': None,
-                    u'messages': str(error),
-                    u'errorMessage': u'Connection request encountered an exception',
-                    u'errorNumber': None
-                }
-            })
+    @classmethod
+    def response_error(cls, error):
+        return ConnectionCompleteEvent({
+            u'params': {
+                u'ownerUri': cls.owner_uri,
+                u'connectionId': None,
+                u'messages': str(error),
+                u'errorMessage': u'Connection request encountered an exception',
+                u'errorNumber': None
+            }
+        })
 
     @staticmethod
-    def decode_response(obj):
+    def decode_response(response):
         """
             Decode response dictionary into a Connection parameter type.
         """
 
-        if u'result' in obj:
-            return ConnectionResponse(obj)
+        if u'result' in response:
+            return ConnectionResponse(response)
 
-        if 'method' in obj and obj['method'] == 'connection/complete':
-            return ConnectionCompleteEvent(obj)
+        if 'method' in response and response['method'] == 'connection/complete':
+            return ConnectionCompleteEvent(response)
 
         # Could not decode return st
-        return obj
+        return response
 
 
 class ConnectionDetails:
