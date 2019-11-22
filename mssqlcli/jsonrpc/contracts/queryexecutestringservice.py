@@ -25,9 +25,6 @@ class QueryExecuteStringRequest(Request):
             return self.get_decoded_response(self.decode_response)
 
         except Exception as error:  # pylint: disable=broad-except
-            self.finished = True
-            self.json_rpc_client.request_finished(self.request_id)
-            self.json_rpc_client.request_finished(self.owner_uri)
             return QueryCompleteEvent(
                 {u'params': None}, exception_message=str(error)
             )
@@ -122,9 +119,6 @@ class QuerySubsetRequest(Request):
         try:
             return self.get_decoded_response(self.decode_response)
         except Exception as error:      # pylint: disable=broad-except
-            self.finished = True
-            self.json_rpc_client.request_finished(self.request_id)
-            self.json_rpc_client.request_finished(self.owner_uri)
             return ResultSubset(None, error_message=str(error))
 
     @staticmethod
