@@ -12,15 +12,11 @@ class ConnectionRequest(Request):
     """
         SqlToolsService Connection request.
     """
-    METHOD_NAME = u'connection/connect'
 
     def __init__(self, request_id, owner_uri, json_rpc_client, parameters):
         super().__init__(request_id, owner_uri, False, json_rpc_client,
-                         ConnectionParams(parameters), ConnectionCompleteEvent)
-
-    def execute(self):
-        self.json_rpc_client.submit_request(
-            self.METHOD_NAME, self.params.format(), self.request_id)
+                         ConnectionParams(parameters), u'connection/connect',
+                         ConnectionCompleteEvent)
 
     def get_response(self):
         """
@@ -42,12 +38,6 @@ class ConnectionRequest(Request):
                     u'errorNumber': None
                 }
             })
-
-    def completed(self):
-        """
-            Get current request state.
-        """
-        return self.finished
 
     @staticmethod
     def decode_response(obj):

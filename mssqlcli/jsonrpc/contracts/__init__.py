@@ -14,19 +14,21 @@ class Request(ABC):
     """
 
     def __init__(self, request_id, owner_uri, finished, json_rpc_client, parameters,
-                 connectionCompleteEvent):
+                 method_name, connectionCompleteEvent):
         self.request_id = request_id
         self.owner_uri = owner_uri
         self.finished = finished
         self.json_rpc_client = json_rpc_client
         self.params = parameters
+        self.method_name = method_name
         self.connectionCompleteEvent = connectionCompleteEvent
 
-    @abc.abstractmethod
     def execute(self):
         """
             Executes the request.
         """
+        self.json_rpc_client.submit_request(
+            self.method_name, self.params.format(), self.request_id)
 
     @abc.abstractmethod
     def get_response(self):
@@ -51,8 +53,8 @@ class Request(ABC):
 
         return decoded_response
 
-    @abc.abstractmethod
     def completed(self):
         """
             Return state of request.
         """
+        return self.finished

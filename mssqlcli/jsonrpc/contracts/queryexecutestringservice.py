@@ -12,11 +12,9 @@ class QueryExecuteStringRequest(Request):
         Uses SQL Tools Service query/executeString method.
     """
 
-    METHOD_NAME = u'query/executeString'
-
     def __init__(self, request_id, owner_uri, json_rpc_client, parameters):
         super().__init__(request_id, owner_uri, False, json_rpc_client,
-                         QueryExecuteStringParams(parameters),
+                         QueryExecuteStringParams(parameters), u'query/executeString',
                          (QueryCompleteEvent, QueryExecuteErrorResponseEvent))
 
     def get_response(self):
@@ -33,16 +31,6 @@ class QueryExecuteStringRequest(Request):
             return QueryCompleteEvent(
                 {u'params': None}, exception_message=str(error)
             )
-
-    def execute(self):
-        self.json_rpc_client.submit_request(
-            self.METHOD_NAME, self.params.format(), self.request_id)
-
-    def completed(self):
-        """
-            Get current request state.
-        """
-        return self.finished
 
     @staticmethod
     def decode_response(response):
@@ -126,17 +114,9 @@ class QuerySubsetRequest(Request):
         SqlToolsService QuerySubset Request.
     """
 
-    METHOD_NAME = u'query/subset'
-
     def __init__(self, request_id, owner_uri, json_rpc_client, parameters):
         super().__init__(request_id, owner_uri, False, json_rpc_client,
-                         QuerySubsetParams(parameters), ResultSubset)
-
-    def completed(self):
-        """
-            Get current request state.
-        """
-        return self.finished
+                         QuerySubsetParams(parameters), u'query/subset', ResultSubset)
 
     def get_response(self):
         try:
@@ -146,10 +126,6 @@ class QuerySubsetRequest(Request):
             self.json_rpc_client.request_finished(self.request_id)
             self.json_rpc_client.request_finished(self.owner_uri)
             return ResultSubset(None, error_message=str(error))
-
-    def execute(self):
-        self.json_rpc_client.submit_request(
-            self.METHOD_NAME, self.params.format(), self.request_id)
 
     @staticmethod
     def decode_response(response):
