@@ -40,18 +40,24 @@ class Request(ABC):
         """
             Retreives decoded response given a decoder.
         """
-        response = self.json_rpc_client.get_response(self.request_id, self.owner_uri)
-        decoded_response = None
-        if response:
-            logger.debug(response)
-            decoded_response = decode_response_method(response)
+        try:
+            response = self.json_rpc_client.get_response(self.request_id, self.owner_uri)
+            decoded_response = None
+            if response:
+                logger.debug(response)
+                decoded_response = decode_response_method(response)
 
-        if isinstance(decoded_response, self.connectionCompleteEvent):
+            if isinstance(decoded_response, self.connectionCompleteEvent):
+                self.finished = True
+                self.json_rpc_client.request_finished(self.request_id)
+                self.json_rpc_client.request_finished(self.owner_uri)
+            return decoded_response
+        except Exception as error:  # pylint: disable=broad-except
+            logger.info(str(error))
             self.finished = True
             self.json_rpc_client.request_finished(self.request_id)
             self.json_rpc_client.request_finished(self.owner_uri)
-
-        return decoded_response
+            raise error
 
     def completed(self):
         """

@@ -25,10 +25,6 @@ class ConnectionRequest(Request):
         try:
             return self.get_decoded_response(self.decode_response)
         except Exception as error:  # pylint: disable=broad-except
-            logger.info(str(error))
-            self.finished = True
-            self.json_rpc_client.request_finished(self.request_id)
-            self.json_rpc_client.request_finished(self.owner_uri)
             return ConnectionCompleteEvent({
                 u'params': {
                     u'ownerUri': self.owner_uri,
