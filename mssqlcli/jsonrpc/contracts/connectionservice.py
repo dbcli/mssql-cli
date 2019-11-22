@@ -16,7 +16,7 @@ class ConnectionRequest(Request):
 
     def __init__(self, request_id, owner_uri, json_rpc_client, parameters):
         super().__init__(request_id, owner_uri, False, json_rpc_client,
-                         ConnectionParams(parameters))
+                         ConnectionParams(parameters), ConnectionCompleteEvent)
 
     def execute(self):
         self.json_rpc_client.submit_request(
@@ -27,19 +27,7 @@ class ConnectionRequest(Request):
             Get latest response, event or exception if it occured.
         """
         try:
-            response = self.json_rpc_client.get_response(self.request_id, self.owner_uri)
-            decoded_response = None
-            if response:
-                logger.debug(response)
-                decoded_response = self.decode_response(response)
-
-            if isinstance(decoded_response, ConnectionCompleteEvent):
-                self.finished = True
-                self.json_rpc_client.request_finished(self.request_id)
-                self.json_rpc_client.request_finished(self.owner_uri)
-
-            return decoded_response
-
+            return self.get_decoded_response(self.decode_response)
         except Exception as error:  # pylint: disable=broad-except
             logger.info(str(error))
             self.finished = True
