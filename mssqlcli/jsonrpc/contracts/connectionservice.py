@@ -15,11 +15,8 @@ class ConnectionRequest(Request):
     METHOD_NAME = u'connection/connect'
 
     def __init__(self, request_id, owner_uri, json_rpc_client, parameters):
-        self.request_id = request_id
-        self.owner_uri = owner_uri
-        self.finished = False
-        self.json_rpc_client = json_rpc_client
-        self.params = ConnectionParams(parameters)
+        super().__init__(request_id, owner_uri, False, json_rpc_client,
+                         ConnectionParams(parameters))
 
     def execute(self):
         self.json_rpc_client.submit_request(
