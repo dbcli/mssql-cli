@@ -143,7 +143,7 @@ class MssqlCliClient:
                                                                  is_error=query_subset_error)
 
                 query_message_for_current_result_set \
-                    = query_messages[result_set_summary.id].message if query_messages else u''
+                    = query_messages[result_set_summary.request_id].message if query_messages else u''
 
                 yield self._generate_query_results_to_tuples(
                     column_info=result_set_summary.column_info,
@@ -243,7 +243,7 @@ class MssqlCliClient:
                 {
                     u'OwnerUri': query_response.owner_uri,
                     u'BatchIndex': result_set_summary.batch_id,
-                    u'ResultSetIndex': result_set_summary.id,
+                    u'ResultSetIndex': result_set_summary.request_id,
                     u'RowsStartIndex': 0,
                     u'RowCount': result_set_summary.row_count
                 },

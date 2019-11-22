@@ -52,7 +52,7 @@ class JsonRpcClientTests(unittest.TestCase):
         baseline = {u'key': u'value'}
 
         self.assertEqual(response, baseline)
-        self.shutdown_background_threads(test_client)
+        JsonRpcClientTests.shutdown_background_threads(test_client)
         # All background threads should be shut down.
         self.assertFalse(test_client.request_thread.is_alive())
         self.assertFalse(test_client.response_thread.is_alive())
@@ -76,11 +76,13 @@ class JsonRpcClientTests(unittest.TestCase):
         test_client.submit_request(
             u'scriptingService/ScriptDatabase', {u'ScriptDatabaseOptions': u'True'})
 
-        self.shutdown_background_threads(test_client)
+        JsonRpcClientTests.shutdown_background_threads(test_client)
 
         # check stream contents.
         input_stream.seek(0)
-        expected = b'Content-Length: 120\r\n\r\n{"id": null, "jsonrpc": "2.0", "method": "scriptingService/ScriptDatabase", "params": {"ScriptDatabaseOptions": "True"}}'
+        expected = (b'Content-Length: 120\r\n\r\n{"id": null, "jsonrpc": "2.0", '
+                    b'"method": "scriptingService/ScriptDatabase", '
+                    b'"params": {"ScriptDatabaseOptions": "True"}}')
 
         self.assertEqual(input_stream.getvalue(), expected)
         self.assertFalse(test_client.request_thread.is_alive())
@@ -115,13 +117,18 @@ class JsonRpcClientTests(unittest.TestCase):
         time.sleep(1)
 
         # Kill the threads so we can just verify the queues.
-        self.shutdown_background_threads(test_client)
+        JsonRpcClientTests.shutdown_background_threads(test_client)
 
         input_stream.seek(0)
-        expected = \
-            b'Content-Length: 120\r\n\r\n{"id": null, "jsonrpc": "2.0", "method": "scriptingService/ScriptDatabase", "params": {"ScriptDatabaseOptions": "True"}}'\
-            b'Content-Length: 115\r\n\r\n{"id": null, "jsonrpc": "2.0", "method": "scriptingService/ScriptDatabase", "params": {"ScriptCollations": "True"}}'\
-            b'Content-Length: 113\r\n\r\n{"id": null, "jsonrpc": "2.0", "method": "scriptingService/ScriptDatabase", "params": {"ScriptDefaults": "True"}}'
+        expected = (
+            b'Content-Length: 120\r\n\r\n{"id": null, "jsonrpc": "2.0", '
+            b'"method": "scriptingService/ScriptDatabase", '
+            b'"params": {"ScriptDatabaseOptions": "True"}}'
+            b'Content-Length: 115\r\n\r\n{"id": null, "jsonrpc": "2.0", '
+            b'"method": "scriptingService/ScriptDatabase", "params": {"ScriptCollations": "True"}}'
+            b'Content-Length: 113\r\n\r\n{"id": null, "jsonrpc": "2.0", '
+            b'"method": "scriptingService/ScriptDatabase", "params": {"ScriptDefaults": "True"}}'
+        )
 
         self.assertEqual(input_stream.getvalue(), expected)
         self.assertFalse(test_client.request_thread.is_alive())
@@ -261,7 +268,8 @@ class JsonRpcClientTests(unittest.TestCase):
         """
         input_stream = io.BytesIO()
         output_stream = io.BytesIO(
-            b'Content-Length: 86\r\n\r\n{"params": {"Key": "Value"}, "jsonrpc": "2.0", "method": "testMethod/DoThis", "id": 1}')
+            b'Content-Length: 86\r\n\r\n{"params": {"Key": "Value"}, "jsonrpc": "2.0", '
+            b'"method": "testMethod/DoThis", "id": 1}')
 
         test_client = json_rpc_client.JsonRpcClient(
             input_stream, output_stream)
@@ -283,7 +291,8 @@ class JsonRpcClientTests(unittest.TestCase):
         self.assertEqual(response, baseline)
         test_client.shutdown()
 
-    def shutdown_background_threads(self, test_client):
+    @staticmethod
+    def shutdown_background_threads(test_client):
         """
             Stops background leaves streams open for testing
         """

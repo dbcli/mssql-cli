@@ -1,3 +1,6 @@
+# pylint: disable=too-many-instance-attributes
+# pylint: disable=too-few-public-methods
+
 import logging
 from mssqlcli.jsonrpc.contracts import Request
 
@@ -11,8 +14,8 @@ class QueryExecuteStringRequest(Request):
 
     METHOD_NAME = u'query/executeString'
 
-    def __init__(self, id, owner_uri, json_rpc_client, parameters):
-        self.id = id
+    def __init__(self, request_id, owner_uri, json_rpc_client, parameters):
+        self.request_id = request_id
         self.owner_uri = owner_uri
         self.finished = False
         self.json_rpc_client = json_rpc_client
@@ -23,23 +26,23 @@ class QueryExecuteStringRequest(Request):
             Get latest response, event or exception if occured.
         """
         try:
-            response = self.json_rpc_client.get_response(self.id, self.owner_uri)
+            response = self.json_rpc_client.get_response(self.request_id, self.owner_uri)
 
             decoded_response = None
             if response:
-                decoded_response = self.decode_response(response)
+                decoded_response = QueryExecuteStringRequest.decode_response(response)
 
-            if isinstance(decoded_response, QueryCompleteEvent) or \
-               isinstance(decoded_response, QueryExecuteErrorResponseEvent):
+            if isinstance(decoded_response,
+                          (QueryCompleteEvent, QueryExecuteErrorResponseEvent)):
                 self.finished = True
-                self.json_rpc_client.request_finished(self.id)
+                self.json_rpc_client.request_finished(self.request_id)
                 self.json_rpc_client.request_finished(self.owner_uri)
 
             return decoded_response
 
-        except Exception as error:
+        except Exception as error:  # pylint: disable=broad-except
             self.finished = True
-            self.json_rpc_client.request_finished(self.id)
+            self.json_rpc_client.request_finished(self.request_id)
             self.json_rpc_client.request_finished(self.owner_uri)
             return QueryCompleteEvent(
                 {u'params': None}, exception_message=str(error)
@@ -47,7 +50,7 @@ class QueryExecuteStringRequest(Request):
 
     def execute(self):
         self.json_rpc_client.submit_request(
-            self.METHOD_NAME, self.params.format(), self.id)
+            self.METHOD_NAME, self.params.format(), self.request_id)
 
     def completed(self):
         """
@@ -55,18 +58,19 @@ class QueryExecuteStringRequest(Request):
         """
         return self.finished
 
-    def decode_response(self, response):
+    @staticmethod
+    def decode_response(response):
         if u'method' in response and response[u'method'] == u'query/complete':
             return QueryCompleteEvent(response)
-        elif u'method' in response and response[u'method'] == u'query/message':
+        if u'method' in response and response[u'method'] == u'query/message':
             return QueryMessageEvent(response)
-        elif u'error' in response:
+        if u'error' in response:
             return QueryExecuteErrorResponseEvent(response)
 
         return response
 
 
-class QueryExecuteStringParams(object):
+class QueryExecuteStringParams:
     def __init__(self, parameters):
         self.owner_uri = parameters['OwnerUri']
         self.query = parameters['Query']
@@ -76,14 +80,14 @@ class QueryExecuteStringParams(object):
                 u'Query': self.query}
 
 
-class QueryExecuteErrorResponseEvent(object):
+class QueryExecuteErrorResponseEvent:
     def __init__(self, parameters):
         inner_params = parameters[u'error']
         self.exception_message = inner_params[u'message'] if u'message' in inner_params else ''
         self.error_code = inner_params[u'code'] if u'code' in inner_params else ''
 
 
-class QueryMessageEvent(object):
+class QueryMessageEvent:
     def __init__(self, parameters):
         inner_params = parameters[u'params']
         self.owner_uri = inner_params[u'ownerUri']
@@ -92,7 +96,7 @@ class QueryMessageEvent(object):
         self.message = inner_params[u'message'][u'message']
 
 
-class QueryCompleteEvent(object):
+class QueryCompleteEvent:
     def __init__(self, parameters, exception_message=None):
         inner_params = parameters[u'params']
         if inner_params:
@@ -104,10 +108,10 @@ class QueryCompleteEvent(object):
         self.exception_message = exception_message
 
 
-class BatchSummary(object):
+class BatchSummary:
     def __init__(self, parameters):
         self.has_error = parameters[u'hasError']
-        self.id = parameters[u'id']
+        self.request_id = parameters[u'id']
         self.execution_time_elapsed = parameters[u'executionElapsed']
         self.result_set_summaries = []
         for result_set_summary in parameters[u'resultSetSummaries']:
@@ -115,17 +119,17 @@ class BatchSummary(object):
                 ResultSetSummary(result_set_summary))
 
 
-class ResultSetSummary(object):
+class ResultSetSummary:
     def __init__(self, parameters):
         self.batch_id = parameters[u'batchId']
-        self.id = parameters[u'id']
+        self.request_id = parameters[u'id']
         self.row_count = parameters[u'rowCount']
         self.column_info = []
         for column in parameters[u'columnInfo']:
             self.column_info.append(Column(column))
 
 
-class Column(object):
+class Column:
     def __init__(self, parameters):
         self.column_name = parameters[u'columnName']
         self.data_type_name = parameters[u'dataTypeName']
@@ -138,8 +142,8 @@ class QuerySubsetRequest(Request):
 
     METHOD_NAME = u'query/subset'
 
-    def __init__(self, id, owner_uri, json_rpc_client, parameters):
-        self.id = id
+    def __init__(self, request_id, owner_uri, json_rpc_client, parameters):
+        self.request_id = request_id
         self.owner_uri = owner_uri
         self.finished = False
         self.json_rpc_client = json_rpc_client
@@ -153,37 +157,42 @@ class QuerySubsetRequest(Request):
 
     def get_response(self):
         try:
-            response = self.json_rpc_client.get_response(self.id, self.owner_uri)
+            response = self.json_rpc_client.get_response(self.request_id, self.owner_uri)
             decoded_response = None
             if response:
-                decoded_response = self.decode_response(response)
+                decoded_response = QuerySubsetRequest.decode_response(response)
 
             if isinstance(decoded_response, ResultSubset):
                 self.finished = True
-                self.json_rpc_client.request_finished(self.id)
+                self.json_rpc_client.request_finished(self.request_id)
                 self.json_rpc_client.request_finished(self.owner_uri)
 
             return decoded_response
 
-        except Exception as error:
+        except Exception as error:      # pylint: disable=broad-except
             self.finished = True
-            self.json_rpc_client.request_finished(self.id)
+            self.json_rpc_client.request_finished(self.request_id)
             self.json_rpc_client.request_finished(self.owner_uri)
             return ResultSubset(None, error_message=str(error))
 
     def execute(self):
         self.json_rpc_client.submit_request(
-            self.METHOD_NAME, self.params.format(), self.id)
+            self.METHOD_NAME, self.params.format(), self.request_id)
 
-    def decode_response(self, response):
+    @staticmethod
+    def decode_response(response):
+        result_subset = None
+
         if u'result' in response:
-            return ResultSubset(response)
+            result_subset = ResultSubset(response)
         elif u'error' in response:
-            return ResultSubset(
+            result_subset = ResultSubset(
                 None, error_message=response[u'error']['message'])
 
+        return result_subset
 
-class QuerySubsetParams(object):
+
+class QuerySubsetParams:
     def __init__(self, parameters):
         self.owner_uri = parameters[u'OwnerUri']
         self.batch_index = parameters[u'BatchIndex']
@@ -199,7 +208,7 @@ class QuerySubsetParams(object):
                 u'RowsCount': self.row_count}
 
 
-class ResultSubset(object):
+class ResultSubset:
     def __init__(self, parameters, error_message=None):
         if not error_message:
             inner_params = parameters[u'result'][u'resultSubset']
@@ -211,14 +220,14 @@ class ResultSubset(object):
         self.error_message = error_message
 
 
-class ResultRow(object):
+class ResultRow:
     def __init__(self, parameter):
         self.result_cells = []
         for result_cell in parameter:
             self.result_cells.append(ResultCell(result_cell))
 
 
-class ResultCell(object):
+class ResultCell:
     def __init__(self, parameter):
         self.display_value = parameter[u'displayValue']
         self.row_id = parameter[u'rowId']
