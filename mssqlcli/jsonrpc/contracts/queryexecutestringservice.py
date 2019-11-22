@@ -13,7 +13,7 @@ class QueryExecuteStringRequest(Request):
     """
 
     def __init__(self, request_id, owner_uri, json_rpc_client, parameters):
-        super().__init__(request_id, owner_uri, False, json_rpc_client,
+        super().__init__(request_id, owner_uri, json_rpc_client,
                          QueryExecuteStringParams(parameters), u'query/executeString',
                          (QueryCompleteEvent, QueryExecuteErrorResponseEvent))
 
@@ -112,7 +112,7 @@ class QuerySubsetRequest(Request):
     """
 
     def __init__(self, request_id, owner_uri, json_rpc_client, parameters):
-        super().__init__(request_id, owner_uri, False, json_rpc_client,
+        super().__init__(request_id, owner_uri, json_rpc_client,
                          QuerySubsetParams(parameters), u'query/subset', ResultSubset)
 
     def get_response(self):

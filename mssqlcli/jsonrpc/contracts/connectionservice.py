@@ -14,7 +14,7 @@ class ConnectionRequest(Request):
     """
 
     def __init__(self, request_id, owner_uri, json_rpc_client, parameters):
-        super().__init__(request_id, owner_uri, False, json_rpc_client,
+        super().__init__(request_id, owner_uri, json_rpc_client,
                          ConnectionParams(parameters), u'connection/connect',
                          ConnectionCompleteEvent)
 
