@@ -447,8 +447,8 @@ class MssqlCli(object):
 
     def _build_cli(self, history):
         """
-        Builds prompt session.
-        NOTE: PROMPT-SESSION USES THIS AS DEPENDENCY.
+            Builds prompt session.
+            NOTE: PROMPT-SESSION USES THIS AS DEPENDENCY.
         """
 
         def get_message():
@@ -456,6 +456,9 @@ class MssqlCli(object):
             return [(u'class:prompt', prompt)]
 
         def get_continuation(width, line_number, is_soft_wrap):
+            """
+                NOTE: updating parameters will cause prompt session to crash.
+            """
             # pylint: disable=unused-argument
             continuation = self.multiline_continuation_char * (width - 1) + ' '
             return [(u'class:continuation', continuation)]
@@ -506,17 +509,21 @@ class MssqlCli(object):
             return self.prompt_session
 
     def _should_show_limit_prompt(self, status, rows):
-        """returns True if limit prompt should be shown, False otherwise."""
+        """
+            Returns True if limit prompt should be shown, False otherwise.
+            NOTE: updating parameters will cause prompt session to crash.
+        """
         # pylint: disable=unused-argument
         if not rows:
             return False
         return self.interactive_mode and self.row_limit > 0 and len(rows) > self.row_limit
 
     def _evaluate_command(self, text):
-        """Used to run a command entered by the user during CLI operation
-        (Puts the E in REPL)
+        """
+            Used to run a command entered by the user during CLI operation
+            (Puts the E in REPL)
 
-        returns (results, MetaQuery)
+            returns (results, MetaQuery)
         """
         # pylint: disable=too-many-locals
 
