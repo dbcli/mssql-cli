@@ -446,12 +446,20 @@ class MssqlCli(object):
                 print(localized.goodbye())
 
     def _build_cli(self, history):
+        """
+            Builds prompt session.
+            NOTE: PROMPT-SESSION USES THIS AS DEPENDENCY.
+        """
 
         def get_message():
             prompt = self.get_prompt(self.prompt_format)
             return [(u'class:prompt', prompt)]
 
-        def get_continuation(width):
+        def get_continuation(width, line_number, is_soft_wrap):
+            """
+                NOTE: updating parameters will cause prompt session to crash.
+            """
+            # pylint: disable=unused-argument
             continuation = self.multiline_continuation_char * (width - 1) + ' '
             return [(u'class:continuation', continuation)]
 
@@ -476,7 +484,8 @@ class MssqlCli(object):
                     ConditionalProcessor(
                         processor=HighlightMatchingBracketProcessor(
                             chars='[](){}'),
-                        filter=HasFocus(DEFAULT_BUFFER) & ~IsDone()),       #FIXME: what is this?
+                        #pylint: disable=invalid-unary-operand-type
+                        filter=HasFocus(DEFAULT_BUFFER) & ~IsDone()),
                     # Render \t as 4 spaces instead of "^I"
                     TabsProcessor(char1=u' ', char2=u' ')],
                 reserve_space_for_menu=self.min_num_menu_lines,
@@ -499,17 +508,22 @@ class MssqlCli(object):
 
             return self.prompt_session
 
-    def _should_show_limit_prompt(self, rows):
-        """returns True if limit prompt should be shown, False otherwise."""
+    def _should_show_limit_prompt(self, status, rows):
+        """
+            Returns True if limit prompt should be shown, False otherwise.
+            NOTE: updating parameters will cause prompt session to crash.
+        """
+        # pylint: disable=unused-argument
         if not rows:
             return False
         return self.interactive_mode and self.row_limit > 0 and len(rows) > self.row_limit
 
     def _evaluate_command(self, text):
-        """Used to run a command entered by the user during CLI operation
-        (Puts the E in REPL)
+        """
+            Used to run a command entered by the user during CLI operation
+            (Puts the E in REPL)
 
-        returns (results, MetaQuery)
+            returns (results, MetaQuery)
         """
         # pylint: disable=too-many-locals
 
@@ -534,7 +548,7 @@ class MssqlCli(object):
                 self.mssqlcliclient_main.execute_query(text):
 
             total = time() - start
-            if self._should_show_limit_prompt(rows):
+            if self._should_show_limit_prompt(status, rows):
                 click.secho('The result set has more than %s rows.'
                             % self.row_limit, fg='red')
                 if not click.confirm('Do you want to continue?'):
