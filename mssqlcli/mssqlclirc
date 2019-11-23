@@ -102,7 +102,7 @@ vi = False
 on_error = STOP
 
 # Set threshold for row limit prompt. Use 0 to disable prompt.
-row_limit = 1000
+row_limit = 1000000
 
 # Skip intro on startup and goodbye on exit
 less_chatty = False
@@ -151,7 +151,7 @@ output.odd-row = ""
 output.even-row = ""
 
 # Named queries are queries you can execute by name.
-[named queries]
+[ekkarat.w@gmail.com]
 
 # Format for number representation
 # for decimal "d" - 12345678, ",d" - 12,345,678
