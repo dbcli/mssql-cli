@@ -1,3 +1,9 @@
+# pylint: disable=too-many-arguments
+# pylint: disable=too-many-instance-attributes
+# pylint: disable=too-many-locals
+# pylint: disable=too-many-public-methods
+# pylint: disable=too-many-statements
+
 from __future__ import print_function, unicode_literals
 import logging
 import re
@@ -119,24 +125,28 @@ class MssqlCompleter(Completer):
         self._arg_list_cache = None
         self.special_commands = None
 
-    def escape_name(self, name):
+    @staticmethod
+    def escape_name(name):
         if name:
             name = u'"%s"' % name
 
         return name
 
-    def escape_schema(self, name):
-        return u"'{}'".format(self.unescape_name(name))
+    @classmethod
+    def escape_schema(cls, name):
+        return u"'{}'".format(cls.unescape_name(name))
 
-    def unescape_name(self, name):
+    @staticmethod
+    def unescape_name(name):
         """ Unquote a string."""
         if name and name[0] == '"' and name[-1] == '"':
             name = name[1:-1]
 
         return name
 
-    def escaped_names(self, names):
-        return [self.escape_name(name) for name in names]
+    @classmethod
+    def escaped_names(cls, names):
+        return [cls.escape_name(name) for name in names]
 
     def extend_database_names(self, databases):
         databases = self.escaped_names(databases)
@@ -354,24 +364,28 @@ class MssqlCompleter(Completer):
             pat = re.compile('(%s)' % regex)
 
             def _match(item):
+                match_item = None
                 if item.lower()[:len(text) + 1] in (text, text + ' '):
                     # Exact match of first word in suggestion
                     # This is to get exact alias matches to the top
                     # E.g. for input `e`, 'Entries E' should be on top
                     # (before e.g. `EndUsers EU`)
-                    return float('Infinity'), -1
+                    match_item = float('Infinity'), -1
                 r = pat.search(self.unescape_name(item.lower()))
                 if r:
-                    return -len(r.group()), -r.start()
+                    match_item = -len(r.group()), -r.start()
+                return match_item
         else:
             match_end_limit = len(text)
 
             def _match(item):
+                match_item = None
                 match_point = item.lower().find(text, 0, match_end_limit)
                 if match_point >= 0:
                     # Use negative infinity to force keywords to sort after all
                     # fuzzy matches
-                    return -float('Infinity'), -match_point
+                    match_item = -float('Infinity'), -match_point
+                return match_item
 
         matches = []
         for cand in collection:
@@ -546,7 +560,7 @@ class MssqlCompleter(Completer):
             tbl = generate_alias(self.unescape_name(tbl))
         if normalize_ref(tbl) not in tbls:
             return tbl
-        elif tbl[0] == '"':
+        if tbl[0] == '"':
             aliases = ('"' + tbl[1:-1] + str(i) + '"' for i in count(2))
         else:
             aliases = (tbl + str(i) for i in count(2))
@@ -717,9 +731,9 @@ class MssqlCompleter(Completer):
         args = func.args()
         if not template:
             return '()'
-        elif usage == 'call' and len(args) < 2:
+        if usage == 'call' and len(args) < 2:
             return '()'
-        elif usage == 'call' and func.has_variadic():
+        if usage == 'call' and func.has_variadic():
             return '()'
         multiline = usage == 'call' and len(args) > self.call_arg_oneliner_max
         max_arg_len = max(len(a.name) for a in args) if multiline else 0
@@ -729,8 +743,7 @@ class MssqlCompleter(Completer):
         )
         if multiline:
             return '(' + ','.join('\n    ' + a for a in args if a) + '\n)'
-        else:
-            return '(' + ', '.join(a for a in args if a) + ')'
+        return '(' + ', '.join(a for a in args if a) + ')'
 
     def _format_arg(self, template, arg, arg_num, max_arg_len):
         if not template:
@@ -820,6 +833,8 @@ class MssqlCompleter(Completer):
                                  mode='strict', meta='keyword')
 
     def get_path_matches(self, _, word_before_cursor):
+        # pylint: disable=no-self-use
+        # function cannot be static since it has to be a callable for get_completions
         completer = PathCompleter(expanduser=True)
         document = Document(text=word_before_cursor,
                             cursor_position=len(word_before_cursor))

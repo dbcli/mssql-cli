@@ -1,12 +1,12 @@
 import logging
-import click
 import shlex
 import re
 import io
 from os.path import expanduser
+import click
+from mssqlcli.packages.special import export
 from mssqlcli.packages.special.main import special_command, NO_QUERY
 from mssqlcli.packages.special.namedqueries import named_queries
-from mssqlcli.packages.special import export
 
 logger = logging.getLogger('mssqlcli.commands')
 
@@ -94,7 +94,8 @@ ORDER BY
     '''
 
     if verbose:
-        base_query = base_query.format(verbose=',IndexId = ind.index_id, ColumnId = ic.index_column_id',
+        base_query = base_query.format(verbose=(',IndexId = ind.index_id, '
+                                                'ColumnId = ic.index_column_id'),
                                        pattern='{pattern}')
     else:
         base_query = base_query.format(verbose='', pattern='{pattern}')
@@ -127,7 +128,6 @@ WHERE type_desc like '%function%' {pattern}
         base_query = base_query.format(pattern='')
 
     return mssqlcliclient.execute_query(base_query)
-
 
 @special_command('\\sf', '\\sf FUNCNAME', 'Show a function\'s definition.')
 def show_function_definition(mssqlcliclient, pattern, verbose):
@@ -173,10 +173,12 @@ ORDER BY name, type_desc
 
     if verbose:
         if mssqlcliclient.is_cloud:
-            base_query = base_query.format(cols='name, type_desc, default_schema_name, type, create_date',
+            base_query = base_query.format(cols=('name, type_desc, default_schema_name, '
+                                                 'type, create_date'),
                                            pattern='{pattern}')
         else:
-            base_query = base_query.format(cols='name, type_desc, default_database_name, type, create_date',
+            base_query = base_query.format(cols=('name, type_desc, default_database_name, '
+                                                 'type, create_date'),
                                            pattern='{pattern}')
     else:
         base_query = base_query.format(cols='name, type_desc', pattern='{pattern}')
@@ -200,12 +202,10 @@ def execute_named_query(mssqlcliclient, pattern, **__):
     if query is None:
         message = "No named query: {}".format(pattern)
         return [(None, None, message, None, False)]
-    else:
-        query, arg_error = subst_favorite_query_args(query, params)
-        if arg_error:
-            return [(None, None, arg_error, None, False)]
-        else:
-            return mssqlcliclient.execute_query(query)
+    query, arg_error = subst_favorite_query_args(query, params)
+    if arg_error:
+        return [(None, None, arg_error, None, False)]
+    return mssqlcliclient.execute_query(query)
 
 
 @special_command('\\sn', '\\sn name query', 'Save a named query.')
@@ -268,10 +268,10 @@ def subst_favorite_query_args(query, args):
     for idx, val in enumerate(args):
         subst_var = '$' + str(idx + 1)
         if subst_var not in query:
-            return [None, 'query does not have substitution parameter ' + subst_var + ':\n  ' + query]
+            return [None, 'query does not have substitution parameter ' + subst_var + ':\n  ' \
+                                                                        + query]
 
         query = query.replace(subst_var, val)
-
     match = re.search('\\$\d+', query)
     if match:
         return[None, 'missing substitution for ' + match.group(0) + ' in query:\n  ' + query]
@@ -293,13 +293,13 @@ def editor_command(command):
 @export
 def get_filename(sql):
     if sql.strip().startswith('\\e'):
-        command, _, filename = sql.partition(' ')
+        _, _, filename = sql.partition(' ')
         return filename.strip() or None
-
+    return None
 
 @export
 def get_watch_command(command):
-    match = re.match("(.*?)[\s]*\\\\watch (\d+);?$", command)
+    match = re.match(r'(.*?)[\s]*\\\\watch (\d+);?$', command)
     if match:
         groups = match.groups()
         return groups[0], int(groups[1])
@@ -314,7 +314,7 @@ def get_editor_query(sql):
     # The reason we can't simply do .strip('\e') is that it strips characters,
     # not a substring. So it'll strip "e" in the end of the sql also!
     # Ex: "select * from style\e" -> "select * from styl".
-    pattern = re.compile('(^\\\e|\\\e$)')
+    pattern = re.compile(r'(^\\\e|\\\e$)')
     while pattern.search(sql):
         sql = pattern.sub('', sql)
 

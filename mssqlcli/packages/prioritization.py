@@ -1,9 +1,9 @@
 from __future__ import unicode_literals
 
 import re
+from collections import defaultdict
 import sqlparse
 from sqlparse.tokens import Name
-from collections import defaultdict
 from .mssqlliterals.main import get_literals
 
 
@@ -21,7 +21,7 @@ keywords = get_literals('keywords')
 keyword_regexs = dict((kw, _compile_regex(kw)) for kw in keywords)
 
 
-class PrevalenceCounter(object):
+class PrevalenceCounter:
     def __init__(self):
         self.keyword_counts = defaultdict(int)
         self.name_counts = defaultdict(int)

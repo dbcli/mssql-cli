@@ -55,13 +55,11 @@ def last_word(text, include='alphanum_underscore'):
 
     if text[-1].isspace():
         return ''
-    else:
-        regex = cleanup_regex[include]
-        matches = regex.search(text)
-        if matches:
-            return matches.group(0)
-        else:
-            return ''
+    regex = cleanup_regex[include]
+    matches = regex.search(text)
+    if matches:
+        return matches.group(0)
+    return ''
 
 
 def find_prev_keyword(sql, n_skip=0):
@@ -80,8 +78,9 @@ def find_prev_keyword(sql, n_skip=0):
     logical_operators = ('AND', 'OR', 'NOT', 'BETWEEN')
 
     for t in reversed(flattened):
-        if t.value == '(' or (t.is_keyword and (
-                              t.value.upper() not in logical_operators)):
+        if t.value == '(' or (t.is_keyword and
+                              (t.value.upper() not in logical_operators)
+                             ):
             # Find the location of token t in the original parsed statement
             # We can't use parsed.token_index(t) because t may be a child token
             # inside a TokenList, in which case token_index thows an error
@@ -132,9 +131,8 @@ def parse_partial_identifier(word):
     n_tok = len(p.tokens)
     if n_tok == 1 and isinstance(p.tokens[0], Identifier):
         return p.tokens[0]
-    elif p.token_next_by(m=(Error, '"'))[1]:
+    if p.token_next_by(m=(Error, '"'))[1]:
         # An unmatched double quote, e.g. '"foo', 'foo."', or 'foo."bar'
         # Close the double quote, then reparse
         return parse_partial_identifier(word + '"')
-    else:
-        return None
+    return None
