@@ -78,12 +78,30 @@ def create_test_db():
         '-', '_').replace('.', '_')
     test_db_name = u'mssqlcli_testdb_{0}_{1}'.format(
         local_machine_name, random_str())
-    query = u"CREATE DATABASE {0};".format(test_db_name)
-    for _, _, _, _, is_error in client.execute_query(query):
-        if is_error is True:
-            test_db_name = None
+    query_db_create = u"CREATE DATABASE {0};".format(test_db_name)
+    rows, columns, status, statement, is_error = None, None, None, None, None
+    count = 0
+
+    # retry logic in case db create fails
+    while count < 5:
+        for _, _, _, _, is_create_error in client.execute_query(query_db_create):
+            if not is_create_error:
+                shutdown(client)
+                return test_db_name
+        count += 1
     shutdown(client)
-    return test_db_name
+
+    # cleanup db just in case, then raise exception
+    clean_up_test_db(test_db_name)
+    raise AssertionError(
+        ("DB creation failed:\n"
+         "rows:\t{0}\n"
+         "columns:\t{1}\n"
+         "status:\t{2}\n"
+         "statement:\t{3}\n"
+         "is_error:\t{4}").format(rows, columns, status, statement, is_error)
+    )
+
 
 def clean_up_test_db(test_db_name):
     client = create_mssql_cli_client()
