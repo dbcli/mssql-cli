@@ -20,14 +20,16 @@ class Request(ABC):
         self.connectionCompleteEvent = connectionCompleteEvent
         self.finished = False
 
-    @abc.abstractstaticmethod
+    @staticmethod
+    @abc.abstractmethod
     def decode_response(response):
         """
             Returns decoded response.
         """
         pass
 
-    @abc.abstractclassmethod
+    @classmethod
+    @abc.abstractmethod
     def response_error(cls, error):
         """
             Returns object when response fails.
