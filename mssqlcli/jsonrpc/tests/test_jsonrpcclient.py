@@ -207,7 +207,7 @@ class JsonRpcClientTests(unittest.TestCase):
             test_client.shutdown()
             self.assertFalse(test_client.request_thread.is_alive())
         else:
-            raise AssertionError("LookupError exception not caught when it should've been.")
+            raise AssertionError("LookupError should have been thrown.")
         finally:
             test_client.shutdown()
 
@@ -229,7 +229,9 @@ class JsonRpcClientTests(unittest.TestCase):
             # Verify the background thread communicated the exception.
             self.assertEqual(
                 str(exception), u'I/O operation on closed file.')
-
+        else:
+            raise AssertionError("ValueError should have been thrown.")
+        finally:
             test_client.shutdown()
 
     @unittest.skip("Disabling until scenario is valid")
@@ -252,6 +254,7 @@ class JsonRpcClientTests(unittest.TestCase):
         self.assertFalse(test_client.request_thread.is_alive())
         self.assertFalse(test_client.response_thread.is_alive())
 
+    @unittest.skip("Test functionality is broken.")
     def test_stream_closed_during_process(self):
         """
             Verify request stream closed, exception returned and request thread died.
@@ -277,6 +280,9 @@ class JsonRpcClientTests(unittest.TestCase):
                 str(exception), u'I/O operation on closed file.')
             # Verify response thread is dead.
             self.assertFalse(test_client.request_thread.is_alive())
+        else:
+            raise AssertionError("ValueError should have been thrown.")
+        finally:
             test_client.shutdown()
 
     def test_get_response_with_id(self):
