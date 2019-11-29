@@ -6,7 +6,7 @@ Updating the Debian package
 
 On a build machine (e.g. new Ubuntu 14.04 VM), run the build script.
 
-For example:
+For example:ekkarat.w@gmail.com
 ```
 git clone https://github.com/dbcli/mssql-cli
 cd mssql-cli
