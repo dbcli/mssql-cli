@@ -15,7 +15,7 @@ from cli_helpers.tabular_output.preprocessors import (align_decimals,
                                                       format_numbers)
 import humanize
 import click
-from prompt_toolkit.shortcuts.prompt import PromptSession, CompleteStyle
+from prompt_toolkit.shortcuts import PromptSession, CompleteStyle
 from prompt_toolkit.completion import DynamicCompleter, ThreadedCompleter
 from prompt_toolkit.enums import DEFAULT_BUFFER, EditingMode
 from prompt_toolkit.document import Document
