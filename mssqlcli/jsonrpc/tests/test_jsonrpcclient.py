@@ -254,7 +254,7 @@ class JsonRpcClientTests(unittest.TestCase):
         self.assertFalse(test_client.request_thread.is_alive())
         self.assertFalse(test_client.response_thread.is_alive())
 
-    @unittest.skip("Test functionality is broken.")
+    @unittest.skip("Test functionality is broken: ValueError is never thrown.")
     def test_stream_closed_during_process(self):
         """
             Verify request stream closed, exception returned and request thread died.
