@@ -41,16 +41,8 @@ class TestMssqlCliClientConnection(MssqlCliClient):
             Helper method to get baseline file.
             """
             return os.path.abspath(
-                os.path.join(
-                    os.path.abspath(__file__),
-                    u'..',
-                    u'..',
-                    u'mssqlcli',
-                    u'jsonrpc',
-                    u'contracts',
-                    u'tests',
-                    u'baselines',
-                    file_name))
+                os.path.join(os.path.dirname(os.path.abspath(__file__)), 'jsonrpc',
+                             'baselines', file_name))
 
         try:
             with open(get_test_baseline(u'test_simple_query.txt'), u'r+b', buffering=0) \
