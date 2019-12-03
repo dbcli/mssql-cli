@@ -1,5 +1,6 @@
 import os
 import socket
+import warnings
 from argparse import Namespace
 import mssqlcli.sqltoolsclient as sqltoolsclient
 import mssqlcli.mssqlcliclient as mssqlcliclient
@@ -78,12 +79,24 @@ def create_test_db():
         '-', '_').replace('.', '_')
     test_db_name = u'mssqlcli_testdb_{0}_{1}'.format(
         local_machine_name, random_str())
-    query = u"CREATE DATABASE {0};".format(test_db_name)
-    for _, _, _, _, is_error in client.execute_query(query):
-        if is_error is True:
-            test_db_name = None
+    query_db_create = u"CREATE DATABASE {0};".format(test_db_name)
+    count = 0
+
+    # retry logic in case db create fails
+    while count < 5:
+        for _, _, status, _, is_create_error in client.execute_query(query_db_create):
+            if not is_create_error:
+                shutdown(client)
+                return test_db_name
+            # log warning to console
+            warnings.warn('Test DB create failed with error: {0}'.format(status))
+        count += 1
     shutdown(client)
-    return test_db_name
+
+    # cleanup db just in case, then raise exception
+    clean_up_test_db(test_db_name)
+    raise AssertionError("DB creation failed.")
+
 
 def clean_up_test_db(test_db_name):
     client = create_mssql_cli_client()
