@@ -207,6 +207,9 @@ class JsonRpcClientTests(unittest.TestCase):
             self.assertFalse(test_client.response_thread.is_alive())
             test_client.shutdown()
             self.assertFalse(test_client.request_thread.is_alive())
+        except Exception as exception:
+            raise AssertionError("Expected LookupError but caught a different exception: {}"\
+                                 .format(exception))
         else:
             raise AssertionError("LookupError should have been thrown.")
         finally:
@@ -231,6 +234,9 @@ class JsonRpcClientTests(unittest.TestCase):
             # Verify the background thread communicated the exception.
             self.assertEqual(
                 str(exception), u'I/O operation on closed file.')
+        except Exception as exception:
+            raise AssertionError("Expected ValueError but caught a different exception: {}"\
+                                 .format(exception))
         else:
             raise AssertionError("ValueError should have been thrown.")
         finally:
@@ -282,6 +288,9 @@ class JsonRpcClientTests(unittest.TestCase):
                 str(exception), u'I/O operation on closed file.')
             # Verify response thread is dead.
             self.assertFalse(test_client.request_thread.is_alive())
+        except Exception as exception:
+            raise AssertionError("Expected ValueError but caught a different exception: {}"\
+                                 .format(exception))
         else:
             raise AssertionError("ValueError should have been thrown.")
         finally:
