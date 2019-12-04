@@ -1,6 +1,7 @@
 import unittest
 import time
 import io
+import threading
 
 import mssqlcli.jsonrpc.jsonrpcclient as json_rpc_client
 
@@ -188,11 +189,27 @@ class JsonRpcClientTests(unittest.TestCase):
             self.assertEqual(
                 str(exception),
                 u'Content-Length was not found in headers received.')
+
+            # flaky test fix: logic that waits until threads shut down
+            count = 0
+            while count < 5:
+                active_threads = threading.enumerate()
+                if test_client.request_thread not in active_threads or \
+                    test_client.response_thread in active_threads:
+                    time.sleep(5)
+                    count += 1
+                else:
+                    break
+
             # Lookup exception for invalid content length spelling.
             self.assertTrue(test_client.request_thread.is_alive())
             self.assertFalse(test_client.response_thread.is_alive())
             test_client.shutdown()
             self.assertFalse(test_client.request_thread.is_alive())
+        else:
+            raise AssertionError("LookupError should have been thrown.")
+        finally:
+            test_client.shutdown()
 
     def test_response_stream_closed_exception(self):
         """
@@ -212,7 +229,9 @@ class JsonRpcClientTests(unittest.TestCase):
             # Verify the background thread communicated the exception.
             self.assertEqual(
                 str(exception), u'I/O operation on closed file.')
-
+        else:
+            raise AssertionError("ValueError should have been thrown.")
+        finally:
             test_client.shutdown()
 
     @unittest.skip("Disabling until scenario is valid")
@@ -235,6 +254,7 @@ class JsonRpcClientTests(unittest.TestCase):
         self.assertFalse(test_client.request_thread.is_alive())
         self.assertFalse(test_client.response_thread.is_alive())
 
+    @unittest.skip("Test functionality is broken: ValueError is never thrown.")
     def test_stream_closed_during_process(self):
         """
             Verify request stream closed, exception returned and request thread died.
@@ -260,6 +280,9 @@ class JsonRpcClientTests(unittest.TestCase):
                 str(exception), u'I/O operation on closed file.')
             # Verify response thread is dead.
             self.assertFalse(test_client.request_thread.is_alive())
+        else:
+            raise AssertionError("ValueError should have been thrown.")
+        finally:
             test_client.shutdown()
 
     def test_get_response_with_id(self):
