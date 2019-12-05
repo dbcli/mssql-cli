@@ -2,7 +2,7 @@ import unittest
 import time
 import io
 import threading
-
+import pytest
 import mssqlcli.jsonrpc.jsonrpcclient as json_rpc_client
 
 
@@ -170,6 +170,7 @@ class JsonRpcClientTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             test_client.submit_request(None, None)
 
+    @pytest.mark.unstable
     def test_receive_invalid_response_exception(self):
         """
             Verify invalid response has exception queued and response thread dies.

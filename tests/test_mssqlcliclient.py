@@ -119,6 +119,7 @@ class TestMssqlCliClientQuery(MssqlCliClient):
             assert query == test_query
 
     @staticmethod
+    @pytest.mark.unstable
     def test_schema_table_views_and_columns_query(client):
         """
             Verify mssqlcliclient's tables, views, columns, and schema are populated.
@@ -160,6 +161,7 @@ class TestMssqlCliClientQuery(MssqlCliClient):
             drop_entities(client)
 
     @staticmethod
+    @pytest.mark.unstable
     def test_stored_proc_multiple_result_sets(client):
         """
             Verify the results of running a stored proc with multiple result sets

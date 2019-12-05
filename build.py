@@ -126,10 +126,23 @@ def unit_test():
     """
     runid = str(uuid.uuid1())
     python_version = platform.python_version()
-    utility.exec_command(
-        'pytest -l --cov mssqlcli --doctest-modules --junitxml=junit/test-{}-results.xml \
-            --cov-report=xml --cov-report=html --cov-append '
-        '-o junit_suite_name=pytest-{} '
+    utility.exec_command(('pytest -l --cov mssqlcli --doctest-modules '
+                          '--junitxml=junit/test-{}-results.xml --cov-report=xml '
+                          '--cov-report=html --cov-append -o junit_suite_name=pytest-{} '
+                          '-s -m "not unstable" {}').format(runid, python_version,
+                                                            get_active_test_filepaths()),
+                         utility.ROOT_DIR, continue_on_error=False)
+
+def unstable_unit_test():
+    """
+    Run all unstable unit tests.
+    """
+    utility.exec_command('pytest -s -v -m unstable {}'.format(get_active_test_filepaths()),
+                         utility.ROOT_DIR, continue_on_error=False)
+
+
+def get_active_test_filepaths():
+    return (
         'tests/test_mssqlcliclient.py '
         'tests/test_completion_refresher.py '
         'tests/test_config.py '
@@ -143,10 +156,9 @@ def unit_test():
         'tests/test_telemetry.py '
         'tests/test_localization.py '
         'tests/test_globalization.py '
-        '-s tests/test_noninteractive_mode.py '# -s disables capturing--test doesn't work without it
-        'tests/test_special.py'.format(runid, python_version),
-        utility.ROOT_DIR,
-        continue_on_error=False)
+        'tests/test_noninteractive_mode.py '
+        'tests/test_special.py'
+    )
 
 
 def integration_test():
@@ -223,6 +235,7 @@ if __name__ == '__main__':
         'build': build,
         'validate_package': validate_package,
         'unit_test': unit_test,
+        'unstable_unit_test': unstable_unit_test,
         'integration_test': integration_test,
         'test': test
     }
