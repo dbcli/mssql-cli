@@ -80,6 +80,10 @@ def build():
                              utility.ROOT_DIR,
                              continue_on_error=False)
 
+        # generate sdist
+        utility.exec_command('%s setup.py check -r -s sdist --formats=gztar,zip' % PYTHON,
+                             utility.ROOT_DIR, continue_on_error=False)
+
     # Copy back the SqlToolsService binaries for this platform.
     clean_and_copy_sqltoolsservice(utility.get_current_platform())
     copy_and_rename_wheels()
