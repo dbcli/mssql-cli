@@ -1,3 +1,4 @@
 include LICENSE.txt
 include mssqlcli/mssqltoolsservice/bin/*
 include mssqlcli/mssqltoolsservice/bin/*/*
+include mssqlcli/packages/mssqlliterals/sqlliterals.json
