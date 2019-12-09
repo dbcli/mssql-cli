@@ -39,7 +39,7 @@ def create_toolbar_tokens_func(mssql_cli):
             if mssql_cli.multiline_mode == 'safe':
                 result.append((token, ' ([Esc] [Enter] to execute]) '))
             else:
-                result.append((token, ' (Semi-colon [;] will end the line) '))
+                result.append((token, ' ([GO] statement will end the line) '))
 
         if mssql_cli.vi_mode:
             result.append(

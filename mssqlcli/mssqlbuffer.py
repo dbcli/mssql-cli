@@ -21,10 +21,10 @@ def mssql_is_multiline(mssql_cli):
 
 
 def _is_complete(sql):
-    # A complete command is an sql statement that ends with a semicolon, unless
+    # A complete command is an sql statement that ends with a 'GO', unless
     # there's an open quote surrounding it, as is common when writing a
     # CREATE FUNCTION command
-    return sql.endswith(';') and not is_open_quote(sql)
+    return sql.lower().endswith('go') and not is_open_quote(sql)
 
 
 def _multiline_exception(text):

@@ -230,7 +230,7 @@ class MssqlCliClient:
         query_has_exception = query_response.exception_message
         query_has_error_messages = query_messages[0].is_error if query_messages else False
         query_has_batch_error = query_response.batch_summaries[0].has_error \
-            if hasattr(query_response, 'batch_summaries') else False
+            if query_response.batch_summaries else False
 
         query_failed = query_has_exception or query_has_batch_error or query_has_error_messages
 
@@ -277,7 +277,8 @@ class MssqlCliClient:
 
     @staticmethod
     def _no_results_found_in(query_response):
-        return not query_response.batch_summaries[0].result_set_summaries
+        return not query_response.batch_summaries \
+               or not query_response.batch_summaries[0].result_set_summaries
 
     @staticmethod
     def _no_rows_found_in(query_response):
