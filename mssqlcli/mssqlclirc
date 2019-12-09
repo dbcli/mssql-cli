@@ -10,13 +10,13 @@ smart_completion = True
 wider_completion_menu = False
 
 # Multi-line mode allows breaking up the sql statements into multiple lines. If
-# this is set to True, then the end of the statements must have a semi-colon.
+# this is set to True, then the end of the statements must have 'GO'.
 # If this is set to False then sql statements can't be split into multiple
 # lines. End of line (return) is considered as the end of the statement.
 multi_line = False
 
 # If multi_line_mode is set to "tsql", in multi-line mode, [Enter] will execute
-# the current input if the input ends in a semicolon.
+# the current input if the input ends in 'GO'.
 # If multi_line_mode is set to "safe", in multi-line mode, [Enter] will always
 # insert a newline, and [Esc] [Enter] or [Alt]-[Enter] must be used to execute
 # a command.
