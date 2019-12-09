@@ -6,7 +6,7 @@
 import io
 import unittest
 import mssqlcli.jsonrpc.jsonrpcclient as jsonrpc
-from tests.jsonrpc import BASELINE_REQUEST
+from jsonrpc import BASELINE_REQUEST
 
 class JsonRpcTest(unittest.TestCase):
     """

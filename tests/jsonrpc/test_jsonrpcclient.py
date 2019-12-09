@@ -4,7 +4,7 @@ import io
 import threading
 import pytest
 import mssqlcli.jsonrpc.jsonrpcclient as json_rpc_client
-from tests.jsonrpc import BASELINE_REQUEST
+from jsonrpc import BASELINE_REQUEST
 
 class JsonRpcClientTests(unittest.TestCase):
     """
