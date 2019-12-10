@@ -2,6 +2,7 @@ from __future__ import print_function
 from subprocess import check_call, CalledProcessError
 import os
 import platform
+import shlex
 import shutil
 import sys
 import string
@@ -21,7 +22,12 @@ def exec_command(command, directory, continue_on_error=True):
         Execute command.
     """
     try:
-        check_call(command.split(), cwd=directory)
+        command_split = [token.strip('"') for token in shlex.split(command, posix=False)]
+        # The logic above is used to preserve multiple token arguments with pytest. It is
+        # specifically needed when calling "not unstable" for running all tests not marked
+        # as unstable.
+
+        check_call(command_split, cwd=directory)
     except CalledProcessError as err:
         # Continue execution in scenarios where we may be bulk command execution.
         print(err, file=sys.stderr)
