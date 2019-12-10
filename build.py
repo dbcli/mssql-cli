@@ -80,7 +80,8 @@ def build():
                              utility.ROOT_DIR,
                              continue_on_error=False)
 
-        # generate sdist--only run on Mac to eliminate redundant copies when published to Azure
+        # generate sdist--only run on macOS to eliminate redundant copies when published to Azure
+        # NOTE: macOS was arbitrarily chosen as the single OS
         if sys.platform == 'darwin':
             utility.exec_command('%s setup.py check -r -s sdist --formats=gztar,zip' % PYTHON,
                                  utility.ROOT_DIR, continue_on_error=False)
