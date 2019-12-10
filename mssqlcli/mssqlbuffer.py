@@ -24,7 +24,9 @@ def _is_complete(sql):
     # A complete command is an sql statement that ends with a 'GO', unless
     # there's an open quote surrounding it, as is common when writing a
     # CREATE FUNCTION command
-    return sql.lower().endswith('go') and not is_open_quote(sql)
+    if sql is not "":
+        tokens = sql.split()
+        return tokens[len(tokens) - 1].lower() == 'go' and not is_open_quote(sql)
 
 
 def _multiline_exception(text):
