@@ -83,7 +83,7 @@ def build():
         # generate sdist--only run on macOS to eliminate redundant copies when published to Azure
         # NOTE: macOS was arbitrarily chosen as the single OS
         if sys.platform == 'darwin':
-            utility.exec_command('%s setup.py check -r -s sdist --formats=gztar,zip' % PYTHON,
+            utility.exec_command('%s setup.py check -r -s sdist --formats=gztar' % PYTHON,
                                  utility.ROOT_DIR, continue_on_error=False)
 
     # Copy back the SqlToolsService binaries for this platform.
