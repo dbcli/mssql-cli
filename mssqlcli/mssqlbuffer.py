@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-
+import re
 from prompt_toolkit.enums import DEFAULT_BUFFER
 from prompt_toolkit.filters import Condition
 from prompt_toolkit.application import get_app
@@ -25,8 +25,16 @@ def _is_complete(sql):
     # there's an open quote surrounding it, as is common when writing a
     # CREATE FUNCTION command
     if sql is not "":
-        tokens = sql.split()
-        return tokens[len(tokens) - 1].lower() == 'go' and not is_open_quote(sql)
+        tokens = sql.split('\n')
+        lastline = tokens[len(tokens) - 1]
+        
+        # remove commented code in last line to ensure we have a valid 'go'
+        # to end the multiline query
+        comments = re.findall('\/\*.*?\*\/|--.*?\n', lastline)
+        for comment in comments:
+            lastline = lastline.replace(comment, '')
+
+        return lastline.lower().strip() == 'go' and not is_open_quote(sql)
 
 
 def _multiline_exception(text):
