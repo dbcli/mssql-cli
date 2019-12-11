@@ -24,17 +24,19 @@ def _is_complete(sql):
     # A complete command is an sql statement that ends with a 'GO', unless
     # there's an open quote surrounding it, as is common when writing a
     # CREATE FUNCTION command
-    if sql is not "":
+    if sql != "":
         tokens = sql.split('\n')
         lastline = tokens[len(tokens) - 1]
-        
+
         # remove commented code in last line to ensure we have a valid 'go'
         # to end the multiline query
-        comments = re.findall('\/\*.*?\*\/|--.*?\n', lastline)
+        comments = re.findall(r'\/\*.*?\*\/|--.*', lastline)
         for comment in comments:
             lastline = lastline.replace(comment, '')
 
         return lastline.lower().strip() == 'go' and not is_open_quote(sql)
+
+    return False
 
 
 def _multiline_exception(text):
