@@ -163,7 +163,7 @@ class TestGlobalizationResultSet(GlobalizationTests):
         finally:
             shutdown(client)
 
-
+@pytest.mark.unstable
 class TestGlobalizationMetadata(GlobalizationTests):
     @staticmethod
     @pytest.fixture(scope="class")
@@ -172,7 +172,6 @@ class TestGlobalizationMetadata(GlobalizationTests):
         yield db
         clean_up_test_db(db)
 
-    @pytest.mark.unstable
     def test_schema_metadata_double(self, test_db):
         self.run_schema_metadata_validation('double', test_db)
 
