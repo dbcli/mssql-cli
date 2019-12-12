@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-CLI_VERSION=0.17.2
+CLI_VERSION=0.17.3
 
 if [ -z "$1" ]
   then
