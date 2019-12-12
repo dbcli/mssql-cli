@@ -104,9 +104,9 @@ def publish_official():
     # Run twine action for mssql-cli.
     # Only authorized users with credentials will be able to upload this package.
     # Credentials will be stored in a .pypirc file.
-    for f in mssqlcli_dist_dir:
+    for file_dist in mssqlcli_dist_dir:
         utility.exec_command(
-            'twine upload {}'.format(f),
+            'twine upload {}'.format(file_dist),
             utility.MSSQLCLI_DIST_DIRECTORY)
 
 
