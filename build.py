@@ -95,12 +95,25 @@ def copy_and_rename_wheels():
     # Create a additional copy of each build artifact with a ever green name with 'dev-latest' as
     # it's version.
     for pkg_name in os.listdir(utility.MSSQLCLI_DIST_DIRECTORY):
-        first_dash = pkg_name.find('-')
-        second_dash = pkg_name.find('-', first_dash + 1, len(pkg_name))
-        pkg_daily_name = pkg_name.replace(pkg_name[first_dash + 1:second_dash], 'dev-latest')
+        file_name, file_extension = os.path.splitext(pkg_name)
+
+        if file_extension == '.gz':
+            file_extension = '.tar.gz'
+            # rename sdist to make underscore consistent with wheel
+            file_name = file_name.replace('mssql-cli', 'mssql_cli').replace('.tar', '')
+            end_index_to_replace = len(file_name)
+
+        first_dash = file_name.find('-')
+
+        if file_extension == '.whl':
+            end_index_to_replace = file_name.find('-', first_dash + 1, len(file_name))
+
+        pkg_daily_name = file_name.replace(file_name[first_dash + 1:end_index_to_replace],
+                                           'dev-latest')
 
         original_path = os.path.join(utility.MSSQLCLI_DIST_DIRECTORY, pkg_name)
-        updated_path = os.path.join(utility.MSSQLCLI_DIST_DIRECTORY, pkg_daily_name)
+        updated_path = os.path.join(utility.MSSQLCLI_DIST_DIRECTORY,
+                                    pkg_daily_name + file_extension)
         copyfile(original_path, updated_path)
 
 
