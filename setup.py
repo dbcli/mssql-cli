@@ -44,7 +44,7 @@ setup(
     name='mssql-cli',
     author='Microsoft Corporation',
     author_email='sqlcli@microsoft.com',
-    version=version if os.environ.get('MSSQL_CLI_OFFICIAL_BUILD', '') \
+    version=version if os.environ.get('MSSQL_CLI_OFFICIAL_BUILD', '').lower() == 'true' \
                     else get_timestamped_version(version),
     license='BSD-3',
     url='https://github.com/dbcli/mssql-cli',
