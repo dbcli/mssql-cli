@@ -212,6 +212,7 @@ class JsonRpcClientTests(unittest.TestCase):
         finally:
             test_client.shutdown()
 
+    @pytest.mark.unstable
     def test_response_stream_closed_exception(self):
         """
             Verify response stream closed, exception returned and response thread died.
