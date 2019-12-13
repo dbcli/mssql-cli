@@ -9,6 +9,8 @@ from mssqltestutils import (
     create_mssql_cli,
     create_mssql_cli_options,
     create_mssql_cli_client,
+    create_test_db,
+    clean_up_test_db,
     shutdown,
     random_str
 )
@@ -25,6 +27,22 @@ class MssqlCliClient:   # pylint: disable=too-few-public-methods
         cl = create_mssql_cli_client()
         yield cl
         shutdown(cl)
+
+    @staticmethod
+    @pytest.fixture(scope='class')
+    def client_with_db():
+        db_name = create_test_db()
+
+        # create options with db name
+        options = create_mssql_cli_options()
+        options.database = db_name
+
+        cl = create_mssql_cli_client(options)
+        yield cl
+
+        # cleanup
+        shutdown(cl)
+        clean_up_test_db(db_name)
 
 class TestMssqlCliClientConnection(MssqlCliClient):
     """
@@ -126,39 +144,44 @@ class TestMssqlCliClientQuery(MssqlCliClient):
             Note: This test should run against a database that the credentials
                   MSSQL_CLI_USER and MSSQL_CLI_PASSWORD have write access to.
         """
+        client = client_with_db
+
         # create random strings for entities
         tabletest1 = "test_%s" % random_str()
         tabletest2 = "test_%s" % random_str()
         viewtest = "test_%s" % random_str()
         schematest = "test_%s" % random_str()
 
-        def drop_entities(mssqlcli_client):
-            list(mssqlcli_client.execute_query('DROP TABLE %s;' % tabletest1))
-            list(mssqlcli_client.execute_query('DROP TABLE %s;' % tabletest2))
-            list(mssqlcli_client.execute_query('DROP VIEW %s IF EXISTS;' % viewtest))
-            list(mssqlcli_client.execute_query('DROP TABLE %s;' % "."
-                                               .join([schematest, tabletest1])))
-            list(mssqlcli_client.execute_query('DROP SCHEMA %s;' % schematest))
+        queries_create = [
+            'CREATE TABLE %s (a int, b varchar(25));' % tabletest1,
+            'CREATE TABLE %s (x int, y varchar(25), z bit);' % tabletest2,
+            'CREATE VIEW %s as SELECT a from %s;' % (viewtest, tabletest1),
+            'CREATE SCHEMA %s;' % schematest,
+            'CREATE TABLE %s (a int);' % '.'.join([schematest, tabletest1])
+        ]
+
+        queries_drop = [
+            'DROP TABLE IF EXISTS %s;' % tabletest1,
+            'DROP TABLE IF EXISTS %s;' % tabletest2,
+            'DROP VIEW IF EXISTS %s;' % viewtest,
+            'DROP TABLE IF EXISTS %s;' % ".".join([schematest, tabletest1]),
+            'DROP SCHEMA IF EXISTS %s;' % schematest
+        ]
 
         try:
-            drop_entities(client)   # drop entities in beginning (in case tables exist)
-
-            list(client.execute_query('CREATE TABLE %s (a int, b varchar(25));' % tabletest1))
-            list(client.execute_query('CREATE TABLE %s (x int, y varchar(25), z bit);'
-                                      % tabletest2))
-            list(client.execute_query('CREATE VIEW %s as SELECT a from %s;'
-                                      % (viewtest, tabletest1)))
-            list(client.execute_query('CREATE SCHEMA %s;' % schematest))
-            list(client.execute_query('CREATE TABLE %s (a int);'
-                                      % '.'.join([schematest, tabletest1])))
+            # drop entities in beginning (in case tables exist)
+            self.execute_queries(client, queries_drop)
+            self.execute_queries(client, queries_create)
 
             assert (schematest, tabletest1) in set(client.get_tables())
             assert ('dbo', viewtest) in set(client.get_views())
             assert (schematest, tabletest1, 'a', 'int', 'NULL') in set(client.get_table_columns())
             assert ('dbo', viewtest, 'a', 'int', 'NULL') in set(client.get_view_columns())
             assert schematest in client.get_schemas()
+        except Exception as e:
+            raise AssertionError(e)
         finally:
-            drop_entities(client)
+            self.execute_queries(client, queries_drop)
 
     @staticmethod
     @pytest.mark.unstable
@@ -166,6 +189,8 @@ class TestMssqlCliClientQuery(MssqlCliClient):
         """
             Verify the results of running a stored proc with multiple result sets
         """
+        client = client_with_db
+
         create_stored_proc = u"CREATE PROC sp_mssqlcli_multiple_results " \
                         u"AS " \
                         u"BEGIN " \
@@ -177,14 +202,25 @@ class TestMssqlCliClientQuery(MssqlCliClient):
         del_stored_proc = u"DROP PROCEDURE sp_mssqlcli_multiple_results"
 
         try:
-            list(client.execute_query(create_stored_proc))
+            self.execute_queries(client, [create_stored_proc])
             row_counts = []
             for rows, _, _, _, _ in client.execute_query(exec_stored_proc):
                 row_counts.append(len(rows))
             assert row_counts[0] == 2
             assert row_counts[1] == 3
+        except Exception as e:
+            raise AssertionError(e)
         finally:
-            list(client.execute_query(del_stored_proc))
+            self.execute_queries(client, [del_stored_proc])
+
+    @staticmethod
+    def execute_queries(client, queries):
+        """ Executes a batch of queries. """
+        for query in queries:
+            for _, _, status, _, is_error in client.execute_query(query):
+                if is_error:
+                    raise AssertionError("Query execution failed: {}".format(status))
+        return True
 
 
 class TestMssqlCliClientMultipleStatement(MssqlCliClient):
