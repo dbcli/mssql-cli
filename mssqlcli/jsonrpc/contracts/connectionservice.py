@@ -1,83 +1,46 @@
 # pylint: disable=too-many-instance-attributes
 # pylint: disable=too-few-public-methods
 
-import logging
 from mssqlcli.jsonrpc.contracts import Request
-
-
-logger = logging.getLogger(u'mssqlcli.connectionservice')
 
 
 class ConnectionRequest(Request):
     """
         SqlToolsService Connection request.
     """
-    METHOD_NAME = u'connection/connect'
 
     def __init__(self, request_id, owner_uri, json_rpc_client, parameters):
-        self.request_id = request_id
-        self.owner_uri = owner_uri
-        self.finished = False
-        self.json_rpc_client = json_rpc_client
-        self.params = ConnectionParams(parameters)
+        super(ConnectionRequest, self).__init__(request_id, owner_uri, json_rpc_client,
+                                                ConnectionParams(parameters),
+                                                u'connection/connect',
+                                                ConnectionCompleteEvent)
 
-    def execute(self):
-        self.json_rpc_client.submit_request(
-            self.METHOD_NAME, self.params.format(), self.request_id)
-
-    def get_response(self):
-        """
-            Get latest response, event or exception if it occured.
-        """
-        try:
-            response = self.json_rpc_client.get_response(self.request_id, self.owner_uri)
-            decoded_response = None
-            if response:
-                logger.debug(response)
-                decoded_response = self.decode_response(response)
-
-            if isinstance(decoded_response, ConnectionCompleteEvent):
-                self.finished = True
-                self.json_rpc_client.request_finished(self.request_id)
-                self.json_rpc_client.request_finished(self.owner_uri)
-
-            return decoded_response
-
-        except Exception as error:  # pylint: disable=broad-except
-            logger.info(str(error))
-            self.finished = True
-            self.json_rpc_client.request_finished(self.request_id)
-            self.json_rpc_client.request_finished(self.owner_uri)
-            return ConnectionCompleteEvent({
-                u'params': {
-                    u'ownerUri': self.owner_uri,
-                    u'connectionId': None,
-                    u'messages': str(error),
-                    u'errorMessage': u'Connection request encountered an exception',
-                    u'errorNumber': None
-                }
-            })
-
-    def completed(self):
-        """
-            Get current request state.
-        """
-        return self.finished
+    @classmethod
+    def response_error(cls, error):
+        return ConnectionCompleteEvent({
+            u'params': {
+                u'ownerUri': cls.owner_uri,
+                u'connectionId': None,
+                u'messages': str(error),
+                u'errorMessage': u'Connection request encountered an exception',
+                u'errorNumber': None
+            }
+        })
 
     @staticmethod
-    def decode_response(obj):
+    def decode_response(response):
         """
             Decode response dictionary into a Connection parameter type.
         """
 
-        if u'result' in obj:
-            return ConnectionResponse(obj)
+        if u'result' in response:
+            return ConnectionResponse(response)
 
-        if 'method' in obj and obj['method'] == 'connection/complete':
-            return ConnectionCompleteEvent(obj)
+        if 'method' in response and response['method'] == 'connection/complete':
+            return ConnectionCompleteEvent(response)
 
         # Could not decode return st
-        return obj
+        return response
 
 
 class ConnectionDetails:

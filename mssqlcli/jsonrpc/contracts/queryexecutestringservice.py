@@ -12,51 +12,18 @@ class QueryExecuteStringRequest(Request):
         Uses SQL Tools Service query/executeString method.
     """
 
-    METHOD_NAME = u'query/executeString'
-
     def __init__(self, request_id, owner_uri, json_rpc_client, parameters):
-        self.request_id = request_id
-        self.owner_uri = owner_uri
-        self.finished = False
-        self.json_rpc_client = json_rpc_client
-        self.params = QueryExecuteStringParams(parameters)
+        super(QueryExecuteStringRequest, self).__init__(request_id, owner_uri, json_rpc_client,
+                                                        QueryExecuteStringParams(parameters),
+                                                        u'query/executeString',
+                                                        (QueryCompleteEvent,
+                                                         QueryExecuteErrorResponseEvent))
 
-    def get_response(self):
-        """
-            Get latest response, event or exception if occured.
-        """
-        try:
-            response = self.json_rpc_client.get_response(self.request_id, self.owner_uri)
-
-            decoded_response = None
-            if response:
-                decoded_response = QueryExecuteStringRequest.decode_response(response)
-
-            if isinstance(decoded_response,
-                          (QueryCompleteEvent, QueryExecuteErrorResponseEvent)):
-                self.finished = True
-                self.json_rpc_client.request_finished(self.request_id)
-                self.json_rpc_client.request_finished(self.owner_uri)
-
-            return decoded_response
-
-        except Exception as error:  # pylint: disable=broad-except
-            self.finished = True
-            self.json_rpc_client.request_finished(self.request_id)
-            self.json_rpc_client.request_finished(self.owner_uri)
-            return QueryCompleteEvent(
-                {u'params': None}, exception_message=str(error)
-            )
-
-    def execute(self):
-        self.json_rpc_client.submit_request(
-            self.METHOD_NAME, self.params.format(), self.request_id)
-
-    def completed(self):
-        """
-            Get current request state.
-        """
-        return self.finished
+    @classmethod
+    def response_error(cls, error):
+        return QueryCompleteEvent(
+            {u'params': None}, exception_message=str(error)
+        )
 
     @staticmethod
     def decode_response(response):
@@ -140,44 +107,14 @@ class QuerySubsetRequest(Request):
         SqlToolsService QuerySubset Request.
     """
 
-    METHOD_NAME = u'query/subset'
-
     def __init__(self, request_id, owner_uri, json_rpc_client, parameters):
-        self.request_id = request_id
-        self.owner_uri = owner_uri
-        self.finished = False
-        self.json_rpc_client = json_rpc_client
-        self.params = QuerySubsetParams(parameters)
+        super(QuerySubsetRequest, self).__init__(request_id, owner_uri, json_rpc_client,
+                                                 QuerySubsetParams(parameters),
+                                                 u'query/subset', ResultSubset)
 
-    def completed(self):
-        """
-            Get current request state.
-        """
-        return self.finished
-
-    def get_response(self):
-        try:
-            response = self.json_rpc_client.get_response(self.request_id, self.owner_uri)
-            decoded_response = None
-            if response:
-                decoded_response = QuerySubsetRequest.decode_response(response)
-
-            if isinstance(decoded_response, ResultSubset):
-                self.finished = True
-                self.json_rpc_client.request_finished(self.request_id)
-                self.json_rpc_client.request_finished(self.owner_uri)
-
-            return decoded_response
-
-        except Exception as error:      # pylint: disable=broad-except
-            self.finished = True
-            self.json_rpc_client.request_finished(self.request_id)
-            self.json_rpc_client.request_finished(self.owner_uri)
-            return ResultSubset(None, error_message=str(error))
-
-    def execute(self):
-        self.json_rpc_client.submit_request(
-            self.METHOD_NAME, self.params.format(), self.request_id)
+    @classmethod
+    def response_error(cls, error):
+        return ResultSubset(None, error_message=str(error))
 
     @staticmethod
     def decode_response(response):
