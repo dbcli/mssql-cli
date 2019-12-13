@@ -101,6 +101,10 @@ def copy_and_rename_wheels():
             file_extension = '.tar.gz'
             # rename sdist to make underscore consistent with wheel
             file_name = file_name.replace('mssql-cli', 'mssql_cli').replace('.tar', '')
+            os.rename(os.path.join(utility.MSSQLCLI_DIST_DIRECTORY, pkg_name),
+                      os.path.join(utility.MSSQLCLI_DIST_DIRECTORY, file_name + file_extension))
+            pkg_name = file_name + file_extension
+
             end_index_to_replace = len(file_name)
 
         first_dash = file_name.find('-')
