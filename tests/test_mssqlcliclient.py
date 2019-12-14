@@ -136,9 +136,8 @@ class TestMssqlCliClientQuery(MssqlCliClient):
             assert len(rows) == 3
             assert query == test_query
 
-    @staticmethod
     @pytest.mark.unstable
-    def test_schema_table_views_and_columns_query(client):
+    def test_schema_table_views_and_columns_query(self, client_with_db):
         """
             Verify mssqlcliclient's tables, views, columns, and schema are populated.
             Note: This test should run against a database that the credentials
@@ -183,9 +182,8 @@ class TestMssqlCliClientQuery(MssqlCliClient):
         finally:
             self.execute_queries(client, queries_drop)
 
-    @staticmethod
     @pytest.mark.unstable
-    def test_stored_proc_multiple_result_sets(client):
+    def test_stored_proc_multiple_result_sets(self, client_with_db):
         """
             Verify the results of running a stored proc with multiple result sets
         """
