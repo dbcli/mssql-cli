@@ -173,6 +173,7 @@ def get_active_test_filepaths():
         'tests/test_config.py '
         'tests/test_naive_completion.py '
         'tests/test_main.py '
+        'tests/test_multiline.py '
         'tests/test_fuzzy_completion.py '
         'tests/test_rowlimit.py '
         'tests/test_sqlcompletion.py '
