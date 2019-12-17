@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+import re
 import sqlparse
 from prompt_toolkit.enums import DEFAULT_BUFFER
 from prompt_toolkit.filters import Condition
@@ -28,10 +29,15 @@ def _is_complete(sql):
         # remove comments
         sql = sqlparse.format(sql, strip_comments=True)
 
-        tokens = sql.split('\n')
-        lastline = tokens[len(tokens) - 1]
+        # remove all closed quotes to isolate instances of open comments
+        sql_no_quotes = re.sub(r'".*?"|\'.*?\'', '', sql)
+        tokens = sql.split()
+        last_token = tokens[len(tokens) - 1]
 
-        return lastline.lower().strip() == 'go' and not is_open_quote(sql)
+        # check that 'go' is on last line, not in open quotes, and there's no open
+        # comment with closed comments and quotes removed
+        return last_token == 'go' and not is_open_quote(sql) \
+            and len(re.findall(r'\/\*', sql_no_quotes)) == 0
 
     return False
 
