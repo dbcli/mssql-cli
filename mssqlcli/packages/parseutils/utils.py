@@ -113,7 +113,7 @@ def is_open_quote(sql):
 
 def _parsed_is_open_quote(parsed):
     # Look for unmatched single quotes, or unmatched dollar sign quotes
-    return any(tok.match(Token.Error, ("'", "$")) for tok in parsed.flatten())
+    return any(tok.match(Token.Error, ("'", '"', "$")) for tok in parsed.flatten())
 
 
 def parse_partial_identifier(word):
