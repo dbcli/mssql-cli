@@ -160,7 +160,9 @@ def unstable_unit_test():
     """
     Run all unstable unit tests.
     """
-    utility.exec_command('pytest -s -v -m unstable {}'.format(get_active_test_filepaths()),
+    runid = str(uuid.uuid1())
+    utility.exec_command('pytest --doctest-modules --junitxml=junit/test-unstable-{}-results.xml '
+                         '-s -v -m unstable {}'.format(runid, get_active_test_filepaths()),
                          utility.ROOT_DIR, continue_on_error=False)
 
 
