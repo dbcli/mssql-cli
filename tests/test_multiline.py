@@ -4,13 +4,20 @@ from mssqlcli.mssqlbuffer import _is_complete
 
 class TestMssqlCliMultiline:
     testdata = [
+        (None, False),
+        ('', False),
         ('select 1 /* open comment!\ngo', False),
         ('select 1\ngo -- another comment', True),
         ('select 1; select 2, "open quote: go', False),
-        ('select 1; go', False),
+        ('select 1; GO', False),
         ('select 1\n select 2;\ngo', True),
         ('select 1;', False),
-        ('select 3 /* another open comment\n*/   go', True)
+        ('select 1 go', False)
+        # tests below to be enabled when sqlparse supports retaining newlines
+        # when stripping comments:
+        # ('select 3 /* another open comment\n*/   GO', True),
+        # ('select 1\n*/go', False),
+        # ('select 1 /*\nmultiple lines!\n*/go', True)
     ]
 
     @staticmethod
