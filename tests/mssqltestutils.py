@@ -9,6 +9,8 @@ from mssqlcli.mssqlclioptionsparser import create_parser
 from utility import random_str
 
 
+_BASELINE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # test queries mapped to files
 test_queries = [
     ("-Q \"SELECT 1\"", 'small.txt'),
@@ -22,7 +24,6 @@ def create_mssql_cli(**non_default_options):
     mssql_cli = MssqlCli(mssqlcli_options)
 
     return mssql_cli
-
 
 def create_mssql_cli_client(options=None, owner_uri=None, connect=True, sql_tools_client=None,
                             **additional_params):
@@ -51,7 +52,6 @@ def create_mssql_cli_client(options=None, owner_uri=None, connect=True, sql_tool
         print('Connection failed')
         raise e
 
-
 def create_mssql_cli_options(**nondefault_options):
 
     parser = create_parser()
@@ -69,7 +69,6 @@ def create_mssql_cli_options(**nondefault_options):
         return Namespace(**updateable_mssql_cli_options)
 
     return default_mssql_cli_options
-
 
 def shutdown(connection):
     connection.shutdown()
@@ -105,7 +104,6 @@ def create_test_db():
     clean_up_test_db(test_db_name)
     raise AssertionError("DB creation failed.")
 
-
 def clean_up_test_db(test_db_name):
     client = create_mssql_cli_client()
     query = u"DROP DATABASE {0};".format(test_db_name)
@@ -115,3 +113,18 @@ def clean_up_test_db(test_db_name):
             success = False
     shutdown(client)
     return success
+
+def get_file_contents(file_path):
+    """ Get expected result from file. """
+    try:
+        with open(file_path, 'r') as f:
+            # remove string literals (needed in python2) and newlines
+            return f.read().replace('\r', '').strip()
+    except OSError as e:
+        raise e
+
+def get_io_paths(test_file_suffix):
+    """ Returns tuple of file paths for the input and output of a test. """
+    i = os.path.join(_BASELINE_DIR, 'test_query_inputs', 'input_%s' % test_file_suffix)
+    o = os.path.join(_BASELINE_DIR, 'test_query_baseline', 'baseline_%s' % test_file_suffix)
+    return (i, o)

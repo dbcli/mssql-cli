@@ -8,10 +8,12 @@ from mssqltestutils import (
     create_mssql_cli,
     random_str,
     shutdown,
-    test_queries
+    test_queries,
+    get_file_contents,
+    get_io_paths,
+    _BASELINE_DIR
 )
 
-_BASELINE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 class TestNonInteractiveResults:
     """
@@ -31,8 +33,8 @@ class TestNonInteractiveResults:
     def test_query(self, query_str, test_file):
         """ Tests query outputs to command-line, ensuring -Q and -i produce
         the same results. """
-        file_input, file_baseline = self.input_output_paths(test_file)
-        output_baseline = self.get_file_contents(file_baseline)
+        file_input, file_baseline = get_io_paths(test_file)
+        output_baseline = get_file_contents(file_baseline)
 
         # test with -Q
         output_query_for_Q = self.execute_query_via_subprocess(query_str)
@@ -46,8 +48,8 @@ class TestNonInteractiveResults:
     @pytest.mark.timeout(60)
     def test_output_file(self, query_str, test_file, tmp_filepath):
         """ Tests -o (and ensures file overwrite works) """
-        file_input, file_baseline = self.input_output_paths(test_file)
-        output_baseline = self.get_file_contents(file_baseline)
+        file_input, file_baseline = get_io_paths(test_file)
+        output_baseline = get_file_contents(file_baseline)
 
         # test with -Q
         output_query_for_Q = self.execute_query_via_subprocess(query_str, output_file=tmp_filepath)
@@ -65,12 +67,12 @@ class TestNonInteractiveResults:
         try:
             mssqlcli = create_mssql_cli(interactive_mode=False, output_file=tmp_filepath)
             output_query = '\n'.join(mssqlcli.execute_query(query_str))
-            file_baseline = self.input_output_paths('big.txt')[1]
-            output_baseline = self.get_file_contents(file_baseline)
+            file_baseline = get_io_paths('big.txt')[1]
+            output_baseline = get_file_contents(file_baseline)
             assert output_query == output_baseline
 
             # test output to file
-            output_query_from_file = self.get_file_contents(tmp_filepath)
+            output_query_from_file = get_file_contents(tmp_filepath)
             assert output_query_from_file == output_baseline
         finally:
             shutdown(mssqlcli)
@@ -95,13 +97,6 @@ class TestNonInteractiveResults:
         output = cls.execute_query_via_subprocess("-Q 'select 1' -i 'this_breaks.txt'")
         assert output == "Invalid arguments: either -Q or -i may be specified."
 
-    @staticmethod
-    def input_output_paths(test_file_suffix):
-        """ Returns tuple of file paths for the input an output of a test. """
-        i = os.path.join(_BASELINE_DIR, 'test_query_inputs', 'input_%s' % test_file_suffix)
-        o = os.path.join(_BASELINE_DIR, 'test_query_baseline', 'baseline_%s' % test_file_suffix)
-        return (i, o)
-
     @classmethod
     def execute_query_via_subprocess(cls, query_str, output_file=None):
         """ Helper method for running a query. """
@@ -117,18 +112,8 @@ class TestNonInteractiveResults:
 
         if output_file:
             # get file contents if we used -o
-            return cls.get_file_contents(output_file)
+            return get_file_contents(output_file)
         return output.decode("utf-8").replace('\r', '').strip()
-
-    @staticmethod
-    def get_file_contents(file_path):
-        """ Get expected result from file. """
-        try:
-            with open(file_path, 'r') as f:
-                # remove string literals (needed in python2) and newlines
-                return f.read().replace('\r', '').strip()
-        except OSError as e:
-            raise e
 
 
 class TestNonInteractiveShutdownQuery:
