@@ -9,6 +9,14 @@ from mssqlcli.mssqlclioptionsparser import create_parser
 from utility import random_str
 
 
+# test queries mapped to files
+test_queries = [
+    ("-Q \"SELECT 1\"", 'small.txt'),
+    ("-Q \"SELECT 1; SELECT 2;\"", 'multiple.txt'),
+    ("-Q \"SELECT %s\"" % ('x' * 250), 'col_too_wide.txt'),
+    ("-Q \"SELECT REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024)\"", 'col_wide.txt')
+]
+
 def create_mssql_cli(**non_default_options):
     mssqlcli_options = create_mssql_cli_options(**non_default_options)
     mssql_cli = MssqlCli(mssqlcli_options)

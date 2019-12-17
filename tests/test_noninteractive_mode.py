@@ -6,7 +6,9 @@ import subprocess
 import pytest
 from mssqltestutils import (
     create_mssql_cli,
-    random_str
+    random_str,
+    shutdown,
+    test_queries
 )
 
 _BASELINE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -24,14 +26,7 @@ class TestNonInteractiveResults:
         yield fp
         os.remove(fp)
 
-    testdata = [
-        ("-Q \"SELECT 1\"", 'small.txt'),
-        ("-Q \"SELECT 1; SELECT 2;\"", 'multiple.txt'),
-        ("-Q \"SELECT %s\"" % ('x' * 250), 'col_too_wide.txt'),
-        ("-Q \"SELECT REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024)\"", 'col_wide.txt')
-    ]
-
-    @pytest.mark.parametrize("query_str, test_file", testdata)
+    @pytest.mark.parametrize("query_str, test_file", test_queries)
     @pytest.mark.timeout(60)
     def test_query(self, query_str, test_file):
         """ Tests query outputs to command-line, ensuring -Q and -i produce
@@ -47,7 +42,7 @@ class TestNonInteractiveResults:
         output_query_for_i = self.execute_query_via_subprocess("-i %s" % file_input)
         assert output_query_for_i == output_baseline
 
-    @pytest.mark.parametrize("query_str, test_file", testdata)
+    @pytest.mark.parametrize("query_str, test_file", test_queries)
     @pytest.mark.timeout(60)
     def test_output_file(self, query_str, test_file, tmp_filepath):
         """ Tests -o (and ensures file overwrite works) """
@@ -78,7 +73,7 @@ class TestNonInteractiveResults:
             output_query_from_file = self.get_file_contents(tmp_filepath)
             assert output_query_from_file == output_baseline
         finally:
-            mssqlcli.shutdown()
+            shutdown(mssqlcli)
 
     @staticmethod
     @pytest.mark.timeout(60)
@@ -91,7 +86,7 @@ class TestNonInteractiveResults:
         except ValueError:
             assert True
         finally:
-            mssqlcli.shutdown()
+            shutdown(mssqlcli)
 
     @classmethod
     @pytest.mark.timeout(60)
@@ -160,7 +155,7 @@ class TestNonInteractiveShutdownQuery:
         try:
             mssqlcli.execute_query(query_str)
         finally:
-            mssqlcli.shutdown()
+            shutdown(mssqlcli)
             assert mssqlcli.mssqlcliclient_main.sql_tools_client.\
                 tools_service_process.poll() is not None
 
@@ -192,6 +187,6 @@ class TestNonInteractiveShutdownOutput:
         try:
             mssqlcli.execute_query(query_str)
         finally:
-            mssqlcli.shutdown()
+            shutdown(mssqlcli)
             assert mssqlcli.mssqlcliclient_main.sql_tools_client.\
                 tools_service_process.poll() is not None
