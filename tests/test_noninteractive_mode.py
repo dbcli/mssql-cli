@@ -35,6 +35,7 @@ class TestNonInteractiveResults:
         the same results. """
         file_input, file_baseline = get_io_paths(test_file)
         output_baseline = get_file_contents(file_baseline)
+        query_str = '-Q "{}"'.format(query_str)     # append -Q for non-interactive call
 
         # test with -Q
         output_query_for_Q = self.execute_query_via_subprocess(query_str)
@@ -50,6 +51,7 @@ class TestNonInteractiveResults:
         """ Tests -o (and ensures file overwrite works) """
         file_input, file_baseline = get_io_paths(test_file)
         output_baseline = get_file_contents(file_baseline)
+        query_str = '-Q "{}"'.format(query_str)     # append -Q for non-interactive call
 
         # test with -Q
         output_query_for_Q = self.execute_query_via_subprocess(query_str, output_file=tmp_filepath)

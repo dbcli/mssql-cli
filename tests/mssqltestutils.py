@@ -13,10 +13,10 @@ _BASELINE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # test queries mapped to files
 test_queries = [
-    ("-Q \"SELECT 1\"", 'small.txt'),
-    ("-Q \"SELECT 1; SELECT 2;\"", 'multiple.txt'),
-    ("-Q \"SELECT %s\"" % ('x' * 250), 'col_too_wide.txt'),
-    ("-Q \"SELECT REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024)\"", 'col_wide.txt')
+    ("SELECT 1", 'small.txt'),
+    ("SELECT 1; SELECT 2;", 'multiple.txt'),
+    ("SELECT %s" % ('x' * 250), 'col_too_wide.txt'),
+    ("SELECT REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024)", 'col_wide.txt')
 ]
 
 def create_mssql_cli(**non_default_options):
