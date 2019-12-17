@@ -25,19 +25,23 @@ def _is_complete(sql):
     # A complete command is an sql statement that ends with a 'GO', unless
     # there's an open quote surrounding it, as is common when writing a
     # CREATE FUNCTION command
-    if sql != "":
+    if sql is not None and sql != "":
         # remove comments
         sql = sqlparse.format(sql, strip_comments=True)
 
+        # check for open comments
         # remove all closed quotes to isolate instances of open comments
         sql_no_quotes = re.sub(r'".*?"|\'.*?\'', '', sql)
-        tokens = sql.split()
-        last_token = tokens[len(tokens) - 1]
+        is_open_comment = len(re.findall(r'\/\*', sql_no_quotes)) > 0
+
+        # check that 'go' is only token on newline
+        lines = sql.split('\n')
+        lastline = lines[len(lines) - 1].lower().strip()
+        is_valid_go_on_lastline = 'go' == lastline
 
         # check that 'go' is on last line, not in open quotes, and there's no open
         # comment with closed comments and quotes removed
-        return last_token == 'go' and not is_open_quote(sql) \
-            and len(re.findall(r'\/\*', sql_no_quotes)) == 0
+        return not is_open_quote(sql) and not is_open_comment and is_valid_go_on_lastline
 
     return False
 
