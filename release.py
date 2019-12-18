@@ -75,17 +75,18 @@ def download_official_wheels():
     utility.clean_up(utility.MSSQLCLI_DIST_DIRECTORY)
     os.mkdir(utility.MSSQLCLI_DIST_DIRECTORY)
 
-    print('Downloading official wheels with version: {}'.format(latest_version))
+    print('Downloading official wheels and sdist with version: {}'.format(latest_version))
     blob_names = [
         'mssql_cli-{}-py2.py3-none-macosx_10_11_intel.whl'.format(latest_version),
         'mssql_cli-{}-py2.py3-none-manylinux1_x86_64.whl'.format(latest_version),
         'mssql_cli-{}-py2.py3-none-win_amd64.whl'.format(latest_version),
-        'mssql_cli-{}-py2.py3-none-win32.whl'.format(latest_version)
+        'mssql_cli-{}-py2.py3-none-win32.whl'.format(latest_version),
+        'mssql_cli-{}.tar.gz'.format(latest_version)
     ]
 
     blob_service = BlockBlobService(connection_string=AZURE_STORAGE_CONNECTION_STRING)
     for blob in blob_names:
-        print('Downloading wheel:{}'.format(blob))
+        print('Downloading file:{}'.format(blob))
 
         if not blob_service.exists(BLOB_MSSQL_CLI_DAILY_CONTAINER_NAME, blob):
             print('Error: blob: {} does not exist in container: {}'\
