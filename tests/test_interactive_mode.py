@@ -43,6 +43,21 @@ class TestInteractiveModeInvalidRuns:
         self.invalid_run(output_file='will-fail.txt')
 
     @staticmethod
+    def test_output_with_interactive_change():
+        '''
+        Fails on run after interactive mode has been toggled
+        '''
+        mssqlcli = create_mssql_cli(interactive_mode=False, output_file='will-fail-eventually.txt')
+        mssqlcli.interactive_mode = True
+        try:
+            mssqlcli.run()
+            assert False
+        except ValueError:
+            assert True
+        finally:
+            shutdown(mssqlcli)
+
+    @staticmethod
     @pytest.mark.timeout(60)
     def invalid_run(**options):
         '''
