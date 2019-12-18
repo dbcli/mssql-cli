@@ -25,7 +25,7 @@ class TestInteractiveModeQueries:
     def test_query(query_str, test_file, mssqlcli):
         _, file_baseline = get_io_paths(test_file)
         output_baseline = get_file_contents(file_baseline)
-        output_query = '\n'.join(mssqlcli.execute_query(query_str))
+        output_query = '\n'.join(mssqlcli.execute_query(query_str)).replace('\r', '')
         assert output_query == output_baseline
 
 class TestInteractiveModeInvalidRuns:
