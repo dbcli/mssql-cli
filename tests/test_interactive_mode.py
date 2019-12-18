@@ -7,7 +7,7 @@ from mssqltestutils import (
     get_io_paths
 )
 
-class TestInteractiveMode:
+class TestInteractiveModeQueries:
     @staticmethod
     @pytest.fixture(scope='class')
     def mssqlcli():
@@ -27,3 +27,34 @@ class TestInteractiveMode:
         output_baseline = get_file_contents(file_baseline)
         output_query = '\n'.join(mssqlcli.execute_query(query_str))
         assert output_query == output_baseline
+
+class TestInteractiveModeInvalidRuns:
+    @pytest.mark.timeout(60)
+    def test_noninteractive_run(self):
+        '''
+        Test that calling run throws an exception only when interactive_mode is false
+        '''
+        self.invalid_run(interactive_mode=False)
+
+    def test_interactive_output(self):
+        '''
+        Test run with interactive mode enabled with output file, which should return ValueError
+        '''
+        self.invalid_run(output_file='will-fail.txt')
+
+    @staticmethod
+    @pytest.mark.timeout(60)
+    def invalid_run(**options):
+        '''
+        Tests mssql-cli runs with invalid combination of properities set
+        '''
+        mssqlcli = None
+        try:
+            mssqlcli = create_mssql_cli(**options)
+            mssqlcli.run()
+            assert False
+        except ValueError:
+            assert True
+        finally:
+            if mssqlcli is not None:
+                shutdown(mssqlcli)

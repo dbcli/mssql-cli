@@ -62,8 +62,9 @@ class TestNonInteractiveResults:
                                                                output_file=tmp_filepath)
         assert output_query_for_i == output_baseline
 
+    @staticmethod
     @pytest.mark.timeout(60)
-    def test_long_query(self, tmp_filepath):
+    def test_long_query(tmp_filepath):
         """ Output large query using Python class instance. """
         query_str = "SELECT * FROM STRING_SPLIT(REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024), ',')"
         try:
@@ -76,19 +77,6 @@ class TestNonInteractiveResults:
             # test output to file
             output_query_from_file = get_file_contents(tmp_filepath)
             assert output_query_from_file == output_baseline
-        finally:
-            shutdown(mssqlcli)
-
-    @staticmethod
-    @pytest.mark.timeout(60)
-    def test_noninteractive_run():
-        """ Test that calling run throws an exception only when interactive_mode is false """
-        mssqlcli = create_mssql_cli(interactive_mode=False)
-        try:
-            mssqlcli.run()
-            assert False
-        except ValueError:
-            assert True
         finally:
             shutdown(mssqlcli)
 
