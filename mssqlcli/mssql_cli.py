@@ -205,22 +205,23 @@ class MssqlCli(object):
         if self.sqltoolsclient:
             self.sqltoolsclient.shutdown()
 
-    def write_to_file(self, pattern, **_):
-        if not pattern:
-            self.output_file = None
-            message = 'File output disabled'
-            return [(None, None, None, message, '', True)]
-        filename = os.path.abspath(os.path.expanduser(pattern))
-        if not os.path.isfile(filename):
-            try:
-                open(filename, 'w').close()
-            except IOError as e:
-                self.output_file = None
-                message = str(e) + '\nFile output disabled'
-                return [(None, None, None, message, '', False)]
-        self.output_file = filename
-        message = 'Writing to file "%s"' % self.output_file
-        return [(None, None, None, message, '', True)]
+    # TODO: possibly use at a later date for expanded output file functionality
+    # def write_to_file(self, pattern, **_):
+    #     if not pattern:
+    #         self.output_file = None
+    #         message = 'File output disabled'
+    #         return [(None, None, None, message, '', True)]
+    #     filename = os.path.abspath(os.path.expanduser(pattern))
+    #     if not os.path.isfile(filename):
+    #         try:
+    #             open(filename, 'w').close()
+    #         except IOError as e:
+    #             self.output_file = None
+    #             message = str(e) + '\nFile output disabled'
+    #             return [(None, None, None, message, '', False)]
+    #     self.output_file = filename
+    #     message = 'Writing to file "%s"' % self.output_file
+    #     return [(None, None, None, message, '', True)]
 
     def initialize_logging(self):
         log_file = self.config['main']['log_file']
