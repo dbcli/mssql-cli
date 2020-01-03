@@ -13,6 +13,10 @@ Once Python is installed and in the PATH environment variable, open a command pr
 ```shell
 C:\> pip install mssql-cli
 ```
+or use the following command if you encounter a launcher error
+```shell
+C:\> python -m pip install mssql-cli
+```
 
 ## Installation with daily preview build
 Daily preview builds are dropped in our storage account. To install the latest available version of mssql-cli, use the below command:
