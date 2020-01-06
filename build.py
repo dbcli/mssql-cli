@@ -152,8 +152,8 @@ def unit_test():
     utility.exec_command(('pytest -l --cov mssqlcli --doctest-modules '
                           '--junitxml=junit/test-{}-results.xml --cov-report=xml '
                           '--cov-report=html --cov-append -o junit_suite_name=pytest-{} '
-                          '-s -m "not unstable" {}').format(runid, python_version,
-                                                            get_active_test_filepaths()),
+                          '-m "not unstable" {}').format(runid, python_version,
+                                                         get_active_test_filepaths()),
                          utility.ROOT_DIR, continue_on_error=False)
 
 def unstable_unit_test():
@@ -181,6 +181,7 @@ def get_active_test_filepaths():
         'tests/test_telemetry.py '
         'tests/test_localization.py '
         'tests/test_globalization.py '
+        'tests/test_interactive_mode.py '
         'tests/test_noninteractive_mode.py '
         'tests/test_special.py'
     )

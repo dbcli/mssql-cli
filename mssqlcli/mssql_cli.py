@@ -192,37 +192,36 @@ class MssqlCli(object):
 
         # exit and return error if user enters interactive mode with -i or -o arguments enabled
         if self.interactive_mode and (self.input_file or self.output_file):
-            click.secho("Invalid arguments: -i and -o can only be used in non-interactive mode.",
-                        err=True, fg='red')
-            sys.exit(1)
+            raise ValueError("Invalid arguments: -i and -o can only be used in non-interactive "
+                             "mode.")
 
         # exit and return error if both query text and an input file are specified
         if self.query and self.input_file:
-            click.secho("Invalid arguments: either query [-Q] or input file [-i] may be specified.",
-                        err=True, fg='red')
-            sys.exit(1)
+            raise ValueError("Invalid arguments: either query [-Q] or input file [-i] may be "
+                             "specified.")
 
     def __del__(self):
         # Shut-down sqltoolsservice
         if self.sqltoolsclient:
             self.sqltoolsclient.shutdown()
 
-    def write_to_file(self, pattern, **_):
-        if not pattern:
-            self.output_file = None
-            message = 'File output disabled'
-            return [(None, None, None, message, '', True)]
-        filename = os.path.abspath(os.path.expanduser(pattern))
-        if not os.path.isfile(filename):
-            try:
-                open(filename, 'w').close()
-            except IOError as e:
-                self.output_file = None
-                message = str(e) + '\nFile output disabled'
-                return [(None, None, None, message, '', False)]
-        self.output_file = filename
-        message = 'Writing to file "%s"' % self.output_file
-        return [(None, None, None, message, '', True)]
+    # TODO: possibly use at a later date for expanded output file functionality
+    # def write_to_file(self, pattern, **_):
+    #     if not pattern:
+    #         self.output_file = None
+    #         message = 'File output disabled'
+    #         return [(None, None, None, message, '', True)]
+    #     filename = os.path.abspath(os.path.expanduser(pattern))
+    #     if not os.path.isfile(filename):
+    #         try:
+    #             open(filename, 'w').close()
+    #         except IOError as e:
+    #             self.output_file = None
+    #             message = str(e) + '\nFile output disabled'
+    #             return [(None, None, None, message, '', False)]
+    #     self.output_file = filename
+    #     message = 'Writing to file "%s"' % self.output_file
+    #     return [(None, None, None, message, '', True)]
 
     def initialize_logging(self):
         log_file = self.config['main']['log_file']
@@ -390,15 +389,13 @@ class MssqlCli(object):
 
         # raise error if interactive mode is set to false here
         if not self.interactive_mode:
-            raise ValueError("'run' must be used in interactive mode! Please set \
-                             interactive_mode to True.")
+            raise ValueError("Invalid arguments: 'run' must be used in interactive mode! Please set "
+                             "interactive_mode to True.")
 
         # exit and return error if user enters interactive mode with -o argument enabled
         if self.output_file:
-            click.secho("Invalid arguments: -o must be used with interactive mode set to false.",
-                        err=True, fg='red')
-            self.shutdown()
-            sys.exit(1)
+            raise ValueError("Invalid arguments: -o must be used with interactive mode set to "
+                             "false.")
 
         history_file = self.config['main']['history_file']
         if history_file == 'default':
