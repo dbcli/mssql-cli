@@ -37,10 +37,13 @@ def _is_complete(sql):
         # check that 'go' is only token on newline
         lines = sql.split('\n')
         lastline = lines[len(lines) - 1].lower().strip()
-        is_valid_go_on_lastline = 'go' == lastline
+        is_valid_go_on_lastline = lastline == 'go'
 
         # check that 'go' is on last line, not in open quotes, and there's no open
-        # comment with closed comments and quotes removed
+        # comment with closed comments and quotes removed.
+        # NOTE: this method fails when GO follows a closing '*/' block comment on the same line,
+        # we've taken a dependency with sqlparse
+        # (https://github.com/andialbrecht/sqlparse/issues/484)
         return not is_open_quote(sql) and not is_open_comment and is_valid_go_on_lastline
 
     return False
