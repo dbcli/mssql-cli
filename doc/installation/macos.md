@@ -4,7 +4,7 @@
 * macOS (x64) 10.12+
 
 ## Installation via pip
-On macOS, Python 2.7 is generally pre-installed. You may have to upgrade pip with the following easy_install commands.
+Python 2.7 is pre-installed on macOS.
 ```shell
 # Install pip
 $ sudo easy_install pip
@@ -13,10 +13,10 @@ $ sudo easy_install pip
 $ sudo pip install --upgrade pip
 
 # Install mssql-cli
-$ sudo pip install mssql-cli --ignore-installed six
+$ sudo pip install mssql-cli
 
 # Run mssql-cli
-$ mssql-cli -h
+$ mssql-cli
 ```
 
 ## Installation with daily preview build
