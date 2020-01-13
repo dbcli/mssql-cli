@@ -6,8 +6,9 @@
 * Windows Server 2012+
 
 Python is required for installation of mssql-cli and is not installed by default on Windows. To install Python, follow these instructions:
-1. The latest Python installation package can be downloaded from [here](https://www.python.org/downloads/).
-2. During installation, select the **Add Python to PATH** option. Python must be in the PATH environment variable.
+1. Install the latest Python package from [here](https://www.python.org/downloads/).
+2. Select **Add Python [Version] to PATH** option before installation. Python must be in the PATH environment variable.
+3. Install Python.
 
 **Note:** If Python was installed into the "Program Files" directory, you may need to open the command prompt as an administrator for the above command to succeed.
 
