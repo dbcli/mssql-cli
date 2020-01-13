@@ -71,7 +71,7 @@ Installation via pip
 
     $ pip install mssql-cli
 
-Please refer to `Install via pip`_ for detailed install instructions via pip on each platform
+Please refer to `Install via pip`_ for detailed install instructions via pip on each platform.
 
 
 
