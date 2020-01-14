@@ -132,14 +132,15 @@ SELECT *
 
 ```sql
 SELECT "Name", "DepartmentID"
-......FROM "HumanResources"."Department" as hr;
+......FROM "HumanResources"."Department" as hr
 ```
 
-4. To execute your multi-line query, add a semi-colon **;** at the end of the last line of your query, then press **Enter** key
+4. To execute your multi-line query, add **GO** on a new-line, then press **Enter** key
 
 ```sql
 SELECT "Name", "DepartmentID"
-......FROM "HumanResources"."Department" as hr;
+......FROM "HumanResources"."Department" as hr
+......GO
 ```
 
 ## Environment Variables
