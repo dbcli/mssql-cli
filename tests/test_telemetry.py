@@ -25,6 +25,8 @@ class TelemetryTests(unittest.TestCase):
         import mssqlcli.telemetry as telemetry      # pylint: disable=import-outside-toplevel
         return telemetry
 
+    @unittest.skipUnless(os.environ['MSSQL_CLI_TELEMETRY_OPTOUT'].lower() != 'true',
+                         "Only works when telemetry opt-out not set to true.")
     def test_telemetry_data_points(self):
         test_telemetry_client = self.build_telemetry_client()
         test_telemetry_client.start()
