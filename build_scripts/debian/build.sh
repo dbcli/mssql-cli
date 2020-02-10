@@ -59,7 +59,6 @@ export CUSTOM_PIP=$source_dir/python_env/bin/pip3
 
 # Build mssql-cli wheel from source.
 cd $source_dir
-$source_dir/python_env/bin/python3 $source_dir/dev_setup.py
 $source_dir/python_env/bin/python3 $source_dir/build.py build
 cd -
 
