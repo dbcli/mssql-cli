@@ -57,6 +57,9 @@ make install
 export CUSTOM_PYTHON=$source_dir/python_env/bin/python3
 export CUSTOM_PIP=$source_dir/python_env/bin/pip3
 
+# Download dependencies needed to run build stage
+$source_dir/python_env/bin/python3 -m pip install -r $source_dir/requirements-dev.txt
+
 # Build mssql-cli wheel from source.
 cd $source_dir
 $source_dir/python_env/bin/python3 $source_dir/build.py build
