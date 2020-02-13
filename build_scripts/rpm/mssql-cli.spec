@@ -60,6 +60,9 @@ make clean || echo "Nothing to clean"
 make
 make install
 
+# Install Python dependencies for build
+%{python_dir}/bin/python3 -m pip install -r %{repo_path}/requirements-dev.txt
+
 # Build mssql-cli wheel from source.
 export CUSTOM_PYTHON=%{python_dir}/bin/python3
 export CUSTOM_PIP=%{python_dir}/bin/pip3
@@ -72,7 +75,7 @@ dist_dir=%{repo_path}/dist
 
 # Ignore the dev latest wheel since build outputs two.
 all_modules=`find $dist_dir -not -name "mssql_cli-dev-latest-py2.py3-none-manylinux1_x86_64.whl" -type f`
-%{python_dir}/bin/pip3  install $all_modules
+%{python_dir}/bin/pip3 install $all_modules
 
 # Create executable
 mkdir -p %{buildroot}%{cli_lib_dir}
