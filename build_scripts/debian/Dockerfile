@@ -10,10 +10,10 @@ RUN echo "connection string: ${AZURE_STORAGE_CONNECTION_STRING}"
 RUN echo "official build: ${MSSQL_CLI_OFFICIAL_BUILD}"
 
 RUN apt-get update
-RUN apt-get -y install python-all python3-all python3-pip python-setuptools nano git sudo wget libssl-dev libffi-dev debhelper
+RUN apt-get -y install python3-all python3-pip python3-setuptools nano git sudo wget libssl-dev libffi-dev debhelper
 
 # Install pip and stdeb
-RUN python -m pip install --upgrade pip
+RUN python3 -m pip install --upgrade pip
 
 # Build .deb
 RUN mkdir Repos
@@ -23,4 +23,4 @@ WORKDIR Repos/mssql-cli
 RUN build_scripts/debian/build.sh $(pwd)
 
 # Build dependencies to support publishing release of .deb
-RUN python -m pip install -r requirements-dev.txt
+RUN python3 -m pip install -r requirements-dev.txt
