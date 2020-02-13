@@ -22,7 +22,7 @@ script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 debian_directory_creator=$script_dir/dir_creator.sh
 
 # Install dependencies for the build
-sudo apt-get install -y libssl-dev libffi-dev debhelper
+sudo apt-get install -y libssl-dev libffi-dev debhelper python-setuptools
 # Download, Extract, Patch, Build CLI
 tmp_pkg_dir=$(mktemp -d)
 working_dir=$(mktemp -d)
