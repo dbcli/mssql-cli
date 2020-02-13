@@ -10,7 +10,7 @@ RUN echo "connection string: ${AZURE_STORAGE_CONNECTION_STRING}"
 RUN echo "official build: ${MSSQL_CLI_OFFICIAL_BUILD}"
 
 RUN apt-get update
-RUN apt-get -y install python-all python3-all python3-pip nano git sudo wget libssl-dev libffi-dev debhelper
+RUN apt-get -y install python-all python3-all python3-pip python3-setuptools nano git sudo wget libssl-dev libffi-dev debhelper
 
 # Install pip and stdeb
 RUN pip3 install --upgrade pip
