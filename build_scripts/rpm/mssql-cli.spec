@@ -36,8 +36,9 @@ BuildArch:      x86_64
 BuildRequires:  gcc
 BuildRequires:  libffi-devel
 BuildRequires:  openssl-devel
+BuildRequires:  /usr/bin/pathfix.py
 
-Requires:       libunwind, libicu
+Requires:       libicu
 
 %description
     We’re excited to introduce mssql-cli, a new and interactive command line query tool for SQL Server.
@@ -61,7 +62,8 @@ make
 make install
 
 # Install Python dependencies for build
-%{python_dir}/bin/python3 -m pip install -r %{repo_path}/requirements-dev.txt
+%{python_dir}/bin/pip3 install --upgrade pip
+%{python_dir}/bin/pip3 install -r %{repo_path}/requirements-dev.txt
 
 # Build mssql-cli wheel from source.
 export CUSTOM_PYTHON=%{python_dir}/bin/python3
@@ -83,6 +85,9 @@ cp -a %{python_dir}/* %{buildroot}%{cli_lib_dir}
 mkdir -p %{buildroot}%{_bindir}
 printf "if [ -z ${PYTHONIOENCODING+x} ]; then export PYTHONIOENCODING=utf8; fi" > %{buildroot}%{_bindir}/mssql-cli
 printf '#!/usr/bin/env bash\n%{cli_lib_dir}/bin/python3 -Esm mssqlcli.main "$@"' > %{buildroot}%{_bindir}/mssql-cli
+
+# Some files got ambiguous python shebangs, we fix them after everything else is done
+pathfix.py -pni %{python_dir}/bin/python3 %{buildroot}/usr
 
 %files
 # Include mssql-cli directory which includes it's own python.
