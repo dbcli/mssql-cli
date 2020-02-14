@@ -24,18 +24,18 @@ Verification
 ------------
 
 ```
-sudo rpm -i RPMS/*/mssql-cli-0.10.0.dev-1.el7.x86_64.rpm
+sudo rpm -i /root/rpmbuild/RPMS/x86_64/mssql-cli*.rpm
 mssql-cli --version
 ```
 
 Check the file permissions of the package:  
 ```
-rpmlint RPMS/*/mssql-cli-0.10.0.dev-1.el7.x86_64.rpm
+rpmlint /root/rpmbuild/RPMS/x86_64/mssql-cli*.rpm
 ```
 
 Check the file permissions of the package:  
 ```
-rpm -qlvp RPMS/*/mssql-cli-0.10.0.dev-1.el7.x86_64.rpm
+rpm -qlvp /root/rpmbuild/RPMS/x86_64/mssql-cli*.rpm
 ```
 
 To remove:  
