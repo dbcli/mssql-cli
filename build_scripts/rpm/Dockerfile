@@ -1,4 +1,3 @@
-# FROM registry.access.redhat.com/rhel7
 FROM centos:8
 
 ARG AZURE_STORAGE_CONNECTION_STRING
@@ -22,3 +21,6 @@ RUN mkdir Repos/mssql-cli
 ADD . Repos/mssql-cli
 WORKDIR Repos/mssql-cli
 RUN build_scripts/rpm/build.sh $(pwd)
+
+# Build dependencies for eventual release
+RUN python3 -m pip install -r requirements-dev.txt
