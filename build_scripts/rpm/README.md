@@ -1,9 +1,24 @@
-RPM Packaging
-================
+# RPM Packaging
 
-Building the RPM package
-------------------------
+## Building the RPM Package
 
+### Building with Docker
+From the root repo directory, run:
+```
+docker build \
+--build-arg AZURE_STORAGE_CONNECTION_STRING=${AZURE_STORAGE_CONNECTION_STRING} \
+--build-arg MSSQL_CLI_OFFICIAL_BUILD=${MSSQL_CLI_OFFICIAL_BUILD} \
+-t mssqlcli-rpm-build \
+-f build_scripts/rpm/Dockerfile . --no-cache
+```
+
+### Release RPM Package to Daily Storage with Docker
+After the docker container is built, call:
+```
+docker run mssqlcli-rpm-build python3 release.py publish_daily_rpm
+```
+
+### Building without Docker
 On a build machine (e.g. new CentOS 7 VM) run the following.
 
 Install dependencies required to build:
@@ -20,10 +35,10 @@ cd mssql-cli
 build_scripts/rpm/build.sh $(pwd)
 ```
 
-Verification
-------------
+## Verification
 
 ```
+sudo yum install -y libicu
 sudo rpm -i /root/rpmbuild/RPMS/x86_64/mssql-cli*.rpm
 mssql-cli --version
 ```
@@ -43,8 +58,7 @@ To remove:
 sudo rpm -e mssql-cli
 ```
 
-Links
------
+## Links
 
 https://fedoraproject.org/wiki/How_to_create_an_RPM_package
 
