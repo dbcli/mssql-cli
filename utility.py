@@ -16,6 +16,9 @@ MSSQLCLI_DIST_DIRECTORY = os.path.abspath(
 MSSQLCLI_BUILD_DIRECTORY = os.path.abspath(
     os.path.join(os.path.abspath(__file__), '..', 'build'))
 
+MSSQLCLI_RPM_DIRECTORY = os.path.abspath(
+    os.path.join(os.path.abspath(__file__), '..', '..', 'rpm_output')
+)
 
 def exec_command(command, directory, continue_on_error=True):
     """
