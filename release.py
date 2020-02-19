@@ -58,7 +58,9 @@ def _upload_package(service, file_path, pkg_name):
     file_name = os.path.basename(file_path)
     _, file_ext = os.path.splitext(file_name)
 
-    if file_ext == '.rpm':
+    if file_ext == '.deb':
+        blob_name = 'deb/{}'.format(file_name)
+    elif file_ext == '.rpm':
         blob_name = 'rpm/{}'.format(file_name)
     else:
         blob_name = 'whl/{}/{}'.format(pkg_name, file_name)
@@ -141,6 +143,22 @@ def publish_daily():
         UPLOADED_PACKAGE_LINKS)
 
 
+def publish_daily_deb():
+    """ Publish .deb package """
+    print('Publishing Debian package to daily container within storage account.')
+    assert AZURE_STORAGE_CONNECTION_STRING,\
+          'Set AZURE_STORAGE_CONNECTION_STRING environment variable'
+
+    blob_service = BlockBlobService(
+        connection_string=AZURE_STORAGE_CONNECTION_STRING)
+
+    print_heading('Uploading packages to blob storage ')
+    for pkg in os.listdir(utility.MSSQLCLI_DEB_DIRECTORY):
+        pkg_path = os.path.join(utility.MSSQLCLI_DEB_DIRECTORY, pkg)
+        print('Uploading package {}'.format(pkg_path))
+        _upload_package(blob_service, pkg_path, 'mssql-cli')
+
+
 def publish_daily_rpm():
     """ Publish .rpm package """
     print('Publishing rpm package to daily container within storage account.')
@@ -162,6 +180,7 @@ if __name__ == '__main__':
 
     targets = {
         'publish_daily': publish_daily,
+        'publish_daily_deb': publish_daily_deb,
         'publish_daily_rpm': publish_daily_rpm,
         'publish_official': publish_official,
         'download_official_wheels': download_official_wheels

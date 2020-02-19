@@ -20,6 +20,10 @@ MSSQLCLI_RPM_DIRECTORY = os.path.abspath(
     os.path.join(os.path.abspath(__file__), '..', '..', 'rpm_output')
 )
 
+MSSQLCLI_DEB_DIRECTORY = os.path.abspath(
+    os.path.join(os.path.abspath(__file__), '..', '..', 'debian_output')
+)
+
 def exec_command(command, directory, continue_on_error=True):
     """
         Execute command.
