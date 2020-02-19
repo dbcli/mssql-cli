@@ -22,7 +22,7 @@ script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 debian_directory_creator=$script_dir/dir_creator.sh
 
 # Install dependencies for the build
-sudo apt-get install -y libssl-dev libffi-dev debhelper
+sudo apt-get install -y libssl-dev libffi-dev debhelper python-setuptools
 # Download, Extract, Patch, Build CLI
 tmp_pkg_dir=$(mktemp -d)
 working_dir=$(mktemp -d)
@@ -57,9 +57,13 @@ make install
 export CUSTOM_PYTHON=$source_dir/python_env/bin/python3
 export CUSTOM_PIP=$source_dir/python_env/bin/pip3
 
+# Download dependencies needed to run build stage
+$source_dir/python_env/bin/python3 -m pip install --upgrade pip
+$source_dir/python_env/bin/python3 -m pip install -r $source_dir/requirements-dev.txt
+
 # Build mssql-cli wheel from source.
 cd $source_dir
-$source_dir/python_env/bin/python3 $source_dir/build.py build;
+$source_dir/python_env/bin/python3 $source_dir/build.py build
 cd -
 
 # Install mssql-cli wheel.
