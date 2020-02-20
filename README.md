@@ -13,12 +13,30 @@
 - Configuration file support 
 - Multi-line queries
 
+## Install
+| [Windows] | macOS | Linux |
+| - | - | - |
+
+### pip
+```
+$ pip install mssql-cli
+```
+Please refer to `install via pip`_ for detailed install instructions via pip on each platform.
+
+### apt-get and yum
+**A new stable version of mssql-cli is coming soon.**
+
+Older versions of mssql-cli may be installed using `apt-get` or `yum` by following [these instructions]('https://github.com/dbcli/mssql-cli/blob/master/doc/installation/linux.md')
+
+### Download Daily Builds Directly
+
+
 ## Get mssql-cli
 | Install Instructions              |
 | --------------------------------- |
 |  Windows (x64)                    |
 |  Windows (x86)                    |
-|  macOS 10.12                      |
+|  macOS 10.12+                     |
 |  Ubuntu 17.04                     |
 |  Ubuntu 16.04                     |
 |  Ubuntu 14.04                     |
