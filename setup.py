@@ -40,6 +40,9 @@ install_requirements = [
     'enum34>=1.1.6'
 ]
 
+with open ("README.md", "r") as fh:
+    long_description = fh.read()
+
 setup(
     name='mssql-cli',
     author='Microsoft Corporation',
@@ -52,7 +55,8 @@ setup(
     package_data={'mssqlcli': ['mssqlclirc',
                                'packages/mssqlliterals/sqlliterals.json']},
     description=description,
-    long_description=open('README.rst', encoding='utf-8').read(),
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     install_requires=install_requirements,
     include_package_data=True,
     scripts=[
