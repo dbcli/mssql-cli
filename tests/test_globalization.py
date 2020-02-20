@@ -163,7 +163,6 @@ class TestGlobalizationResultSet(GlobalizationTests):
         finally:
             shutdown(client)
 
-@pytest.mark.unstable
 class TestGlobalizationMetadata(GlobalizationTests):
     @staticmethod
     @pytest.fixture(scope="class")
