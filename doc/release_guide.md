@@ -117,7 +117,7 @@ password: <Get Password from Azure Key Vault>
 
 ### Test Publishing with TestPyPI
 
-[TestPyPi](test.pypi.org) can be used to test distribution before going to production. To test publishing to TestPyPI, use the above `.pypirc` file and call:
+[TestPyPi](https://test.pypi.org) can be used to test distribution before going to production. To test publishing to TestPyPI, use the above `.pypirc` file and call:
 ```
 twine upload --repository testpypi dist/*
 ```
