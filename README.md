@@ -2,7 +2,7 @@
 [![Python 2,3](https://img.shields.io/badge/python-2.7,&nbsp;3.x-blue.svg)](https://github.com/dbcli/mssql-cli)
 
 # mssql-cli
-`mssql-cli` is an interactive command line query tool for SQL Server. This open source tool works cross-platform and proud to be a part of the [`dbcli`](github.com/dbcli) community. 
+[**mssql-cli**](https://github.com/dbcli/mssql-cli) is an interactive command line query tool for SQL Server. This open source tool works cross-platform and proud to be a part of the [**dbcli**](github.com/dbcli) community. 
 
 ![mssql-cli Autocomplete](https://github.com/dbcli/mssql-cli/raw/master/screenshots/mssql-cli-autocomplete.gif)
 
@@ -39,10 +39,9 @@ Please refer to `Get mssql-cli`_ for detailed install instructions per platform.
 
 
 ### Installation via pip
-.. code:: bash
-
-    $ pip install mssql-cli
-
+```
+$ pip install mssql-cli
+```
 Please refer to `install via pip`_ for detailed install instructions via pip on each platform.
 
 
