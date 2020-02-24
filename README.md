@@ -14,21 +14,25 @@
 - Multi-line queries
 
 ## Install
-| [Windows] | macOS | Linux |
+Platform-specific installation instructions are below:
+| [Windows](https://github.com/dbcli/mssql-cli/blob/master/doc/installation/windows.md#windows-installation) | [macOS](https://github.com/dbcli/mssql-cli/blob/master/doc/installation/macos.md#macos-installation) | [Linux](https://github.com/dbcli/mssql-cli/blob/master/doc/installation/linux.md) |
 | - | - | - |
 
-### pip
+Please view the [official release guide](https://github.com/dbcli/mssql-cli/blob/master/doc/installation_guide.md) to view all supported releases.
+
+### Install with pip
 ```
 $ pip install mssql-cli
 ```
-Please refer to `install via pip`_ for detailed install instructions via pip on each platform.
+Please refer to the [pip installation docs](https://github.com/dbcli/mssql-cli/blob/master/doc/installation/pip.md) for more platform-specific information.
 
-### apt-get and yum
-**A new stable version of mssql-cli is coming soon.**
+### Install with apt-get and yum
+**A new stable version of mssql-cli is coming soon for `apt-get` and `yum`.**
 
 Older versions of mssql-cli may be installed using `apt-get` or `yum` by following [these instructions]('https://github.com/dbcli/mssql-cli/blob/master/doc/installation/linux.md')
 
-### Download Daily Builds Directly
+### Install Daily Builds
+Direct downloads for both latest stable and preview bits can be found at [here](https://github.com/dbcli/mssql-cli/blob/master/doc/installation_guide.md#Direct-Downloads).
 
 
 ## Get mssql-cli

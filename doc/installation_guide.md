@@ -45,17 +45,13 @@ also be found in the links above.
 |  Windows (x64)                             |[.whl][whl-win-x64]           |[.whl][whl-win-x64-daily]|
 |  Windows (x86)                             |[.whl][whl-win-x86]           |[.whl][whl-win-x86-daily]|
 |  macOS 10.12+                              |[.whl][whl-macos]             |[.whl][whl-macos-daily]  |
-|  Ubuntu 17.04                              |[.deb][deb]                   |[.deb][deb-daily]        |
-|  Ubuntu 16.04                              |[.deb][deb]                   |[.deb][deb-daily]        |
-|  Ubuntu 14.04                              |[.deb][deb]                   |[.deb][deb-daily]        |
+|  Ubuntu 14.04+                             |[.deb][deb]                   |[.deb][deb-daily]        |
 |  Debian 8.7+                               |[.deb][deb]                   |[.deb][deb-daily]        |
-|  Debian 9                                  |[.deb][deb]                   |[.deb][deb-daily]        |
 |  CentOS 7                                  |[.rpm][rpm]                   |[.rpm][rpm-daily]        |
 |  Red Hat Enterprise Linux 7                |[.rpm][rpm]                   |[.rpm][rpm-daily]        |
 |  OpenSUSE 42.2+                            |[.rpm][rpm]                   |[.rpm][rpm-daily]        |
 |  SUSE Enterprise Linux (SLES) 12           |[.rpm][rpm]                   |[.rpm][rpm-daily]        |
-|  Fedora 25                                 |[.rpm][rpm]                   |[.rpm][rpm-daily]        |
-|  Fedora 26                                 |[.rpm][rpm]                   |[.rpm][rpm-daily]        |
+|  Fedora 25+                                |[.rpm][rpm]                   |[.rpm][rpm-daily]        |
 
 [whl-win-x64-daily]: https://mssqlcli.blob.core.windows.net/daily/whl/mssql-cli/mssql_cli-dev-latest-py2.py3-none-win_amd64.whl
 [whl-win-x86-daily]: https://mssqlcli.blob.core.windows.net/daily/whl/mssql-cli/mssql_cli-dev-latest-py2.py3-none-win32.whl
