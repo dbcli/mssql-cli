@@ -2,27 +2,31 @@
 [![Python 2,3](https://img.shields.io/badge/python-2.7,&nbsp;3.x-blue.svg)](https://github.com/dbcli/mssql-cli)
 
 # mssql-cli
-[**mssql-cli**](https://github.com/dbcli/mssql-cli) is an interactive command line query tool for SQL Server. This open source tool works cross-platform and proud to be a part of the [**dbcli**](github.com/dbcli) community. 
+[**mssql-cli**](https://github.com/dbcli/mssql-cli) is an interactive command line query tool for SQL Server. This open source tool works cross-platform and proud to be a part of the [dbcli](github.com/dbcli) community. 
 
 ![mssql-cli Autocomplete](https://github.com/dbcli/mssql-cli/raw/master/screenshots/mssql-cli-autocomplete.gif)
 
-## Features
-- Auto-completion
-- Syntax highlighting
-- Query history
-- Configuration file support 
-- Multi-line queries
+mssql-cli supports a rich interactive command line experience, with features such as:
+- **Auto-completion**: fewer keystrokes needed to complete complicated queries.
+- **Syntax highlighting**: highlights T-SQL keywords.
+- **Query history**: easily complete an auto-suggested query that was previously executed.
+- **Configuration file support**: customize the mssql-cli experience for your needs.
+- **Multi-line queries**: execute multiple queries at once using the multi-line edit mode.
+- **Non-interactive support**: execute a query without jumping into the interactive experience.
 
-## Install
+## Quick Start
+Read the section below to quickly get started with mssql-cli. Consult the [usage guide](https://github.com/dbcli/mssql-cli/tree/master/doc/usage_guide.md) for a deeper dive into mssql-cli features.
+
+### Install mssql-cli
 Platform-specific installation instructions are below:
 | [Windows](https://github.com/dbcli/mssql-cli/blob/master/doc/installation/windows.md#windows-installation) | [macOS](https://github.com/dbcli/mssql-cli/blob/master/doc/installation/macos.md#macos-installation) | [Linux](https://github.com/dbcli/mssql-cli/blob/master/doc/installation/linux.md) |
 | - | - | - |
 
-Please view the [official release guide](https://github.com/dbcli/mssql-cli/blob/master/doc/installation_guide.md) to view all supported releases.
+Visit the [official release guide](https://github.com/dbcli/mssql-cli/blob/master/doc/installation_guide.md) to view all supported releases.
 
 ### Install with pip
 ```
-$ pip install mssql-cli
+pip install mssql-cli
 ```
 Please refer to the [pip installation docs](https://github.com/dbcli/mssql-cli/blob/master/doc/installation/pip.md) for more platform-specific information.
 
@@ -34,56 +38,32 @@ Older versions of mssql-cli may be installed using `apt-get` or `yum` by followi
 ### Install Daily Builds
 Direct downloads for both latest stable and preview bits can be found at [here](https://github.com/dbcli/mssql-cli/blob/master/doc/installation_guide.md#Direct-Downloads).
 
-
-## Get mssql-cli
-| Install Instructions              |
-| --------------------------------- |
-|  Windows (x64)                    |
-|  Windows (x86)                    |
-|  macOS 10.12+                     |
-|  Ubuntu 17.04                     |
-|  Ubuntu 16.04                     |
-|  Ubuntu 14.04                     |
-|  Debian 8.7                       |
-|  Debian 9                         |
-|  CentOS 7                         |
-|  Red Hat Enterprise Linux 7       |
-|  OpenSUSE 42.2                    |
-|  Fedora 25                        |
-|  Fedora 26                        |
-
-
-### Direct downloads
-Direct downloads for both latest stable and preview bits can be found at `Direct download`_.
-
-### Installation via apt, yum
-Please refer to `Get mssql-cli`_ for detailed install instructions per platform.
-
-
-### Installation via pip
+### Connect to Server
+Complete the command below to connect to your server:
 ```
-$ pip install mssql-cli
+mssql-cli -S <server URL> -d <database name> -U <username> -P <password>
 ```
-Please refer to `install via pip`_ for detailed install instructions via pip on each platform.
 
+### Exit mssql-cli
+Press **Ctrl+D** or type `quit`.
 
-## Usage
-Please refer to the [usage guide](https://github.com/dbcli/mssql-cli/tree/master/doc/usage_guide.md) for details on options and example usage. If you are having any issues using mssql-cli, please see the [troubleshooting guide](https://github.com/dbcli/mssql-cli/blob/master/doc/troubleshooting_guide.md).
-
+### Show Options
 For general help content, pass in the `-h` parameter:
 ```
-$ mssql-cli --help
+mssql-cli --help
 ```
-The mssql-cli tool includes a telemetry feature.  Please refer to the [telemetry guide](https://github.com/dbcli/mssql-cli/tree/master/doc/telemetry_guide.md) for more information.
 
-### Configuration
-Customization and persistence of settings can be achieved with a config file, whose path can be passed as the `--mssqlclirc <file>` command line argument. Otherwise it is read from the default path `~/.config/mssqlcli/config` on macOS and Linux, and `%LOCALAPPDATA%\dbcli\mssqlcli\config` on Windows. See the [config file](https://github.com/dbcli/mssql-cli/blob/master/mssqlcli/mssqlclirc) itself for a description of all available options.
+### Usage Docs
+Please refer to the [usage guide](https://github.com/dbcli/mssql-cli/tree/master/doc/usage_guide.md) for details on options and example usage. If you are having any issues using mssql-cli, please see the [troubleshooting guide](https://github.com/dbcli/mssql-cli/blob/master/doc/troubleshooting_guide.md).
+
+## Telemetry
+The mssql-cli tool includes a telemetry feature. Please refer to the [telemetry guide](https://github.com/dbcli/mssql-cli/tree/master/doc/telemetry_guide.md) for more information.
 
 ## Contributing
 If you would like to contribute to the project, please refer to the [development guide](https://github.com/dbcli/mssql-cli/tree/master/doc/development_guide.md).
 
-## Reporting issues and feedback
-If you encounter any bugs with the tool please file an issue in the
+## Contact Us
+If you encounter any bugs or would like to leave a feature request, please file an issue in the
 [**Issues**](https://github.com/dbcli/mssql-cli/issues) section of our GitHub repo.
 
 ## Code of Conduct
