@@ -38,7 +38,8 @@ build_scripts/rpm/build.sh $(pwd)
 ## Verification
 
 ```
-sudo yum install -y libicu
+sudo yum install -y epel-release
+sudo yum install -y libunwind libicu
 sudo rpm -i /root/rpmbuild/RPMS/x86_64/mssql-cli*.rpm
 mssql-cli --version
 ```
