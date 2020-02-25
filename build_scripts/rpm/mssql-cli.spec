@@ -36,6 +36,7 @@ BuildArch:      x86_64
 BuildRequires:  gcc
 BuildRequires:  libffi-devel
 BuildRequires:  openssl-devel
+BuildRequires:  /usr/bin/pathfix.py
 
 Requires:       libunwind, libicu
 
@@ -60,6 +61,10 @@ make clean || echo "Nothing to clean"
 make
 make install
 
+# Install Python dependencies for build
+%{python_dir}/bin/pip3 install --upgrade pip
+%{python_dir}/bin/pip3 install -r %{repo_path}/requirements-dev.txt
+
 # Build mssql-cli wheel from source.
 export CUSTOM_PYTHON=%{python_dir}/bin/python3
 export CUSTOM_PIP=%{python_dir}/bin/pip3
@@ -72,7 +77,7 @@ dist_dir=%{repo_path}/dist
 
 # Ignore the dev latest wheel since build outputs two.
 all_modules=`find $dist_dir -not -name "mssql_cli-dev-latest-py2.py3-none-manylinux1_x86_64.whl" -type f`
-%{python_dir}/bin/pip3  install $all_modules
+%{python_dir}/bin/pip3 install $all_modules
 
 # Create executable
 mkdir -p %{buildroot}%{cli_lib_dir}
@@ -80,6 +85,9 @@ cp -a %{python_dir}/* %{buildroot}%{cli_lib_dir}
 mkdir -p %{buildroot}%{_bindir}
 printf "if [ -z ${PYTHONIOENCODING+x} ]; then export PYTHONIOENCODING=utf8; fi" > %{buildroot}%{_bindir}/mssql-cli
 printf '#!/usr/bin/env bash\n%{cli_lib_dir}/bin/python3 -Esm mssqlcli.main "$@"' > %{buildroot}%{_bindir}/mssql-cli
+
+# Some files got ambiguous python shebangs, we fix them after everything else is done
+pathfix.py -pni %{python_dir}/bin/python3 %{buildroot}/usr
 
 %files
 # Include mssql-cli directory which includes it's own python.

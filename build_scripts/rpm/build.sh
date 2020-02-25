@@ -8,11 +8,16 @@ fi
 
 export REPO_PATH=$1
 
+sudo yum repolist
+sudo yum update
+sudo yum install -y gcc git rpm-build rpm-devel rpmlint make bash diffutils patch rpmdevtools python3 libffi-devel python3-devel openssl-devel
+
 # Clean output dir.
 rm -rf ~/rpmbuild
 rm -rf ${REPO_PATH}/../rpm_output
 
-rpmbuild -v -bb --clean mssql-cli.spec
+# Build rpm package
+rpmbuild -v -bb --clean ${REPO_PATH}/build_scripts/rpm/mssql-cli.spec
 
 # Copy build artifact to output dir.
 mkdir ${REPO_PATH}/../rpm_output
