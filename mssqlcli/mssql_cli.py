@@ -9,7 +9,6 @@ import traceback
 # pylint: disable=redefined-builtin
 from codecs import open
 from collections import namedtuple
-from shutil import which
 from time import time
 from cli_helpers.tabular_output import TabularOutputFormatter
 from cli_helpers.tabular_output.preprocessors import (align_decimals,
@@ -45,6 +44,7 @@ from mssqlcli.mssqltoolbar import create_toolbar_tokens_func
 from mssqlcli.sqltoolsclient import SqlToolsClient
 from mssqlcli.packages import special
 from mssqlcli.mssqlbuffer import mssql_is_multiline
+from mssqlcli.util import is_command_valid
 import mssqlcli.localized_strings as localized
 
 # Query tuples are used for maintaining history
@@ -98,7 +98,7 @@ class MssqlCli(object):
     def set_default_pager(self, config):
         configured_pager = config['main'].get('pager')
         os_environ_pager = os.environ.get('PAGER')
-        is_less_installed = which('less') is not None
+        is_less_installed = is_command_valid('less')
 
         if configured_pager:
             self.logger.info(
