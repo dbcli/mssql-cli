@@ -9,6 +9,7 @@ import traceback
 # pylint: disable=redefined-builtin
 from codecs import open
 from collections import namedtuple
+from shutil import which
 from time import time
 from cli_helpers.tabular_output import TabularOutputFormatter
 from cli_helpers.tabular_output.preprocessors import (align_decimals,
@@ -97,15 +98,16 @@ class MssqlCli(object):
     def set_default_pager(self, config):
         configured_pager = config['main'].get('pager')
         os_environ_pager = os.environ.get('PAGER')
+        is_less_installed = which('less') is not None
 
         if configured_pager:
             self.logger.info(
                 'Default pager found in config file: "%s"', configured_pager)
             os.environ['PAGER'] = configured_pager
-        elif os_environ_pager:
+        elif os_environ_pager or is_less_installed:
             self.logger.info('Default pager found in PAGER environment variable: "%s"',
                              os_environ_pager)
-            os.environ['PAGER'] = os_environ_pager
+            os.environ['PAGER'] = os_environ_pager or 'less -SRXF'
         else:
             self.logger.info(
                 'No default pager found in environment. Using os default pager')
@@ -115,6 +117,11 @@ class MssqlCli(object):
         if not os.environ.get('LESS'):
             os.environ['LESS'] = '-SRXF'
 
+        if 'PAGER' in os.environ.keys():
+            return os.environ['PAGER']
+        else:
+            return None
+
     def __init__(self, options):
 
         # Load config.
@@ -123,7 +130,7 @@ class MssqlCli(object):
         self.initialize_logging()
         self.logger = logging.getLogger(u'mssqlcli.main')
 
-        self.set_default_pager(c)
+        pager = self.set_default_pager(c)
         self.interactive_mode = options.interactive_mode
 
         self.table_format = c['main']['table_format']
@@ -131,7 +138,9 @@ class MssqlCli(object):
         self.float_format = c['data_formats']['float']
         self.null_string = c['main'].get('null_string', '<null>')
         self.expanded_output = c['main']['expand'] == 'always'
-        self.auto_expand = options.auto_vertical_output or c['main']['expand'] == 'auto'
+        # set auto_expand to false if less is detected with auto expand
+        self.auto_expand = options.auto_vertical_output \
+            or (c['main']['expand'] == 'auto' and pager != 'less -SRXF')
         self.prompt_session = None
         self.integrated_auth = options.integrated_auth
         self.less_chatty = bool(
