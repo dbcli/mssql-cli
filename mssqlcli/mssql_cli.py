@@ -130,7 +130,6 @@ class MssqlCli(object):
         self.initialize_logging()
         self.logger = logging.getLogger(u'mssqlcli.main')
 
-        pager = self.set_default_pager(c)
         self.interactive_mode = options.interactive_mode
 
         self.table_format = c['main']['table_format']
@@ -138,10 +137,6 @@ class MssqlCli(object):
         self.float_format = c['data_formats']['float']
         self.null_string = c['main'].get('null_string', '<null>')
         self.expanded_output = c['main']['expand'] == 'always'
-        # set auto_expand to false if less is detected with auto expand
-        self.auto_expand = options.auto_vertical_output \
-            or (c['main']['expand'] == 'auto' and pager != 'less -SRXF')
-        self.prompt_session = None
         self.integrated_auth = options.integrated_auth
         self.less_chatty = bool(
             options.less_chatty) or c['main'].as_bool('less_chatty') or self.interactive_mode
@@ -161,6 +156,12 @@ class MssqlCli(object):
         }
 
         if self.interactive_mode:
+            pager = self.set_default_pager(c)
+            self.prompt_session = None
+
+            # set auto_expand to false if less is detected with auto expand
+            self.auto_expand = options.auto_vertical_output \
+                or (c['main']['expand'] == 'auto' and pager != 'less -SRXF')
             self.multiline = c['main'].as_bool('multi_line')
             self.multiline_mode = c['main'].get('multi_line_mode', 'tsql')
             self.vi_mode = c['main'].as_bool('vi')
@@ -568,7 +569,7 @@ class MssqlCli(object):
                 all_success = False
                 continue
 
-            if self.auto_expand and self.prompt_session:
+            if self.interactive_mode and self.auto_expand and self.prompt_session:
                 max_width = self.prompt_session.output.get_size().columns
             else:
                 max_width = None
