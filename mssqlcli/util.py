@@ -23,6 +23,9 @@ def is_command_valid(command):
     Checks if command is recognized on machine. Used to determine installations
     of 'less' pager.
     """
+    if not command:
+        return False
+
     try:
         # call command silentyly
         with open(devnull, 'wb') as no_out:

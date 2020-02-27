@@ -99,15 +99,17 @@ class MssqlCli(object):
         configured_pager = config['main'].get('pager')
         os_environ_pager = os.environ.get('PAGER')
         is_less_installed = is_command_valid('less')
+        default_pager = configured_pager or os_environ_pager or \
+                        ('less -SRXF' if is_less_installed else False) or None
 
         if configured_pager:
             self.logger.info(
                 'Default pager found in config file: "%s"', configured_pager)
-            os.environ['PAGER'] = configured_pager
-        elif os_environ_pager or is_less_installed:
+        elif os_environ_pager:
             self.logger.info('Default pager found in PAGER environment variable: "%s"',
                              os_environ_pager)
-            os.environ['PAGER'] = os_environ_pager or 'less -SRXF'
+        elif is_less_installed:
+            self.logger.info('Default pager set to Less')
         else:
             self.logger.info(
                 'No default pager found in environment. Using os default pager')
@@ -117,10 +119,8 @@ class MssqlCli(object):
         if not os.environ.get('LESS'):
             os.environ['LESS'] = '-SRXF'
 
-        if 'PAGER' in os.environ.keys():
-            return os.environ['PAGER']
-        else:
-            return None
+        os.environ['PAGER'] = default_pager
+        return default_pager
 
     def __init__(self, options):
 

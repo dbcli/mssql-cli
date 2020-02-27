@@ -5,6 +5,7 @@ from argparse import Namespace
 import mssqlcli.sqltoolsclient as sqltoolsclient
 import mssqlcli.mssqlcliclient as mssqlcliclient
 from mssqlcli.mssql_cli import MssqlCli
+from mssqlcli.config import get_config
 from mssqlcli.mssqlclioptionsparser import create_parser
 from utility import random_str
 
@@ -69,6 +70,14 @@ def create_mssql_cli_options(**nondefault_options):
         return Namespace(**updateable_mssql_cli_options)
 
     return default_mssql_cli_options
+
+def create_mssql_cli_config(options=None):
+    """
+    Create config from options.
+    """
+    if not options:
+        options = create_mssql_cli_options()
+    return get_config(options.mssqlclirc_file)
 
 def shutdown(connection):
     connection.shutdown()
