@@ -1,4 +1,5 @@
 import os
+import sys
 import pytest
 from mssqlcli.util import is_command_valid
 from mssqltestutils import (
@@ -89,9 +90,13 @@ class TestInteractiveModePager(TestInteractiveMode):
     @staticmethod
     @pytest.mark.timeout(60)
     def test_pager_environ(mssqlcli):
+        """
+        Defaults to environment variable with no config value for pager
+        """
         os.environ['PAGER'] = 'testing environ value'
 
         config = create_mssql_cli_config()
+        config['main'].pop('pager')     # remove config pager value
         assert mssqlcli.set_default_pager(config) == 'testing environ value'
 
         os.environ['PAGER'] = 'less -SRXF'
@@ -100,7 +105,9 @@ class TestInteractiveModePager(TestInteractiveMode):
     @staticmethod
     @pytest.mark.timeout(60)
     def test_pager_config(mssqlcli):
-        # defaults to config value over os.environ
+        """
+        Defaults to config value over environment variable
+        """
         os.environ['PAGER'] = 'less -SRXF'
         config_value = 'testing config value'
 
@@ -111,7 +118,15 @@ class TestInteractiveModePager(TestInteractiveMode):
     @staticmethod
     @pytest.mark.timeout(60)
     def test_valid_command():
-        assert is_command_valid('cd')
+        """
+        Checks valid command by running mssql-cli executable in repo
+        """
+        if sys.platform == 'win32':
+            exe_name = 'mssql-cli.bat'
+        else:
+            exe_name = 'mssql-cli'
+        mssqlcli_path = os.path.join('.', exe_name)
+        assert is_command_valid(mssqlcli_path)
 
     @staticmethod
     @pytest.mark.timeout(60)
