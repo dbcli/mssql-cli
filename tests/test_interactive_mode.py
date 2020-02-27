@@ -1,6 +1,7 @@
 import os
 import sys
 import pytest
+import utility
 from mssqlcli.util import is_command_valid
 from mssqltestutils import (
     create_mssql_cli,
@@ -96,7 +97,11 @@ class TestInteractiveModePager(TestInteractiveMode):
         os.environ['PAGER'] = 'testing environ value'
 
         config = create_mssql_cli_config()
-        config['main'].pop('pager')     # remove config pager value
+
+        # remove config pager value if exists
+        if 'pager' in config['main'].keys():
+            config['main'].pop('pager')
+
         assert mssqlcli.set_default_pager(config) == 'testing environ value'
 
         os.environ['PAGER'] = 'less -SRXF'
@@ -125,8 +130,8 @@ class TestInteractiveModePager(TestInteractiveMode):
             exe_name = 'mssql-cli.bat'
         else:
             exe_name = 'mssql-cli'
-        mssqlcli_path = os.path.join('.', exe_name)
-        assert is_command_valid(mssqlcli_path)
+
+        assert is_command_valid([os.path.join(utility.ROOT_DIR, exe_name), '--version'])
 
     @staticmethod
     @pytest.mark.timeout(60)
