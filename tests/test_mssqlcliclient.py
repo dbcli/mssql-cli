@@ -240,7 +240,7 @@ class TestMssqlCliClientMultipleStatement(MssqlCliClient):
         for (i, (rows, _, _, query_executed, is_error)) in \
             enumerate(client.execute_query(query_str)):
 
-            queries = query_str.split(';')
+            queries = ["{};".format(query) for query in query_str.split(';')]
             assert query_executed == queries[i].strip()
             assert len(rows) == rows_outputted[i]
             assert (is_error and len(rows) == 0) or (not is_error)
