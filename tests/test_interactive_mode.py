@@ -1,13 +1,21 @@
+import os
+import sys
 import pytest
+import utility
+from mssqlcli.util import is_command_valid
 from mssqltestutils import (
     create_mssql_cli,
+    create_mssql_cli_config,
     shutdown,
     test_queries,
     get_file_contents,
     get_io_paths
 )
 
-class TestInteractiveModeQueries:
+class TestInteractiveMode:
+    """
+    Fixture used at class-level.
+    """
     @staticmethod
     @pytest.fixture(scope='class')
     def mssqlcli():
@@ -19,6 +27,7 @@ class TestInteractiveModeQueries:
         yield mssqlcli
         shutdown(mssqlcli)
 
+class TestInteractiveModeQueries(TestInteractiveMode):
     @staticmethod
     @pytest.mark.parametrize("query_str, test_file", test_queries)
     @pytest.mark.timeout(60)
@@ -73,3 +82,59 @@ class TestInteractiveModeInvalidRuns:
         finally:
             if mssqlcli is not None:
                 shutdown(mssqlcli)
+
+class TestInteractiveModePager(TestInteractiveMode):
+    """
+    Test default pager setting.
+    """
+
+    @staticmethod
+    @pytest.mark.timeout(60)
+    def test_pager_environ(mssqlcli):
+        """
+        Defaults to environment variable with no config value for pager
+        """
+        os.environ['PAGER'] = 'testing environ value'
+
+        config = create_mssql_cli_config()
+
+        # remove config pager value if exists
+        if 'pager' in config['main'].keys():
+            config['main'].pop('pager')
+
+        assert mssqlcli.set_default_pager(config) == 'testing environ value'
+
+        os.environ['PAGER'] = 'less -SRXF'
+        assert mssqlcli.set_default_pager(config) == 'less -SRXF'
+
+    @staticmethod
+    @pytest.mark.timeout(60)
+    def test_pager_config(mssqlcli):
+        """
+        Defaults to config value over environment variable
+        """
+        os.environ['PAGER'] = 'less -SRXF'
+        config_value = 'testing config value'
+
+        config = create_mssql_cli_config()
+        config['main']['pager'] = config_value
+        assert mssqlcli.set_default_pager(config) == config_value
+
+    @staticmethod
+    @pytest.mark.timeout(60)
+    def test_valid_command():
+        """
+        Checks valid command by running mssql-cli executable in repo
+        """
+        if sys.platform == 'win32':
+            exe_name = 'mssql-cli.bat'
+        else:
+            exe_name = 'mssql-cli'
+
+        assert is_command_valid([os.path.join(utility.ROOT_DIR, exe_name), '--version'])
+
+    @staticmethod
+    @pytest.mark.timeout(60)
+    def test_invalid_command():
+        assert not is_command_valid(None)
+        assert not is_command_valid('')
