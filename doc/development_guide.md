@@ -30,7 +30,7 @@ provided by the bot. You will only need to do this once across all repos using o
 
 mssql-cli sources are located on GitHub (https://github.com/dbcli/mssql-cli). In order to contribute to the project, you are expected to: 
 -	Have a GitHub account. For Microsoft contributors, follow the guidelines on https://opensourcehub.microsoft.com/ to create, configure and link your account
--	Fork the https://github.com/dbcli/mssql-cli repository into your private GitHub account
+-	Clone or fork the https://github.com/dbcli/mssql-cli repository into your private GitHub account
 -	Create pull requests against the https://github.com/dbcli/mssql-cli repository to get your code changes merged into the project repository.
 
 ## <a name="Install_Python_Clone_Source_Code"></a>1. Install Python / Clone Source Code
