@@ -1,0 +1,9 @@
+Commands completed successfully.
+Commands completed successfully.
+(4 rows affected)
+Commands completed successfully.
+Commands completed successfully.
+(5 rows affected)
+(6 rows affected)
+(5 rows affected)
+Commands completed successfully.

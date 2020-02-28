@@ -1,0 +1,62 @@
+--Example taken from https://www.sqlservertutorial.net/sql-server-basics/sql-server-merge/
+
+drop table if exists  dbo.category;
+CREATE TABLE dbo.category (
+    category_id INT PRIMARY KEY,
+    category_name VARCHAR(255) NOT NULL,
+    amount DECIMAL(10 , 2 )
+);
+
+INSERT INTO dbo.category(category_id, category_name, amount)
+VALUES(1,'Children Bicycles',15000),
+    (2,'Comfort Bicycles',25000),
+    (3,'Cruisers Bicycles',13000),
+    (4,'Cyclocross Bicycles',10000);
+
+drop table if exists dbo.category_staging;
+CREATE TABLE dbo.category_staging (
+    category_id INT PRIMARY KEY,
+    category_name VARCHAR(255) NOT NULL,
+    amount DECIMAL(10 , 2 )
+);
+
+INSERT INTO dbo.category_staging(category_id, category_name, amount)
+VALUES(1,'Children Bicycles',15000),
+    (3,'Cruisers Bicycles',13000),
+    (4,'Cyclocross Bicycles',20000),
+    (5,'Electric Bikes',10000),
+    (6,'Mountain Bikes',10000);
+
+
+go
+
+--Do the merge
+MERGE dbo.category t
+    USING dbo.category_staging s
+ON (s.category_id = t.category_id)
+WHEN MATCHED
+    THEN UPDATE SET
+        t.category_name = s.category_name,
+        t.amount = s.amount
+WHEN NOT MATCHED BY TARGET
+    THEN INSERT (category_id, category_name, amount)
+         VALUES (s.category_id, s.category_name, s.amount)
+WHEN NOT MATCHED BY SOURCE
+    THEN DELETE;
+
+go
+
+--Do the exact same statement (cut/pasted)
+MERGE dbo.category t
+    USING dbo.category_staging s
+ON (s.category_id = t.category_id)
+WHEN MATCHED
+    THEN UPDATE SET
+        t.category_name = s.category_name,
+        t.amount = s.amount
+WHEN NOT MATCHED BY TARGET
+    THEN INSERT (category_id, category_name, amount)
+         VALUES (s.category_id, s.category_name, s.amount)
+WHEN NOT MATCHED BY SOURCE
+    THEN DELETE;
+go

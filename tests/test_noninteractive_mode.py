@@ -6,6 +6,8 @@ import subprocess
 import pytest
 from mssqltestutils import (
     create_mssql_cli,
+    create_test_db,
+    clean_up_test_db,
     random_str,
     shutdown,
     test_queries,
@@ -79,6 +81,25 @@ class TestNonInteractiveResults:
             assert output_query_from_file == output_baseline
         finally:
             shutdown(mssqlcli)
+
+    @pytest.mark.timeout(300)
+    def test_multiple_merge(self):
+        """
+        Tests query with multiple merges. Requires creation of temp db.
+        """
+        try:
+            # create temporary db
+            db_name = create_test_db()
+
+            file_input, file_baseline = get_io_paths('multiple_merge.txt')
+            text_baseline = get_file_contents(file_baseline)
+
+            # test with -i
+            output_query = self.execute_query_via_subprocess("-i {} -d {}"\
+                                                             .format(file_input, db_name))
+            assert output_query == text_baseline
+        finally:
+            clean_up_test_db(db_name)
 
     @classmethod
     @pytest.mark.timeout(60)
