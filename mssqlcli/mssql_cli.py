@@ -98,7 +98,7 @@ class MssqlCli(object):
     def set_default_pager(self, config):
         configured_pager = config['main'].get('pager')
         os_environ_pager = os.environ.get('PAGER')
-        is_less_installed = is_command_valid('less')
+        is_less_installed = is_command_valid(['less', '--version'])
         default_pager = configured_pager or os_environ_pager or \
                         ('less -SRXF' if is_less_installed else False) or None
 
