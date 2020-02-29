@@ -17,7 +17,9 @@ class TestMssqlCliMultiline:
         ('select 1 go', False),
         ('select 1\ngo go go', False),
         ('GO select 1', False),
-        ('GO', True)
+        ('GO', True),
+        ('select 1;select 1\nGO\nselect 1;select 1\nGO', True),
+        ("select '\nGO\n';", False)
         # tests below to be enabled when sqlparse supports retaining newlines
         # when stripping comments (tracking here:
         # https://github.com/andialbrecht/sqlparse/issues/484):
