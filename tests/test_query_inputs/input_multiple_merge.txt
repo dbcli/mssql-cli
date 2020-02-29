@@ -1,5 +1,3 @@
---Example taken from https://www.sqlservertutorial.net/sql-server-basics/sql-server-merge/
-
 drop table if exists  dbo.category;
 CREATE TABLE dbo.category (
     category_id INT PRIMARY KEY,
