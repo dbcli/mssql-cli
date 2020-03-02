@@ -5,9 +5,6 @@ Stable installations of mssql-cli on Linux are hosted in the [Microsoft Linux So
 - [**Ubuntu**](#Stable-Installation-on-Ubuntu)
     - [Ubuntu 14.04 (Trusty)](#ubuntu-1404-Trusty)
     - [Ubuntu 16.04 (Xenial)](#ubuntu-1604-Xenial)
-    - [Ubuntu 18.04 (Bionic)](#ubuntu-1804-Bionic)
-    - [Ubuntu 18.10 (Cosmic)](#ubuntu-1810-Cosmic)
-    - [Ubuntu 19.04 (Disco)](#ubuntu-1904-Disco)
     - [Insiders Direct Download on Ubuntu](#Insiders-Direct-Download-on-Ubuntu)
 - [**Debian**](#Stable-Installation-on-Debian)
     - [Debian 8](#debian-8)
@@ -54,51 +51,6 @@ curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
 
 # Register the Microsoft Ubuntu repository
 sudo apt-add-repository https://packages.microsoft.com/ubuntu/16.04/prod
-
-# Update the list of products
-sudo apt-get update
-
-# Install mssql-cli
-sudo apt-get install mssql-cli
-```
-
-#### Ubuntu 18.04 (Bionic)
-```sh
-# Import the public repository GPG keys
-curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
-
-# Register the Microsoft Ubuntu repository
-sudo apt-add-repository https://packages.microsoft.com/ubuntu/18.04/prod
-
-# Update the list of products
-sudo apt-get update
-
-# Install mssql-cli
-sudo apt-get install mssql-cli
-```
-
-#### Ubuntu 18.10 (Cosmic)
-```sh
-# Import the public repository GPG keys
-curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
-
-# Register the Microsoft Ubuntu repository
-sudo apt-add-repository https://packages.microsoft.com/ubuntu/18.10/prod
-
-# Update the list of products
-sudo apt-get update
-
-# Install mssql-cli
-sudo apt-get install mssql-cli
-```
-
-#### Ubuntu 19.04 (Disco)
-```sh
-# Import the public repository GPG keys
-curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
-
-# Register the Microsoft Ubuntu repository
-sudo apt-add-repository https://packages.microsoft.com/ubuntu/19.04/prod
 
 # Update the list of products
 sudo apt-get update
