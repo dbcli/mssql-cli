@@ -12,7 +12,9 @@ from mssqltestutils import (
     create_test_db,
     clean_up_test_db,
     shutdown,
-    random_str
+    random_str,
+    get_io_paths,
+    get_file_contents
 )
 
 
@@ -240,7 +242,20 @@ class TestMssqlCliClientMultipleStatement(MssqlCliClient):
         for (i, (rows, _, _, query_executed, is_error)) in \
             enumerate(client.execute_query(query_str)):
 
-            queries = query_str.split(';')
+            queries = ["{};".format(query) for query in query_str.split(';')]
             assert query_executed == queries[i].strip()
             assert len(rows) == rows_outputted[i]
             assert (is_error and len(rows) == 0) or (not is_error)
+
+    @staticmethod
+    def test_mssqlcliclient_multiple_merge(client_with_db):
+        """
+        Tests query with multiple merges. Requires creation of temp db.
+        """
+        file_input, _ = get_io_paths('multiple_merge.txt')
+        query_input = get_file_contents(file_input)
+
+        for rows, _, status, _, is_error in client_with_db.execute_query(query_input):
+            if is_error:
+                raise AssertionError("Query execution failed: {}".format(status))
+            assert () == rows

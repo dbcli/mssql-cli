@@ -106,7 +106,7 @@ class MssqlCliClient:
             else:
                 for single_query in sqlparse.split(query):
                     # Remove spaces, EOL and semi-colons from end
-                    single_query = single_query.strip().rstrip(';')
+                    single_query = single_query.strip()
                     if single_query:
                         for rows, columns, status, statement, is_error \
                             in self._execute_query(single_query):
