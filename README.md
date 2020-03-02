@@ -24,18 +24,18 @@ Platform-specific installation instructions are below:
 
 Visit the [installation reference guide](https://github.com/dbcli/mssql-cli/tree/master/doc/installation) to view all supported releases and downloads.
 
-### Install with pip
+#### Install with Linux Package Manager
+> A new stable version of mssql-cli is coming March 2020 for `apt-get` and `yum`.
+
+Follow the [Linux installation instructions]('https://github.com/dbcli/mssql-cli/blob/master/doc/installation/linux.md') to install mssql-cli using `apt-get`, `yum`, and other Linux package managers.
+
+#### Install with pip
 ```
 pip install mssql-cli
 ```
 Please refer to the [pip installation docs](https://github.com/dbcli/mssql-cli/blob/master/doc/installation/pip.md) for more platform-specific information.
 
-### Install with apt-get and yum
-**A new stable version of mssql-cli is coming soon for `apt-get` and `yum`.**
-
-Older versions of mssql-cli may be installed using `apt-get` or `yum` by following [these instructions]('https://github.com/dbcli/mssql-cli/blob/master/doc/installation/linux.md')
-
-### Install Daily Builds
+#### Install Daily Builds
 Direct downloads for both latest stable and preview bits can be found at [here](https://github.com/dbcli/mssql-cli/blob/master/doc/installation_guide.md#Direct-Downloads).
 
 ### Connect to Server
