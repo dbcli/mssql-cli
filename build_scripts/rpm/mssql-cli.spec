@@ -19,7 +19,7 @@
 %define official_build %{getenv:MSSQL_CLI_OFFICIAL_BUILD}
 
 # the ',,' makes environment variable lower case in Bash 4+
-%if "%{official_build,,}" != "true"
+%if "%{official_build}" != "true"
   %define version %{base_version}.dev%{time_stamp}
 %else
   %define version %{base_version}

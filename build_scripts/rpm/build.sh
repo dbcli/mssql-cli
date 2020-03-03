@@ -16,6 +16,10 @@ sudo yum install -y gcc git rpm-build rpm-devel rpmlint make bash diffutils patc
 rm -rf ~/rpmbuild
 rm -rf ${REPO_PATH}/../rpm_output
 
+# the ',,' makes environment variable lower case in Bash 4+
+# needed before switch statement checks for 'true'
+MSSQL_CLI_OFFICIAL_BUILD="${MSSQL_CLI_OFFICIAL_BUILD,,}"
+
 # Build rpm package
 rpmbuild -v -bb --clean ${REPO_PATH}/build_scripts/rpm/mssql-cli.spec
 
