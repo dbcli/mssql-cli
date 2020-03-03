@@ -1,0 +1,245 @@
+
+[
+    {
+        "id": "588bb8e4d6a6e3720572166c",
+        "url": "microsoft-ubuntu-trusty-prod",
+        "type": "apt",
+        "state": "Published",
+        "prss": true,
+        "distribution": "trusty",
+        "architectures": [
+            "amd64",
+            "arm64",
+            "armhf"
+        ]
+    },
+    {
+        "id": "582bd623ae062a5d0fec5b8c",
+        "url": "microsoft-ubuntu-xenial-prod",
+        "type": "apt",
+        "state": "Published",
+        "prss": true,
+        "esrpTrackingID": null,
+        "distribution": "xenial",
+        "architectures": [
+            "amd64",
+            "arm64",
+            "armhf"
+        ]
+    },
+    {
+        "id": "585485b7d6a6e37205720936",
+        "url": "microsoft-ubuntu-yakkety-prod",
+        "type": "apt",
+        "state": "Published",
+        "prss": true,
+        "distribution": "yakkety",
+        "architectures": [
+            "amd64",
+            "arm64",
+            "armhf"
+        ]
+    },
+    {
+        "id": "58e2e26934a9b7736d4e6825",
+        "url": "microsoft-debian-jessie-prod",
+        "type": "apt",
+        "state": "Published",
+        "prss": true,
+        "distribution": "jessie",
+        "architectures": [
+            "amd64",
+            "arm64",
+            "armhf"
+        ]
+    },
+    {
+        "id": "59d3d49df3c7fa07032ce371",
+        "url": "microsoft-ubuntu-artful-prod",
+        "type": "apt",
+        "state": "Published",
+        "prss": true,
+        "distribution": "artful",
+        "architectures": [
+            "amd64",
+            "arm64",
+            "armhf"
+        ]
+    },
+    {
+        "id": "599211761cc20bce4a8ab950",
+        "url": "microsoft-debian-stretch-prod",
+        "type": "apt",
+        "state": "Published",
+        "prss": true,
+        "distribution": "stretch",
+        "architectures": [
+            "amd64",
+            "arm64",
+            "armhf"
+        ]
+    },
+    {
+        "id": "5a5f98a2424a5c053cc3f0b7",
+        "url": "microsoft-opensuse42.3-prod",
+        "type": "yum",
+        "state": "Signed",
+        "prss": true,
+        "distribution": "trusty",
+        "architectures": [
+            "x86_64"
+        ]
+    },
+    {
+        "id": "58f96a4c41b3c26843b55bd6",
+        "url": "microsoft-rhel7.1-prod",
+        "type": "yum",
+        "state": null,
+        "prss": false,
+        "distribution": "trusty",
+        "architectures": [
+            "x86_64"
+        ]
+    },
+    {
+        "id": "582bd4c5ae062a5d0fec5b8b",
+        "url": "microsoft-rhel7.3-prod",
+        "type": "yum",
+        "state": null,
+        "prss": true,
+        "distribution": "trusty",
+        "architectures": [
+            "x86_64"
+        ]
+    },
+    {
+        "id": "58f96a5241b3c26843b55bd7",
+        "url": "microsoft-rhel7.2-prod",
+        "type": "yum",
+        "state": null,
+        "prss": false,
+        "distribution": "trusty",
+        "architectures": [
+            "x86_64"
+        ]
+    },
+    {
+        "id": "58f96a4341b3c26843b55bd5",
+        "url": "microsoft-rhel7.0-prod",
+        "type": "yum",
+        "state": "Signed",
+        "prss": true,
+        "distribution": "trusty",
+        "architectures": [
+            "x86_64"
+        ]
+    },
+    {
+        "id": "5a038171cb62ef0555519a27",
+        "url": "microsoft-rhel7.4-prod",
+        "type": "yum",
+        "state": "Signed",
+        "prss": true,
+        "distribution": "trusty",
+        "architectures": [
+            "x86_64"
+        ]
+    },
+    {
+        "id": "59d40cdcf3c7fa07032ce385",
+        "url": "microsoft-centos7-prod",
+        "type": "yum",
+        "state": "Signed",
+        "prss": true,
+        "distribution": "trusty",
+        "architectures": [
+            "x86_64"
+        ]
+    },
+    {
+        "id": "58f809a034a9b7736d4e70f7",
+        "url": "microsoft-opensuse42.2-prod",
+        "type": "yum",
+        "prss": true,
+        "distribution": "trusty",
+        "architectures": [
+            "x86_64"
+        ]
+    },
+    {
+        "id": "584a0f48d6a6e37205720776",
+        "url": "microsoft-sles12-prod",
+        "type": "yum",
+        "state": "Signed",
+        "prss": true,
+        "distribution": "trusty",
+        "architectures": [
+            "x86_64"
+        ]
+    },
+    {
+        "id": "5dd2fb59e4f4449ba82df855",
+        "url": "microsoft-ubuntu-bionic-prod",
+        "type": "apt",
+        "state": "Published",
+        "prss": true,
+        "distribution": "insiders-fast",
+        "architectures": [
+           "amd64",
+           "arm64",
+           "armhf"
+        ]
+    },
+    {
+        "id": "5baa74cb3cb16940ddabf91d",
+        "url": "microsoft-ubuntu-cosmic-prod",
+        "type": "apt",
+        "state": "Published",
+        "prss": true,
+        "esrpTrackingID": null,
+        "distribution": "cosmic",
+        "architectures": [
+           "amd64",
+           "arm64",
+           "armhf"
+        ]
+    },
+    {
+        "id": "5cb5f8932d876c76fb07ea4e",
+        "url": "microsoft-ubuntu-disco-prod",
+        "type": "apt",
+        "state": "Published",
+        "prss": true,
+        "esrpTrackingID": null,
+        "distribution": "disco",
+        "architectures": [
+           "amd64",
+           "arm64",
+           "armhf"
+        ]
+    },
+    {
+        "id": "5d4470e1eebce7156eee5407",
+        "url": "microsoft-rhel8.0-prod",
+        "type": "yum",
+        "state": "Signed",
+        "prss": true,
+        "distribution": "trusty",
+        "architectures": [
+           "x86_64"
+        ]
+    },
+    {
+        "id": "5d23b16c9a6e3b375bbba42e",
+        "url": "microsoft-debian-buster-prod",
+        "type": "apt",
+        "state": "Published",
+        "prss": true,
+        "distribution": "buster",
+        "architectures": [
+           "amd64",
+           "arm64",
+           "armhf"
+        ]
+    }   
+]
