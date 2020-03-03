@@ -12,7 +12,8 @@ local_repo=$1
 
 sudo apt-get update
 
-if [ "${MSSQL_CLI_OFFICIAL_BUILD}" != "True" ]
+# the ',,' makes environment variable lower case in Bash 4+
+if [ "${MSSQL_CLI_OFFICIAL_BUILD,,}" != "true" ]
     then
         time_stamp=$(date +%y%m%d%H%M)
         CLI_VERSION=$CLI_VERSION.dev$time_stamp
