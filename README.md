@@ -1,5 +1,5 @@
 [![PyPI](https://badge.fury.io/py/mssql-cli.svg)](https://pypi.python.org/pypi/mssql-cli)
-[![Python 2,3](https://img.shields.io/badge/python-2.7,&nbsp;3.x-blue.svg)](https://github.com/dbcli/mssql-cli)
+[![Python 2.7|3.4|3.5|3.6|3.7|3.8](https://img.shields.io/badge/python-2.7&nbsp;|&nbsp;3.4&nbsp;|&nbsp;3.5&nbsp;|&nbsp;3.6&nbsp;|&nbsp;3.7&nbsp;|&nbsp;3.8-blue.svg)](https://github.com/dbcli/mssql-cli)
 
 # mssql-cli
 [**mssql-cli**](https://github.com/dbcli/mssql-cli) is an interactive command line query tool for SQL Server. This open source tool works cross-platform and proud to be a part of the [dbcli](github.com/dbcli) community. 
