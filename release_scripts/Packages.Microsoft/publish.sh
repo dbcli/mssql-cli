@@ -8,20 +8,37 @@ fi
 
 local_repo=$1
 config_file=/root/.repoclient/config.json
+deb_pkg = /root/mssql-cli-dev-latest.deb
+rpm_pkg = /root/mssql-cli-dev-latest.rpm
+
 # create tmp dir for tmp config
 tmp_dir=$(mktemp -d)
 
 # iterate through supported repos to obtain data, which we'll append to config.json.
 # config.json can only hold one repo ID at a time, by doing this we can automate publishing.
+echo "Starting publishing script. Each package may take several minutes to upload."
 for data_repo in $(cat $local_repo/release_scripts/Packages.Microsoft/supported_repos_testing.json \
  | jq -r '.[] | @base64'); do
     _jq() {
         echo ${data_repo} | base64 --decode | jq -r ${1}
     }
 
-    # make temp config with new id value
     repo_id=$(_jq '.id')
+    repo_type=$(_jq '.type')
+    repo_url=$(_jq '.url')
+
+    # make temp config with new id value and then replace repoclient config
     jq --arg a "$repo_id" '.repositoryId = $a' $config_file > $tmp_dir/tmp_config.json \
         && mv $tmp_dir/tmp_config.json $config_file
-    cat $config_file
+
+    # with config updated, publish deb or rpm package
+    if [ $repo_type == "apt" ]; then
+        echo "Publishing .deb for $repo_url..."
+        repoclient package add $deb_pkg
+    elif [ $repo_type == "yum" ]; then
+        echo "Publishing .rpm for $repo_url..."
+        repoclient package add $rpm_pkg
+    else
+        echo "No package published for $(_jq '.url')"
+    fi
 done
