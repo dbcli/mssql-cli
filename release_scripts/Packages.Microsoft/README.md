@@ -6,9 +6,10 @@
 
 ## Creating Config File for Publishing
 A config file must be created to publish to packages.microsoft repository:
-1. On the [Repo Cli](http://csd-linux-publishing-service.azurewebsites.net/client#commands) website, select the **Configure the Repo CLI** tab
+1. On the [Repo CLI](http://csd-linux-publishing-service.azurewebsites.net/client#commands) website, select the **Configure the Repo CLI** tab
 
-## Create the cert
+## Create the Certificate and Config Files
+> This section needs to be completed.
 
 ## Build Docker Container
 Complete the below command below to create a Docker container with dependencies installed for publishing.
@@ -19,7 +20,7 @@ docker build -t mssqlcli-publish-msftrepo -f release_scripts/Packages.Microsoft/
 ```
 
 ## Run Docker Container
-This will run the Docker container built using the previous command:
+This will run the Docker container built using the previous command.
 ```sh
 docker run -it mssqlcli-publish-msftrepo bash
 ```
@@ -32,8 +33,29 @@ apt-get -y install azure-repoapi-client
 ```
 
 ## Publish to Packages.Microsoft Using Repo CLI
+The `publish.sh` script will upload deb and rpm packages to Packages.Microsoft by consulting the `supported_repos_prod.json` or `supported_repos_testing.json` file. This data is used to find supported repositories located in Packages.Microsoft.
 
-### Repo CLI Commands
+`publish.sh` takes `'testing'` or `'prod'` parameters as its second argument. Uploading to the testing distribution is effective for testing the installation and usage of mssql-cli on various Linux systems without affecting production.
+
+### Publish to Testing
+From the mssql-cli folder root, make the following command to upload packages to all repositories in the `supported_repos_testing.json` file:
+```sh
+release_scripts/Packages.Microsoft/publish.sh $(pwd) 'testing'
+```
+
+Visit the [testing](#testing-distribution-downloads) section for more information on downloading builds from the testing distribution.
+
+### Publish to Production
+When ready for production, change `'testing'` with `'prod'`, which will upload to all repositories in the `supported_repos_prod.json` file:
+```sh
+release_scripts/Packages.Microsoft/publish.sh $(pwd) 'prod'
+```
+
+## Testing Distribution Downloads
+> This section needs to be completed.
+
+## Repo CLI Commands
+This list below contains frequently used commands to navigate the Repo CLI API:
 
 #### List Uploaded Packages
 ```sh
