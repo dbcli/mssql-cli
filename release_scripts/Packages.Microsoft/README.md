@@ -25,12 +25,9 @@ docker run -it mssqlcli-publish-msftrepo bash
 ```
 
 ## Install Repo CLI
-In your Docker container, complete the commands below to install the Repo CLI, the tool used to publish packages to Packages.Microsoft.
+In your Docker container, complete the command below to install the Repo CLI, the tool used to publish packages to Packages.Microsoft.
 
 ```sh
-curl http://tux-devrepo.corp.microsoft.com/keys/tux-devrepo.asc > tux-devrepo.asc | apt-key add tux-devrepo.asc
-echo "deb [arch=amd64] http://tux-devrepo.corp.microsoft.com/repos/tux-dev/ xenial main" | tee /etc/apt/sources.list.d/tuxdev.list
-apt-get update
 apt-get -y install azure-repoapi-client
 ```
 

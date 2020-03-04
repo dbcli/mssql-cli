@@ -10,7 +10,8 @@ ADD ./release_scripts/Packages.Microsoft/config.json /root/.repoclient/config.js
 ADD ./release_scripts/Packages.Microsoft/private.pem /root/private.pem
 
 # Install Repo CLI requirements
-RUN curl http://tux-devrepo.corp.microsoft.com/keys/tux-devrepo.asc > tux-devrepo.asc | apt-key add tux-devrepo.asc
+RUN curl http://tux-devrepo.corp.microsoft.com/keys/tux-devrepo.asc > tux-devrepo.asc
+RUN apt-key add tux-devrepo.asc
 RUN echo "deb [arch=amd64] http://tux-devrepo.corp.microsoft.com/repos/tux-dev/ xenial main" | tee /etc/apt/sources.list.d/tuxdev.list
 RUN apt-get update
 
