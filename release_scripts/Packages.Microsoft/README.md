@@ -2,13 +2,11 @@
 > Publishing to the Microsoft Repo may only be completed on corp-net. Support for non-corp-net access is not available at the time of this writing. Repo CLI docs may be accessed [here](http://csd-linux-publishing-service.azurewebsites.net/).
 
 ## Requirements
-1. Install Docker Desktop
 
-## Creating Config File for Publishing
-A config file must be created to publish to packages.microsoft repository:
-1. On the [Repo CLI](http://csd-linux-publishing-service.azurewebsites.net/client#commands) website, select the **Configure the Repo CLI** tab
+### Install Docker Desktop
+> This section needs to be completed.
 
-## Create the Certificate and Config Files
+### Create the Certificate and Config Files
 > This section needs to be completed.
 
 ## Build Docker Container
