@@ -2,22 +2,31 @@
 
 if [ -z "$1" ]
   then
-    echo "Argument should be path to local repo."
+    echo "First argument should be path to local repo."
+    exit 1
+fi
+
+if [ ${2,,} = 'prod' ]; then
+    repo_dist='prod'
+elif [ ${2,,} = 'testing' ]; then
+    repo_dist='testing'
+else
+    echo "Second argument should specify 'prod' or 'testing' for repository distribution type."
     exit 1
 fi
 
 local_repo=$1
 config_file=/root/.repoclient/config.json
-deb_pkg = /root/mssql-cli-dev-latest.deb
-rpm_pkg = /root/mssql-cli-dev-latest.rpm
+deb_pkg=/root/mssql-cli-dev-latest.deb
+rpm_pkg=/root/mssql-cli-dev-latest.rpm
 
 # create tmp dir for tmp config
 tmp_dir=$(mktemp -d)
 
 # iterate through supported repos to obtain data, which we'll append to config.json.
 # config.json can only hold one repo ID at a time, by doing this we can automate publishing.
-echo "Starting publishing script. Each package may take several minutes to upload."
-for data_repo in $(cat $local_repo/release_scripts/Packages.Microsoft/supported_repos_testing.json \
+echo "Uploading packages to $repo_dist. Each package may take several minutes to upload."
+for data_repo in $(cat $local_repo/release_scripts/Packages.Microsoft/supported_repos_$repo_dist.json \
  | jq -r '.[] | @base64'); do
     _jq() {
         echo ${data_repo} | base64 --decode | jq -r ${1}
