@@ -2,27 +2,27 @@
 Stable installations of mssql-cli on Linux are hosted in the [Microsoft Linux Software Repository](https://docs.microsoft.com/en-us/windows-server/administration/linux-package-repository-for-microsoft-software). mssql-cli supports the following Linux distributions:
 
 [**Debian-based**](#Debian-based)
-- [**Ubuntu**](#Stable-Installation-on-Ubuntu)
+- [**Ubuntu**](#Ubuntu)
     - [Ubuntu 14.04 (Trusty)](#ubuntu-1404-Trusty)
     - [Ubuntu 16.04 (Xenial)](#ubuntu-1604-Xenial)
-- [**Debian**](#Stable-Installation-on-Debian)
+- [**Debian**](#Debian)
     - [Debian 8](#debian-8)
     - [Debian 9](#debian-9)
 
 [**RPM-based**](#RPM-based)
-- [**CentOS/RHEL**](#Stable-Inatallation-on-CentOSRHEL)
+- [**CentOS/RHEL**](#CentOSRHEL)
     - [CentOS 7](#centos-7)
     - [Red Hat Enterprise Linux (RHEL) 7](#red-hat-enterprise-linux-rhel-7)
-- [**openSUSE**](#stable-installation-on-opensuse)
+- [**openSUSE**](#opensuse)
     - [openSUSE 42.2](#opensuse-422)
-- [**Fedora**](#stable-installation-on-fedora)
+- [**Fedora**](#fedora)
     - [Fedora 25](#fedora-25)
     - [Fedora 26](#fedora-26)
 
 
 ## Debian-based
 
-### Stable Installation on Ubuntu
+### Ubuntu
 
 #### Ubuntu 14.04 (Trusty)
 ```sh
@@ -54,7 +54,7 @@ sudo apt-get update
 sudo apt-get install mssql-cli
 ```
 
-### Stable Installation on Debian
+### Debian
 > `apt-transport-https` is required for importing keys. If not installed, call `sudo apt-get install curl apt-transport-https`.
 
 #### Debian 8
@@ -97,7 +97,7 @@ To uninstall mssql-cli, call `sudo apt-get remove mssql-cli`.
 
 ## RPM-based
 
-### Stable Inatallation on CentOS/RHEL
+### CentOS/RHEL
 
 #### CentOS 7
 > This package also works on Oracle Linux 7.
@@ -125,7 +125,7 @@ To uninstall mssql-cli, call `sudo yum remove mssql-cli`.
 
 ## openSUSE
 
-### Stable Installation on openSUSE
+### openSUSE
 
 #### openSUSE 42.2
 
@@ -152,7 +152,7 @@ sudo zypper install mssql-cli
 
 ## Fedora
 
-### Stable Installation on Fedora
+### Fedora
 
 #### Fedora 25
 
