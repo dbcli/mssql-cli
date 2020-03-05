@@ -1,92 +1,64 @@
-# Package Installation Instructions
+# Linux Installation
+Stable installations of mssql-cli on Linux are hosted in the [Microsoft Linux Software Repository](https://docs.microsoft.com/en-us/windows-server/administration/linux-package-repository-for-microsoft-software). mssql-cli supports the following Linux distributions:
 
-Supports:
+[**Debian-based**](#Debian-based)
+- [**Ubuntu**](#Ubuntu)
+    - [Ubuntu 14.04 (Trusty)](#ubuntu-1404-Trusty)
+    - [Ubuntu 16.04 (Xenial)](#ubuntu-1604-Xenial)
+- [**Debian**](#Debian)
+    - [Debian 8](#debian-8)
+    - [Debian 9](#debian-9)
 
-- [Ubuntu][u]
-- [Debian 8][deb8]
-- [Debian 9][deb9]
-- [CentOS 7][cos]
-- [Red Hat Enterprise Linux (RHEL) 7][rhel7]
-- [OpenSUSE 42.2][opensuse]
-- [SUSE Enterprise Linux (SLES) 12][sles12]
-- [Fedora 25][fed25]
-- [Fedora 26][fed26]
+[**RPM-based**](#RPM-based)
+- [**CentOS/RHEL**](#CentOSRHEL)
+    - [CentOS 7](#centos-7)
+    - [Red Hat Enterprise Linux (RHEL) 7](#red-hat-enterprise-linux-rhel-7)
+- [**openSUSE**](#opensuse)
+    - [openSUSE 42.2](#opensuse-422)
+- [**Fedora**](#fedora)
+    - [Fedora 25](#fedora-25)
+    - [Fedora 26](#fedora-26)
 
-[downloads]:https://github.com/dbcli/mssql-cli/tree/master#get-mssql-cli
 
-Once the package is installed, run `mssql-cli` from a terminal.
+## Debian-based
 
-[u]:        #ubuntu
-[deb8]:     #debian-8
-[deb9]:     #debian-9
-[cos]:      #centos-7
-[rhel7]:    #red-hat-enterprise-linux-rhel-7
-[opensuse]: #opensuse-422
-[sles12]:   #sles-12
-[fed25]:    #fedora-25
-[fed26]:    #fedora-26
+### Ubuntu
 
-## Ubuntu
-
-### Installation for latest stable version via Package Repository
-
-mssql-cli, for Linux, is published to package repositories for easy installation (and updates).
-This is the preferred method.
-
+#### Ubuntu 14.04 (Trusty)
 ```sh
 # Import the public repository GPG keys
-wget -qO- https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
 
 # Register the Microsoft Ubuntu repository
-sudo curl -o /etc/apt/sources.list.d/microsoft.list "https://packages.microsoft.com/config/ubuntu/$(lsb_release -sr)/prod.list"
+sudo apt-add-repository https://packages.microsoft.com/ubuntu/14.04/prod
 
 # Update the list of products
 sudo apt-get update
 
 # Install mssql-cli
 sudo apt-get install mssql-cli
-
-# Start mssql-cli
-mssql-cli
 ```
 
-After registering the Microsoft repository once as superuser,
-from then on, you just need to use `sudo apt-get upgrade mssql-cli` to update it.
-
-### Installation for latest preview version via Direct Download
-
-Download the Debian package `mssql-cli-dev-latest.deb`
-from the [downloads] page onto the Ubuntu machine.
-
-Then execute the following in the terminal:
-
+#### Ubuntu 16.04 (Xenial)
 ```sh
-sudo dpkg -i mssql-cli-dev-latest.deb
-sudo apt-get install -f
-```
+# Import the public repository GPG keys
+curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
 
-> Please note that `dpkg -i` will fail with unmet dependencies;
-> the next command, `apt-get install -f` resolves these
-> and then finishes configuring the mssql-cli package.
+# Register the Microsoft Ubuntu repository
+sudo apt-add-repository https://packages.microsoft.com/ubuntu/16.04/prod
 
-### Uninstallation - Ubuntu
-
-```sh
-sudo apt-get remove mssql-cli
-```
-
-## Debian 8
-
-### Installation for latest stable version via Package Repository - Debian 8
-
-mssql-cli, for Linux, is published to package repositories for easy installation (and updates).
-This is the preferred method.
-
-```sh
-# Install system components
+# Update the list of products
 sudo apt-get update
-sudo apt-get install curl apt-transport-https
 
+# Install mssql-cli
+sudo apt-get install mssql-cli
+```
+
+### Debian
+> `apt-transport-https` is required for importing keys. If not installed, call `sudo apt-get install curl apt-transport-https`.
+
+#### Debian 8
+```sh
 # Import the public repository GPG keys
 wget -qO- https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
 
@@ -98,44 +70,9 @@ sudo apt-get update
 
 # Install mssql-cli
 sudo apt-get install mssql-cli
-
-# Start mssql-cli
-mssql-cli
 ```
 
-After registering the Microsoft repository once as superuser,
-from then on, you just need to use `sudo apt-get upgrade mssql-cli` to update it.
-
-### Installation for latest preview version via Direct Download - Debian 8
-
-Download the Debian package
-`mssql-cli-dev-latest.deb`
-from the [downloads] page onto the Debian machine.
-
-Then execute the following in the terminal:
-
-```sh
-sudo dpkg -i mssql-cli-dev-latest.deb
-sudo apt-get install -f
-```
-
-> Please note that `dpkg -i` will fail with unmet dependencies;
-> the next command, `apt-get install -f` resolves these
-> and then finishes configuring the mssql-cli package.
-
-### Uninstallation - Debian 8
-
-```sh
-sudo apt-get remove mssql-cli
-```
-
-## Debian 9
-
-### Installation for latest stable version via Package Repository - Debian 9
-
-mssql-cli, for Linux, is published to package repositories for easy installation (and updates).
-This is the preferred method.
-
+#### Debian 9
 ```sh
 # Import the public repository GPG keys
 wget -qO- https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
@@ -148,138 +85,49 @@ sudo apt-get update
 
 # Install mssql-cli
 sudo apt-get install mssql-cli
-
-# Start mssql-cli
-mssql-cli
 ```
 
+### Upgrade on Ubuntu/Debian
 After registering the Microsoft repository once as superuser,
 from then on, you just need to use `sudo apt-get upgrade mssql-cli` to update it.
 
-### Installation for latest preview version via Direct Download - Debian 9
+### Uninstall on Ubuntu/Debian
+To uninstall mssql-cli, call `sudo apt-get remove mssql-cli`.
 
-Download the Debian package
-`mssql-cli-dev-latest.deb`
-from the [downloads] page onto the Debian machine.
 
-Then execute the following in the terminal:
+## RPM-based
 
-```sh
-sudo dpkg -i mssql-cli-dev-latest.deb
-sudo apt-get install -f
-```
+### CentOS/RHEL
 
-> Please note that `dpkg -i` will fail with unmet dependencies;
-> the next command, `apt-get install -f` resolves these
-> and then finishes configuring the mssql-cli package.
-
-### Uninstallation - Debian 9
-
-```sh
-sudo apt-get remove mssql-cli
-```
-
-## CentOS 7
-
+#### CentOS 7
 > This package also works on Oracle Linux 7.
 
-### Installation for latest stable version via Package Repository (preferred) - CentOS 7
-
-mssql-cli for Linux is published to official Microsoft repositories for easy installation (and updates).
-
 ```sh
-# Import Microsoft repository key
 sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
-
-# Register the Microsoft RedHat repository
 sudo curl -o /etc/yum.repos.d/mssql-cli.repo https://packages.microsoft.com/config/rhel/7/prod.repo
-
-# Install mssql-cli
 sudo yum install mssql-cli
-
-# Start mssql-cli
-mssql-cli
 ```
 
-After registering the Microsoft repository once as superuser,
-you just need to use `sudo yum update mssql-cli` to update mssql-cli.
-
-### Installation for latest preview version via Direct Download - CentOS 7
-
-Using [CentOS 7][], download the RPM package
-`mssql-cli-dev-latest.rpm`
-from the [downloads] page onto the CentOS machine.
-
-Then execute the following in the terminal:
-
+#### Red Hat Enterprise Linux (RHEL) 7
 ```sh
-sudo yum install mssql-cli-dev-latest.rpm
-```
-
-You can also install the RPM without the intermediate step of downloading it:
-
-```sh
-sudo yum install https://mssqlcli.blob.core.windows.net/daily/rpm/mssql-cli-dev-latest.rpm
-```
-
-### Uninstallation - CentOS 7
-
-```sh
-sudo yum remove mssql-cli
-```
-
-[CentOS 7]: https://www.centos.org/download/
-
-## Red Hat Enterprise Linux (RHEL) 7
-
-### Installation for latest stable version via Package Repository (preferred) - Red Hat Enterprise Linux (RHEL) 7
-
-mssql-cli for Linux is published to official Microsoft repositories for easy installation (and updates).
-
-```sh
-# Import Microsoft repository key
 sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
-
-# Register the Microsoft RedHat repository
 curl https://packages.microsoft.com/config/rhel/7/prod.repo | sudo tee /etc/yum.repos.d/microsoft.repo
-
-# Install mssql-cli
 sudo yum install mssql-cli
-
-# Start mssql-cli
-mssql-cli
 ```
 
+### Upgrade on CentOS/RHEL
 After registering the Microsoft repository once as superuser,
-you just need to use `sudo yum update mssql-cli` to update mssql-cli.
+from then on, you just need to use `sudo yum update mssql-cli` to update it.
 
-### Installation for latest preview version via Direct Download - Red Hat Enterprise Linux (RHEL) 7
+### Uninstall on CentOS/RHEL
+To uninstall mssql-cli, call `sudo yum remove mssql-cli`.
 
-Download the RPM package
-`mssql-cli-dev-latest.rpm`
-from the [downloads] page onto the Red Hat Enterprise Linux machine.
 
-Then execute the following in the terminal:
+## openSUSE
 
-```sh
-sudo yum install mssql-cli-dev-latest.rpm --nogpgcheck
-```
+### openSUSE
 
-You can also install the RPM without the intermediate step of downloading it:
-
-```sh
-sudo yum install https://mssqlcli.blob.core.windows.net/daily/rpm/mssql-cli-dev-latest.rpm
-```
-
-### Uninstallation - Red Hat Enterprise Linux (RHEL) 7
-
-```sh
-sudo yum remove mssql-cli
-```
-
-## OpenSUSE 42.2
-
-### Installation for latest stable version via Package Repository (preferred) - OpenSUSE 42.2
+#### openSUSE 42.2
 
 mssql-cli for Linux is published to official Microsoft repositories for easy installation (and updates).
 
@@ -299,39 +147,14 @@ sudo zypper update
 # Install system level component and mssql-cli
 sudo zypper install libffi-devel
 sudo zypper install mssql-cli
-
-# Start mssql-cli
-mssql-cli
 ```
 
-### Installation for latest preview version via Direct Download - OpenSUSE 42.2
 
-Download the RPM package `mssql-cli-dev-latest.rpm`
-from the [downloads] page onto the OpenSUSE machine.
+## Fedora
 
-```sh
-sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
-sudo zypper install mssql-cli-dev-latest.rpm
-```
+### Fedora
 
-You can also install the RPM without the intermediate step of downloading it:
-
-```sh
-sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
-sudo zypper install https://mssqlcli.blob.core.windows.net/daily/rpm/mssql-cli-dev-latest.rpm
-```
-
-### Uninstallation - OpenSUSE 42.2
-
-```sh
-sudo zypper remove mssql-cli
-```
-
-## Fedora 25
-
-### Installation for latest stable version via Package Repository (preferred) - Fedora 25
-
-mssql-cli for Linux is published to official Microsoft repositories for easy installation (and updates).
+#### Fedora 25
 
 ```sh
 # Register the Microsoft RedHat repository
@@ -342,41 +165,9 @@ sudo dnf update
 
 # Install mssql-cli
 sudo dnf install mssql-cli
-
-# Start mssql-cli
-mssql-cli
 ```
 
-### Installation for latest preview version via Direct Download - Fedora 25
-
-Download the RPM package
-`mssql-cli-dev-latest.rpm`
-from the [downloads] page onto the Fedora machine.
-
-Then execute the following in the terminal:
-
-```sh
-sudo dnf install mssql-cli-dev-latest.rpm
-```
-
-You can also install the RPM without the intermediate step of downloading it:
-
-```sh
-sudo dnf install https://mssqlcli.blob.core.windows.net/daily/rpm/mssql-cli-dev-latest.rpm
-```
-
-### Uninstallation - Fedora 25
-
-```sh
-sudo dnf remove mssql-cli
-```
-
-## Fedora 26
-
-### Installation for latest stable version via Package Repository (preferred) - Fedora 26
-
-mssql-cli for Linux is published to official Microsoft repositories for easy installation (and updates).
-
+#### Fedora 26
 ```sh
 # Register the Microsoft RedHat repository
 sudo curl -o /etc/yum.repos.d/mssql-cli.repo https://packages.microsoft.com/config/rhel/7/prod.repo
@@ -386,35 +177,4 @@ sudo dnf update
 
 # Install mssql-cli
 sudo dnf install mssql-cli
-
-# Start mssql-cli
-mssql-cli
 ```
-
-### Installation for latest preview version via Direct Download - Fedora 26
-
-Download the RPM package
-`mssql-cli-dev-latest.rpm`
-from the [downloads] page onto the Fedora machine.
-
-Then execute the following in the terminal:
-
-```sh
-sudo dnf update
-sudo dnf install mssql-cli-dev-latest.rpm
-```
-
-You can also install the RPM without the intermediate step of downloading it:
-
-```sh
-sudo dnf update
-sudo dnf install https://mssqlcli.blob.core.windows.net/daily/rpm/mssql-cli-dev-latest.rpm
-```
-
-### Uninstallation - Fedora 26
-
-```sh
-sudo dnf remove mssql-cli
-```
-
-

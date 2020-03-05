@@ -2,7 +2,8 @@ import ast
 import os
 import re
 import datetime
-from codecs import open     #pylint: disable=redefined-builtin
+# pylint: disable=redefined-builtin
+from codecs import open
 from setuptools import setup, find_packages
 
 _version_re = re.compile(r'__version__\s+=\s+(.*)')
@@ -40,11 +41,14 @@ install_requirements = [
     'enum34>=1.1.6'
 ]
 
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
 setup(
     name='mssql-cli',
     author='Microsoft Corporation',
     author_email='sqlcli@microsoft.com',
-    version=version if os.environ.get('MSSQL_CLI_OFFICIAL_BUILD', '').lower() == 'true' \
+    version=version if os.environ.get('MSSQL_CLI_OFFICIAL_BUILD', '').lower() == 'true'
                     else get_timestamped_version(version),
     license='BSD-3',
     url='https://github.com/dbcli/mssql-cli',
@@ -52,7 +56,8 @@ setup(
     package_data={'mssqlcli': ['mssqlclirc',
                                'packages/mssqlliterals/sqlliterals.json']},
     description=description,
-    long_description=open('README.rst', encoding='utf-8').read(),
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     install_requires=install_requirements,
     include_package_data=True,
     scripts=[

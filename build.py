@@ -76,9 +76,14 @@ def build():
 
         print_heading('Building mssql-cli pip package')
         utility.exec_command('%s --version' % PYTHON, utility.ROOT_DIR)
-        utility.exec_command('%s setup.py check -r -s bdist_wheel --plat-name %s' % (PYTHON, plat),
+        utility.exec_command('%s setup.py bdist_wheel --plat-name %s' % (PYTHON, plat),
                              utility.ROOT_DIR,
                              continue_on_error=False)
+
+        # checks if long description will render correctly
+        utility.exec_command('twine check {}'
+                             .format(os.path.join(utility.MSSQLCLI_DIST_DIRECTORY, '*')),
+                             utility.ROOT_DIR, continue_on_error=False)
 
     # Copy back the SqlToolsService binaries for this platform.
     clean_and_copy_sqltoolsservice(utility.get_current_platform())
@@ -126,9 +131,8 @@ def validate_package():
     # cache overshadowing actual changes made.
     current_platform = utility.get_current_platform()
 
-    mssqlcli_wheel_name = [
-        pkge for pkge in mssqlcli_wheel_dir if current_platform in pkge and
-        'dev-latest' not in pkge]
+    mssqlcli_wheel_name = [pkge for pkge in mssqlcli_wheel_dir
+                           if current_platform in pkge and 'dev-latest' not in pkge]
     utility.exec_command(
         '{0} install --no-cache-dir --no-index ./dist/{1}'.format(
             PIP,
@@ -149,6 +153,7 @@ def unit_test():
                           '-m "not unstable" {}').format(runid, python_version,
                                                          get_active_test_filepaths()),
                          utility.ROOT_DIR, continue_on_error=False)
+
 
 def unstable_unit_test():
     """
@@ -217,7 +222,7 @@ def generate_mo(extraction_target_path, lang_name, trans_mappings, domain, local
     """
     extraction_target_dir = extraction_target_path\
         if os.path.isdir(extraction_target_path) else os.path.dirname(extraction_target_path)
-    localedir = localedir if (not localedir is None) \
+    localedir = localedir if localedir is not None \
                           else os.path.join(extraction_target_dir, 'locale')
     mo_dir = os.path.join(localedir, lang_name, 'LC_MESSAGES')
     create_dir([extraction_target_dir, 'locale', lang_name, 'LC_MESSAGES'])
