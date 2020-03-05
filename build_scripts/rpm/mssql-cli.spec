@@ -39,7 +39,7 @@ BuildRequires:  libffi-devel
 BuildRequires:  openssl-devel
 BuildRequires:  /usr/bin/pathfix.py
 
-Requires:       libunwind, libicu
+Requires:       libunwind, libicu, less
 
 %description
     We’re excited to introduce mssql-cli, a new and interactive command line query tool for SQL Server.
