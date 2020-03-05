@@ -5,24 +5,19 @@ Stable installations of mssql-cli on Linux are hosted in the [Microsoft Linux So
 - [**Ubuntu**](#Stable-Installation-on-Ubuntu)
     - [Ubuntu 14.04 (Trusty)](#ubuntu-1404-Trusty)
     - [Ubuntu 16.04 (Xenial)](#ubuntu-1604-Xenial)
-    - [Insiders Direct Download on Ubuntu](#Insiders-Direct-Download-on-Ubuntu)
 - [**Debian**](#Stable-Installation-on-Debian)
     - [Debian 8](#debian-8)
     - [Debian 9](#debian-9)
-    - [Insiders Direct Download on Debian](#Insiders-Direct-Download-on-Debian)
 
 [**RPM-based**](#RPM-based)
 - [**CentOS/RHEL**](#Stable-Inatallation-on-CentOSRHEL)
     - [CentOS 7](#centos-7)
     - [Red Hat Enterprise Linux (RHEL) 7](#red-hat-enterprise-linux-rhel-7)
-    - [Insiders Direct Download on CentOS/RHEL](#Insiders-Direct-Download-on-CentOSRHEL)
 - [**openSUSE**](#stable-installation-on-opensuse)
     - [openSUSE 42.2](#opensuse-422)
-    - [Insiders Direct Download on openSUSE](#insiders-direct-download-on-opensuse)
 - [**Fedora**](#stable-installation-on-fedora)
     - [Fedora 25](#fedora-25)
     - [Fedora 26](#fedora-26)
-    - [Insiders Direct Download on Fedora](#insiders-direct-download-on-fedora)
 
 
 ## Debian-based
@@ -59,18 +54,6 @@ sudo apt-get update
 sudo apt-get install mssql-cli
 ```
 
-##### Insiders Direct Download on Ubuntu
-```sh
-wget https://mssqlcli.blob.core.windows.net/daily/deb/mssql-cli-dev-latest.deb
-sudo dpkg -i mssql-cli-dev-latest.deb
-sudo apt-get install -f
-```
-
-> Please note that `dpkg -i` will fail with unmet dependencies;
-> the next command, `apt-get install -f` resolves these
-> and then finishes configuring the mssql-cli package.
-
-
 ### Stable Installation on Debian
 > `apt-transport-https` is required for importing keys. If not installed, call `sudo apt-get install curl apt-transport-https`.
 
@@ -104,17 +87,6 @@ sudo apt-get update
 sudo apt-get install mssql-cli
 ```
 
-#### Insiders Direct Download on Debian
-```sh
-wget https://mssqlcli.blob.core.windows.net/daily/deb/mssql-cli-dev-latest.deb
-sudo dpkg -i mssql-cli-dev-latest.deb
-sudo apt-get install -f
-```
-
-> Please note that `dpkg -i` will fail with unmet dependencies;
-> the next command, `apt-get install -f` resolves these
-> and then finishes configuring the mssql-cli package.
-
 ### Upgrade on Ubuntu/Debian
 After registering the Microsoft repository once as superuser,
 from then on, you just need to use `sudo apt-get upgrade mssql-cli` to update it.
@@ -141,11 +113,6 @@ sudo yum install mssql-cli
 sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
 curl https://packages.microsoft.com/config/rhel/7/prod.repo | sudo tee /etc/yum.repos.d/microsoft.repo
 sudo yum install mssql-cli
-```
-
-### Insiders Direct Download on CentOS/RHEL
-```sh
-sudo yum install https://mssqlcli.blob.core.windows.net/daily/rpm/mssql-cli-dev-latest.rpm
 ```
 
 ### Upgrade on CentOS/RHEL
@@ -182,13 +149,6 @@ sudo zypper install libffi-devel
 sudo zypper install mssql-cli
 ```
 
-### Insiders Direct Download on openSUSE
-
-```sh
-sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
-sudo zypper install https://mssqlcli.blob.core.windows.net/daily/rpm/mssql-cli-dev-latest.rpm
-```
-
 
 ## Fedora
 
@@ -217,9 +177,4 @@ sudo dnf update
 
 # Install mssql-cli
 sudo dnf install mssql-cli
-```
-
-### Insiders Direct Download on Fedora
-```sh
-sudo dnf install https://mssqlcli.blob.core.windows.net/daily/rpm/mssql-cli-dev-latest.rpm
 ```
