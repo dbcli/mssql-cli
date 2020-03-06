@@ -16,9 +16,9 @@ RUN apt-get -y install python3-all python3-pip python3-setuptools nano git sudo 
 RUN python3 -m pip install --upgrade pip
 
 # Build .deb
-RUN mkdir Repos
-RUN mkdir Repos/mssql-cli
-ADD . Repos/mssql-cli
+RUN mkdir /Repos
+RUN mkdir /Repos/mssql-cli
+ADD . /Repos/mssql-cli
 WORKDIR /Repos/mssql-cli
 RUN build_scripts/debian/build.sh $(pwd)
 
