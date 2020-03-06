@@ -19,8 +19,9 @@ RUN python3 -m pip install --upgrade pip
 RUN mkdir Repos
 RUN mkdir Repos/mssql-cli
 ADD . Repos/mssql-cli
-WORKDIR Repos/mssql-cli
+WORKDIR /Repos/mssql-cli
 RUN build_scripts/debian/build.sh $(pwd)
 
-# Build dependencies to support publishing release of .deb
-RUN python3 -m pip install -r requirements-dev.txt
+# Copy deb to root where DevOps copies package
+WORKDIR /
+RUN cp /Repos/debian_output/mssql-cli-dev-latest.deb .
