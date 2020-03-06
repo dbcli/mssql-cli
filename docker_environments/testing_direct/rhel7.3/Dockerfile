@@ -1,0 +1,23 @@
+FROM registry.redhat.io/rhel7.3
+
+ARG MSSQL_CLI_SERVER
+ARG MSSQL_CLI_DATABASE
+ARG MSSQL_CLI_USER
+ARG MSSQL_CLI_PASSWORD
+ARG MSSQL_CLI_PKG_RPM
+ARG REDHAT_USERNAME
+ARG REDHAT_PASSWORD
+
+ENV MSSQL_CLI_SERVER=$MSSQL_CLI_SERVER
+ENV MSSQL_CLI_DATABASE=$MSSQL_CLI_DATABASE
+ENV MSSQL_CLI_USER=$MSSQL_CLI_USER
+ENV MSSQL_CLI_PASSWORD=$MSSQL_CLI_PASSWORD
+
+RUN subscription-manager register --username $REDHAT_USERNAME --password $REDHAT_PASSWORD --auto-attach
+
+# Installs dependencies
+RUN yum install -y wget libicu libunwind less
+
+# Installs rpm from arg
+RUN wget $MSSQL_CLI_PKG_RPM
+RUN yum install -y mssql-cli-*.rpm

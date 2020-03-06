@@ -1,0 +1,21 @@
+FROM centos:8
+
+ARG MSSQL_CLI_SERVER
+ARG MSSQL_CLI_DATABASE
+ARG MSSQL_CLI_USER
+ARG MSSQL_CLI_PASSWORD
+ARG MSSQL_CLI_PKG_RPM
+
+ENV MSSQL_CLI_SERVER=$MSSQL_CLI_SERVER
+ENV MSSQL_CLI_DATABASE=$MSSQL_CLI_DATABASE
+ENV MSSQL_CLI_USER=$MSSQL_CLI_USER
+ENV MSSQL_CLI_PASSWORD=$MSSQL_CLI_PASSWORD
+
+# Installs dependencies
+RUN yum update -y
+RUN yum install -y epel-release
+RUN yum install -y wget libicu libunwind less
+
+# Installs rpm from arg
+RUN wget $MSSQL_CLI_PKG_RPM
+RUN yum install -y mssql-cli-*.rpm

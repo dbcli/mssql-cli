@@ -19,8 +19,8 @@ Read the section below to quickly get started with mssql-cli. Consult the [usage
 
 ### Install mssql-cli
 Platform-specific installation instructions are below:
-| [Windows](https://github.com/dbcli/mssql-cli/blob/master/doc/installation/windows.md#windows-installation) | [macOS](https://github.com/dbcli/mssql-cli/blob/master/doc/installation/macos.md#macos-installation) | [Linux](https://github.com/dbcli/mssql-cli/blob/master/doc/installation/linux.md) |
-| - | - | - |
+| [Windows](https://github.com/dbcli/mssql-cli/blob/master/doc/installation/windows.md#windows-installation) | [macOS](https://github.com/dbcli/mssql-cli/blob/master/doc/installation/macos.md#macos-installation) | [Linux](https://github.com/dbcli/mssql-cli/blob/master/doc/installation/linux.md) | [Docker](https://github.com/dbcli/mssql-cli/blob/master/docker_environments/) |
+| - | - | - | - |
 
 Visit the [installation reference guide](https://github.com/dbcli/mssql-cli/tree/master/doc/installation) to view all supported releases and downloads.
 
