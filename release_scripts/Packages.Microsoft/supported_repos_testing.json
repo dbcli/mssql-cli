@@ -238,5 +238,17 @@
             "arm64",
             "armhf"
         ]
+    },
+    {
+        "id": "5e6057ca523a8075b1476111",
+        "url": "microsoft-centos8-testing-prod",
+        "type": "yum",
+        "state": "Local",
+        "prss": true,
+        "distribution": "centos",
+        "component": "",
+        "architectures": [
+           "x86_64"
+        ]
     }
 ]
