@@ -85,7 +85,8 @@ def build():
             utility.exec_command('twine check {}'
                                 .format(os.path.join(utility.MSSQLCLI_DIST_DIRECTORY, '*')),
                                 utility.ROOT_DIR, continue_on_error=False)
-        except IOError:
+        except IOError as err:
+            print(err)
             print("Unable to run 'twine check'.")
 
     # Copy back the SqlToolsService binaries for this platform.
