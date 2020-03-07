@@ -1,7 +1,7 @@
 FROM amd64/ubuntu:18.04 AS builder
 
 RUN apt-get update
-RUN apt-get -y install wget curl sudo gnupg gnupg2 gnupg1 jq
+RUN apt-get -y install wget curl nano sudo gnupg gnupg2 gnupg1 jq
 RUN apt-get -y install software-properties-common
 RUN apt-get -y install apt-transport-https
 
