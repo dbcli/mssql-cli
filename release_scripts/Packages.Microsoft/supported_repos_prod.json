@@ -96,5 +96,31 @@
         "architectures": [
            "x86_64"
         ]
+    },
+    {
+        "id": "58e2e26934a9b7736d4e6825",
+        "url": "microsoft-debian-jessie-prod",
+        "type": "apt",
+        "state": "Published",
+        "prss": true,
+        "distribution": "jessie",
+        "architectures": [
+           "amd64",
+           "arm64",
+           "armhf"
+        ]
+    },
+    {
+        "id": "599211761cc20bce4a8ab950",
+        "url": "microsoft-debian-stretch-prod",
+        "type": "apt",
+        "state": "Published",
+        "prss": true,
+        "distribution": "stretch",
+        "architectures": [
+           "amd64",
+           "arm64",
+           "armhf"
+        ]
     }
 ]
