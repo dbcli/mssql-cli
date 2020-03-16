@@ -80,10 +80,14 @@ def build():
                              utility.ROOT_DIR,
                              continue_on_error=False)
 
-        # checks if long description will render correctly
-        utility.exec_command('twine check {}'
-                             .format(os.path.join(utility.MSSQLCLI_DIST_DIRECTORY, '*')),
-                             utility.ROOT_DIR, continue_on_error=False)
+        try:
+            # checks if long description will render correctly--does not work on some systems
+            utility.exec_command('twine check {}'
+                                .format(os.path.join(utility.MSSQLCLI_DIST_DIRECTORY, '*')),
+                                utility.ROOT_DIR, continue_on_error=False)
+        except IOError as err:
+            print(err)
+            print("Unable to run 'twine check'.")
 
     # Copy back the SqlToolsService binaries for this platform.
     clean_and_copy_sqltoolsservice(utility.get_current_platform())

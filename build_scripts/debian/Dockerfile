@@ -16,11 +16,12 @@ RUN apt-get -y install python3-all python3-pip python3-setuptools nano git sudo 
 RUN python3 -m pip install --upgrade pip
 
 # Build .deb
-RUN mkdir Repos
-RUN mkdir Repos/mssql-cli
-ADD . Repos/mssql-cli
-WORKDIR Repos/mssql-cli
+RUN mkdir /Repos
+RUN mkdir /Repos/mssql-cli
+ADD . /Repos/mssql-cli
+WORKDIR /Repos/mssql-cli
 RUN build_scripts/debian/build.sh $(pwd)
 
-# Build dependencies to support publishing release of .deb
-RUN python3 -m pip install -r requirements-dev.txt
+# Copy deb to root where DevOps copies package
+WORKDIR /
+RUN cp /Repos/debian_output/mssql-cli-dev-latest.deb .
