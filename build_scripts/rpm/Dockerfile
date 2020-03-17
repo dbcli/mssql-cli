@@ -22,6 +22,4 @@ ADD . /Repos/mssql-cli
 WORKDIR /Repos/mssql-cli
 RUN build_scripts/rpm/build.sh $(pwd)
 
-# Copy rpm to root where DevOps copies package
 WORKDIR /
-RUN cp /Repos/rpm_output/mssql-cli-dev-latest.rpm .
