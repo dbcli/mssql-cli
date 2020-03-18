@@ -22,6 +22,4 @@ ADD . /Repos/mssql-cli
 WORKDIR /Repos/mssql-cli
 RUN build_scripts/debian/build.sh $(pwd)
 
-# Copy deb to root where DevOps copies package
 WORKDIR /
-RUN cp /Repos/debian_output/mssql-cli-dev-latest.deb .
