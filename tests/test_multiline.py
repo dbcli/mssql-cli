@@ -1,5 +1,5 @@
 import pytest
-from mssqlcli.mssqlbuffer import _is_complete
+from mssqlcli.mssqlbuffer import _is_query_executable
 
 
 class TestMssqlCliMultiline:
@@ -17,7 +17,9 @@ class TestMssqlCliMultiline:
         ('select 1 go', False),
         ('select 1\ngo go go', False),
         ('GO select 1', False),
-        ('GO', True)
+        ('GO', True),
+        ('select 1;select 1\nGO\nselect 1;select 1\nGO', True),
+        ("select '\nGO\n';", False)
         # tests below to be enabled when sqlparse supports retaining newlines
         # when stripping comments (tracking here:
         # https://github.com/andialbrecht/sqlparse/issues/484):
@@ -27,11 +29,11 @@ class TestMssqlCliMultiline:
     ]
 
     @staticmethod
-    @pytest.mark.parametrize("query_str, is_complete", testdata)
-    def test_multiline_completeness(query_str, is_complete):
+    @pytest.mark.parametrize("query_str, is_query_executable", testdata)
+    def test_multiline_completeness(query_str, is_query_executable):
         """
-        Tests the _is_complete helper method, which parses a T-SQL multiline
+        Tests the _is_query_executable helper method, which parses a T-SQL multiline
         statement on each newline and determines whether the script should
         execute.
         """
-        assert _is_complete(query_str) == is_complete
+        assert _is_query_executable(query_str) == is_query_executable

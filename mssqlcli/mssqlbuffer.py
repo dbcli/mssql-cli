@@ -21,7 +21,7 @@ def mssql_is_multiline(mssql_cli):
     return cond
 
 
-def _is_complete(sql):
+def _is_query_executable(sql):
     # A complete command is an sql statement that ends with a 'GO', unless
     # there's an open quote surrounding it, as is common when writing a
     # CREATE FUNCTION command
@@ -54,7 +54,7 @@ def _multiline_exception(text):
     return (
         text.startswith('\\') or  # Special Command
         text.endswith(r'\e') or  # Ended with \e which should launch the editor
-        _is_complete(text) or  # A complete SQL command
+        _is_query_executable(text) or  # A complete SQL command
         (text == 'exit') or  # Exit doesn't need semi-colon
         (text == 'quit') or  # Quit doesn't need semi-colon
         (text == ':q') or  # To all the vim fans out there
