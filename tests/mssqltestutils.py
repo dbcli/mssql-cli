@@ -1,5 +1,6 @@
 import os
 import socket
+import time
 import warnings
 from argparse import Namespace
 import mssqlcli.sqltoolsclient as sqltoolsclient
@@ -90,28 +91,63 @@ def getTempPath(*args):
     return  os.path.abspath(tempPath)
 
 def create_test_db():
+    """
+    Creates database for test, using various status checks and retry logic for reliability.
+    - Uses outer while loop to retry db create failures
+    - Uses an inner while loop to keep checking status if still processing
+    - Exits on successful response
+    """
     client = create_mssql_cli_client()
     local_machine_name = socket.gethostname().replace(
         '-', '_').replace('.', '_')
-    test_db_name = u'mssqlcli_testdb_{0}_{1}'.format(
-        local_machine_name, random_str())
-    query_db_create = u"CREATE DATABASE {0};".format(test_db_name)
-    count = 0
 
     # retry logic in case db create fails
-    while count < 5:
+    count_outer = 0
+    while count_outer < 5:
+        test_db_name = u'mssqlcli_testdb_{0}_{1}'.format(
+            local_machine_name, random_str())
+        query_db_create = u"CREATE DATABASE {0};".format(test_db_name)
+
         for _, _, status, _, is_create_error in client.execute_query(query_db_create):
-            if not is_create_error:
-                shutdown(client)
-                return test_db_name
-            # log warning to console
-            warnings.warn('Test DB create failed with error: {0}'.format(status))
-        count += 1
+            if is_create_error:
+                # log warning to console and cleanup db
+                warnings.warn('Test DB create failed with error: {0}'.format(status))
+                clean_up_test_db(test_db_name)
+            else:
+                # check if create db is still processing. if so, continue to check on it for
+                # another 5 tries
+                count_inner = 0
+                while count_inner < 5:
+                    create_db_status = check_create_test_db_status(test_db_name, client)
+                    if create_db_status == 'COMPLETED':
+                        # created successfully
+                        shutdown(client)
+                        return test_db_name
+
+                    if create_db_status == 'PROCESSING':
+                        # sleep for 5 seconds and try again
+                        time.sleep(5)
+                        count_inner += 1
+                    else:
+                        # db create failed, cleanup db, and exit inner while loop
+                        warnings.warn('Test DB create failed. Evaluated from ' \
+                                      'sys.dm_operation_status.')
+                        clean_up_test_db(test_db_name)
+                        break
+        count_outer += 1
     shutdown(client)
 
     # cleanup db just in case, then raise exception
     clean_up_test_db(test_db_name)
     raise AssertionError("DB creation failed.")
+
+def check_create_test_db_status(db_name, client):
+    """ Checks if database create is still being processed. """
+    query_check_status = u"SELECT TOP 1 state_desc FROM sys.dm_operation_status " \
+                         u"WHERE major_resource_id = '{}' AND operation = 'CREATE DATABASE' " \
+                         u"ORDER BY start_time DESC".format(db_name)
+    for row, _, _, _, _ in client.execute_query(query_check_status):
+        return row[0][0]
 
 def clean_up_test_db(test_db_name):
     client = create_mssql_cli_client()
