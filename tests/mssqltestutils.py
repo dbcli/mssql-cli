@@ -1,6 +1,6 @@
+from datetime import datetime, timedelta
 import os
 import socket
-import time
 import warnings
 from argparse import Namespace
 import mssqlcli.sqltoolsclient as sqltoolsclient
@@ -94,7 +94,7 @@ def create_test_db():
     """
     Creates database for test, using various status checks and retry logic for reliability.
     - Calls helper method to check status of create db task, if possible
-    - Exits on successful response or retry counter exceeds limit
+    - Exits on successful response or retry period exceeds time limit
     """
     client = create_mssql_cli_client()
     local_machine_name = socket.gethostname().replace(
@@ -135,17 +135,15 @@ def check_create_db_status(db_name, client):
     query_check_status = u"SELECT TOP 1 state_desc FROM sys.dm_operation_status " \
                          u"WHERE major_resource_id = '{}' AND operation = 'CREATE DATABASE' " \
                          u"ORDER BY start_time DESC".format(db_name)
-    count = 0
-    while count < 5:
+
+    # retry for 5 minutes until db status is no longer 'processing'
+    datetime_end_loop = datetime.now() + timedelta(minutes=5)
+    while datetime.now() < datetime_end_loop:
         for row, _, _, _, _ in client.execute_query(query_check_status):
             create_db_status = row[0][0]
 
             if create_db_status != 'PROCESSING':
                 return create_db_status
-
-            # sleep for 5 seconds and try again if still processing
-            time.sleep(5)
-            count += 1
 
     return 'FAILED'
 
