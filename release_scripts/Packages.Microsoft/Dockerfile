@@ -23,8 +23,8 @@ ADD . Repos/mssql-cli
 
 # Download latest stable deb and rpm packages
 WORKDIR /root
-RUN wget https://mssqlcli.blob.core.windows.net/daily/deb/mssql-cli-dev-latest.deb
-RUN wget https://mssqlcli.blob.core.windows.net/daily/rpm/mssql-cli-dev-latest.rpm
+RUN wget https://mssqlcli.blob.core.windows.net/daily/deb/mssql-cli_0.18.2-1_all.deb
+RUN wget https://mssqlcli.blob.core.windows.net/daily/rpm/mssql-cli-0.18.2-1.el8.x86_64.rpm
 
 # add privileges to publish script
 WORKDIR /root/Repos/mssql-cli
