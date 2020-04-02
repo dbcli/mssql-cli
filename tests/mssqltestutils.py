@@ -106,17 +106,23 @@ def create_test_db():
     query_db_create = u"CREATE DATABASE {0};".format(test_db_name)
 
     for _, _, status, _, is_create_error in client.execute_query(query_db_create):
-        create_db_status = check_create_db_status(test_db_name, client)
+        try:
+            create_db_status = check_create_db_status(test_db_name, client)
 
-        if is_create_error or create_db_status == 'FAILED':
-            # log warning to console and cleanup db
-            warnings.warn('Test DB create failed with error: {0}'.format(status))
-            clean_up_test_db(test_db_name)
+            if is_create_error or create_db_status == 'FAILED':
+                # log warning to console and cleanup db
+                warnings.warn('Test DB create failed with error: {0}'.format(status))
+                clean_up_test_db(test_db_name)
 
-        elif create_db_status in ('COMPLETED', 'UNKNOWN'):
-            # 'unknown' is returned if the check_create_db_status function creates db
+            elif create_db_status == 'COMPLETED':
+                shutdown(client)
+                return test_db_name
+        except PermissionError:
+            # PermissionError is returned if the check_create_db_status function creates db
             # using a non-master db. only master db is supported.
             shutdown(client)
+            warnings.warn(UserWarning("Warning: use the master DB with your SQL Server to "
+                                      "create test DBs more reliably."))
             return test_db_name
 
     shutdown(client)
@@ -131,7 +137,7 @@ def check_create_db_status(db_name, client):
     """
     if client.database.lower() != 'master':
         # sys.dm_operation_status CANNOT be used if the client isn't running on master db.
-        return 'UNKNOWN'
+        raise PermissionError("Error: this method can only be used with the master DB.")
 
     query_check_status = u"SELECT TOP 1 state_desc FROM sys.dm_operation_status " \
                          u"WHERE major_resource_id = '{}' AND operation = 'CREATE DATABASE' " \
