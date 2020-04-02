@@ -93,34 +93,30 @@ def getTempPath(*args):
 def create_test_db():
     """
     Creates database for test, using various status checks and retry logic for reliability.
-    - Uses while loop to retry db create failures
     - Calls helper method to check status of create db task, if possible
-    - Exits on successful response or outer/inner counters exceed limit
+    - Exits on successful response or retry counter exceeds limit
     """
     client = create_mssql_cli_client()
     local_machine_name = socket.gethostname().replace(
         '-', '_').replace('.', '_')
 
-    # retry logic in case db create fails
-    count = 0
-    while count < 5:
-        test_db_name = u'mssqlcli_testdb_{0}_{1}'.format(
-            local_machine_name, random_str())
-        query_db_create = u"CREATE DATABASE {0};".format(test_db_name)
+    test_db_name = u'mssqlcli_testdb_{0}_{1}'.format(
+        local_machine_name, random_str())
+    query_db_create = u"CREATE DATABASE {0};".format(test_db_name)
 
-        for _, _, status, _, is_create_error in client.execute_query(query_db_create):
-            create_db_status = check_create_db_status(test_db_name, client)
+    for _, _, status, _, is_create_error in client.execute_query(query_db_create):
+        create_db_status = check_create_db_status(test_db_name, client)
 
-            if is_create_error or create_db_status == 'FAILED':
-                # log warning to console and cleanup db
-                warnings.warn('Test DB create failed with error: {0}'.format(status))
-                clean_up_test_db(test_db_name)
+        if is_create_error or create_db_status == 'FAILED':
+            # log warning to console and cleanup db
+            warnings.warn('Test DB create failed with error: {0}'.format(status))
+            clean_up_test_db(test_db_name)
 
-            elif create_db_status in ('COMPLETED', 'UNKNOWN'):
-                shutdown(client)
-                return test_db_name
-
-        count += 1
+        elif create_db_status in ('COMPLETED', 'UNKNOWN'):
+            # 'unknown' is returned if the check_create_db_status function creates db
+            # using a non-master db. only master db is supported.
+            shutdown(client)
+            return test_db_name
 
     shutdown(client)
 
