@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 import os
 import socket
+import time
 import warnings
 from argparse import Namespace
 import mssqlcli.sqltoolsclient as sqltoolsclient
@@ -144,6 +145,9 @@ def check_create_db_status(db_name, client):
 
             if create_db_status != 'PROCESSING':
                 return create_db_status
+
+            # call sleep so db isn't overburdened with requrests
+            time.sleep(5)
 
     return 'FAILED'
 
