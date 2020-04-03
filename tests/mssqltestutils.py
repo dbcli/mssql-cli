@@ -97,7 +97,8 @@ def create_test_db():
     - Calls helper method to check status of create db task, if possible
     - Exits on successful response or retry period exceeds time limit
     """
-    client = create_mssql_cli_client()
+    options = create_mssql_cli_options(database='master')
+    client = create_mssql_cli_client(options)
     local_machine_name = socket.gethostname().replace(
         '-', '_').replace('.', '_')
 
@@ -106,23 +107,15 @@ def create_test_db():
     query_db_create = u"CREATE DATABASE {0};".format(test_db_name)
 
     for _, _, status, _, is_create_error in client.execute_query(query_db_create):
-        try:
-            create_db_status = check_create_db_status(test_db_name, client)
+        create_db_status = _check_create_db_status(test_db_name, client)
 
-            if is_create_error or create_db_status == 'FAILED':
-                # log warning to console and cleanup db
-                warnings.warn('Test DB create failed with error: {0}'.format(status))
-                clean_up_test_db(test_db_name)
+        if is_create_error or create_db_status == 'FAILED':
+            # log warning to console and cleanup db
+            warnings.warn('Test DB create failed with error: {0}'.format(status))
+            clean_up_test_db(test_db_name)
 
-            elif create_db_status == 'COMPLETED':
-                shutdown(client)
-                return test_db_name
-        except PermissionError:
-            # PermissionError is returned if the check_create_db_status function creates db
-            # using a non-master db. only master db is supported.
+        elif create_db_status == 'COMPLETED':
             shutdown(client)
-            warnings.warn(UserWarning("Warning: use the master DB with your SQL Server to "
-                                      "create test DBs more reliably."))
             return test_db_name
 
     shutdown(client)
@@ -131,14 +124,10 @@ def create_test_db():
     clean_up_test_db(test_db_name)
     raise AssertionError("DB creation failed.")
 
-def check_create_db_status(db_name, client):
+def _check_create_db_status(db_name, client):
     """
     Uses retry logic with sys.dm_operation_status to check statis of create database job.
     """
-    if client.database.lower() != 'master':
-        # sys.dm_operation_status CANNOT be used if the client isn't running on master db.
-        raise PermissionError("Error: this method can only be used with the master DB.")
-
     query_check_status = u"SELECT TOP 1 state_desc FROM sys.dm_operation_status " \
                          u"WHERE major_resource_id = '{}' AND operation = 'CREATE DATABASE' " \
                          u"ORDER BY start_time DESC".format(db_name)
@@ -146,13 +135,16 @@ def check_create_db_status(db_name, client):
     # retry for 5 minutes until db status is no longer 'processing'
     datetime_end_loop = datetime.now() + timedelta(minutes=5)
     while datetime.now() < datetime_end_loop:
-        for row, _, _, _, _ in client.execute_query(query_check_status):
+        for row, _, status, _, is_error in client.execute_query(query_check_status):
+            if is_error:
+                raise ConnectionError("Checking database creation status failed: {}"\
+                                      .format(status))
             create_db_status = row[0][0]
 
             if create_db_status != 'PROCESSING':
                 return create_db_status
 
-            # call sleep so db isn't overburdened with requrests
+            # call sleep so db isn't overburdened with requests
             time.sleep(5)
 
     return 'FAILED'
