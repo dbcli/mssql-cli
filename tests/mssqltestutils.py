@@ -99,6 +99,11 @@ def create_test_db():
     """
     options = create_mssql_cli_options(database='master')
     client = create_mssql_cli_client(options)
+
+    if not _is_client_db_on_cloud(client):
+        raise AssertionError("Create test DB must use SQL Azure. Please make sure the SQL" \
+                             "Server agent is in Azure and not on-prem.")
+
     local_machine_name = socket.gethostname().replace(
         '-', '_').replace('.', '_')
 
@@ -123,6 +128,16 @@ def create_test_db():
     # cleanup db just in case, then raise exception
     clean_up_test_db(test_db_name)
     raise AssertionError("DB creation failed.")
+
+def _is_client_db_on_cloud(client):
+    """
+    Checks if client is connected to Azure DB.
+    """
+    for rows, _, _, _, _ in client.execute_query("SELECT @@VERSION"):
+        if "microsoft sql azure" in rows[0][0].lower():
+            return True
+
+    return False
 
 def _check_create_db_status(db_name, client):
     """
