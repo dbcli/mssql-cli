@@ -100,10 +100,6 @@ def create_test_db():
     options = create_mssql_cli_options(database='master')
     client = create_mssql_cli_client(options)
 
-    if not _is_client_db_on_cloud(client):
-        raise AssertionError("Create test DB must use SQL Azure. Please make sure the SQL" \
-                             "Server agent is in Azure and not on-prem.")
-
     local_machine_name = socket.gethostname().replace(
         '-', '_').replace('.', '_')
 
@@ -112,16 +108,21 @@ def create_test_db():
     query_db_create = u"CREATE DATABASE {0};".format(test_db_name)
 
     for _, _, status, _, is_create_error in client.execute_query(query_db_create):
-        create_db_status = _check_create_db_status(test_db_name, client)
-
-        if is_create_error or create_db_status == 'FAILED':
-            # log warning to console and cleanup db
+        if is_create_error:
+            # break loop to assert db creation failure
             warnings.warn('Test DB create failed with error: {0}'.format(status))
-            clean_up_test_db(test_db_name)
+            break
 
-        elif create_db_status == 'COMPLETED':
-            shutdown(client)
-            return test_db_name
+        if _is_client_db_on_cloud(client):
+            # retry logic is only supported for sql azure
+            create_db_status = _check_create_db_status(test_db_name, client)
+
+            if create_db_status == 'FAILED':
+                # break loop to assert db creation failure
+                break
+
+        shutdown(client)
+        return test_db_name
 
     shutdown(client)
 
