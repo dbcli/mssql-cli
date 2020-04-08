@@ -1,8 +1,10 @@
 import argparse
 import os
+import sys
+import click
 import mssqlcli
 
-from .config import config_location
+from .config import config_location, get_config
 
 MSSQL_CLI_USER = u'MSSQL_CLI_USER'
 MSSQL_CLI_PASSWORD = u'MSSQL_CLI_PASSWORD'
@@ -70,7 +72,9 @@ def create_parser():
     args_parser.add_argument(
         u'--row-limit',
         dest=u'row_limit',
-        default=os.environ.get(MSSQL_CLI_ROW_LIMIT, None),
+        default=get_config()['main'].as_int('row_limit') or \
+                os.environ.get(MSSQL_CLI_ROW_LIMIT, None),
+        type=check_positive_int,
         metavar=u'',
         help=u'Set threshold for row limit prompt. Use 0 to disable prompt.')
 
@@ -187,3 +191,23 @@ def create_parser():
     )
 
     return args_parser
+
+def check_positive_int(row_limit):
+    """
+    Validates row_limit option has valid integer
+    """
+
+    try:
+        row_limit_int = int(row_limit)
+    except ValueError:
+        click.secho(u'Error: row-limit has been set to an invalid value.\nPlease ' \
+                    u'specify a positive integer using the --row-limit command-line ' \
+                    u'argument or by setting row_limit in the config file.', fg='red')
+        sys.exit(1)
+    else:
+        if row_limit_int < 0:
+            click.secho(u'Error: row-limit cannot be negative.\nPlease ' \
+                        u'specify a positive integer using the --row-limit command-line ' \
+                        u'argument or by setting row_limit in the config file.', fg='red')
+            sys.exit(1)
+        return row_limit_int

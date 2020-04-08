@@ -167,8 +167,7 @@ class MssqlCli(object):
             self.multiline_mode = c['main'].get('multi_line_mode', 'tsql')
             self.vi_mode = c['main'].as_bool('vi')
             self.prompt_format = options.prompt or c['main'].get('prompt', self.default_prompt)
-            self.row_limit = \
-                self._set_row_limit(options.row_limit or c['main'].as_int('row_limit'))
+            self.row_limit = options.row_limit
             self.min_num_menu_lines = c['main'].as_int('min_num_menu_lines')
             self.multiline_continuation_char = c['main']['multiline_continuation_char']
             self.syntax_style = c['main']['syntax_style']
@@ -209,14 +208,9 @@ class MssqlCli(object):
                              "specified.")
 
     def __del__(self):
-        """ Shut down sqltoolsservice if defined. """
-        try:
-            # try/except block needed if shutdown is invoked before sqltoolsclient is defined.
-            # example: invalid row-limit argument is passed.
-            if self.sqltoolsclient:
-                self.sqltoolsclient.shutdown()            
-        except AttributeError:
-            pass
+        # Shut-down sqltoolsservice
+        if self.sqltoolsclient:
+            self.sqltoolsclient.shutdown()
 
     # TODO: possibly use at a later date for expanded output file functionality
     # def write_to_file(self, pattern, **_):
@@ -320,27 +314,6 @@ class MssqlCli(object):
 
             editor_command = special.editor_command(text)
         return text
-
-    @staticmethod
-    def _set_row_limit(row_limit):
-        """
-        Validates row_limit option has valid integer
-        """
-
-        try:
-            row_limit_int = int(row_limit)
-        except ValueError:
-            click.secho(u'Error: row-limit has been set to an invalid value.\nPlease ' \
-                        u'specify a positive integer using the --row-limit command-line ' \
-                        u'argument or by setting row_limit in the config file.', fg='red')
-            sys.exit(1)
-        else:
-            if row_limit_int < 0:
-                click.secho(u'Error: row-limit cannot be negative.\nPlease ' \
-                            u'specify a positive integer using the --row-limit command-line ' \
-                            u'argument or by setting row_limit in the config file.', fg='red')
-                sys.exit(1)
-            return row_limit_int
 
     def _execute_interactive_command(self, text):
         """ Runs commands in the interactive CLI mode. """

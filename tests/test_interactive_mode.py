@@ -2,7 +2,6 @@ import os
 import sys
 import pytest
 import utility
-from mssqlcli.mssql_cli import MssqlCli
 from mssqlcli.util import is_command_valid
 from mssqltestutils import (
     create_mssql_cli,
@@ -81,52 +80,6 @@ class TestInteractiveModeInvalidRuns:
             mssqlcli.run()
             assert False
         except ValueError:
-            assert True
-        finally:
-            if mssqlcli is not None:
-                shutdown(mssqlcli)
-
-
-class TestInteractiveModeRowLimit:
-    # pylint: disable=protected-access
-
-    test_data_valid = [5, 0]
-    test_data_invalid = ['string!', -3]
-
-    @staticmethod
-    @pytest.mark.parametrize("row_limit", test_data_valid)
-    def test_valid_row_limit(row_limit):
-        """
-        Test valid value types for row limit argument
-        """
-        assert MssqlCli._set_row_limit(row_limit) == row_limit
-
-    @staticmethod
-    @pytest.mark.parametrize("row_limit", test_data_invalid)
-    def test_invalid_row_limit(row_limit):
-        """
-        Test invalid value types for row limit argument
-        """
-        try:
-            MssqlCli._set_row_limit(row_limit)
-        except SystemExit:
-            # mssqlcli class calls sys.exit(1) on invalid value
-            assert True
-        else:
-            assert False
-
-    @staticmethod
-    @pytest.mark.timeout(60)
-    def invalid_run(**options):
-        '''
-        Tests mssql-cli runs with invalid combination of properities set
-        '''
-        mssqlcli = None
-        try:
-            mssqlcli = create_mssql_cli(**options)
-            mssqlcli.run()
-            assert False
-        except SystemExit:
             assert True
         finally:
             if mssqlcli is not None:
