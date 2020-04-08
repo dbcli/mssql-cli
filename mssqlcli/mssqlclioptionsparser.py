@@ -74,7 +74,7 @@ def create_parser():
         dest=u'row_limit',
         default=get_config()['main'].as_int('row_limit') or \
                 os.environ.get(MSSQL_CLI_ROW_LIMIT, None),
-        type=check_positive_int,
+        type=check_row_limit,
         metavar=u'',
         help=u'Set threshold for row limit prompt. Use 0 to disable prompt.')
 
@@ -192,9 +192,9 @@ def create_parser():
 
     return args_parser
 
-def check_positive_int(row_limit):
+def check_row_limit(row_limit):
     """
-    Validates row_limit option has valid integer
+    Validates row_limit option has valid positive integer
     """
 
     try:

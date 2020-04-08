@@ -2,7 +2,7 @@
 import unittest
 import pytest
 from mssqlcli.mssql_cli import MssqlCli
-from mssqlcli.mssqlclioptionsparser import check_positive_int
+from mssqlcli.mssqlclioptionsparser import check_row_limit
 from mssqltestutils import create_mssql_cli_options
 
 class RowLimitTests(unittest.TestCase):
@@ -62,7 +62,7 @@ class TestRowLimitArgs:
         """
         Test valid value types for row limit argument
         """
-        assert check_positive_int(row_limit) == row_limit
+        assert check_row_limit(row_limit) == row_limit
 
     @staticmethod
     @pytest.mark.parametrize("row_limit", test_data_invalid)
@@ -71,7 +71,7 @@ class TestRowLimitArgs:
         Test invalid value types for row limit argument
         """
         try:
-            check_positive_int(row_limit)
+            check_row_limit(row_limit)
         except SystemExit:
             # mssqlcli class calls sys.exit(1) on invalid value
             assert True
