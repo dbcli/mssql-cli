@@ -330,12 +330,15 @@ class MssqlCli(object):
         try:
             row_limit_int = int(row_limit)
         except ValueError:
-            click.secho(u'Error: --row-limit contains an invalid value as input. ' \
-                        u'Please use a positive integer.', fg='red')
+            click.secho(u'Error: row-limit has been set to an invalid value.\nPlease ' \
+                        u'specify a positive integer using the --row-limit command-line ' \
+                        u'argument or by setting row_limit in the config file.', fg='red')
             sys.exit(1)
         else:
             if row_limit_int < 0:
-                click.secho(u'Error: --row-limit cannot be negative.', fg='red')
+                click.secho(u'Error: row-limit cannot be negative.\nPlease ' \
+                            u'specify a positive integer using the --row-limit command-line ' \
+                            u'argument or by setting row_limit in the config file.', fg='red')
                 sys.exit(1)
             return row_limit_int
 
