@@ -2,6 +2,7 @@ import os
 import sys
 import pytest
 import utility
+from mssqlcli.mssql_cli import MssqlCli
 from mssqlcli.util import is_command_valid
 from mssqltestutils import (
     create_mssql_cli,
@@ -27,6 +28,7 @@ class TestInteractiveMode:
         yield mssqlcli
         shutdown(mssqlcli)
 
+
 class TestInteractiveModeQueries(TestInteractiveMode):
     @staticmethod
     @pytest.mark.parametrize("query_str, test_file", test_queries)
@@ -36,6 +38,7 @@ class TestInteractiveModeQueries(TestInteractiveMode):
         output_baseline = get_file_contents(file_baseline)
         output_query = '\n'.join(mssqlcli.execute_query(query_str)).replace('\r', '')
         assert output_query == output_baseline
+
 
 class TestInteractiveModeInvalidRuns:
     @pytest.mark.timeout(60)
@@ -83,6 +86,53 @@ class TestInteractiveModeInvalidRuns:
             if mssqlcli is not None:
                 shutdown(mssqlcli)
 
+
+class TestInteractiveModeRowLimit:
+    # pylint: disable=protected-access
+
+    test_data_valid = [5, 0]
+    test_data_invalid = ['string!', -3]
+
+    @staticmethod
+    @pytest.mark.parametrize("row_limit", test_data_valid)
+    def test_valid_row_limit(row_limit):
+        """
+        Test valid value types for row limit argument
+        """
+        assert MssqlCli._set_row_limit(row_limit) == row_limit
+
+    @staticmethod
+    @pytest.mark.parametrize("row_limit", test_data_invalid)
+    def test_invalid_row_limit(row_limit):
+        """
+        Test invalid value types for row limit argument
+        """
+        try:
+            MssqlCli._set_row_limit(row_limit)
+        except SystemExit:
+            # mssqlcli class calls sys.exit(1) on invalid value
+            assert True
+        else:
+            assert False
+
+    @staticmethod
+    @pytest.mark.timeout(60)
+    def invalid_run(**options):
+        '''
+        Tests mssql-cli runs with invalid combination of properities set
+        '''
+        mssqlcli = None
+        try:
+            mssqlcli = create_mssql_cli(**options)
+            mssqlcli.run()
+            assert False
+        except SystemExit:
+            assert True
+        finally:
+            if mssqlcli is not None:
+                shutdown(mssqlcli)
+
+
 class TestInteractiveModePager(TestInteractiveMode):
     """
     Test default pager setting.
@@ -119,6 +169,12 @@ class TestInteractiveModePager(TestInteractiveMode):
         config = create_mssql_cli_config()
         config['main']['pager'] = config_value
         assert mssqlcli.set_default_pager(config) == config_value
+
+
+class TestInteractiveModeRun:
+    """
+    Tests the executable.
+    """
 
     @staticmethod
     @pytest.mark.timeout(60)
