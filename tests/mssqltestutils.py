@@ -111,12 +111,13 @@ def create_test_db():
         for _, _, status, _, is_create_error in client.execute_query(query_db_create):
             if _is_client_db_on_cloud(client):
                 # retry logic is only supported for sql azure
-                create_db_status = _check_create_db_status(test_db_name, client)
+                create_db_status, create_db_error = _check_create_db_status(test_db_name, client)
 
                 if create_db_status == 'FAILED':
                     # break loop to assert db creation failure
-                    raise AssertionError("Database creation failed: retry logic for SQL " \
-                                        "Azure DB was unsuccessful.")
+                    raise AssertionError("Database creation failed. Retry logic for SQL " \
+                                        "Azure DB was unsuccessful with the following error: " \
+                                        "\n{}".format(create_db_error))
 
             if is_create_error:
                 # break loop to assert db creation failure
@@ -141,26 +142,28 @@ def _check_create_db_status(db_name, client):
     """
     Uses retry logic with sys.dm_operation_status to check statis of create database job.
     """
-    query_check_status = u"SELECT TOP 1 state_desc FROM sys.dm_operation_status " \
+    query_check_status = u"SELECT TOP 1 state_desc, error_desc FROM sys.dm_operation_status " \
                          u"WHERE major_resource_id = '{}' AND operation = 'CREATE DATABASE' " \
                          u"ORDER BY start_time DESC".format(db_name)
 
     # retry for 5 minutes until db status is no longer 'processing'
     datetime_end_loop = datetime.now() + timedelta(minutes=5)
+    state_desc, error_desc = None, None
     while datetime.now() < datetime_end_loop:
         for row, _, status, _, is_error in client.execute_query(query_check_status):
             if is_error:
                 raise ConnectionError("Checking database creation status failed: {}"\
                                       .format(status))
-            create_db_status = row[0][0]
+            state_desc = row[0][0]
+            error_desc = row[0][1]
 
-            if create_db_status != 'PROCESSING':
-                return create_db_status
+            if state_desc != 'PROCESSING':
+                break
 
             # call sleep so db isn't overburdened with requests
             time.sleep(5)
 
-    return 'FAILED'
+    return (state_desc, error_desc)
 
 def clean_up_test_db(test_db_name):
     client = create_mssql_cli_client()
