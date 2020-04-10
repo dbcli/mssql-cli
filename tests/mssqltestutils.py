@@ -109,10 +109,6 @@ def create_test_db():
 
     try:
         for _, _, status, _, is_create_error in client.execute_query(query_db_create):
-            if is_create_error:
-                # break loop to assert db creation failure
-                raise AssertionError("Database creation failed: {}".format(status))
-
             if _is_client_db_on_cloud(client):
                 # retry logic is only supported for sql azure
                 create_db_status = _check_create_db_status(test_db_name, client)
@@ -121,6 +117,10 @@ def create_test_db():
                     # break loop to assert db creation failure
                     raise AssertionError("Database creation failed: retry logic for SQL " \
                                         "Azure DB was unsuccessful.")
+
+            if is_create_error:
+                # break loop to assert db creation failure
+                raise AssertionError("Database creation failed: {}".format(status))
 
         return test_db_name
 
