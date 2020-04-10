@@ -4,9 +4,17 @@
 ## Requirements
 
 ### Install Docker Desktop
-> This section needs to be completed.
+You can install Docker Desktop for macOS and Windows [here](https://www.docker.com/products/docker-desktop).
 
-### Create the Certificate and Config Files
+### Generate Required Files for Repo CLI
+[Repo CLI](http://csd-linux-publishing-service.azurewebsites.net/client#commands) is the required API to publish Linux packages to Packages.Microsoft. Two files are required to use this tool:
+1. **A certificate** used for authenticating with the tool.
+2. **A JSON config file** as listed on the [Repo CLI docs](http://csd-linux-publishing-service.azurewebsites.net/client#commands).
+
+#### Download Certificate
+The certificate is hosted on the team's key vault account in Azure, under 'Certificates'. Download the certificate as a PEM file and include it in this directory (Packages.Microsoft). Rename the file as **private.pem**.
+
+#### Download Config
 > This section needs to be completed.
 
 ## Build Docker Container
