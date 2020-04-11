@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 import os
 import socket
 import time
-import warnings
 from argparse import Namespace
 import mssqlcli.sqltoolsclient as sqltoolsclient
 import mssqlcli.mssqlcliclient as mssqlcliclient
@@ -157,11 +156,11 @@ def _check_create_db_status(db_name, client):
             state_desc = row[0][0]
             error_desc = row[0][1]
 
-            if state_desc != 'PROCESSING':
-                break
+        if state_desc != 'PROCESSING':
+            break
 
-            # call sleep so db isn't overburdened with requests
-            time.sleep(5)
+        # call sleep so db isn't overburdened with requests
+        time.sleep(5)
 
     return (state_desc, error_desc)
 
