@@ -27,6 +27,7 @@ class TestInteractiveMode:
         yield mssqlcli
         shutdown(mssqlcli)
 
+
 class TestInteractiveModeQueries(TestInteractiveMode):
     @staticmethod
     @pytest.mark.parametrize("query_str, test_file", test_queries)
@@ -36,6 +37,7 @@ class TestInteractiveModeQueries(TestInteractiveMode):
         output_baseline = get_file_contents(file_baseline)
         output_query = '\n'.join(mssqlcli.execute_query(query_str)).replace('\r', '')
         assert output_query == output_baseline
+
 
 class TestInteractiveModeInvalidRuns:
     @pytest.mark.timeout(60)
@@ -83,6 +85,7 @@ class TestInteractiveModeInvalidRuns:
             if mssqlcli is not None:
                 shutdown(mssqlcli)
 
+
 class TestInteractiveModePager(TestInteractiveMode):
     """
     Test default pager setting.
@@ -119,6 +122,12 @@ class TestInteractiveModePager(TestInteractiveMode):
         config = create_mssql_cli_config()
         config['main']['pager'] = config_value
         assert mssqlcli.set_default_pager(config) == config_value
+
+
+class TestInteractiveModeRun:
+    """
+    Tests the executable.
+    """
 
     @staticmethod
     @pytest.mark.timeout(60)

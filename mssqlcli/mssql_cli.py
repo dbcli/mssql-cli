@@ -167,11 +167,7 @@ class MssqlCli(object):
             self.multiline_mode = c['main'].get('multi_line_mode', 'tsql')
             self.vi_mode = c['main'].as_bool('vi')
             self.prompt_format = options.prompt or c['main'].get('prompt', self.default_prompt)
-            if options.row_limit is not None:
-                self.row_limit = options.row_limit
-            else:
-                self.row_limit = c['main'].as_int('row_limit')
-
+            self.row_limit = options.row_limit
             self.min_num_menu_lines = c['main'].as_int('min_num_menu_lines')
             self.multiline_continuation_char = c['main']['multiline_continuation_char']
             self.syntax_style = c['main']['syntax_style']

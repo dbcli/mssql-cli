@@ -1,6 +1,8 @@
 # pylint: disable=protected-access
 import unittest
+import pytest
 from mssqlcli.mssql_cli import MssqlCli
+from mssqlcli.mssqlclioptionsparser import check_row_limit
 from mssqltestutils import create_mssql_cli_options
 
 class RowLimitTests(unittest.TestCase):
@@ -43,3 +45,35 @@ class RowLimitTests(unittest.TestCase):
         result = cli._should_show_limit_prompt(stmt, ['row']*self.over_default)
         assert cli.row_limit == 0
         assert not result
+
+
+class TestRowLimitArgs:
+    """
+    Tests for valid row-limit arguments.
+    """
+    # pylint: disable=protected-access
+
+    test_data_valid = [5, 0]
+    test_data_invalid = ['string!', -3]
+
+    @staticmethod
+    @pytest.mark.parametrize("row_limit", test_data_valid)
+    def test_valid_row_limit(row_limit):
+        """
+        Test valid value types for row limit argument
+        """
+        assert check_row_limit(row_limit) == row_limit
+
+    @staticmethod
+    @pytest.mark.parametrize("row_limit", test_data_invalid)
+    def test_invalid_row_limit(row_limit):
+        """
+        Test invalid value types for row limit argument
+        """
+        try:
+            check_row_limit(row_limit)
+        except SystemExit:
+            # mssqlcli class calls sys.exit(1) on invalid value
+            assert True
+        else:
+            assert False
