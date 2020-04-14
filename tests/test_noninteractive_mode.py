@@ -87,6 +87,8 @@ class TestNonInteractiveResults:
         """
         Tests query with multiple merges. Requires creation of temp db.
         """
+        db_name = None
+
         try:
             # create temporary db
             db_name = create_test_db()
@@ -99,7 +101,8 @@ class TestNonInteractiveResults:
                                                              .format(file_input, db_name))
             assert output_query == text_baseline
         finally:
-            clean_up_test_db(db_name)
+            if db_name:
+                clean_up_test_db(db_name)
 
     @classmethod
     @pytest.mark.timeout(60)

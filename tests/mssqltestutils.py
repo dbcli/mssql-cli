@@ -1,6 +1,7 @@
+from datetime import datetime, timedelta
 import os
 import socket
-import warnings
+import time
 from argparse import Namespace
 import mssqlcli.sqltoolsclient as sqltoolsclient
 import mssqlcli.mssqlcliclient as mssqlcliclient
@@ -90,28 +91,78 @@ def getTempPath(*args):
     return  os.path.abspath(tempPath)
 
 def create_test_db():
-    client = create_mssql_cli_client()
+    """
+    Creates database for test, using various status checks and retry logic for reliability.
+    - Calls helper method to check status of create db task, if possible
+    - Exits on successful response or retry period exceeds time limit
+    """
+    options = create_mssql_cli_options(database='master')
+    client = create_mssql_cli_client(options)
+
     local_machine_name = socket.gethostname().replace(
         '-', '_').replace('.', '_')
+
     test_db_name = u'mssqlcli_testdb_{0}_{1}'.format(
         local_machine_name, random_str())
     query_db_create = u"CREATE DATABASE {0};".format(test_db_name)
-    count = 0
 
-    # retry logic in case db create fails
-    while count < 5:
+    try:
         for _, _, status, _, is_create_error in client.execute_query(query_db_create):
-            if not is_create_error:
-                shutdown(client)
-                return test_db_name
-            # log warning to console
-            warnings.warn('Test DB create failed with error: {0}'.format(status))
-        count += 1
-    shutdown(client)
+            if _is_client_db_on_cloud(client):
+                # retry logic is only supported for sql azure
+                create_db_status, create_db_error = _check_create_db_status(test_db_name, client)
 
-    # cleanup db just in case, then raise exception
-    clean_up_test_db(test_db_name)
-    raise AssertionError("DB creation failed.")
+                if create_db_status == 'FAILED':
+                    # break loop to assert db creation failure
+                    raise AssertionError("Database creation failed. Retry logic for SQL " \
+                                        "Azure DB was unsuccessful with the following error: " \
+                                        "\n{}".format(create_db_error))
+
+            if is_create_error:
+                # break loop to assert db creation failure
+                raise AssertionError("Database creation failed: {}".format(status))
+
+        return test_db_name
+
+    finally:
+        shutdown(client)
+
+def _is_client_db_on_cloud(client):
+    """
+    Checks if client is connected to Azure DB.
+    """
+    for rows, _, _, _, _ in client.execute_query("SELECT @@VERSION"):
+        if "microsoft sql azure" in rows[0][0].lower():
+            return True
+
+    return False
+
+def _check_create_db_status(db_name, client):
+    """
+    Uses retry logic with sys.dm_operation_status to check statis of create database job.
+    """
+    query_check_status = u"SELECT TOP 1 state_desc, error_desc FROM sys.dm_operation_status " \
+                         u"WHERE major_resource_id = '{}' AND operation = 'CREATE DATABASE' " \
+                         u"ORDER BY start_time DESC".format(db_name)
+
+    # retry for 5 minutes until db status is no longer 'processing'
+    datetime_end_loop = datetime.now() + timedelta(minutes=5)
+    state_desc, error_desc = None, None
+    while datetime.now() < datetime_end_loop:
+        for row, _, status, _, is_error in client.execute_query(query_check_status):
+            if is_error:
+                raise ConnectionError("Checking database creation status failed: {}"\
+                                      .format(status))
+            state_desc = row[0][0]
+            error_desc = row[0][1]
+
+        if state_desc != 'PROCESSING':
+            break
+
+        # call sleep so db isn't overburdened with requests
+        time.sleep(5)
+
+    return (state_desc, error_desc)
 
 def clean_up_test_db(test_db_name):
     client = create_mssql_cli_client()
