@@ -24,7 +24,7 @@ The data is collected by Microsoft.
 
 Disable telemetry collection by setting environment variable MSSQL_CLI_TELEMETRY_OPTOUT to 'True' or '1'.
 
-Microsoft Privacy statement: https://privacy.microsoft.com/privacystatement
+Microsoft Privacy statement: https://go.microsoft.com/fwlink/?LinkId=521839
 """
 
 
