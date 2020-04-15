@@ -87,13 +87,14 @@ for repo_data in $(echo "${list_repo_id}"); do
     repo_type=$(_jq '.type')
 
     # publish deb or rpm package
-    # -r specifies the destination repository (by ID)
+    # '-r' specifies the destination repository (by ID)
+    # 'break' exits loop if something failed with command
     if [ $repo_type == "apt" ]; then
         echo "Publishing .deb for $repo_url..."
-        repoclient package add $deb_pkg -r $repo_id
+        repoclient package add $deb_pkg -r $repo_id || break
     elif [ $repo_type == "yum" ]; then
         echo "Publishing .rpm for $repo_url..."
-        repoclient package add $rpm_pkg -r $repo_id
+        repoclient package add $rpm_pkg -r $repo_id || break
     else
         echo "No package published for $(_jq '.url')"
     fi
