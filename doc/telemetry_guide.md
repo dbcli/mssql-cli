@@ -2,7 +2,7 @@
 
 By default, Microsoft collects anonymous usage data in order to improve the user experience. The usage data collected allows the team to prioritize features and bug fixes.
 
-Microsoft Privacy statement: https://privacy.microsoft.com/en-us/privacystatement
+Microsoft Privacy statement: https://go.microsoft.com/fwlink/?LinkId=521839
 
 ## Table of Contents
 1. [How do we anonymize the data?](#anonymize)
