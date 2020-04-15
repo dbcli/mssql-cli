@@ -17,8 +17,8 @@ fi
 
 local_repo=$1
 config_file=/root/.repoclient/config.json
-deb_pkg=/root/mssql-cli-dev-latest.deb
-rpm_pkg=/root/mssql-cli-dev-latest.rpm
+deb_pkg=/root/mssql-cli_*.deb
+rpm_pkg=/root/mssql-cli-*.rpm
 
 # create tmp dir for tmp config
 tmp_dir=$(mktemp -d)
