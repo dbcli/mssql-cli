@@ -1,4 +1,6 @@
 # Publishing to Packages.Microsoft
+> Please ensure that stable versions of rpm and deb have already been published to daily storage.
+
 > Publishing to the Microsoft Repo may only be completed on corp-net. Support for non-corp-net access is not available at the time of this writing. Repo CLI docs may be accessed [here](http://csd-linux-publishing-service.azurewebsites.net/).
 
 ## Requirements
@@ -63,7 +65,16 @@ release_scripts/Packages.Microsoft/publish.sh $(pwd) 'prod'
 ## Repo CLI Commands
 This list below contains frequently used commands to navigate the Repo CLI API:
 
+#### Upload Single Package
+Packages.Microsoft uses **repositories** to distinguish publishing channels. mssql-cli publishes .deb and .rpm packages directly to repositories, which map to a Linux distribution (i.e. Ubuntu 16.04) along with it's distribution channel (i.e. prod or testing). The [list uploaded pacakges](#list-uploaded-packages) command will display a list respositories with previously-published mssql-cli packages.
+
+The call below uploads a .deb or .rpm package to a specificed repository in Packages.Microsoft:
+```sh
+repoclient package add <package filepath> -r <repo ID>
+```
+
 #### List Uploaded Packages
+Use the call below to display a history of previously-published mssql-cli packages:
 ```sh
 repoclient package list | jq '.[] | select(.name=="mssql-cli")'
 ```
