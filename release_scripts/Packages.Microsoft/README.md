@@ -78,3 +78,12 @@ Use the call below to display a history of previously-published mssql-cli packag
 ```sh
 repoclient package list | jq '.[] | select(.name=="mssql-cli")'
 ```
+
+#### List Repositories by Linux Version and Distribution Channel
+Use the below command to list Packages.Microsoft repository information, with filters for Linux OS and distribution channel:
+
+```sh
+repoclient repo list | jq '.[] | select(.url=="<Linux OS name>" and .distribution=="<distribution>")'
+```
+
+For example: `repoclient repo list | jq '.[] | select(.url=="microsoft-ubuntu-xenial-prod" and .distribution=="testing")'`
