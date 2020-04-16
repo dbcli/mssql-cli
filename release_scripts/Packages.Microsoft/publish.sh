@@ -24,9 +24,13 @@ else
     is_print='False'
 fi
 
+# download latest stable deb and rpm packages
+wget https://mssqlcli.blob.core.windows.net/daily/deb/mssql-cli_1.0.0-1_all.deb --directory-prefix=/root/
+wget https://mssqlcli.blob.core.windows.net/daily/rpm/mssql-cli-1.0.0-1.el8.x86_64.rpm --directory-prefix=/root/
+
 local_repo=$1
-deb_pkg=/root/mssql-cli_*.deb
-rpm_pkg=/root/mssql-cli-*.rpm
+deb_pkg=/root/mssql-cli_1.0.0-1_all.deb
+rpm_pkg=/root/mssql-cli-1.0.0-1.el8.x86_64.rpm
 
 # specificies destination testing repos for publishing
 repo_url_testing=( \
