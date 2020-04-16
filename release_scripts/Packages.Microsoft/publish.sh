@@ -1,20 +1,27 @@
 # Publishes deb and rpm packages to Packages.Microsoft repo
 
 # Validate initial argument is used
-if [ -z "$1" ]
+if [[ -z "$1" ]]
   then
     echo "First argument should be path to local repo."
     exit 1
 fi
 
 # Validate second argument specifices either prod or testing for publishing channel
-if [ ${2,,} = 'prod' ]; then
+if [[ ${2,,} = 'prod' ]]; then
     repo_dist='prod'
-elif [ ${2,,} = 'testing' ]; then
+elif [[ ${2,,} = 'testing' ]]; then
     repo_dist='testing'
 else
     echo "Second argument should specify 'prod' or 'testing' for repository distribution type."
     exit 1
+fi
+
+# Confirm if third optional '--print' argument is used
+if [[ ${3,,} = '--print' ]]; then
+    is_print='True'
+else
+    is_print='False'
 fi
 
 local_repo=$1
@@ -65,7 +72,7 @@ url_match_str=""
 for i in ${!repo_url_testing[@]}; do
     repo_url=${repo_url_testing[i]}
 
-    if [ $i == 0 ]; then
+    if [[ $i == 0 ]]; then
         url_match_str=".url==\"${repo_url}\""
     else
         url_match_str="${url_match_str} or .url==\"${repo_url}\""
@@ -89,13 +96,20 @@ for repo_data in $(echo "${list_repo_id}"); do
     # publish deb or rpm package
     # '-r' specifies the destination repository (by ID)
     # 'break' exits loop if something failed with command
-    if [ $repo_type == "apt" ]; then
-        echo "Publishing .deb for $repo_url..."
-        repoclient package add $deb_pkg -r $repo_id || break
-    elif [ $repo_type == "yum" ]; then
-        echo "Publishing .rpm for $repo_url..."
-        repoclient package add $rpm_pkg -r $repo_id || break
+    if [[ $repo_type == "apt" ]]; then
+        command="repoclient package add $deb_pkg -r $repo_id"
+    elif [[ $repo_type == "yum" ]]; then
+        command="repoclient package add $rpm_pkg -r $repo_id"
     else
         echo "No package published for $(_jq '.url')"
+        break
+    fi
+
+    echo $command
+    if [[ $is_print != "True" ]]; then
+        # publish package
+        echo "Publishing $repo_type for $repo_url..."
+        eval "$command || break"
+        printf "\n"
     fi
 done
