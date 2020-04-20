@@ -2,6 +2,7 @@ import datetime as dt
 import functools
 import itertools
 import logging
+from logging.handlers import RotatingFileHandler
 import os
 import sys
 import threading
@@ -243,7 +244,9 @@ class MssqlCli(object):
         if log_level.upper() == 'NONE':
             handler = logging.NullHandler()
         else:
-            handler = logging.FileHandler(os.path.expanduser(log_file), encoding='utf-8')
+            # creates a log buffer with max size of 100 MB and one backup file
+            handler = RotatingFileHandler(os.path.expanduser(log_file), encoding='utf-8',
+                                          maxBytes=10**8, backupCount=1)
 
         level_map = {'CRITICAL': logging.CRITICAL,
                      'ERROR': logging.ERROR,
