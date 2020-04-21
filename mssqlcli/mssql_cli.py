@@ -246,7 +246,7 @@ class MssqlCli(object):
         else:
             # creates a log buffer with max size of 20 MB and 5 backup files
             handler = RotatingFileHandler(os.path.expanduser(log_file), encoding='utf-8',
-                                          maxBytes=2*(10**7), backupCount=5)
+                                          maxBytes=1024*1024*20, backupCount=5)
 
         level_map = {'CRITICAL': logging.CRITICAL,
                      'ERROR': logging.ERROR,
