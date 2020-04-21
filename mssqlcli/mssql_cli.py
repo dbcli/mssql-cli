@@ -244,9 +244,9 @@ class MssqlCli(object):
         if log_level.upper() == 'NONE':
             handler = logging.NullHandler()
         else:
-            # creates a log buffer with max size of 100 MB and one backup file
+            # creates a log buffer with max size of 20 MB and 5 backup files
             handler = RotatingFileHandler(os.path.expanduser(log_file), encoding='utf-8',
-                                          maxBytes=10**8, backupCount=1)
+                                          maxBytes=2*(10**7), backupCount=5)
 
         level_map = {'CRITICAL': logging.CRITICAL,
                      'ERROR': logging.ERROR,
