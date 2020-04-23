@@ -82,7 +82,7 @@ class TestNonInteractiveResults:
         finally:
             shutdown(mssqlcli)
 
-    @pytest.mark.timeout(300)
+    @pytest.mark.timeout(600)
     def test_multiple_merge(self):
         """
         Tests query with multiple merges. Requires creation of temp db.
