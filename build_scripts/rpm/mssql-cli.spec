@@ -8,17 +8,17 @@
   %define dist .el7
 %endif
 
-%define name                   mssql-cli
-%define release                1%{?dist}
-%define time_stamp             %(date +%y%m%d%H%M)
-%define base_version           1.0.0
-%define python_dir             %{_builddir}/python_env
-%define python_build_archive   /root/python_build_archive
-%define python_build           /root/python_build
-%define python_url             https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tgz
-%define cli_lib_dir            %{_libdir}/mssql-cli
-%define repo_path              %{getenv:REPO_PATH}
-%define official_build         %{getenv:MSSQL_CLI_OFFICIAL_BUILD}
+%define name               mssql-cli
+%define release            1%{?dist}
+%define time_stamp         %(date +%y%m%d%H%M)
+%define base_version       1.0.0
+%define python_dir         %{_builddir}/python_env
+%define python_build_src   /root/python_build_src
+%define python_build       /root/python_build
+%define python_url         https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tgz
+%define cli_lib_dir        %{_libdir}/mssql-cli
+%define repo_path          %{getenv:REPO_PATH}
+%define official_build     %{getenv:MSSQL_CLI_OFFICIAL_BUILD}
 
 # the ',,' makes environment variable lower case in Bash 4+
 %if "%{official_build}" != "true"
@@ -50,14 +50,14 @@ Requires:       libunwind, libicu, less
 %prep
 # Clean previous build directory.
 rm -rf %{_builddir}/*
-rm -rf %{python_build_archive}
+rm -rf %{python_build_src}
 
 # Download, Extract Python3
-mkdir %{python_build_archive}
+mkdir %{python_build_src}
 python_archive=$(mktemp)
 wget https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tgz -qO $python_archive
 tar -xvzf $python_archive -C %{_builddir}
-tar -xvzf $python_archive -C %{python_build_archive}
+tar -xvzf $python_archive -C %{python_build_src}
 
 %build
 # clean any previous make files
@@ -69,7 +69,7 @@ make
 make install
 
 # A copy of Python is created for build dependencies only
-%{python_build_archive}/*/configure --srcdir %{python_build_archive}/* --prefix %{python_build}
+%{python_build_src}/*/configure --srcdir %{python_build_src}/* --prefix %{python_build}
 make
 make install
 
