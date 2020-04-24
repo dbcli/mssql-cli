@@ -8,15 +8,17 @@
   %define dist .el7
 %endif
 
-%define name           mssql-cli
-%define release        1%{?dist}
-%define time_stamp     %(date +%y%m%d%H%M)
-%define base_version   1.0.0
-%define python_dir     %{_builddir}/python_env
-%define python_url     https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tgz
-%define cli_lib_dir    %{_libdir}/mssql-cli
-%define repo_path      %{getenv:REPO_PATH}
-%define official_build %{getenv:MSSQL_CLI_OFFICIAL_BUILD}
+%define name                   mssql-cli
+%define release                1%{?dist}
+%define time_stamp             %(date +%y%m%d%H%M)
+%define base_version           1.0.0
+%define python_dir             %{_builddir}/python_env
+%define python_build_archive   /root/python_build_archive
+%define python_build           /root/python_build
+%define python_url             https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tgz
+%define cli_lib_dir            %{_libdir}/mssql-cli
+%define repo_path              %{getenv:REPO_PATH}
+%define official_build         %{getenv:MSSQL_CLI_OFFICIAL_BUILD}
 
 # the ',,' makes environment variable lower case in Bash 4+
 %if "%{official_build}" != "true"
@@ -48,10 +50,14 @@ Requires:       libunwind, libicu, less
 %prep
 # Clean previous build directory.
 rm -rf %{_builddir}/*
+rm -rf %{python_build_archive}
+
 # Download, Extract Python3
+mkdir %{python_build_archive}
 python_archive=$(mktemp)
 wget https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tgz -qO $python_archive
 tar -xvzf $python_archive -C %{_builddir}
+tar -xvzf $python_archive -C %{python_build_archive}
 
 %build
 # clean any previous make files
@@ -62,15 +68,23 @@ make clean || echo "Nothing to clean"
 make
 make install
 
-# Install Python dependencies for build
+# A copy of Python is created for build dependencies only
+%{python_build_archive}/*/configure --srcdir %{python_build_archive}/* --prefix %{python_build}
+make
+make install
+
+# Update pip
 %{python_dir}/bin/pip3 install --upgrade pip
-%{python_dir}/bin/pip3 install -r %{repo_path}/requirements-dev.txt
+%{python_build}/bin/pip3 install --upgrade pip
 
-# Build mssql-cli wheel from source.
-export CUSTOM_PYTHON=%{python_dir}/bin/python3
-export CUSTOM_PIP=%{python_dir}/bin/pip3
+# Install Python dependencies and build from source
+export CUSTOM_PYTHON=%{python_build}/bin/python3
+export CUSTOM_PIP=%{python_build}/bin/pip3
+%{python_build}/bin/pip3 install -r %{repo_path}/requirements-dev.txt
+%{python_build}/bin/python3 %{repo_path}/build.py build
 
-%{python_dir}/bin/python3 %{repo_path}/build.py build
+# Remove python build version after build completes
+rm -rf %{python_build}
 
 %install
 # Install mssql-cli
