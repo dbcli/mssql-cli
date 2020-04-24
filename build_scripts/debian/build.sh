@@ -11,6 +11,8 @@ fi
 local_repo=$1
 
 sudo apt-get update
+#  required to run the 'make install'
+sudo apt-get install -y zlib1g-dev
 
 # the ',,' makes environment variable lower case in Bash 4+
 if [ "${MSSQL_CLI_OFFICIAL_BUILD,,}" != "true" ]
@@ -39,33 +41,46 @@ rm -rf $source_dir/../debian_output
 [ -d $local_repo/privates ] && cp $local_repo/privates/*.whl $tmp_pkg_dir
 
 # Build Python from source and include
-python_dir=$(mktemp -d)
 python_archive=$(mktemp)
 wget https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tgz -qO $python_archive
+
+# A copy of Python is created for build dependencies only
+python_dir=$(mktemp -d)
+python_dir_build=$(mktemp -d)
 tar -xvzf $python_archive -C $python_dir
+tar -xvzf $python_archive -C $python_dir_build
 echo "Python dir is $python_dir"
+echo "Python build dir is $python_dir_build"
 
 #  clean any previous make files
 make clean || echo "Nothing to clean"
 
 $python_dir/*/configure --srcdir $python_dir/* --prefix $source_dir/python_env
 make
-#  required to run the 'make install'
-sudo apt-get install -y zlib1g-dev
 make install
 
-# Set env var to ensure build.py uses the python we built from source.
-export CUSTOM_PYTHON=$source_dir/python_env/bin/python3
-export CUSTOM_PIP=$source_dir/python_env/bin/pip3
+$python_dir_build/*/configure --srcdir $python_dir_build/* --prefix $source_dir/python_build
+make
+make install
+
+# upgrade pip
+$source_dir/python_env/bin/python3 -m pip install --upgrade pip
+$source_dir/python_build/bin/python3 -m pip install --upgrade pip
 
 # Download dependencies needed to run build stage
-$source_dir/python_env/bin/python3 -m pip install --upgrade pip
-$source_dir/python_env/bin/python3 -m pip install -r $source_dir/requirements-dev.txt
+$source_dir/python_build/bin/python3 -m pip install -r $source_dir/requirements-dev.txt
+
+# Set env var to ensure build.py uses the python we built from source.
+export CUSTOM_PYTHON=$source_dir/python_build/bin/python3
+export CUSTOM_PIP=$source_dir/python_build/bin/pip3
 
 # Build mssql-cli wheel from source.
 cd $source_dir
-$source_dir/python_env/bin/python3 $source_dir/build.py build
+$source_dir/python_build/bin/python3 $source_dir/build.py build
 cd -
+
+# Remove python build version after build completes
+rm -rf $source_dir/python_build
 
 # Install mssql-cli wheel.
 dist_dir=$source_dir/dist
