@@ -76,11 +76,11 @@ The `publish.sh` script will upload deb and rpm packages to Packages.Microsoft b
 ### Publishing to Testing Channel
 From the mssql-cli folder root, make the following command to upload packages to all repositories in the `supported_repos_testing.json` file:
 ```sh
-# use --print to display commands rather than call them
-release_scripts/Packages.Microsoft/publish.sh $(pwd) 'testing' --print
-
-# completes call, will publish to Packages.Microsoft
+# default call will display commands rather than upload packages
 release_scripts/Packages.Microsoft/publish.sh $(pwd) 'testing'
+
+# use --upload to publish to Packages.Microsoft
+release_scripts/Packages.Microsoft/publish.sh $(pwd) 'testing' --upload
 ```
 
 Visit the [testing](#testing-distribution-downloads) section for more information on downloading builds from the testing distribution.
@@ -88,11 +88,11 @@ Visit the [testing](#testing-distribution-downloads) section for more informatio
 ### Publishing to Production Channel
 When ready for production, change `'testing'` with `'prod'`, which will upload to all repositories in the `supported_repos_prod.json` file:
 ```sh
-# use --print to display commands rather than call them
-release_scripts/Packages.Microsoft/publish.sh $(pwd) 'prod' --print
-
-# completes call, will publish to Packages.Microsoft
+# default call will display commands rather than upload packages
 release_scripts/Packages.Microsoft/publish.sh $(pwd) 'prod'
+
+# use --upload to publish to Packages.Microsoft
+release_scripts/Packages.Microsoft/publish.sh $(pwd) 'prod' --upload
 ```
 
 ## Repo CLI Commands

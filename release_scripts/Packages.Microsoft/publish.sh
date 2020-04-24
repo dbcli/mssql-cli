@@ -52,15 +52,15 @@ else
     exit 1
 fi
 
-# Confirm if third optional '--print' argument is used
-if [[ ${3,,} = '--print' ]]; then
-    is_print='True'
-else
-    is_print='False'
+# Confirm if third optional '--upload' argument is used
+if [[ ${3,,} = '--upload' ]]; then
+    is_upload='True'
 
     # download latest stable deb and rpm packages
     wget https://mssqlcli.blob.core.windows.net/daily/deb/mssql-cli_1.0.0-1_all.deb --directory-prefix=/root/
     wget https://mssqlcli.blob.core.windows.net/daily/rpm/mssql-cli-1.0.0-1.el8.x86_64.rpm --directory-prefix=/root/
+else
+    is_upload='False'
 fi
 
 local_repo=$1
@@ -108,7 +108,7 @@ for repo_data in $(echo "${list_repo_id}"); do
     fi
 
     echo $command
-    if [[ $is_print != "True" ]]; then
+    if [[ $is_upload == "True" ]]; then
         # publish package
         echo "Publishing $repo_type for $repo_url..."
         eval "$command || break"
