@@ -7,11 +7,46 @@ if [[ -z "$1" ]]
     exit 1
 fi
 
-# Validate second argument specifices either prod or testing for publishing channel
+# Validate second argument specifices either prod or testing for publishing channel.
+# Each dictionary specifies key-value paris for repo URLs with distribution names.
+# Both URL and distribution are needed to query for a repo ID, which is later used
+# for publishing.
 if [[ ${2,,} = 'prod' ]]; then
-    repo_dist='prod'
+    declare -A repos=( \
+        ["microsoft-ubuntu-trusty-prod"]="trusty" \
+        ["microsoft-ubuntu-xenial-prod"]="xenial" \
+        ["microsoft-rhel7.0-prod"]="trusty" \
+        ["microsoft-rhel7.1-prod"]="trusty" \
+        ["microsoft-rhel7.2-prod"]="trusty" \
+        ["microsoft-centos7-prod"]="trusty" \
+        ["microsoft-ubuntu-bionic-prod"]="bionic" \
+        ["microsoft-debian-jessie-prod"]="jessie" \
+        ["microsoft-debian-stretch-prod"]="stretch" \
+    )
 elif [[ ${2,,} = 'testing' ]]; then
-    repo_dist='testing'
+    declare -A repos=( \
+        ["microsoft-ubuntu-trusty-prod"]="testing" \
+        ["microsoft-ubuntu-xenial-prod"]="testing" \
+        ["microsoft-debian-jessie-prod"]="testing" \
+        ["microsoft-debian-stretch-prod"]="testing" \
+        ["microsoft-opensuse42.3-testing-prod"]="testing" \
+        ["microsoft-rhel7.0-testing-prod"]="testing" \
+        ["microsoft-rhel7.1-testing-prod"]="testing" \
+        ["microsoft-rhel7.3-testing-prod"]="testing" \
+        ["microsoft-rhel7.2-testing-prod"]="testing" \
+        ["microsoft-rhel7.4-testing-prod"]="testing" \
+        ["microsoft-rhel8.0-testing-prod"]="testing" \
+        ["microsoft-centos7-testing-prod"]="testing" \
+        ["microsoft-centos8-testing-prod"]="testing" \
+        ["microsoft-opensuse42.2-testing-prod"]="testing" \
+        ["microsoft-sles12-testing-prod"]="testing" \
+        ["microsoft-ubuntu-bionic-prod"]="testing" \
+        ["microsoft-ubuntu-cosmic-prod"]="testing" \
+        ["microsoft-ubuntu-disco-prod"]="testing" \
+        ["microsoft-debian-buster-prod"]="testing" \
+        ["microsoft-debian-jessie-prod"]="testing" \
+        ["microsoft-debian-stretch-prod"]="testing" \
+    )
 else
     echo "Second argument should specify 'prod' or 'testing' for repository distribution type."
     exit 1
@@ -22,70 +57,33 @@ if [[ ${3,,} = '--print' ]]; then
     is_print='True'
 else
     is_print='False'
-fi
 
-# download latest stable deb and rpm packages
-wget https://mssqlcli.blob.core.windows.net/daily/deb/mssql-cli_1.0.0-1_all.deb --directory-prefix=/root/
-wget https://mssqlcli.blob.core.windows.net/daily/rpm/mssql-cli-1.0.0-1.el8.x86_64.rpm --directory-prefix=/root/
+    # download latest stable deb and rpm packages
+    wget https://mssqlcli.blob.core.windows.net/daily/deb/mssql-cli_1.0.0-1_all.deb --directory-prefix=/root/
+    wget https://mssqlcli.blob.core.windows.net/daily/rpm/mssql-cli-1.0.0-1.el8.x86_64.rpm --directory-prefix=/root/
+fi
 
 local_repo=$1
 deb_pkg=/root/mssql-cli_1.0.0-1_all.deb
 rpm_pkg=/root/mssql-cli-1.0.0-1.el8.x86_64.rpm
 
-# specificies destination testing repos for publishing
-repo_url_testing=( \
-    "microsoft-ubuntu-trusty-prod" \
-    "microsoft-ubuntu-xenial-prod" \
-    "microsoft-debian-jessie-prod" \
-    "microsoft-debian-stretch-prod" \
-    "microsoft-opensuse42.3-testing-prod" \
-    "microsoft-rhel7.1-testing-prod" \
-    "microsoft-rhel7.3-testing-prod" \
-    "microsoft-rhel7.2-testing-prod" \
-    "microsoft-rhel7.0-testing-prod" \
-    "microsoft-rhel7.4-testing-prod" \
-    "microsoft-centos7-testing-prod" \
-    "microsoft-opensuse42.2-testing-prod" \
-    "microsoft-sles12-testing-prod" \
-    "microsoft-ubuntu-bionic-prod" \
-    "microsoft-ubuntu-cosmic-prod" \
-    "microsoft-ubuntu-disco-prod" \
-    "microsoft-rhel8.0-testing-prod" \
-    "microsoft-debian-buster-prod" \
-    "microsoft-centos8-testing-prod" \
-    "microsoft-debian-jessie-prod" \
-    "microsoft-debian-stretch-prod" \
-)
-
-# specificies destination prod repos for publishing
-repo_url_prod=( \
-    "microsoft-ubuntu-trusty-prod" \
-    "microsoft-ubuntu-xenial-prod" \
-    "microsoft-rhel7.1-prod" \
-    "microsoft-rhel7.2-prod" \
-    "microsoft-rhel7.0-prod" \
-    "microsoft-centos7-prod" \
-    "microsoft-ubuntu-bionic-prod" \
-    "microsoft-centos8-prod" \
-    "microsoft-debian-jessie-prod" \
-    "microsoft-debian-stretch-prod" \
-)
-
-# for each url, append to string used later as a boolean in a query
+# build url_match_string to get repo ID's from above URL names
 url_match_str=""
-for i in ${!repo_url_testing[@]}; do
-    repo_url=${repo_url_testing[i]}
+for repo_url in ${!repos[@]}; do
+    # get key from url string
+    distribution="${repos[$repo_url]}"
 
-    if [[ $i == 0 ]]; then
-        url_match_str=".url==\"${repo_url}\""
+    if [[ $url_match_str == "" ]]; then
+        # only append 'or' to string if not first index
+        url_match_str="(.url==\"${repo_url}\" and .distribution==\"${distribution}\")"
     else
-        url_match_str="${url_match_str} or .url==\"${repo_url}\""
+        url_match_str="${url_match_str} or (.url==\"${repo_url}\" and .distribution==\"${distribution}\")"
     fi
 done
 
 # construct string for select statement in jq command,
 # filters by repo URL and distribution type
-select_stmnt="select((${url_match_str}) and .distribution==\"${repo_dist}\")"
+select_stmnt="select(${url_match_str})"
 
 # query for list of IDs from repo urls
 list_repo_id=$(repoclient repo list | jq -r ".[] | ${select_stmnt} | @base64")
