@@ -1,7 +1,7 @@
 # Linux Installation
 Stable installations of mssql-cli on Linux are hosted in the [Microsoft Linux Software Repository](https://docs.microsoft.com/en-us/windows-server/administration/linux-package-repository-for-microsoft-software).
 
-mssql-cli supports the Linux distributions listed below. Docker instructions can be seen [here](https://github.com/dbcli/mssql-cli/blob/master/docker_environments/).
+mssql-cli supports the Linux distributions listed below. Docker instructions can be seen [here](https://github.com/dbcli/mssql-cli/blob/master/docker_environments/prod).
 
 [**Debian-based**](#Debian-based)
 - [**Ubuntu**](#Ubuntu)
