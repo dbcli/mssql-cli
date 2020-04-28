@@ -58,7 +58,7 @@ def run_cli_with(options):
             if options.input_file:
                 # get query text from input file
                 try:
-                    with open(options.input_file, 'r') as f:
+                    with open(options.input_file, 'r', encoding='utf-8') as f:
                         text = f.read()
                 except FileNotFoundError as e:
                     click.secho(str(e), err=True, fg='red')
