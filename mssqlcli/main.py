@@ -2,11 +2,12 @@ from __future__ import unicode_literals
 from __future__ import print_function
 
 import getpass
+import io
 import os
 import sys
 from builtins import input
 import click
-
+import six
 from mssqlcli.config import config_location
 from mssqlcli.__init__ import __version__
 from mssqlcli.mssqlclioptionsparser import create_parser
@@ -58,8 +59,12 @@ def run_cli_with(options):
             if options.input_file:
                 # get query text from input file
                 try:
-                    with open(options.input_file, 'r', encoding='utf-8') as f:
-                        text = f.read()
+                    if six.PY2:
+                        with io.open(options.input_file, 'r') as f:
+                            text = f.read().encode('utf-8')
+                    else:
+                        with open(options.input_file, 'r', encoding='utf-8') as f:
+                            text = f.read()
                 except FileNotFoundError as e:
                     click.secho(str(e), err=True, fg='red')
                     sys.exit(1)
