@@ -65,7 +65,7 @@ def run_cli_with(options):
                     else:
                         with open(options.input_file, 'r', encoding='utf-8') as f:
                             text = f.read()
-                except FileNotFoundError as e:
+                except OSError as e:
                     click.secho(str(e), err=True, fg='red')
                     sys.exit(1)
             mssqlcli.execute_query(text)
