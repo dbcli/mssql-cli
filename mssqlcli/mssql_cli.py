@@ -46,7 +46,7 @@ from mssqlcli.mssqltoolbar import create_toolbar_tokens_func
 from mssqlcli.sqltoolsclient import SqlToolsClient
 from mssqlcli.packages import special
 from mssqlcli.mssqlbuffer import mssql_is_multiline
-from mssqlcli.util import is_command_valid
+from mssqlcli.util import is_command_valid, encode
 import mssqlcli.localized_strings as localized
 
 # Query tuples are used for maintaining history
@@ -371,7 +371,7 @@ class MssqlCli(object):
         """ Processes a query string and outputs to file or terminal """
         if six.PY2:
             # text needs to be encoded to utf-8 on Python 2
-            text = str(text.encode('utf-8'))
+            text = encode(text)
         else:
             text = str(text)
 
