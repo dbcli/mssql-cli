@@ -16,6 +16,7 @@ from cli_helpers.tabular_output.preprocessors import (align_decimals,
                                                       format_numbers)
 import humanize
 import click
+import six
 from prompt_toolkit.shortcuts import PromptSession, CompleteStyle
 from prompt_toolkit.completion import DynamicCompleter, ThreadedCompleter
 from prompt_toolkit.enums import DEFAULT_BUFFER, EditingMode
@@ -368,8 +369,12 @@ class MssqlCli(object):
 
     def execute_query(self, text):
         """ Processes a query string and outputs to file or terminal """
+        if six.PY2:
+            # text needs to be encoded to utf-8 on Python 2
+            text = str(text.encode('utf-8'))
+        else:
+            text = str(text)
 
-        text = str(text)
         if self.interactive_mode:
             output = self._execute_interactive_command(text)
         else:
