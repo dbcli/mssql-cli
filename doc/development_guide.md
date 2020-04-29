@@ -1,6 +1,5 @@
   
-Development Guide
-=================
+# Development Guide
 
 ## Contributing
 
@@ -34,7 +33,7 @@ mssql-cli sources are located on GitHub (https://github.com/dbcli/mssql-cli). In
 -	Create pull requests against the https://github.com/dbcli/mssql-cli repository to get your code changes merged into the project repository.
 
 ## <a name="Install_Python_Clone_Source_Code"></a>1. Install Python / Clone Source Code
-1.	Install latest Python from http://python.org. Please note that the version of Python that comes preinstalled on OSX is 2.7. It is recommended to install both Python 2.7 and Python3.7 to ensure backwards compatibility for testing.
+1.	Install latest Python from http://python.org. Please note that the version of Python that comes preinstalled on macOS is 2.7. It is recommended to install both Python 2.7 and supported versions of Python 3 (3.8 at the time of this writing) to ensure backwards compatibility for testing.
     #### Windows
     - The latest Python installation package can be downloaded from [here](https://www.python.org/downloads/).  
     - During installation, select the 'Add Python to PATH' option.  Python must be in the PATH environment variable.
