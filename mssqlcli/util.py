@@ -4,7 +4,7 @@ import subprocess
 def encode(s):
     try:
         return s.encode('utf-8')
-    except (AttributeError, SyntaxError):
+    except (AttributeError, SyntaxError, UnicodeDecodeError):
         pass
     return s
 
