@@ -61,7 +61,6 @@ def run_cli_with(options):
                 try:
                     if six.PY2:
                         with io.open(options.input_file, 'r', encoding='utf-8') as f:
-                            # utf-8 encoding must be called again for windows
                             text = f.read()
                     else:
                         with open(options.input_file, 'r', encoding='utf-8') as f:
