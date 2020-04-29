@@ -368,8 +368,6 @@ class MssqlCli(object):
 
     def execute_query(self, text):
         """ Processes a query string and outputs to file or terminal """
-
-        text = str(text)
         if self.interactive_mode:
             output = self._execute_interactive_command(text)
         else:
