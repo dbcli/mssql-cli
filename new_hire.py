@@ -12,7 +12,7 @@ def register_alias(alias):
     Appends text to 'employee_registry.txt'
     """
     with open(os.path.join(ROOT_DIR, 'employee_registry.txt'), 'a') as f:
-        f.write('{} was here!\t\t{}\n'.format(alias, date.today()))
+        f.write('{0} was here!\t{1}\n'.format(alias, date.today()).expandtabs(50))
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
