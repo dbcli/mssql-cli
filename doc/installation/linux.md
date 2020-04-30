@@ -37,6 +37,9 @@ sudo apt-get update
 
 # Install mssql-cli
 sudo apt-get install mssql-cli
+
+# Install missing dependencies
+sudo apt-get install -f
 ```
 
 #### Ubuntu 16.04 (Xenial)
@@ -52,6 +55,9 @@ sudo apt-get update
 
 # Install mssql-cli
 sudo apt-get install mssql-cli
+
+# Install missing dependencies
+sudo apt-get install -f
 ```
 
 ### Debian
@@ -70,6 +76,9 @@ sudo apt-get update
 
 # Install mssql-cli
 sudo apt-get install mssql-cli
+
+# Install missing dependencies
+sudo apt-get install -f
 ```
 
 #### Debian 9
@@ -85,6 +94,9 @@ sudo apt-get update
 
 # Install mssql-cli
 sudo apt-get install mssql-cli
+
+# Install missing dependencies
+sudo apt-get install -f
 ```
 
 ### Upgrade on Ubuntu/Debian
@@ -103,15 +115,23 @@ To uninstall mssql-cli, call `sudo apt-get remove mssql-cli`.
 > This package also works on Oracle Linux 7.
 
 ```sh
-sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
-sudo curl -o /etc/yum.repos.d/mssql-cli.repo https://packages.microsoft.com/config/rhel/7/prod.repo
+sudo rpm -Uvh https://packages.microsoft.com/config/centos/7/packages-microsoft-prod.rpm
+sudo yum install libunwind
+sudo yum install mssql-cli
+```
+
+#### CentOS 8
+
+```sh
+sudo rpm -Uvh https://packages.microsoft.com/config/centos/8/packages-microsoft-prod.rpm
+sudo yum install libunwind
 sudo yum install mssql-cli
 ```
 
 #### Red Hat Enterprise Linux (RHEL) 7
 ```sh
-sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
-curl https://packages.microsoft.com/config/rhel/7/prod.repo | sudo tee /etc/yum.repos.d/microsoft.repo
+sudo rpm -Uvh https://packages.microsoft.com/config/rhel/7/packages-microsoft-prod.rpm
+sudo yum install libunwind
 sudo yum install mssql-cli
 ```
 
