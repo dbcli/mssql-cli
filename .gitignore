@@ -120,3 +120,7 @@ env*/
 
 # .env file
 .env
+
+# cert and config files for Packages.Microsoft publishing
+release_scripts/Packages.Microsoft/private.pem
+release_scripts/Packages.Microsoft/config.json

@@ -1,0 +1,10 @@
+{
+  "server": "package-repo-service.corp.microsoft.com",
+  "port": "443",
+  "AADClientId": "",
+  "AADClientCertificate": "/root/private.pem",
+  "AADResource": "",
+  "AADTenant": "",
+  "AADAuthorityUrl": "https://login.microsoftonline.com",
+  "repositoryId": ""
+}
