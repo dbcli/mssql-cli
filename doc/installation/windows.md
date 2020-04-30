@@ -1,53 +1,54 @@
 # Windows Installation
 
-## Supported OS versions:
+## Requirements
+
+### Supported OS Versions
+mssql-cli is supported on Windows with:
 * Windows (x86/x64) 8.1 
 * Windows (x86/x64) 10 
 * Windows Server 2012+
 
+### Python Installation
+
 Python is required for installation of mssql-cli and is not installed by default on Windows. To install Python, follow these instructions:
 1. Open the latest Python installer package from [here](https://www.python.org/downloads/).
+> Python 3.x is recommended. Version 2.7 has been officially deprecated by Python.
 2. Select **Add Python [Version] to PATH** option before installation. Python must be in the PATH environment variable.
 3. Install Python.
 
-**Note:** If Python was installed into the "Program Files" directory, you may need to open the command prompt as an administrator for the above command to succeed.
+> If Python was installed into the "Program Files" directory, you may need to open the command prompt as an administrator for the above command to succeed.
 
-Once Python is installed and in the PATH environment variable, open a command prompt, and install mssql-cli using the below command.
+Proceed to the next section once Python is installed and in the PATH environment variable.
 
-## Installation via pip
-```shell
-C:\> pip install mssql-cli
-```
-Or, use the following command if you encounter a launcher error:
-```shell
-C:\> python -m pip install mssql-cli
-```
+## Installing mssql-cli
+> Note: your path to Python may be different from the listed command. For example, instead of `python` you may need to call `python3`.
 
-## Installation with daily preview build
-Daily preview builds are dropped in our storage account. To install the latest available version of mssql-cli, use the below command:
-```shell
-C:\> pip install --pre --no-cache --extra-index-url https://mssqlcli.blob.core.windows.net/daily/whl mssql-cli
+mssql-cli is installed using `pip` on Windows:
+```sh
+python -m pip install mssql-cli
 ```
 
-## Uninstallation via pip
-```shell
-C:\> pip uninstall mssql-cli
+## Uninstalling mssql-cli
+Uninstall mssql-cli using `pip`:
+```sh
+pip uninstall mssql-cli
 ```
 
-## Installation behind a proxy
+## Installation Behind a Proxy
 Set two environment variables:
-```shell
-C:\>set http_proxy=domain\username:password@proxy_server:port
-C:\>set https_proxy=domain\username:password@proxy_server:port
+```sh
+set http_proxy=domain\username:password@proxy_server:port
+set https_proxy=domain\username:password@proxy_server:port
 ```
-If the Password contains special characters like @,$,! (e.g. Password: P@ssword) then replace the special characters by their hex code equivalents with % prefix like this:
-@==>%40
-$==>%24
-!==>%21
-Example: username:p%40ssword@proxy_server:port
+If the Password contains special characters like `@,$,!` (e.g. `password:p@ssword`) then replace the special characters by their hex code equivalents with `%` prefix, as exemplified below:
+* `@`: `%40`
+* `$`: `%24`
+* `!`: `%21`
 
-after this steps try install again
+Example: `username:p%40ssword@proxy_server:port`
 
-```shell
-C:\>pip install mssql-cli
+You may attempt installation after completing these steps:
+
+```sh
+pip install mssql-cli
 ```
