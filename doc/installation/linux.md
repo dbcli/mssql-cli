@@ -112,15 +112,26 @@ To uninstall mssql-cli, call `sudo apt-get remove mssql-cli`.
 > This package also works on Oracle Linux 7.
 
 ```sh
+# Import the public repository GPG keys
+sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
+
+# Register the Microsoft product feed
 sudo rpm -Uvh https://packages.microsoft.com/config/centos/7/packages-microsoft-prod.rpm
+
+# Install dependencies and mssql-cli
 sudo yum install libunwind
 sudo yum install mssql-cli
 ```
 
 #### CentOS 8
-
 ```sh
+# Import the public repository GPG keys
+sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
+
+# Register the Microsoft product feed
 sudo rpm -Uvh https://packages.microsoft.com/config/centos/8/packages-microsoft-prod.rpm
+
+# Install dependencies and mssql-cli
 sudo yum install libunwind
 sudo yum install mssql-cli
 ```
@@ -129,7 +140,13 @@ sudo yum install mssql-cli
 
 #### RHEL 7
 ```sh
+# Import the public repository GPG keys
+sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
+
+# Register the Microsoft product feed
 sudo rpm -Uvh https://packages.microsoft.com/config/rhel/7/packages-microsoft-prod.rpm
+
+# Install dependencies and mssql-cli
 sudo yum install libunwind
 sudo yum install mssql-cli
 ```
