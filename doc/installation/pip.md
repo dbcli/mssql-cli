@@ -68,6 +68,7 @@ $ sudo pip install mssql-cli --ignore-installed six
 ```
 
 # Linux Installation
+> **Installing on Linux using `pip` is no longer recommended.** Please consult the [Linux Installation Guide](https://github.com/dbcli/mssql-cli/blob/master/doc/installation/linux.md) for installing mssql-cli with `apt-get` or `yum`.
 
 On Linux, Python 2.7 is generally pre-installed. There are two prerequisite packages to run mssql-cli on Linux: libunwind and libicu.
 
