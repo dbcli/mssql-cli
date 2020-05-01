@@ -116,7 +116,7 @@ To uninstall mssql-cli, call `sudo apt-get remove mssql-cli`.
 sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
 
 # Register the Microsoft product feed
-sudo rpm -Uvh https://packages.microsoft.com/config/centos/7/packages-microsoft-prod.rpm
+curl https://packages.microsoft.com/config/centos/7/prod.repo > /etc/yum.repos.d/msprod.repo
 
 # Install dependencies and mssql-cli
 sudo yum install libunwind
@@ -129,7 +129,7 @@ sudo yum install mssql-cli
 sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
 
 # Register the Microsoft product feed
-sudo rpm -Uvh https://packages.microsoft.com/config/centos/8/packages-microsoft-prod.rpm
+curl https://packages.microsoft.com/config/cenots/8/prod.repo > /etc/yum.repos.d/msprod.repo
 
 # Install dependencies and mssql-cli
 sudo yum install libunwind
@@ -144,7 +144,7 @@ sudo yum install mssql-cli
 sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
 
 # Register the Microsoft product feed
-sudo rpm -Uvh https://packages.microsoft.com/config/rhel/7/packages-microsoft-prod.rpm
+curl https://packages.microsoft.com/config/rhel/7/prod.repo > /etc/yum.repos.d/msprod.repo
 
 # Install dependencies and mssql-cli
 sudo yum install libunwind
