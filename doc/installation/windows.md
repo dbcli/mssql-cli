@@ -12,7 +12,6 @@ mssql-cli is supported on Windows with:
 
 Python is required for installation of mssql-cli and is not installed by default on Windows. To install Python, follow these instructions:
 1. Open the latest Python installer package from [here](https://www.python.org/downloads/).
-> Python 3.x is recommended. Version 2.7 has been officially deprecated by Python.
 2. Select **Add Python [Version] to PATH** option before installation. Python must be in the PATH environment variable.
 3. Install Python.
 
