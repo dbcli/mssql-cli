@@ -6,6 +6,7 @@ This article explores mssql-cli features. Click a link below to jump to a specif
 * [Special Commands](#special-commands)
 * [Non-Interactive Options](#non-interactive-options)
 * [Configuration](#configuration)
+* [Horizontal Paging Options on Windows](#horizontal-paging-options-on-windows)
 * [Troubleshooting](#troubleshooting)
 
 ## Options
@@ -266,6 +267,20 @@ To print the results of your [non-interactive query](#executing-a-query-in-non-i
 
 ## Configuration
 Customization and persistence of settings can be achieved with a config file, whose path can be passed as the `--mssqlclirc <file>` command line argument. Otherwise it is read from the default path `~/.config/mssqlcli/config` on macOS and Linux, and `%LOCALAPPDATA%\dbcli\mssqlcli\config` on Windows. See the [config file](https://github.com/dbcli/mssql-cli/blob/master/mssqlcli/mssqlclirc) itself for a description of all available options.
+
+## Horizontal Paging Options on Windows
+mssql-cli on Windows will default to a vertical layout when table results would otherwise exceed the window width. Horizontal paging may present an improved experience, however is not supported out-of-the-box for mssql-cli on Windows.
+
+A workaround for horizontal paging support on Windows is provided with installation of pypager:
+> **Disclaimer**: pypager will enter paging mode for every query.
+```sh
+python -m pip install pypager
+```
+
+After installation of pypager, update the `pager` value in the [config](#configuration) file with:
+```
+pager=pypager
+```
 
 ## Troubleshooting
 If you encounter any issues, see the [troubleshooting](troubleshooting_guide.md) section for known issues and workarounds.
