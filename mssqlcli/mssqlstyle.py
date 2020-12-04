@@ -36,12 +36,6 @@ TOKEN_TO_PROMPT_STYLE = {
     Token.Output.Header: 'output.header',
     Token.Output.OddRow: 'output.odd-row',
     Token.Output.EvenRow: 'output.even-row',
-    Token.Prompt.Default: 'prompt.default',
-    Token.Prompt.Datetime: 'prompt.datetime',
-    Token.Prompt.Username: 'prompt.username',
-    Token.Prompt.Hostname: 'prompt.hostname',
-    Token.Prompt.Database: 'prompt.database',
-    Token.Prompt.Port: 'prompt.port',
 }
 
 # reverse dict for cli_helpers, because they still expect Pygments tokens.
