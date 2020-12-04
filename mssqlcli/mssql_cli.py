@@ -16,6 +16,7 @@ from cli_helpers.tabular_output.preprocessors import (align_decimals,
                                                       format_numbers)
 import humanize
 import click
+from prompt_toolkit import HTML
 from prompt_toolkit.shortcuts import PromptSession, CompleteStyle
 from prompt_toolkit.completion import DynamicCompleter, ThreadedCompleter
 from prompt_toolkit.enums import DEFAULT_BUFFER, EditingMode
@@ -457,8 +458,7 @@ class MssqlCli(object):
         """
 
         def get_message():
-            prompt = self.get_prompt(self.prompt_format)
-            return [(u'class:prompt', prompt)]
+            return self.get_prompt(self.prompt_format)
 
         def get_continuation(width, line_number, is_soft_wrap):
             """
@@ -709,13 +709,13 @@ class MssqlCli(object):
                 Document(text=text, cursor_position=cursor_position), None)
 
     def get_prompt(self, string):
-        string = string.replace('\\t', self.now.strftime('%x %X'))
-        string = string.replace('\\u', self.mssqlcliclient_main.user_name or '(none)')
-        string = string.replace('\\h', self.mssqlcliclient_main.prompt_host or '(none)')
-        string = string.replace('\\d', self.mssqlcliclient_main.connected_database or '(none)')
-        string = string.replace('\\p', str(self.mssqlcliclient_main.prompt_port) or '(none)')
+        string = string.replace('\\t', "<prompt.datetime>%s</prompt.datetime>" % self.now.strftime('%x %X'))
+        string = string.replace('\\u', "<prompt.username>%s</prompt.username>" % self.mssqlcliclient_main.user_name or '(none)')
+        string = string.replace('\\h', "<prompt.hostname>%s</prompt.hostname>" % self.mssqlcliclient_main.prompt_host or '(none)')
+        string = string.replace('\\d', "<prompt.database>%s</prompt.database>" % self.mssqlcliclient_main.connected_database or '(none)')
+        string = string.replace('\\p', "<prompt.port>%s</prompt.port>" % str(self.mssqlcliclient_main.prompt_port) or '(none)')
         string = string.replace('\\n', "\n")
-        return string
+        return HTML("<prompt.default>%s</prompt.default>" % string)
 
     def get_last_query(self):
         """Get the last query executed or None."""
