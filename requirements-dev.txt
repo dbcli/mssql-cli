@@ -1,6 +1,6 @@
 applicationinsights >= 0.11.1
 argparse >= 1.2.1
-enum34 >= 1.1.6
+enum34 >= 1.1.6 ; python_version < '3.4'
 future >= 0.16.0
 setuptools >= 36.0.1
 wheel >= 0.29.0
