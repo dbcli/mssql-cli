@@ -271,7 +271,7 @@ class SqlCompletionTests(unittest.TestCase):
             (
                 'SELECT * FROM tbl x JOIN tbl1 y ORDER BY ',
                 'SELECT * FROM tbl x JOIN tbl1 y ORDER BY ',
-                'BY',
+                'ORDER BY',
             )
         ]
         for arg in test_args:
