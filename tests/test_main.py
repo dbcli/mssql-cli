@@ -95,7 +95,7 @@ class MainTests(unittest.TestCase):
                 'Name | Night',
                 '(3 rows affected)'
                 ]
-            assert list(result) == expected
+            assert '\n'.join(result) == '\n'.join(expected)
         finally:
             shutdown(mssqlcli.mssqlcliclient_main)
 
@@ -138,7 +138,7 @@ class MainTests(unittest.TestCase):
             'head2 | def',
             'test status'
         ]
-        assert list(expanded_results) == expanded
+        assert '\n'.join(expanded_results) == '\n'.join(expanded)
 
     @staticmethod
     def test_missing_rc_dir():
