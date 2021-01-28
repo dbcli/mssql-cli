@@ -5,26 +5,40 @@ import sys
 import tarfile
 import zipfile
 from future.standard_library import install_aliases
+import requests
 import utility
 
 install_aliases()
+
+SQLTOOLSSERVICE_RELEASE = "v3.0.0-release.72"
 
 SQLTOOLSSERVICE_BASE = os.path.join(utility.ROOT_DIR, 'sqltoolsservice/')
 
 # Supported platform key's must match those in mssqlscript's setup.py.
 SUPPORTED_PLATFORMS = {
     'manylinux1_x86_64': SQLTOOLSSERVICE_BASE + 'manylinux1/' +
-                         'Microsoft.SqlTools.ServiceLayer-rhel-x64-netcoreapp2.2.tar.gz',
+                         'Microsoft.SqlTools.ServiceLayer-rhel-x64-netcoreapp3.1.tar.gz',
     'macosx_10_11_intel': SQLTOOLSSERVICE_BASE + 'macosx_10_11_intel/' +
-                          'Microsoft.SqlTools.ServiceLayer-osx-x64-netcoreapp2.2.tar.gz',
+                          'Microsoft.SqlTools.ServiceLayer-osx-x64-netcoreapp3.1.tar.gz',
     'win_amd64': SQLTOOLSSERVICE_BASE + 'win_amd64/' +
-                 'Microsoft.SqlTools.ServiceLayer-win-x64-netcoreapp2.2.zip',
+                 'Microsoft.SqlTools.ServiceLayer-win-x64-netcoreapp3.1.zip',
     'win32': SQLTOOLSSERVICE_BASE + 'win32/' +
-             'Microsoft.SqlTools.ServiceLayer-win-x86-netcoreapp2.2.zip'
+             'Microsoft.SqlTools.ServiceLayer-win-x86-netcoreapp3.1.zip'
 }
 
 TARGET_DIRECTORY = os.path.abspath(os.path.join(os.path.abspath(__file__), '..', 'bin'))
 
+def download_sqltoolsservice_binaries():
+    """
+        Download each for the plaform specific sqltoolsservice packages
+    """
+    for packageFilePath in SUPPORTED_PLATFORMS.values():
+        packageFileName = os.path.basename(packageFilePath)
+        githubUrl = 'https://github.com/microsoft/sqltoolsservice/releases/download/{}/{}'.format(SQLTOOLSSERVICE_RELEASE, packageFileName)
+        print('Downloading {}'.format(githubUrl))
+        r = requests.get(githubUrl)
+        with open(packageFilePath, 'wb') as f:
+            f.write(r.content)
 
 def copy_sqltoolsservice(platform):
     """
