@@ -4,7 +4,6 @@ from __future__ import print_function
 import os
 import sys
 import utility
-import mssqlcli.mssqltoolsservice.externals as mssqltoolsservice
 
 PYTHON = os.getenv('CUSTOM_PYTHON', sys.executable)
 
@@ -15,6 +14,7 @@ print('Root directory \'%s\'\n' % utility.ROOT_DIR)
 utility.exec_command('%s -m pip install --no-cache-dir -r requirements-dev.txt' % PYTHON,
                      utility.ROOT_DIR)
 
+import mssqlcli.mssqltoolsservice.externals as mssqltoolsservice
 
 # download the sqltoolssevice binaries for all platforms
 mssqltoolsservice.download_sqltoolsservice_binaries()
