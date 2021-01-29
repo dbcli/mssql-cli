@@ -33,6 +33,9 @@ def download_sqltoolsservice_binaries():
         Download each for the plaform specific sqltoolsservice packages
     """
     for packageFilePath in SUPPORTED_PLATFORMS.values():
+        if not os.path.exists(os.path.dirname(packageFilePath)):
+            os.makedirs(os.path.dirname(packageFilePath))
+
         packageFileName = os.path.basename(packageFilePath)
         githubUrl = 'https://github.com/microsoft/sqltoolsservice/releases/download/{}/{}'.format(SQLTOOLSSERVICE_RELEASE, packageFileName)
         print('Downloading {}'.format(githubUrl))
