@@ -42,7 +42,7 @@ rm -rf $source_dir/../debian_output
 
 # Build Python from source and include
 python_archive=$(mktemp)
-wget https://www.python.org/ftp/python/3.7.9/Python-3.7.9.tgz -qO $python_archive
+wget https://www.python.org/ftp/python/3.8.7/Python-3.8.7.tgz -qO $python_archive
 
 # A copy of Python is created for build dependencies only
 python_dir=$(mktemp -d)
