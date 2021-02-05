@@ -59,15 +59,15 @@ if [[ ${3,,} = '--upload' ]]; then
     is_upload='True'
 
     # download latest stable deb and rpm packages
-    wget https://mssqlcli.blob.core.windows.net/daily/deb/mssql-cli_1.0.0-1_all.deb --directory-prefix=/root/
-    wget https://mssqlcli.blob.core.windows.net/daily/rpm/mssql-cli-1.0.0-1.el7.x86_64.rpm --directory-prefix=/root/
+    wget https://mssqlcli.blob.core.windows.net/daily/deb/mssql-cli_1.1.0-1_all.deb --directory-prefix=/root/
+    wget https://mssqlcli.blob.core.windows.net/daily/rpm/mssql-cli-1.1.0-1.el7.x86_64.rpm --directory-prefix=/root/
 else
     is_upload='False'
 fi
 
 local_repo=$1
-deb_pkg=/root/mssql-cli_1.0.0-1_all.deb
-rpm_pkg=/root/mssql-cli-1.0.0-1.el7.x86_64.rpm
+deb_pkg=/root/mssql-cli_1.1.0-1_all.deb
+rpm_pkg=/root/mssql-cli-1.1.0-1.el7.x86_64.rpm
 
 # build url_match_string to get repo ID's from above URL names
 url_match_str=""

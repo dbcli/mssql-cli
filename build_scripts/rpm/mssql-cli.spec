@@ -11,7 +11,7 @@
 %define name               mssql-cli
 %define release            1%{?dist}
 %define time_stamp         %(date +%y%m%d%H%M)
-%define base_version       1.0.0
+%define base_version       1.1.0
 %define python_dir         %{_builddir}/python_env
 %define python_build_src   /root/python_build_src
 %define python_build       /root/python_build
