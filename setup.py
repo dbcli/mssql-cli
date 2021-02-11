@@ -29,11 +29,13 @@ def get_timestamped_version(ver):
 install_requirements = [
     'click >= 4.1,<7.1',
     'Pygments >= 2.0',  # Pygments has to be Capitalcased.
-    'prompt_toolkit>=2.0.6,<4.0.0',
+    'prompt_toolkit>=2.0.6,<4.0.0;python_version>"2.7",
+    'prompt_toolkit>=2.0.6,<3.0.0;python_version<="2.7"',
     'sqlparse >=0.3.0,<0.5',
     'configobj >= 5.0.6',
     'humanize >= 0.5.1',
-    'cli_helpers[styles] >= 2.0.0',
+    'cli_helpers[styles] >= 2.0.0;python_version>"2.7"',
+    'cli_helpers < 1.2.0;python_version<="2.7"',
     'applicationinsights>=0.11.1',
     'future>=0.16.0',
     'wheel>=0.29.0',
