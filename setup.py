@@ -37,7 +37,7 @@ install_requirements = [
     'applicationinsights>=0.11.1',
     'future>=0.16.0',
     'wheel>=0.29.0',
-    'enum34>=1.1.6'
+    'enum34>=1.1.6;python_version<"3.4"'
 ]
 
 with open("README.md", "r") as fh:
@@ -59,7 +59,6 @@ setup(
     long_description_content_type='text/markdown',
     install_requires=install_requirements,
     include_package_data=True,
-    python_requires=">=3.6",
     scripts=[
         'mssql-cli.bat',
         'mssql-cli'
@@ -69,7 +68,9 @@ setup(
         'License :: OSI Approved :: BSD License',
         'Operating System :: Unix',
         'Programming Language :: Python',
+        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
