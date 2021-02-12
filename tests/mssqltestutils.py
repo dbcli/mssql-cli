@@ -23,7 +23,7 @@ test_queries = [
 
 # Ignore python 2.X which has a different baseline
 if (sys.version_info > (3, 0)):
-    test_queries["SELECT REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024)"] = 'col_wide.txt'
+    test_queries.append(("SELECT REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024)", 'col_wide.txt'))
 
 def create_mssql_cli(**non_default_options):
     mssqlcli_options = create_mssql_cli_options(**non_default_options)
