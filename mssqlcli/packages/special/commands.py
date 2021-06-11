@@ -48,6 +48,7 @@ def list_tables(mssqlcliclient, pattern, verbose):
         base_query = base_query.format('table_schema, table_name')
     if pattern:
         base_query += "and table_name like '%{0}%'".format(pattern)
+    base_query += " ORDER BY TABLE_NAME"
 
     return mssqlcliclient.execute_query(base_query)
 
