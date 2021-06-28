@@ -78,6 +78,12 @@ Connect to a server, a specific database, and with a username. -S -d and -U are 
 mssql-cli -S localhost -d AdventureWorks -U sa
 ```
 
+If the server is using a nonstandard port (1433) you can specify a port via the following invocation:
+
+```bash
+mssql-cli -S "localhost,42069" -d AdventureWorks -U sa
+```
+
 ### Exit mssql-cli 
 Press **Ctrl+D** or type `quit`.
 
