@@ -18,7 +18,7 @@ def isolate_query_ctes(full_text, text_before_cursor):
     """Simplify a query by converting CTEs into table metadata objects
     """
 
-    if not full_text:
+    if not full_text or not full_text.strip():
         return full_text, text_before_cursor, tuple()
 
     ctes, _ = extract_ctes(full_text)

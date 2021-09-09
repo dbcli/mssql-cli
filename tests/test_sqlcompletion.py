@@ -271,7 +271,7 @@ class SqlCompletionTests(unittest.TestCase):
             (
                 'SELECT * FROM tbl x JOIN tbl1 y ORDER BY ',
                 'SELECT * FROM tbl x JOIN tbl1 y ORDER BY ',
-                'BY',
+                'ORDER BY',
             )
         ]
         for arg in test_args:
@@ -849,7 +849,7 @@ SELECT 1 FROM foo;
 
     @staticmethod
     def test_specials_included_for_initial_completion():
-        initial_texts = ('', '    ', '\t \t',)
+        initial_texts = ('', '    ', '\t \t', '\n')
         for initial_text in initial_texts:
             suggestions = suggest_type(initial_text, initial_text)
             assert set(suggestions) == set([Keyword(), Special()])

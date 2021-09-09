@@ -28,17 +28,18 @@ def get_timestamped_version(ver):
 
 install_requirements = [
     'click >= 4.1,<7.1',
-    'argparse >= 1.2.1',
     'Pygments >= 2.0',  # Pygments has to be Capitalcased.
-    'prompt_toolkit >= 2.0.0 , < 2.1.0',
-    'sqlparse >=0.2.2,<0.3.0',
+    'prompt_toolkit>=2.0.6,<4.0.0;python_version>"2.7"',
+    'prompt_toolkit>=2.0.6,<3.0.0;python_version<="2.7"',
+    'sqlparse >=0.3.0,<0.5',
     'configobj >= 5.0.6',
     'humanize >= 0.5.1',
-    'cli_helpers >= 0.2.3, < 1.0.0',
+    'cli_helpers[styles] >= 2.0.0;python_version>"2.7"',
+    'cli_helpers < 1.2.0;python_version<="2.7"',
     'applicationinsights>=0.11.1',
     'future>=0.16.0',
     'wheel>=0.29.0',
-    'enum34>=1.1.6'
+    'enum34>=1.1.6;python_version<"3.4"'
 ]
 
 with open("README.md", "r") as fh:
@@ -71,11 +72,11 @@ setup(
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
         'Programming Language :: SQL',
         'Topic :: Database',
         'Topic :: Database :: Front-Ends',

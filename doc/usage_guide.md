@@ -167,7 +167,7 @@ mssql-cli -S localhost -d AdventureWorks
 Set environment variable MSSQL_CLI_PASSWORD to set a default password.
 
 ```bash
-set MSSQL_CLI_PASSWORD=abc123
+set MSSQL_CLI_PASSWORD=[PLACEHOLDER]
 mssql-cli -S localhost -d AdventureWorks -U sa
 ```
 

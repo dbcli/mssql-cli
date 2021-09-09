@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 import os
 import socket
+import sys
 import time
 from argparse import Namespace
 import mssqlcli.sqltoolsclient as sqltoolsclient
@@ -17,9 +18,12 @@ _BASELINE_DIR = os.path.dirname(os.path.abspath(__file__))
 test_queries = [
     ("SELECT 1", 'small.txt'),
     ("SELECT 1; SELECT 2;", 'multiple.txt'),
-    ("SELECT %s" % ('x' * 250), 'col_too_wide.txt'),
-    ("SELECT REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024)", 'col_wide.txt')
+    ("SELECT %s" % ('x' * 250), 'col_too_wide.txt')
 ]
+
+# Ignore python 2.X which has a different baseline
+if (sys.version_info > (3, 0)):
+    test_queries.append(("SELECT REPLICATE(CAST('X,' AS VARCHAR(MAX)), 1024)", 'col_wide.txt'))
 
 def create_mssql_cli(**non_default_options):
     mssqlcli_options = create_mssql_cli_options(**non_default_options)

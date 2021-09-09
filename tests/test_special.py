@@ -33,7 +33,7 @@ class SpecialCommandsTests(unittest.TestCase):
             list(client.execute_query('CREATE FUNCTION {0}() \
                                        RETURNS TABLE AS RETURN (select 1 as number);'
                                       .format(cls.function)))
-            list(client.execute_query('CREATE LOGIN {0} WITH PASSWORD=\'yoloC123445!\''
+            list(client.execute_query('CREATE LOGIN {0} WITH PASSWORD=\'PLACEHOLDER\''
                                       .format(cls.login)))
         finally:
             shutdown(client)

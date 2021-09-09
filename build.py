@@ -14,8 +14,8 @@ import mssqlcli.mssqltoolsservice.externals as mssqltoolsservice
 # different from the user's PATH. When building our linux packages on various distros, we want to
 # be build machine agnostic, so we redirect python calls to the python we bundle in. Usage of
 # these variables can be seen in our build_scripts folder.
-PIP = os.getenv('CUSTOM_PIP', 'pip')
-PYTHON = os.getenv('CUSTOM_PYTHON', 'python')
+
+PYTHON = os.getenv('CUSTOM_PYTHON', sys.executable)
 
 
 def print_heading(heading, f=None):
@@ -52,7 +52,7 @@ def build():
 
     # install general requirements.
     utility.exec_command(
-        '{0} install -r requirements-dev.txt'.format(PIP),
+        '{0} -m pip install -r requirements-dev.txt'.format(PYTHON),
         utility.ROOT_DIR)
 
     # convert windows line endings to unix for mssql-cli bash script
@@ -138,8 +138,8 @@ def validate_package():
     mssqlcli_wheel_name = [pkge for pkge in mssqlcli_wheel_dir
                            if current_platform in pkge and 'dev-latest' not in pkge]
     utility.exec_command(
-        '{0} install --no-cache-dir --no-index ./dist/{1}'.format(
-            PIP,
+        '{0} -m pip install --no-cache-dir --no-index ./dist/{1}'.format(
+            PYTHON,
             mssqlcli_wheel_name[0]),
         root_dir, continue_on_error=False
     )
