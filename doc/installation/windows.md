@@ -39,7 +39,7 @@ Set two environment variables:
 set http_proxy=domain\username:password@proxy_server:port
 set https_proxy=domain\username:password@proxy_server:port
 ```
-If the Password contains special characters like `@,$,!` (e.g. `password:p@ssword`) then replace the special characters by their hex code equivalents with `%` prefix, as exemplified below:
+If the Password contains special characters like `@,$,!` (e.g. `password:PLACEHOLDER`) then replace the special characters by their hex code equivalents with `%` prefix, as exemplified below:
 * `@`: `%40`
 * `$`: `%24`
 * `!`: `%21`
