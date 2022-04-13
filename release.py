@@ -87,6 +87,7 @@ def download_official_wheels():
     blob_names = [
         'mssql_cli-{}-py2.py3-none-macosx_10_11_intel.whl'.format(latest_version),
         'mssql_cli-{}-py2.py3-none-manylinux1_x86_64.whl'.format(latest_version),
+        'mssql_cli-{}-py2.py3-none-manylinux2014_aarch64.whl'.format(latest_version),
         'mssql_cli-{}-py2.py3-none-win_amd64.whl'.format(latest_version),
         'mssql_cli-{}-py2.py3-none-win32.whl'.format(latest_version)
     ]

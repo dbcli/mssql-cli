@@ -78,7 +78,10 @@ def get_current_platform():
     elif system == 'Darwin':
         run_time_id = 'macosx_10_11_intel'
     elif system == 'Linux':
-        run_time_id = 'manylinux1_x86_64'
+        if platform.machine() == 'x86_64':
+            run_time_id = 'manylinux1_x86_64'
+        elif platform.machine() == 'aarch64':
+            run_time_id = 'manylinux2014_aarch64'
 
     return run_time_id
 
