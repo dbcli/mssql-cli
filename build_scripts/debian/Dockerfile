@@ -1,5 +1,5 @@
 # Builds .deb and installs dependencies to support release
-FROM ubuntu:16.04
+FROM ubuntu:20.04
 
 ARG AZURE_STORAGE_CONNECTION_STRING
 ARG MSSQL_CLI_OFFICIAL_BUILD
@@ -9,8 +9,9 @@ ENV MSSQL_CLI_OFFICIAL_BUILD=$MSSQL_CLI_OFFICIAL_BUILD
 RUN echo "connection string: ${AZURE_STORAGE_CONNECTION_STRING}"
 RUN echo "official build: ${MSSQL_CLI_OFFICIAL_BUILD}"
 
-RUN apt-get update
-RUN apt-get -y install python3-all python3-pip python3-setuptools nano git sudo wget libssl-dev libffi-dev debhelper
+RUN apt-get update \
+&& DEBIAN_FRONTEND="noninteractive" TZ="America/Pacific" \
+apt-get -y -q install python3-all python3-pip python3-setuptools nano git sudo wget libssl-dev libffi-dev debhelper
 
 # Install pip and stdeb
 RUN python3 -m pip install --upgrade pip
