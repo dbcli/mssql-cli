@@ -2,6 +2,11 @@
 [![Python 2.7|3.4|3.5|3.6|3.7|3.8](https://img.shields.io/badge/python-2.7&nbsp;|&nbsp;3.4&nbsp;|&nbsp;3.5&nbsp;|&nbsp;3.6&nbsp;|&nbsp;3.7&nbsp;|&nbsp;3.8-blue.svg)](https://github.com/dbcli/mssql-cli)
 
 # mssql-cli
+
+
+
+> **DEPRECATION NOTICE** mssql-cli is on the path to deprecation, and will be fully replaced by the new [go-sqlcmd](https://learn.microsoft.com/sql/tools/sqlcmd/go-sqlcmd-utility) utility once it becomes generally available. We are actively in development for the new sqlcmd, and would love to hear feedback on it [here](https://github.com/microsoft/go-sqlcmd/issues)!
+
 [**mssql-cli**](https://github.com/dbcli/mssql-cli) is an interactive command line query tool for SQL Server. This open source tool works cross-platform and proud to be a part of the [dbcli](https://github.com/dbcli) community. 
 
 ![mssql-cli Autocomplete](https://github.com/dbcli/mssql-cli/raw/main/screenshots/mssql-cli-autocomplete.gif)
