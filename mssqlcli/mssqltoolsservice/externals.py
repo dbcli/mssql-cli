@@ -10,7 +10,7 @@ import utility
 
 install_aliases()
 
-SQLTOOLSSERVICE_RELEASE = "v3.0.0-release.72"
+SQLTOOLSSERVICE_RELEASE = "4.4.0.7"
 
 SQLTOOLSSERVICE_BASE = os.path.join(utility.ROOT_DIR, 'sqltoolsservice/')
 
@@ -20,6 +20,8 @@ SUPPORTED_PLATFORMS = {
                          'Microsoft.SqlTools.ServiceLayer-rhel-x64-netcoreapp3.1.tar.gz',
     'macosx_10_11_intel': SQLTOOLSSERVICE_BASE + 'macosx_10_11_intel/' +
                           'Microsoft.SqlTools.ServiceLayer-osx-x64-netcoreapp3.1.tar.gz',
+    'macos_m1': SQLTOOLSSERVICE_BASE + 'macos_m1/' +
+                          'Microsoft.SqlTools.ServiceLayer-osx-arm64-net6.0.tar.gz',
     'win_amd64': SQLTOOLSSERVICE_BASE + 'win_amd64/' +
                  'Microsoft.SqlTools.ServiceLayer-win-x64-netcoreapp3.1.zip',
     'win32': SQLTOOLSSERVICE_BASE + 'win32/' +
@@ -53,7 +55,7 @@ def copy_sqltoolsservice(platform):
     if not platform or platform not in SUPPORTED_PLATFORMS:
         print('{} is not supported.'.format(platform))
         print('Please provide a valid platform flag.' +
-              '[win32, win_amd64, manylinux1_x86_64, macosx_10_11_intel]')
+              '[win32, win_amd64, manylinux1_x86_64, macosx_10_11_intel, macos_m1]')
         sys.exit(1)
 
     copy_file_path = SUPPORTED_PLATFORMS[platform]

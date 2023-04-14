@@ -68,6 +68,7 @@ def get_current_platform():
     """
     system = platform.system()
     arch = platform.architecture()[0]
+    processor = platform.processor()
 
     run_time_id = None
     if system == 'Windows':
@@ -76,7 +77,10 @@ def get_current_platform():
         elif arch == '64bit':
             run_time_id = 'win_amd64'
     elif system == 'Darwin':
-        run_time_id = 'macosx_10_11_intel'
+        if processor == 'arm':
+            run_time_id = 'macos_m1'
+        elif processor == 'amd':
+            run_time_id = 'macosx_10_11_intel'
     elif system == 'Linux':
         run_time_id = 'manylinux1_x86_64'
 
@@ -94,7 +98,7 @@ def copy_current_platform_mssqltoolsservice():
     if current_platform:
         mssqltoolsservice.copy_sqltoolsservice(current_platform)
     else:
-        print("This platform: {} does not support mssqltoolsservice.".format(platform.system()))
+        print("This platform: {},{},{} does not support mssqltoolsservice.".format(platform.system(), platform.architecture()[0], platform.processor()))
 
 
 def random_str(size=12, chars=string.ascii_uppercase + string.digits):
