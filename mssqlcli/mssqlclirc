@@ -145,6 +145,14 @@ arg-toolbar.text = 'nobold'
 bottom-toolbar.transaction.valid = 'bg:#222222 #00ff5f bold'
 bottom-toolbar.transaction.failed = 'bg:#222222 #ff005f bold'
 
+# style classes for the prompt
+# prompt.default = 'bg:#000000 #FFFFFF'
+# prompt.datetime = 'bg:#000000 #FFFFFF'
+# prompt.username = 'bg:#000000 #FFFFFF'
+# prompt.hostname = 'bg:#000000 #FFFFFF'
+# prompt.database = 'bg:#000000 #FFFFFF'
+# prompt.port = 'bg:#000000 #FFFFFF'
+
 # style classes for colored table output
 output.header = "#00ff5f bold"
 output.odd-row = ""
