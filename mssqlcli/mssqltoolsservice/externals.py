@@ -7,6 +7,7 @@ import zipfile
 from future.standard_library import install_aliases
 import requests
 import utility
+import platform
 
 install_aliases()
 
@@ -18,6 +19,8 @@ SQLTOOLSSERVICE_BASE = os.path.join(utility.ROOT_DIR, 'sqltoolsservice/')
 SUPPORTED_PLATFORMS = {
     'manylinux1_x86_64': SQLTOOLSSERVICE_BASE + 'manylinux1/' +
                          'Microsoft.SqlTools.ServiceLayer-rhel-x64-netcoreapp3.1.tar.gz',
+    manylinux2014_aarch64': SQLTOOLSSERVICE_BASE + 'manylinux2014/' +
+                             'v3.0.0-release.72.tar.gz',
     'macosx_10_11_intel': SQLTOOLSSERVICE_BASE + 'macosx_10_11_intel/' +
                           'Microsoft.SqlTools.ServiceLayer-osx-x64-netcoreapp3.1.tar.gz',
     'win_amd64': SQLTOOLSSERVICE_BASE + 'win_amd64/' +
@@ -37,7 +40,10 @@ def download_sqltoolsservice_binaries():
             os.makedirs(os.path.dirname(packageFilePath))
 
         packageFileName = os.path.basename(packageFilePath)
-        githubUrl = 'https://github.com/microsoft/sqltoolsservice/releases/download/{}/{}'.format(SQLTOOLSSERVICE_RELEASE, packageFileName)
+        if platform.machine() == 'aarch64':
+            githubUrl = 'https://github.com/microsoft/sqltoolsservice/archive/refs/tags/v3.0.0-release.72.tar.gz'
+        else:
+            githubUrl = 'https://github.com/microsoft/sqltoolsservice/releases/download/{}/{}'.format(SQLTOOLSSERVICE_RELEASE, packageFileName)
         print('Downloading {}'.format(githubUrl))
         r = requests.get(githubUrl)
         with open(packageFilePath, 'wb') as f:
@@ -53,7 +59,7 @@ def copy_sqltoolsservice(platform):
     if not platform or platform not in SUPPORTED_PLATFORMS:
         print('{} is not supported.'.format(platform))
         print('Please provide a valid platform flag.' +
-              '[win32, win_amd64, manylinux1_x86_64, macosx_10_11_intel]')
+              '[win32, win_amd64, manylinux1_x86_64, macosx_10_11_intel, manylinux2014_aarch64]')
         sys.exit(1)
 
     copy_file_path = SUPPORTED_PLATFORMS[platform]
