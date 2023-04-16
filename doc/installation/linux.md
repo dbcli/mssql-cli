@@ -132,8 +132,7 @@ sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
 curl https://packages.microsoft.com/config/centos/8/prod.repo > /etc/yum.repos.d/msprod.repo
 
 # Install dependencies and mssql-cli
-sudo yum install libunwind
-sudo yum install mssql-cli
+sudo yum install libunwind mssql-cli -y
 ```
 
 ### Red Hat Enterprise Linux
