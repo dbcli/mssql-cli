@@ -57,6 +57,23 @@ sudo apt-get install mssql-cli
 sudo apt-get install -f
 ```
 
+#### Ubuntu 20.04 (Focal)
+
+# Import the public repository GPG keys
+curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
+
+# Register the Microsoft Ubuntu repository
+sudo apt-add-repository https://packages.microsoft.com/ubuntu/20.04/prod
+
+# Update the list of products
+sudo apt-get update
+
+# Install mssql-cli
+sudo apt-get install mssql-cli
+
+# Install missing dependencies
+sudo apt-get install -f
+
 ### Debian
 > `apt-transport-https` is required for importing keys. If not installed, call `sudo apt-get install curl apt-transport-https`.
 
