@@ -15,6 +15,8 @@ Stable installations of mssql-cli on Linux are hosted in the [Microsoft Linux So
     - [CentOS 8](#centos-8)
 - [**Red Hat Enterprise Linux**](#Red-Hat-Enterprise-Linux)
     - [RHEL 7](#RHEL-7)
+    - [RHEL 8](#RHEL-8)
+    - [RHEL 9](#RHEL-9)
 
 
 ## Debian-based
