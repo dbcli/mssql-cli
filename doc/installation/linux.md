@@ -15,6 +15,8 @@ Stable installations of mssql-cli on Linux are hosted in the [Microsoft Linux So
     - [CentOS 8](#centos-8)
 - [**Red Hat Enterprise Linux**](#Red-Hat-Enterprise-Linux)
     - [RHEL 7](#RHEL-7)
+    - [RHEL 8](#RHEL-8)
+    - [RHEL 9](#RHEL-9)
 
 
 ## Debian-based
@@ -116,7 +118,7 @@ To uninstall mssql-cli, call `sudo apt-get remove mssql-cli`.
 sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
 
 # Register the Microsoft product feed
-curl https://packages.microsoft.com/config/centos/7/prod.repo > /etc/yum.repos.d/msprod.repo
+curl https://packages.microsoft.com/config/centos/7/prod.repo | sudo tee /etc/yum.repos.d/msprod.repo
 
 # Install dependencies and mssql-cli
 sudo yum install libunwind
@@ -129,7 +131,7 @@ sudo yum install mssql-cli
 sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
 
 # Register the Microsoft product feed
-curl https://packages.microsoft.com/config/centos/8/prod.repo > /etc/yum.repos.d/msprod.repo
+curl https://packages.microsoft.com/config/centos/8/prod.repo | sudo tee /etc/yum.repos.d/msprod.repo
 
 # Install dependencies and mssql-cli
 sudo yum install libunwind
@@ -144,7 +146,33 @@ sudo yum install mssql-cli
 sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
 
 # Register the Microsoft product feed
-curl https://packages.microsoft.com/config/rhel/7/prod.repo > /etc/yum.repos.d/msprod.repo
+curl https://packages.microsoft.com/config/rhel/7/prod.repo | sudo tee /etc/yum.repos.d/msprod.repo
+
+# Install dependencies and mssql-cli
+sudo yum install libunwind
+sudo yum install mssql-cli
+```
+
+#### RHEL 8
+```sh
+# Import the public repository GPG keys
+sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
+
+# Register the Microsoft product feed
+curl https://packages.microsoft.com/config/rhel/8/prod.repo | sudo tee /etc/yum.repos.d/msprod.repo
+
+# Install dependencies and mssql-cli
+sudo yum install libunwind
+sudo yum install mssql-cli
+```
+
+#### RHEL 9
+```sh
+# Import the public repository GPG keys
+sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
+
+# Register the Microsoft product feed
+curl https://packages.microsoft.com/config/rhel/9/prod.repo | sudo tee /etc/yum.repos.d/msprod.repo
 
 # Install dependencies and mssql-cli
 sudo yum install libunwind
